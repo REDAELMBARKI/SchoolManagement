@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Immutable;
 using System.Data.Common;
+using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
+using SchoolManagement.Database.Seeders;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -43,23 +46,97 @@ using (var scope = app.Services.CreateScope())
 }
 
 // fun seeders 
+var isDbCommand = false ; 
 using(var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try
-    {
-        await DatabaseSeeder.Seed(context);
+    {    
+      if (args.Length > 0 && args[0] == "db")
+        {   
+            isDbCommand = true ;
+            switch (args[1])
+            {
+                case "migrate":
+                    await context.Database.MigrateAsync();
+                    Console.WriteLine("migrations applied");
+                    break;
+
+                case "migrate:fresh":
+                    await context.Database.EnsureDeletedAsync();
+                    await context.Database.MigrateAsync();
+                    Console.WriteLine("database freshed");
+                    break;
+
+                case "migrate:fresh:seed":
+                    await context.Database.EnsureDeletedAsync();
+                    await context.Database.MigrateAsync();
+                    await DatabaseSeeder.Seed(context);
+                    Console.WriteLine("freshed and seeded");
+                    break;
+
+                case "seed":
+                    await DatabaseSeeder.Seed(context);
+                    Console.WriteLine("seeded successfully");
+                    break;
+
+                default:
+                    var seedArg = args.FirstOrDefault(a => a.StartsWith("--seed-class="));
+
+                    if (seedArg == null)
+                    {
+                        Console.WriteLine("invalid command");
+                        break;
+                    }
+
+                    var className = seedArg.Split('=')[1];
+
+                    if (string.IsNullOrEmpty(className))
+                    {
+                        Console.WriteLine("no class name provided after =");
+                        break;
+                    }
+
+                    var seederType = AppDomain.CurrentDomain
+                        .GetAssemblies()
+                        .SelectMany(a => a.GetTypes())
+                        .FirstOrDefault(c => c.Name == className);
+
+                    if (seederType == null)
+                    {
+                        Console.WriteLine($"'{className}' not found");
+                        break;
+                    }
+
+                    if (!typeof(Seeder).IsAssignableFrom(seederType))
+                    {
+                        Console.WriteLine($"'{className}' is not a valid seeder");
+                        break;
+                    }
+
+                    var instance = Activator.CreateInstance(seederType, context);
+                    await (Task) seederType.GetMethod("RunAsync")!.Invoke(instance, null)!;
+                    break;
+            }
+
+        }
     }
     catch (Exception ex)
     {
+        isDbCommand = true ;
         var message = ex.InnerException?.InnerException?.Message 
                 ?? ex.InnerException?.Message 
                 ?? ex.Message;
                 
         Log.Error("❌ {Message}", message);
+
     }
 }
-// Configure the HTTP request pipeline.
+
+           
+if(isDbCommand)  return; // never run server
+
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
