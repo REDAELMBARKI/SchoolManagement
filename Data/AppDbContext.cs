@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolManagement.Models;
 public class AppDbContext : DbContext
 {
@@ -36,6 +37,8 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        RoleConversion<Student>(modelBuilder) ; // covert student role from number to a class name 
+
         modelBuilder.Entity<Parent>()
         .HasMany(p => p.Students)
         .WithMany(s => s.Parents)
@@ -47,7 +50,8 @@ public class AppDbContext : DbContext
             j => j.HasOne(sp => sp.Parent)
                  .WithMany()
                  .HasForeignKey(sp => sp.ParentId)
-        ) ;
+        ) 
+        ;
 
 
         /* 
@@ -58,9 +62,20 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Group>()
         .HasMany(g =>  g.Students)
         .WithOne(s => s.Group)
-        .HasForeignKey(s => s.GrouId) ;
+        .HasForeignKey(s => s.GroupId) ;
  
             
+        
+    }
+
+
+    private void RoleConversion<T>(ModelBuilder modelBuilder) where T : User
+    {
+        //convert enums to real class names 
+        var roleConverter = new EnumToStringConverter<Role>() ;
+        modelBuilder.Entity<T>() 
+                    .Property(s => s.Role)
+                    .HasConversion(roleConverter) ; 
         
     }
       

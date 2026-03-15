@@ -8,11 +8,11 @@ public class StudentFactory : UserFactory<Student>
     {
         return new Student
         {
-            DateOfBirth = faker.Date.Past(18, DateTime.Now.AddYears(-6)),  // between 6 and 18 years old
+            DateOfBirth = faker.Date.Past(18, DateTime.Now.AddYears(-6)), 
             Gender      = faker.PickRandom("Male", "Female"),
             NationalId  = faker.Random.AlphaNumeric(10).ToUpper(),
-            PhotoUrl    = faker.Internet.Avatar(),
-            GroupId     = faker.Random.Int(1, 10)
+            GroupId     = faker.Random.Int(1, 10) , 
+            Role = Role.Student 
         } ; 
     }
 

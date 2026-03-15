@@ -1,6 +1,13 @@
 using System.Collections.Immutable;
 using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Error()
+    .WriteTo.Console(outputTemplate: "[{Level}] {Message}{NewLine}{Exception}{NewLine}")
+    .CreateLogger();
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,7 +46,18 @@ using (var scope = app.Services.CreateScope())
 using(var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await DatabaseSeeder.Seed(context) ;
+    try
+    {
+        await DatabaseSeeder.Seed(context);
+    }
+    catch (Exception ex)
+    {
+        var message = ex.InnerException?.InnerException?.Message 
+                ?? ex.InnerException?.Message 
+                ?? ex.Message;
+                
+        Log.Error("❌ {Message}", message);
+    }
 }
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

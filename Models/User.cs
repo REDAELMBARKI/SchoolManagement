@@ -17,14 +17,14 @@ namespace SchoolManagement.Models ;
         [Required, EmailAddress, MaxLength(255)]
         public string Email { get; set; } = string.Empty;
  
-        [Required,Phone ,  MaxLength(30)]
-        public string PhoneNumber { get; set; } = string.Empty;
+        [Required,Phone ,  MaxLength(255)]
+        public string Phone { get; set; } = string.Empty;
 
         [Required]
         public string PasswordHash { get; set; } = string.Empty;
  
         [Required, MaxLength(50)]
-        public string Role { get; set; } = string.Empty;
+        public Role Role { get; set; } 
     }
  
 

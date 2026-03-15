@@ -4,7 +4,6 @@ namespace SchoolManagement.Database.Seeders ;
 
 public abstract class Seeder
 {
-  
-  public abstract Task RunAsync(); 
+    public abstract Task RunAsync(); 
   
 }

@@ -8,7 +8,9 @@ public class ParentFactory : UserFactory<Parent>
     {
         return new Parent
         {
-            Relationship = faker.PickRandom("Father", "Mother", "Guardian", "Uncle", "Aunt") 
+            Relationship = faker.PickRandom("Father", "Mother", "Guardian", "Uncle", "Aunt") ,
+            Role = Role.Parent
+
         } ; 
     }
 

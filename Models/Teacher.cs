@@ -3,8 +3,6 @@ namespace SchoolManagement.Models ;
   
   public class Teacher : User
     {
-        [Phone, MaxLength(20)]
-        public string? Phone { get; set; }
  
         [Required]
         public DateTime HireDate { get; set; } = DateTime.UtcNow;
