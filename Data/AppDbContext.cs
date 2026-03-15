@@ -1,0 +1,67 @@
+using Microsoft.EntityFrameworkCore;
+using SchoolManagement.Models;
+public class AppDbContext : DbContext
+{
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
+    // ── People ──
+    public DbSet<User> Users { get; set; }
+    public DbSet<Teacher> Teachers { get; set; }
+    public DbSet<Student> Students { get; set; }
+    public DbSet<Parent> Parents { get; set; }
+    public DbSet<StudentParent> StudentParents { get; set; }  
+
+    // ── Lookup ──
+    public DbSet<Language> Languages { get; set; } 
+    public DbSet<Level> Levels { get; set; }
+    public DbSet<Module> Modules { get; set; }     
+
+    // ── period ──
+    public DbSet<Session> Sessions { get; set; }    
+    // ── Physical ──
+    public DbSet<Room> Rooms { get; set; }         
+
+    // ── Academic ──
+    public DbSet<Group> Groups { get; set; }
+    public DbSet<GroupTeacher> GroupTeachers { get; set; } 
+    public DbSet<Schedule> Schedules { get; set; } 
+
+    // ── Operations ──
+    public DbSet<Enrollment> Enrollments { get; set; }
+    public DbSet<Absence> Absences { get; set; }
+    public DbSet<Grade> Grades { get; set; }       
+    public DbSet<Payment> Payments { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Parent>()
+        .HasMany(p => p.Students)
+        .WithMany(s => s.Parents)
+        .UsingEntity<StudentParent>(
+            j => j.HasOne(sp => sp.Student)
+                  .WithMany()
+                  .HasForeignKey(sp => sp.StudentId)
+            ,
+            j => j.HasOne(sp => sp.Parent)
+                 .WithMany()
+                 .HasForeignKey(sp => sp.ParentId)
+        ) ;
+
+
+        /* 
+           Group - Student relationships 
+           group -> students 
+           student -> group 
+        */
+        modelBuilder.Entity<Group>()
+        .HasMany(g =>  g.Students)
+        .WithOne(s => s.Group)
+        .HasForeignKey(s => s.GrouId) ;
+ 
+            
+        
+    }
+      
+}
