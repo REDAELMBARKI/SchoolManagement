@@ -11,7 +11,6 @@ namespace SchoolManagement.Models ;
         [Required, MaxLength(50)]
         public string NationalId { get; set; } = string.Empty;
  
-        [Required]
         public ICollection<Parent> Parents {get ; set; } = new List<Parent>(); 
 
         public Group Group {get ;set ; } = null! ;
