@@ -23,11 +23,4 @@ public class StudentDTO : Student
         };
     }
 
-
-    public StudentDTO FromBuissiness(StudentDTO old  , object fullFillmens)
-    {
-        return new StudentDTO
-        {
-        }
-    }
 }
