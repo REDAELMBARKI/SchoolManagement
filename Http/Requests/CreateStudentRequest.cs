@@ -28,5 +28,8 @@ public class CreateStudentRequest
  
         [Required, MaxLength(10)]
         public string Gender { get; set; } = string.Empty;
+
+        [Required]
+        public int LevelId {get ; set ; }
  
 }

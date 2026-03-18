@@ -5,16 +5,15 @@ namespace SchoolManagement.Models ;
         [Required]
         public DateTime DateOfBirth { get; set; }
  
-        [Required, MaxLength(10)]
-        public string Gender { get; set; } = string.Empty;
- 
-        [Required, MaxLength(50)]
-        public string NationalId { get; set; } = string.Empty;
- 
         public ICollection<Parent> Parents {get ; set; } = new List<Parent>(); 
-
-        public Group Group {get ;set ; } = null! ;
+        
+        // fks
+        public int LevelId {get ; set ;}
         public int GroupId {get ;  set ; } 
+
+        // navigation
+        public Group Group {get ;set ; } = null! ;
+        public Level Level {get ;set ; } = null! ;
 
     }
  

@@ -20,6 +20,7 @@ public class StudentDTO : Student
              Gender = data.Gender ,
              DateOfBirth = data.DateOfBirth ,
              PasswordHash =data.PasswordHash ,
+             LevelId  = data.LevelId
         };
     }
 

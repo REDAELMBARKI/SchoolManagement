@@ -1,4 +1,7 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SchoolManagement.Database.Seeders;
 using Serilog;
 
@@ -20,7 +23,20 @@ builder.Services.AddDbContext<AppDbContext>(
    
 ) ; 
 
-
+// add jwt barear 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey         = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+            ValidateIssuer   = false,  // skip for simple project
+            ValidateAudience = false,  // skip for simple project
+            ValidateLifetime = true,   // ✅ checks token expiry
+        };
+});
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -34,7 +50,6 @@ builder.Services.Scan(scan => scan
     .WithScopedLifetime());
 
 builder.Services.AddControllers(); 
-
 
 var app = builder.Build();
 

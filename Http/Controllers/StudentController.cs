@@ -26,11 +26,22 @@ public class StudentController : ControllerBase
         return Ok(new {message = "success"});
     }
 
+    [HttpGet("{id}")]
+     public IActionResult getById(int id)
+    {
+        Student student =  _service.getStudentById(id)
+        return Ok(user)
+    }
+
+
     [HttpPost]
     public IActionResult Create([FromBody] CreateStudentRequest request , StudentDTO dto)
     {   
         StudentDTO _dto = dto.FromRequest(request);
-        return Ok(_dto) ;
+        _service.createStudent(_dto);
         return Ok(new {message = $"the Student has been created with Id "});
     }
+
+
+   
 }
