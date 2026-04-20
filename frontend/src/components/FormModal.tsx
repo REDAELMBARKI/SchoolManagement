@@ -30,6 +30,7 @@ const deleteActionMap = {
   attendance: deleteSubject,
   event: deleteSubject,
   announcement: deleteSubject,
+  intake: deleteSubject,
 };
 
 const TeacherForm = lazy(() => import("./forms/TeacherForm"));
@@ -37,6 +38,7 @@ const StudentForm = lazy(() => import("./forms/StudentForm"));
 const SubjectForm = lazy(() => import("./forms/SubjectForm"));
 const ClassForm = lazy(() => import("./forms/ClassForm"));
 const ExamForm = lazy(() => import("./forms/ExamForm"));
+const IntakeForm = lazy(() => import("./forms/IntakeForm"));
 
 const forms: {
   [key: string]: (
@@ -80,6 +82,14 @@ const forms: {
   ),
   exam: (setOpen, type, data, relatedData) => (
     <ExamForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      relatedData={relatedData}
+    />
+  ),
+  intake: (setOpen, type, data, relatedData) => (
+    <IntakeForm
       type={type}
       data={data}
       setOpen={setOpen}

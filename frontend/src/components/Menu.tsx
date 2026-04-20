@@ -6,6 +6,12 @@ const menuItems = [
     title: "MENU",
     items: [
       {
+        icon: "/setting.png",
+        label: "Theme",
+        href: "/theme",
+        visible: ["admin", "teacher", "student", "parent"],
+      },
+      {
         icon: "/home.png",
         label: "Home",
         href: "/",
@@ -89,6 +95,12 @@ const menuItems = [
         href: "/list/announcements",
         visible: ["admin", "teacher", "student", "parent"],
       },
+      {
+        icon: "/student.png",
+        label: "Intakes",
+        href: "/list/intakes",
+        visible: ["admin", "teacher"],
+      },
     ],
   },
   {
@@ -146,6 +158,12 @@ const menuItems = [
         label: "Exam Form",
         href: "/list/exams/new",
         visible: ["admin", "teacher"],
+      },
+      {
+        icon: "/student.png",
+        label: "Intake Form",
+        href: "/list/intakes/new",
+        visible: ["admin"],
       },
     ],
   },

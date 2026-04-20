@@ -6,6 +6,7 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     // ── People ──
+    public DbSet<User> Staffs { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Teacher> Teachers { get; set; }
     public DbSet<Student> Students { get; set; }
@@ -37,8 +38,6 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        RoleConversion<Student>(modelBuilder) ; // covert student role from number to a class name 
-
         modelBuilder.Entity<Parent>()
         .HasMany(p => p.Students)
         .WithMany(s => s.Parents)
@@ -69,14 +68,5 @@ public class AppDbContext : DbContext
     }
 
 
-    private void RoleConversion<T>(ModelBuilder modelBuilder) where T : User
-    {
-        //convert enums to real class names 
-        var roleConverter = new EnumToStringConverter<Role>() ;
-        modelBuilder.Entity<T>() 
-                    .Property(s => s.Role)
-                    .HasConversion(roleConverter) ; 
-        
-    }
-      
+
 }

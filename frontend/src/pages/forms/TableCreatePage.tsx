@@ -15,11 +15,13 @@ function normalizeTable(
       subjects: { formTable: "subject", listSlug: "subjects" },
       classes: { formTable: "class", listSlug: "classes" },
       exams: { formTable: "exam", listSlug: "exams" },
+      intakes: { formTable: "intake", listSlug: "intakes" },
       teacher: { formTable: "teacher", listSlug: "teachers" },
       student: { formTable: "student", listSlug: "students" },
       subject: { formTable: "subject", listSlug: "subjects" },
       class: { formTable: "class", listSlug: "classes" },
       exam: { formTable: "exam", listSlug: "exams" },
+      intake: { formTable: "intake", listSlug: "intakes" },
     };
 
   return map[t] ?? null;

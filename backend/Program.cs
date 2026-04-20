@@ -16,27 +16,23 @@ var builder = WebApplication.CreateBuilder(args);
 // configure context 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ; 
 builder.Services.AddDbContext<AppDbContext>(
-    options => options.UseMySql(
-        connectionString , 
-        ServerVersion.AutoDetect(connectionString)
-    )
-   
+    options => options.UseSqlite(connectionString)
 ) ; 
 
 // add jwt barear 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey         = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-            ValidateIssuer   = false,  // skip for simple project
-            ValidateAudience = false,  // skip for simple project
-            ValidateLifetime = true,   // ✅ checks token expiry
-        };
-});
+// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//     .AddJwtBearer(options =>
+//     {
+//         options.TokenValidationParameters = new TokenValidationParameters
+//         {
+//             ValidateIssuerSigningKey = true,
+//             IssuerSigningKey         = new SymmetricSecurityKey(
+//                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+//             ValidateIssuer   = false,  // skip for simple project
+//             ValidateAudience = false,  // skip for simple project
+//             ValidateLifetime = true,   // ✅ checks token expiry
+//         };
+// });
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -44,7 +40,7 @@ builder.Services.AddOpenApi();
 // registre all classes 
 builder.Services.Scan(scan => scan
     .FromAssemblyOf<Program>()
-    .AddClasses()
+    .AddClasses(c => c.InNamespaces("SchoolManagement.Repositories", "SchoolManagement.Services"))
     .AsSelf()                  
     .AsMatchingInterface()     
     .WithScopedLifetime());

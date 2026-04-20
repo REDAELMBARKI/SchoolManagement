@@ -24,22 +24,25 @@ public class LoginController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequest request)
     {
-        bool exists = await _context.Users.AnyAsync(u => u.Email == request.Email);
+        bool exists = await _context.Staffs.AnyAsync(u => u.Email == request.Email);
         if (!exists)
         {
             return BadRequest(new {message = "wrong credentials "}) ;
         }
-        User user = await _context.Users.Where(u => u.Email == request.Email)
+        Staff? staff = await _context.Staffs.OfType<Staff>().Where(u => u.Email == request.Email)
                                             .FirstOrDefaultAsync();
-
-        if(new PasswordHasher<User>()
-        .VerifyHashedPassword(user , user.PasswordHash , request.Password) == 
+        if(staff is null)
+        {
+            return BadRequest() ;
+        }
+        if(new PasswordHasher<Staff>()
+        .VerifyHashedPassword(staff , staff.PasswordHash , request.Password) == 
          PasswordVerificationResult.Failed
         )
         {
            return BadRequest(new {message = "wrong credentials "}) ;
         };
-        string token = _jwtService.generateToken(user) ;               
+        string token = _jwtService.generateToken(staff) ;               
         return Ok(token) ;
     }
 }

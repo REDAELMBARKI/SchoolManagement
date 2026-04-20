@@ -1,4 +1,6 @@
+using _.Dtos.Responses;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using SchoolManagement.DTOs;
 using SchoolManagement.Interfaces;
 using SchoolManagement.Models;
@@ -23,12 +25,23 @@ public class StudentRepository
         return await _context.Students.FindAsync(id);
     }
     
-    public async Task<Student> AddAsync(Student student)
+    public async Task<StudentResponseDto> AddAsync(Student student)
     {
         await _context.Students.AddAsync(student);
         await _context.SaveChangesAsync(); 
-        return student; 
+        return new StudentResponseDto(
+            student.Id,
+            student.FirstName ,
+            student.LastName , 
+            student.Gender.Name,
+            student.Group.Name ,
+            student.Level.Name ,
+            student.DateOfBirth ,
+            student.Parents
+        ); 
     }
+
+
     public async Task Destroy(int id )
     {
         var student = await _context.Students.FindAsync(id);

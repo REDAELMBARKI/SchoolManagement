@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SchoolManagement.Http.Requests;
 
-public class CreateStudentRequest
+public  abstract class UserRequest
 {
 
  
@@ -21,15 +21,9 @@ public class CreateStudentRequest
         public string Phone { get; set; } = string.Empty;
 
         [Required]
-        public string PasswordHash { get; set; } = string.Empty;
- 
-        [Required]
         public DateTime DateOfBirth { get; set; }
  
         [Required, MaxLength(10)]
         public string Gender { get; set; } = string.Empty;
 
-        [Required]
-        public int LevelId {get ; set ; }
- 
 }

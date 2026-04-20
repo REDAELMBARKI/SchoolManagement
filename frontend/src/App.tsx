@@ -24,6 +24,7 @@ import EventListPage from "./pages/list/EventListPage";
 import AnnouncementListPage from "./pages/list/AnnouncementListPage";
 import AttendanceListPage from "./pages/list/AttendanceListPage";
 import MessagesPage from "./pages/list/MessagesPage";
+import IntakeListPage from "./pages/list/IntakeListPage";
 import TableCreatePage from "./pages/forms/TableCreatePage";
 import TableDeletePage from "./pages/forms/TableDeletePage";
 import TableEditPage from "./pages/forms/TableEditPage";
@@ -41,6 +42,7 @@ export default function App() {
         <Route path="profile" element={<ProfilePage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="logout" element={<LogoutPage />} />
+        <Route path="list/intakes" element={<IntakeListPage />} />
         <Route path="list/students" element={<StudentListPage />} />
         <Route path="list/students/:id" element={<SingleStudentPage />} />
         <Route path="list/teachers" element={<TeacherListPage />} />
@@ -56,6 +58,7 @@ export default function App() {
         <Route path="list/announcements" element={<AnnouncementListPage />} />
         <Route path="list/attendance" element={<AttendanceListPage />} />
         <Route path="list/messages" element={<MessagesPage />} />
+        <Route path="list/intakes" element={<IntakeListPage />} />
       <Route path="list/:table/new" element={<TableCreatePage />} />
       <Route path="list/:table/:id/edit" element={<TableEditPage />} />
       <Route path="list/:table/:id/delete" element={<TableDeletePage />} />

@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import FormPageRenderer from "@/components/FormPageRenderer";
 import type { FormContainerProps } from "@/components/FormContainer";
-import { classesData, examsData, subjectsData } from "@/lib/data";
+import { classesData, examsData, subjectsData, intakesData } from "@/lib/data";
 import {
   getMockStudentById,
   getMockTeacherById,
@@ -20,11 +20,13 @@ function normalizeTable(
       subjects: { formTable: "subject", listSlug: "subjects" },
       classes: { formTable: "class", listSlug: "classes" },
       exams: { formTable: "exam", listSlug: "exams" },
+      intakes: { formTable: "intake", listSlug: "intakes" },
       teacher: { formTable: "teacher", listSlug: "teachers" },
       student: { formTable: "student", listSlug: "students" },
       subject: { formTable: "subject", listSlug: "subjects" },
       class: { formTable: "class", listSlug: "classes" },
       exam: { formTable: "exam", listSlug: "exams" },
+      intake: { formTable: "intake", listSlug: "intakes" },
     };
 
   return map[t] ?? null;
@@ -100,6 +102,22 @@ export default function TableEditPage() {
         teachers: 1,
       };
     }
+  } else if (normalized.formTable === "intake") {
+    const intakeId = Number(id);
+    const i = intakesData.find((x) => x.id === intakeId);
+    
+    formData = i ? {
+      id: i.id,
+      firstName: i.firstName,
+      lastName: i.lastName,
+      email: i.email,
+      phone: i.phone,
+      dateOfBirth: i.dateOfBirth,
+      gender: i.gender,
+      leadSourceId: i.leadSourceId,
+      opcId: i.opcId,
+      intakeDate: i.intakeDate,
+    } : null;
   }
 
   if (!formData) {

@@ -10,7 +10,6 @@ public abstract class UserFactory<TUser> : Factory<TUser> where TUser : User
         User.LastName     = faker.Name.LastName();
         User.Email        = faker.Internet.Email();
         User.Phone  = faker.Phone.PhoneNumber();
-        User.PasswordHash = BCrypt.Net.BCrypt.HashPassword(faker.Internet.Password());
         return User ;
 
     }

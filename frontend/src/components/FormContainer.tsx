@@ -1,5 +1,4 @@
 import FormModal from "./FormModal";
-import { role } from "@/lib/data";
 
 export type FormContainerProps = {
   table:
@@ -14,7 +13,8 @@ export type FormContainerProps = {
     | "result"
     | "attendance"
     | "event"
-    | "announcement";
+    | "announcement"
+    | "intake";
   type: "create" | "update" | "delete";
   data?: any;
   id?: number | string;
@@ -45,6 +45,20 @@ const FormContainer = ({ table, type, data, id }: FormContainerProps) => {
         break;
       case "exam":
         relatedData = { lessons: [{ id: 1, name: "Math" }] };
+        break;
+      case "intake":
+        relatedData = {
+          leadSources: [
+            { id: 1, name: "Website" },
+            { id: 2, name: "Referral" },
+            { id: 3, name: "Walk-in" }
+          ],
+          opcs: [
+            { id: 1, name: "Online Platform" },
+            { id: 2, name: "Social Media" },
+            { id: 3, name: "Email Campaign" }
+          ]
+        };
         break;
       default:
         break;

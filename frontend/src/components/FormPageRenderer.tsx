@@ -16,6 +16,7 @@ const StudentForm = lazy(() => import("./forms/StudentForm"));
 const SubjectForm = lazy(() => import("./forms/SubjectForm"));
 const ClassForm = lazy(() => import("./forms/ClassForm"));
 const ExamForm = lazy(() => import("./forms/ExamForm"));
+const IntakeForm = lazy(() => import("./forms/IntakeForm"));
 
 const deleteActionMap: Record<string, any> = {
   subject: deleteSubject,
@@ -64,6 +65,20 @@ export default function FormPageRenderer({
         break;
       case "exam":
         relatedData = { lessons: [{ id: 1, name: "Math" }] };
+        break;
+      case "intake":
+        relatedData = {
+          leadSources: [
+            { id: 1, name: "Website" },
+            { id: 2, name: "Referral" },
+            { id: 3, name: "Walk-in" }
+          ],
+          opcs: [
+            { id: 1, name: "Online Platform" },
+            { id: 2, name: "Social Media" },
+            { id: 3, name: "Email Campaign" }
+          ]
+        };
         break;
       default:
         relatedData = {};
@@ -116,6 +131,14 @@ export default function FormPageRenderer({
     ),
     exam: (setOpen, type, data, relatedData) => (
       <ExamForm
+        type={type}
+        data={data}
+        setOpen={setOpen}
+        relatedData={relatedData}
+      />
+    ),
+    intake: (setOpen, type, data, relatedData) => (
+      <IntakeForm
         type={type}
         data={data}
         setOpen={setOpen}

@@ -1,5 +1,5 @@
 // TEMPORARY DATA — demo role for UI (server components read this; change to "student" | "teacher" | "parent" to test)
-export let role = "admin";
+export const role = "admin";
 
 export const teachersData = [
   {
@@ -995,6 +995,79 @@ export const attendanceData = [
     date: "2025-01-19",
     present: false,
   },
+];
+
+export const intakesData = [
+  {
+    id: 1,
+    firstName: "John",
+    lastName: "Doe",
+    email: "john.doe@example.com",
+    phone: "1234567890",
+    dateOfBirth: "1995-06-15",
+    gender: "Male",
+    leadSourceId: 1,
+    opcId: 1,
+    intakeDate: "2024-01-15",
+    leadSource: "Website",
+    opc: "Online Platform"
+  },
+  {
+    id: 2,
+    firstName: "Jane",
+    lastName: "Smith",
+    email: "jane.smith@example.com",
+    phone: "0987654321",
+    dateOfBirth: "1997-03-22",
+    gender: "Female",
+    leadSourceId: 2,
+    opcId: 2,
+    intakeDate: "2024-02-20",
+    leadSource: "Referral",
+    opc: "Social Media"
+  },
+  {
+    id: 3,
+    firstName: "Michael",
+    lastName: "Johnson",
+    email: "michael.j@example.com",
+    phone: "5551234567",
+    dateOfBirth: "1996-11-08",
+    gender: "Male",
+    leadSourceId: 1,
+    opcId: 3,
+    intakeDate: "2024-03-10",
+    leadSource: "Website",
+    opc: "Email Campaign"
+  },
+  {
+    id: 4,
+    firstName: "Emily",
+    lastName: "Brown",
+    email: "emily.b@example.com",
+    phone: "7778889999",
+    dateOfBirth: "1998-09-30",
+    gender: "Female",
+    leadSourceId: 3,
+    opcId: 1,
+    intakeDate: "2024-04-05",
+    leadSource: "Walk-in",
+    opc: "Online Platform"
+  },
+  {
+    id: 5,
+    firstName: "David",
+    lastName: "Wilson",
+    email: "david.w@example.com",
+    phone: "4445556666",
+    dateOfBirth: "1995-12-18",
+    gender: "Male",
+    leadSourceId: 2,
+    opcId: 2,
+    intakeDate: "2024-05-12",
+    leadSource: "Referral",
+    opc: "Social Media"
+  }
 ];
 
 // YOU SHOULD CHANGE THE DATES OF THE EVENTS TO THE CURRENT DATE TO SEE THE EVENTS ON THE CALENDAR
