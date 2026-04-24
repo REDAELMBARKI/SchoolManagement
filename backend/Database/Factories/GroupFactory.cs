@@ -1,9 +1,13 @@
 using Microsoft.EntityFrameworkCore.Storage;
-using SchoolManagement.Models;
+using SchoolManagement.Backend.Models;
 
-namespace SchoolManagement.Database.Factories ; 
+namespace SchoolManagement.Backend.Database.Factories ; 
 public class GroupFactory : Factory<Group>
 {
+    public GroupFactory(AppDbContext context) : base(context)
+    {
+    }
+
     protected override Group Make()
     {
         return new Group

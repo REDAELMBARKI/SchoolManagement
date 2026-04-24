@@ -1,7 +1,7 @@
 
 
 using System.ComponentModel.DataAnnotations ;
-namespace SchoolManagement.Models ; 
+namespace SchoolManagement.Backend.Models ; 
 public class StudentParent
 {
     public int Id { get; set; }    // FKs

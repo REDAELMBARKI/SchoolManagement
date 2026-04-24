@@ -3,9 +3,9 @@ using System.Security.Claims;
 using System.Text;
 using Bogus.DataSets;
 using Microsoft.IdentityModel.Tokens;
-using SchoolManagement.Models;
+using SchoolManagement.Backend.Models;
 
-namespace SchoolManagement.Services;
+namespace SchoolManagement.Backend.Services;
 
 public class JwtService
 {

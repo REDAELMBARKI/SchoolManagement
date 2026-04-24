@@ -2,7 +2,9 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using SchoolManagement.Database.Seeders;
+using SchoolManagement.Backend;
+using SchoolManagement.Backend.Database.Seeders;
+using SchoolManagement.Backend.Database.Factories;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -13,12 +15,16 @@ Log.Logger = new LoggerConfiguration()
 
 var builder = WebApplication.CreateBuilder(args);
 
+// auto mapper 
+builder.Services.AddAutoMapper(typeof(Program)) ;
 // configure context 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ; 
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseSqlite(connectionString)
 ) ; 
 
+
+// di
 // add jwt barear 
 // builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 //     .AddJwtBearer(options =>
@@ -40,7 +46,11 @@ builder.Services.AddOpenApi();
 // registre all classes 
 builder.Services.Scan(scan => scan
     .FromAssemblyOf<Program>()
-    .AddClasses(c => c.InNamespaces("SchoolManagement.Repositories", "SchoolManagement.Services"))
+    .AddClasses(c => 
+          c.InNamespaces("SchoolManagement.Backend.Repositories",
+                         "SchoolManagement.Backend.Services" , 
+                            "SchoolManagement.Backend.Database.Factories"
+                         ))
     .AsSelf()                  
     .AsMatchingInterface()     
     .WithScopedLifetime());
@@ -70,6 +80,8 @@ var isDbCommand = false ;
 using(var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var userFactory = scope.ServiceProvider.GetRequiredService<UserFactory>();
+
     try
     {    
       if (args.Length > 0 && args[0] == "db")
@@ -91,12 +103,12 @@ using(var scope = app.Services.CreateScope())
                 case "migrate:fresh:seed":
                     await context.Database.EnsureDeletedAsync();
                     await context.Database.MigrateAsync();
-                    await DatabaseSeeder.Seed(context);
+                    await DatabaseSeeder.Seed(context , userFactory);
                     Console.WriteLine("freshed and seeded");
                     break;
 
                 case "seed":
-                    await DatabaseSeeder.Seed(context);
+                    await DatabaseSeeder.Seed(context , userFactory);
                     Console.WriteLine("seeded successfully");
                     break;
 

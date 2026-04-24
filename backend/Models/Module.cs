@@ -1,6 +1,6 @@
 
 using System.ComponentModel.DataAnnotations ;
-namespace SchoolManagement.Models ;   
+namespace SchoolManagement.Backend.Models;
 
  public class Module
     {

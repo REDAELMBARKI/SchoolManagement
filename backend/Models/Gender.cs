@@ -1,6 +1,6 @@
 using System;
 
-namespace _.Models;
+namespace SchoolManagement.Backend.Models;
 
 public class Gender
 {

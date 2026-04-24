@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Models;
-using SchoolManagement.Services;
+using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Services;
 
-namespace SchoolManagement.Http.Auth.Controllers;
+namespace SchoolManagement.Backend.Http.Auth.Controllers;
 
 [ApiController]
 [Route("api/auth")]
@@ -24,25 +24,27 @@ public class LoginController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequest request)
     {
-        bool exists = await _context.Staffs.AnyAsync(u => u.Email == request.Email);
+        bool exists = await _context.Users.AnyAsync(u => u.Email == request.Email);
         if (!exists)
         {
             return BadRequest(new {message = "wrong credentials "}) ;
         }
-        Staff? staff = await _context.Staffs.OfType<Staff>().Where(u => u.Email == request.Email)
+        User? user = await _context.Users.OfType<User>().Where(u => u.Email == request.Email)
                                             .FirstOrDefaultAsync();
-        if(staff is null)
+        if(user is null)
         {
             return BadRequest() ;
         }
-        if(new PasswordHasher<Staff>()
-        .VerifyHashedPassword(staff , staff.PasswordHash , request.Password) == 
+
+        if(user.Password is null) return BadRequest(new {message = " your account is not activated "}) ;
+        if(new PasswordHasher<User>()
+        .VerifyHashedPassword(user , user.Password , request.Password) == 
          PasswordVerificationResult.Failed
         )
         {
            return BadRequest(new {message = "wrong credentials "}) ;
         };
-        string token = _jwtService.generateToken(staff) ;               
+        string token = _jwtService.generateToken(user) ;               
         return Ok(token) ;
     }
 }

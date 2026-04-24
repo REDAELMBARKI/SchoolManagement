@@ -1,25 +1,23 @@
 
-using SchoolManagement.Database.Factories;
-using SchoolManagement.Models;
+using SchoolManagement.Backend.Database.Factories;
+using SchoolManagement.Backend.Models;
 
-namespace  SchoolManagement.Database.Seeders ; 
+namespace  SchoolManagement.Backend.Database.Seeders ; 
 
 public class GroupSeeder : Seeder
 {
     private readonly   GroupFactory _factory;
-    private readonly AppDbContext _context;
 
-    public GroupSeeder(AppDbContext context)
+    public GroupSeeder(AppDbContext context) : base(context)
     {
-            _factory = new   GroupFactory();
-            _context = context ;
+            _factory = new   GroupFactory(context);
 
     } 
 
     public override async Task RunAsync()
     {
-       List<Group> Groups = _factory.MakeMany(10);
-       await _context.Groups.AddRangeAsync(Groups);
-       await _context.SaveChangesAsync() ;
+       List<Group> groups = _factory.MakeMany(10);
+       await Context.Groups.AddRangeAsync(groups);
+       await Context.SaveChangesAsync() ;
     }
 }

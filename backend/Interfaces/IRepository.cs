@@ -1,4 +1,4 @@
-namespace SchoolManagement.Interfaces ;
+namespace SchoolManagement.Backend.Interfaces;
 public interface IReadRepository<T> where T : class
 {
     Task<List<T>>  GetAllAsync();
@@ -9,7 +9,7 @@ public interface IReadRepository<T> where T : class
 // WRITE ONLY
 public interface IWriteRepository<T> where T : class
 {
-    Task<T>        AddItemAsync(T entity);
+    Task<T>        AddAsync(T entity);
     Task<T?>       UpdateAsync(int id, T entity);
     Task           DeleteAsync(int id);
 }

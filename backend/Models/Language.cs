@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations ;
-namespace SchoolManagement.Models ; 
+namespace SchoolManagement.Backend.Models ; 
 public class Language
 {
     public int Id { get; set; }

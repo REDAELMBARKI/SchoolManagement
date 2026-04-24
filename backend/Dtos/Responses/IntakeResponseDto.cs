@@ -1,6 +1,6 @@
-using _.Models;
+using SchoolManagement.Backend.Models;
 
-namespace _.Dtos.Responses;
+namespace SchoolManagement.Backend.Dtos.Responses;
 
 public record IntakeResponseDto(
    int Id  ,

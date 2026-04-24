@@ -1,23 +1,21 @@
-using SchoolManagement.Database.Factories;
-using SchoolManagement.Models;
+using SchoolManagement.Backend.Database.Factories;
+using SchoolManagement.Backend.Models;
 
-namespace SchoolManagement.Database.Seeders ; 
+namespace SchoolManagement.Backend.Database.Seeders ; 
 public class LanguageSeeder : Seeder
 {
     private readonly LanguageFactory _factory;
-    private readonly AppDbContext _context;
 
-    public LanguageSeeder(AppDbContext context)
+    public LanguageSeeder(AppDbContext context) : base(context)
     {
-            _factory = new LanguageFactory();
-            _context = context ;
+            _factory = new LanguageFactory(context);
 
     }
     
     public override async Task RunAsync()
     {
         List<Language> languages = _factory.MakeMany(4) ; 
-        await _context.Languages.AddRangeAsync(languages) ; 
-        await _context.SaveChangesAsync() ;
+        await Context.Languages.AddRangeAsync(languages) ; 
+        await Context.SaveChangesAsync() ;
     }
 }

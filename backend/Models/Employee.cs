@@ -1,16 +1,17 @@
 using System.ComponentModel.DataAnnotations;
 using Scalar.AspNetCore;
 
-namespace SchoolManagement.Models ;
+namespace SchoolManagement.Backend.Models;
 
 public class Employee : User
 {
 
     [Required]
     public DateTime HireDate { get; set; } = DateTime.UtcNow;
-        
+    
     [Required]
-    public  JobPosition Position  { get; set; }
+    public decimal Salary { get; set; }
+    
 }
 
 

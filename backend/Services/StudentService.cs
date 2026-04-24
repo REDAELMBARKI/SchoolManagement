@@ -1,31 +1,30 @@
 using System.Threading.Tasks;
-using _.Dtos.Responses;
+using SchoolManagement.Backend.Dtos.Responses;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using SchoolManagement.DTOs;
-using SchoolManagement.Models;
-using SchoolManagement.Repositories;
+using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Repositories;
 
-namespace SchoolManagement.Services;
+namespace SchoolManagement.Backend.Services;
 
 public class StudentService
 {
-    // private readonly StudentRepository _repository;
-    // private readonly StudentDTO _dto ;
+    // private readonly StudentRepository SchoolManagement.Backend.epository;
+    // private readonly StudentDTO SchoolManagement.Backend.to ;
 
     // public StudentService(StudentRepository repository , StudentDTO dto )
     // {
-    //     _repository = repository;
-    //     _dto  = dto ;
+    //     SchoolManagement.Backend.epository = repository;
+    //     SchoolManagement.Backend.to  = dto ;
     // }
 
     // public async Task<List<Student>>  getStudentList()
     // {
-    //    return await _repository.GetAllAsync();
+    //    return await SchoolManagement.Backend.epository.GetAllAsync();
     // }
     
     // public async Task<Student?>  getStudentById(int id)
     // {
-    //   return await _repository.FindByIdAsync(id);
+    //   return await SchoolManagement.Backend.epository.FindByIdAsync(id);
     // }
     
     // public async Task<StudentResponseDto>  CreateStudent(StudentDTO studentDTO)
@@ -33,7 +32,7 @@ public class StudentService
     //    // check student level 
     //    // check group capasity 
     //    // chehck group module
-    //    int groupId  = await  _repository.checkGroupAvailabilityAsync(studentDTO.LevelId);
+    //    int groupId  = await  SchoolManagement.Backend.epository.checkGroupAvailabilityAsync(studentDTO.LevelId);
     //    Student student = new Student
     //    {
     //        FirstName = studentDTO.FirstName , 
@@ -47,7 +46,7 @@ public class StudentService
     //        GroupId = groupId
     //    };
 
-    //    return await _repository.AddAsync(student);
+    //    return await SchoolManagement.Backend.epository.AddAsync(student);
     // }
 
 

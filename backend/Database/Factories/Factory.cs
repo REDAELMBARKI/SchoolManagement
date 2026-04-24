@@ -1,8 +1,13 @@
 using Bogus;
 using Microsoft.VisualBasic;
-namespace SchoolManagement.Database.Factories ; 
+namespace SchoolManagement.Backend.Database.Factories ; 
 public abstract class Factory<T> where T : class 
-{
+{  
+    protected AppDbContext _context;
+    public Factory(AppDbContext context)
+    {
+        _context = context ;
+    }
     protected readonly Faker faker = new Faker() ; 
     protected abstract T Make() ; 
 
@@ -12,5 +17,7 @@ public abstract class Factory<T> where T : class
                .Select(_ => Make()) 
                .ToList() ;
     } 
+
+    protected AppDbContext Context => _context ;
      
 }

@@ -1,21 +1,19 @@
-using SchoolManagement.Database.Factories;
-namespace SchoolManagement.Database.Seeders;
+using SchoolManagement.Backend.Database.Factories;
+namespace SchoolManagement.Backend.Database.Seeders;
 
 public class GradeSeeder : Seeder
 {
     private readonly GradeFactory _factory;
-    private readonly AppDbContext _context;
 
-    public GradeSeeder(AppDbContext context)
+    public GradeSeeder(AppDbContext context) : base(context)
     {
-        _factory = new GradeFactory();
-        _context = context;
+        _factory = new GradeFactory(context);
     }
 
     public override async Task RunAsync()
     {
         var items = _factory.MakeMany(10);
-        await _context.Grades.AddRangeAsync(items);
-        await _context.SaveChangesAsync();
+        await Context.Grades.AddRangeAsync(items);
+        await Context.SaveChangesAsync();
     }
 }

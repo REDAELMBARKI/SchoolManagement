@@ -1,7 +1,7 @@
 using System;
-using SchoolManagement.Models;
+using SchoolManagement.Backend.Models;
 
-namespace _.Dtos.Responses;
+namespace SchoolManagement.Backend.Backend.Dtos.Responses;
 
 public record StudentResponseDto
 (

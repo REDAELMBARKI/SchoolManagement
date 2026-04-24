@@ -1,21 +1,19 @@
-using SchoolManagement.Database.Factories;
-namespace SchoolManagement.Database.Seeders;
+using SchoolManagement.Backend.Database.Factories;
+namespace SchoolManagement.Backend.Database.Seeders;
 
 public class ModuleSeeder : Seeder
 {
     private readonly ModuleFactory _factory;
-    private readonly AppDbContext _context;
 
-    public ModuleSeeder(AppDbContext context)
+    public ModuleSeeder(AppDbContext context) : base(context)
     {
-        _factory = new ModuleFactory();
-        _context = context;
+        _factory = new ModuleFactory(context);
     }
 
     public override async Task RunAsync()
     {
         var items = _factory.MakeMany(10);
-        await _context.Modules.AddRangeAsync(items);
-        await _context.SaveChangesAsync();
+        await Context.Modules.AddRangeAsync(items);
+        await Context.SaveChangesAsync();
     }
 }

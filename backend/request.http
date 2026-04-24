@@ -1,1 +1,29 @@
 GET http://localhost:5298/api/intakes
+
+###
+GET http://localhost:5298/api/lead-sources
+
+
+###
+GET http://localhost:5298/api/genders
+
+
+###
+POST http://localhost:5298/api/genders
+
+###
+POST http://localhost:5298/api/lead-sources
+
+
+###
+POST  http://localhost:5298/api/ads
+
+### 
+POST http://localhost:5298/api/opcs
+
+### 
+GET http://localhost:5298/api/ads
+
+###
+GET http://localhost:5298/api/opcs
+

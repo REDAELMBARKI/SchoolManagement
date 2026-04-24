@@ -1,10 +1,14 @@
-using SchoolManagement.Models;
+using SchoolManagement.Backend.Models;
 using System;
 
-namespace SchoolManagement.Database.Factories ; 
+namespace SchoolManagement.Backend.Database.Factories ; 
 
 public class SessionFactory : Factory<Session>
 {
+    public SessionFactory(AppDbContext context) : base(context)
+    {
+    }
+
     protected override Session Make()
     {
         var start = faker.Date.Between(DateTime.Now.AddYears(-1), DateTime.Now.AddMonths(2));

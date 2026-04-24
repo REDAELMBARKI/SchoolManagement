@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations ;
-namespace SchoolManagement.Models ;   
+namespace SchoolManagement.Backend.Models ;   
 
 
  public class Parent : User

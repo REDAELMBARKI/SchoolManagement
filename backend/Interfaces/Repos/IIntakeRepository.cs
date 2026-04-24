@@ -1,9 +1,10 @@
 using System;
-using SchoolManagement.Interfaces;
+using SchoolManagement.Backend.Interfaces;
+using SchoolManagement.Backend.Models;
 
-namespace _.Interfaces.Repos;
+namespace SchoolManagement.Backend.Interfaces.Repos;
 
-public interface IIntakeRepository  : IReadRepository<Intake>
+public interface IIntakeRepository  : IReadRepository<Intake> , IWriteRepository<Intake>
 {
-  
+
 }

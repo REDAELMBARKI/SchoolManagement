@@ -1,15 +1,20 @@
+using SchoolManagement.Backend.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SchoolManagement.Models;
+using SchoolManagement.Backend.Data;
+
+namespace SchoolManagement.Backend;
+
 public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     // ── People ──
-    public DbSet<User> Staffs { get; set; }
     public DbSet<User> Users { get; set; }
-    public DbSet<Teacher> Teachers { get; set; }
-    public DbSet<Student> Students { get; set; }
+    public DbSet<Intake> Intakes { get; set; }  
+    public DbSet<Student> Students  { get; set; }  
+    public DbSet<Opc> Opcs  { get; set; }  
+    public DbSet<Teacher> Teachers  { get; set; }  
     public DbSet<Parent> Parents { get; set; }
     public DbSet<StudentParent> StudentParents { get; set; }  
 
@@ -33,11 +38,25 @@ public class AppDbContext : DbContext
     public DbSet<Absence> Absences { get; set; }
     public DbSet<Grade> Grades { get; set; }       
     public DbSet<Payment> Payments { get; set; }
+    
+
+    public DbSet<Gender> Genders {get;set;} 
+    public DbSet<LeadSource> LeadSources {get;set;}
+    
+    public DbSet<Platform> Platforms {get;set;}
+    public DbSet<Ad> Ads {get;set;}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
+        // tpt  
+        modelBuilder.Entity<Student>().ToTable("Students");
+        modelBuilder.Entity<Opc>().ToTable("Opcs");
+        modelBuilder.Entity<Teacher>().ToTable("Teachers");
+        modelBuilder.Entity<Parent>().ToTable("Parents");
+        
+        
         modelBuilder.Entity<Parent>()
         .HasMany(p => p.Students)
         .WithMany(s => s.Parents)
@@ -62,11 +81,10 @@ public class AppDbContext : DbContext
         .HasMany(g =>  g.Students)
         .WithOne(s => s.Group)
         .HasForeignKey(s => s.GroupId) ;
- 
-            
-        
+
+        // rules 
+        modelBuilder.onIntakeModelCreating();
+
     }
-
-
 
 }

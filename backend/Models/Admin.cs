@@ -1,10 +1,10 @@
 
 
-namespace SchoolManagement.Models ;
+namespace SchoolManagement.Backend.Models;
 
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using SchoolManagement.Models;
+using SchoolManagement.Backend.Models;
 
 class Admin : User
 {

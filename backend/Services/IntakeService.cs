@@ -1,7 +1,8 @@
-using SchoolManagement.DTOs;
-using SchoolManagement.Repositories;
+using SchoolManagement.Backend.Dtos;
+using SchoolManagement.Backend.Repositories;
+using SchoolManagement.Backend.Models;
 
-namespace SchoolManagement.Services;
+namespace SchoolManagement.Backend.Services;
 
 public class IntakeService
 {
@@ -22,22 +23,21 @@ public class IntakeService
         return await _repository.GetOneAsync(id);
     }
 
-    public async Task AddIntakeAsync(IntakeDTO intake)
-    {
+    public async Task AddIntakeAsync(IntakeDto intakeDto)
+    {   
+
         var entity = new Intake
         {
-            Id = intake.Id,
-            FirstName = intake.FirstName,
-            LastName = intake.LastName,
-            Phone = intake.Phone,
-            Email = intake.Email,
-            IntakeDate = intake.IntakeDate,
-            OpcId = intake.OpcId,
-            LeadSourceId = intake.LeadSourceId,
-            GenderId = intake.GenderId
+            FirstName = intakeDto.FirstName,
+            LastName = intakeDto.LastName,
+            Phone = intakeDto.Phone,
+            Email = intakeDto.Email,
+            IntakeDate = intakeDto.IntakeDate,
+            LeadSourceId = intakeDto.LeadSourceId,
+            GenderId = intakeDto.GenderId
         };
         
-        // await _repository.AddOneAsync(entity);
+        await _repository.AddAsync(entity);
     }
 
  

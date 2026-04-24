@@ -1,20 +1,34 @@
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Interfaces;
+using SchoolManagement.Backend.Interfaces;
 
-namespace SchoolManagement.Repositories ;
+namespace SchoolManagement.Backend.Repositories;
 
-public abstract class Repository<T>(AppDbContext _context) where T : class 
+public abstract class Repository<T> where T : class
 {
-    protected IQueryable<T>  QueryWithTracking()
+    protected readonly AppDbContext _context;
+
+    protected Repository(AppDbContext context)
     {
-        return _context.Set<T>().AsQueryable() ;
+        _context = context;
     }
 
-    protected  IQueryable<T> Query()
+    protected virtual IQueryable<T> QueryWithTracking()
     {
-        return _context.Set<T>().AsNoTracking().AsQueryable() ;
+        return _context.Set<T>().AsQueryable();
     }
- 
+
+    protected virtual IQueryable<T> Query()
+    {
+        return _context.Set<T>().AsNoTracking().AsQueryable();
+    }
+
+
+    protected async Task<T> AddAsync(T entity)
+    {
+        var entry = await _context.Set<T>().AddAsync(entity);
+        await _context.SaveChangesAsync();
+        return entry.Entity;
+    }
     
-    protected AppDbContext Context => _context ;
+    protected AppDbContext Context => _context;
 }

@@ -1,34 +1,40 @@
-using _.Dtos.Responses;
+using SchoolManagement.Backend.Dtos.Responses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using SchoolManagement.DTOs;
-using SchoolManagement.Interfaces;
-using SchoolManagement.Models;
+using SchoolManagement.Backend.Dtos;
+using SchoolManagement.Backend.Interfaces;
+using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Backend.Dtos.Responses;
+using SchoolManagement.Backend.Interfaces.Repos;
 
-namespace SchoolManagement.Repositories;
+namespace SchoolManagement.Backend.Repositories;
 
-public class StudentRepository 
+public class StudentRepository :  Repository<Student> 
 {
-    AppDbContext _context ;
-    public StudentRepository(AppDbContext context)
+    public StudentRepository(AppDbContext context) : base(context)
     {
-        _context  = context ;
     }
 
+
+    protected override IQueryable<Student> Query()
+    {
+        return this.Context.Users.OfType<Student>().AsNoTracking().AsQueryable();
+                
+    }
     public async Task<List<Student>> GetAllAsync()
     { 
-        return  await _context.Students.ToListAsync() ;
+        return  await this.Query().ToListAsync() ;
     }
 
     public async Task<Student?>  FindByIdAsync(int id)
     {
-        return await _context.Students.FindAsync(id);
+        return await this.Query().FirstAsync(s => s.Id == id) ;
     }
     
     public async Task<StudentResponseDto> AddAsync(Student student)
     {
-        await _context.Students.AddAsync(student);
-        await _context.SaveChangesAsync(); 
+        await this.AddAsync(student);
+        await Context.SaveChangesAsync(); 
         return new StudentResponseDto(
             student.Id,
             student.FirstName ,
@@ -44,26 +50,27 @@ public class StudentRepository
 
     public async Task Destroy(int id )
     {
-        var student = await _context.Students.FindAsync(id);
-        if(student == null ) return  ; 
-        _context.Students.Remove(student);
-        await _context.SaveChangesAsync();
+        // var student = await Context.Users.OfType<Student>().FindAsync(id);
+        // if(student == null ) return  ; 
+        // Context.Users.OfType<Student>().Remove(student);
+        // await Context.SaveChangesAsync();
 
     }
 
     public async Task Update(int id )
     {
-        var student = await _context.Students.FindAsync(id);
-        if(student == null ) return  ; 
-        _context.Students.Update(student) ;
-        await _context.SaveChangesAsync();
+        // var student = await Context.Users.OfType<Student>().FindAsync(id);
+        // if(student == null ) return  ; 
+        // Context.Users.OfType<Student>().Update(student) ;
+        // await Context.SaveChangesAsync();
         
     }
 
 
-    public async Task<int> checkGroupAvailabilityAsync(int levelId)
-    {
-       var group = await _context.Groups.Where(g => g.Students.Count() < g.Capacity).FirstAsync();
-       return group.Id ;
-    }
+    // public async Task<int> checkGroupAvailabilityAsync(int levelId)
+    // {
+    //    var group = await Context.Groups.Where(g => g.Users.OfType<Student>().Count() < g.Capacity).FirstAsync();
+    //    return group.Id ;
+    // }
 }
+

@@ -1,8 +1,7 @@
-using SchoolManagement.Http.Requests;
-using SchoolManagement.Models;
-namespace SchoolManagement.DTOs;
+using SchoolManagement.Backend.Models;
+namespace SchoolManagement.Backend.Dtos;
 
-public class StudentDTO : Student
+public class StudentDto : Student
 {
     // public StudentDTO()
     // {
@@ -23,5 +22,6 @@ public class StudentDTO : Student
     //          LevelId  = data.LevelId
     //     };
     // }
+
 
 }

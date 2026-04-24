@@ -1,25 +1,23 @@
 
-using SchoolManagement.Database.Factories;
-using SchoolManagement.Models;
+using SchoolManagement.Backend.Database.Factories;
+using SchoolManagement.Backend.Models;
 
-namespace  SchoolManagement.Database.Seeders ; 
+namespace  SchoolManagement.Backend.Database.Seeders ; 
 
 public class LevelSeeder : Seeder
 {
     private readonly   LevelFactory _factory;
-    private readonly AppDbContext _context;
 
-    public LevelSeeder(AppDbContext context)
+    public LevelSeeder(AppDbContext context) : base(context)
     {
-            _factory = new   LevelFactory();
-            _context = context ;
+            _factory = new   LevelFactory(context);
 
     } 
 
     public override async Task RunAsync()
     {
        List<Level> Levels = _factory.MakeMany(10);
-       await _context.Levels.AddRangeAsync(Levels);
-       await _context.SaveChangesAsync() ;
+       await Context.Levels.AddRangeAsync(Levels);
+       await Context.SaveChangesAsync() ;
     }
 }

@@ -1,9 +1,17 @@
-namespace SchoolManagement.DTOs;
+using System.ComponentModel.DataAnnotations;
 
-public class IntakeDTO : UserDTO
+namespace SchoolManagement.Backend.Dtos;
+
+public class IntakeDto : UserDto
 {
 
-     public DateTime IntakeDate { get; set; }
-     public int LeadSourceId { get; set; }
-     public int OpcId { get; set; }
+
+        [Required]
+        [DataType(DataType.Date)]
+        public DateTime IntakeDate { get; set; }
+
+        [Required]
+        public int LeadSourceId { get; set; }
+
+        public int GenderId { get; set; }
 }

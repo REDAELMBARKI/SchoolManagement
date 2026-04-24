@@ -1,21 +1,19 @@
-using SchoolManagement.Database.Factories;
-namespace SchoolManagement.Database.Seeders;
+using SchoolManagement.Backend.Database.Factories;
+namespace SchoolManagement.Backend.Database.Seeders;
 
 public class RoomSeeder : Seeder
 {
     private readonly RoomFactory _factory;
-    private readonly AppDbContext _context;
 
-    public RoomSeeder(AppDbContext context)
+    public RoomSeeder(AppDbContext context) : base(context)
     {
-        _factory = new RoomFactory();
-        _context = context;
+        _factory = new RoomFactory(context);
     }
 
     public override async Task RunAsync()
     {
         var items = _factory.MakeMany(10);
-        await _context.Rooms.AddRangeAsync(items);
-        await _context.SaveChangesAsync();
+        await Context.Rooms.AddRangeAsync(items);
+        await Context.SaveChangesAsync();
     }
 }

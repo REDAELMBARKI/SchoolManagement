@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace _.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Gender",
+                name: "Genders",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -21,7 +21,7 @@ namespace _.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Gender", x => x.Id);
+                    table.PrimaryKey("PK_Genders", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -66,6 +66,19 @@ namespace _.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Platforms",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Platforms", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Rooms",
                 columns: table => new
                 {
@@ -95,6 +108,50 @@ namespace _.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Sessions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false),
+                    FirstName = table.Column<string>(type: "TEXT", nullable: false),
+                    LastName = table.Column<string>(type: "TEXT", nullable: false),
+                    Email = table.Column<string>(type: "TEXT", nullable: false),
+                    Password = table.Column<string>(type: "TEXT", nullable: true),
+                    IsActivated = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Phone = table.Column<string>(type: "TEXT", nullable: false),
+                    GenderId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_Genders_GenderId",
+                        column: x => x.GenderId,
+                        principalTable: "Genders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Ads",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    PlatformID = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Ads", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Ads_Platforms_PlatformID",
+                        column: x => x.PlatformID,
+                        principalTable: "Platforms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -134,45 +191,177 @@ namespace _.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "User",
+                name: "Opcs",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    FirstName = table.Column<string>(type: "TEXT", nullable: false),
-                    LastName = table.Column<string>(type: "TEXT", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: false),
-                    Phone = table.Column<string>(type: "TEXT", nullable: false),
-                    GenderId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Discriminator = table.Column<string>(type: "TEXT", maxLength: 8, nullable: false),
-                    Relationship = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
-                    DateOfBirth = table.Column<DateOnly>(type: "TEXT", nullable: true),
-                    LevelId = table.Column<int>(type: "INTEGER", nullable: true),
-                    GroupId = table.Column<int>(type: "INTEGER", nullable: true),
-                    PasswordHash = table.Column<string>(type: "TEXT", nullable: true),
-                    Specialization = table.Column<string>(type: "TEXT", nullable: true),
-                    HireDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    Position = table.Column<int>(type: "INTEGER", nullable: true)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false),
+                    HireDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Salary = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Position = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_User", x => x.Id);
+                    table.PrimaryKey("PK_Opcs", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_User_Gender_GenderId",
-                        column: x => x.GenderId,
-                        principalTable: "Gender",
+                        name: "FK_Opcs_Users_Id",
+                        column: x => x.Id,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Parents",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false),
+                    Relationship = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Parents", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_User_Groups_GroupId",
+                        name: "FK_Parents_Users_Id",
+                        column: x => x.Id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Teachers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false),
+                    PasswordHash = table.Column<string>(type: "TEXT", nullable: false),
+                    Specialization = table.Column<string>(type: "TEXT", nullable: false),
+                    HireDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Salary = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Position = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Teachers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Teachers_Users_Id",
+                        column: x => x.Id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Students",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false),
+                    DateOfBirth = table.Column<DateOnly>(type: "TEXT", nullable: false),
+                    LevelId = table.Column<int>(type: "INTEGER", nullable: false),
+                    GroupId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Students", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Students_Groups_GroupId",
                         column: x => x.GroupId,
                         principalTable: "Groups",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_User_Levels_LevelId",
+                        name: "FK_Students_Levels_LevelId",
                         column: x => x.LevelId,
                         principalTable: "Levels",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Students_Users_Id",
+                        column: x => x.Id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LeadSources",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: true),
+                    OpcId = table.Column<int>(type: "INTEGER", nullable: false),
+                    AdId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LeadSources", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LeadSources_Ads_AdId",
+                        column: x => x.AdId,
+                        principalTable: "Ads",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_LeadSources_Opcs_OpcId",
+                        column: x => x.OpcId,
+                        principalTable: "Opcs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GroupTeacher",
+                columns: table => new
+                {
+                    GroupsId = table.Column<int>(type: "INTEGER", nullable: false),
+                    TeachersId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupTeacher", x => new { x.GroupsId, x.TeachersId });
+                    table.ForeignKey(
+                        name: "FK_GroupTeacher_Groups_GroupsId",
+                        column: x => x.GroupsId,
+                        principalTable: "Groups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GroupTeacher_Teachers_TeachersId",
+                        column: x => x.TeachersId,
+                        principalTable: "Teachers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GroupTeachers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    TeacherId = table.Column<int>(type: "INTEGER", nullable: false),
+                    ModuleId = table.Column<int>(type: "INTEGER", nullable: false),
+                    GroupId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupTeachers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GroupTeachers_Groups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Groups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GroupTeachers_Modules_ModuleId",
+                        column: x => x.ModuleId,
+                        principalTable: "Modules",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GroupTeachers_Teachers_TeacherId",
+                        column: x => x.TeacherId,
+                        principalTable: "Teachers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -205,66 +394,9 @@ namespace _.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Enrollments_User_StudentId",
+                        name: "FK_Enrollments_Students_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "User",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "GroupTeacher",
-                columns: table => new
-                {
-                    GroupsId = table.Column<int>(type: "INTEGER", nullable: false),
-                    TeachersId = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_GroupTeacher", x => new { x.GroupsId, x.TeachersId });
-                    table.ForeignKey(
-                        name: "FK_GroupTeacher_Groups_GroupsId",
-                        column: x => x.GroupsId,
-                        principalTable: "Groups",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_GroupTeacher_User_TeachersId",
-                        column: x => x.TeachersId,
-                        principalTable: "User",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "GroupTeachers",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    TeacherId = table.Column<int>(type: "INTEGER", nullable: false),
-                    ModuleId = table.Column<int>(type: "INTEGER", nullable: false),
-                    GroupId = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_GroupTeachers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_GroupTeachers_Groups_GroupId",
-                        column: x => x.GroupId,
-                        principalTable: "Groups",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_GroupTeachers_Modules_ModuleId",
-                        column: x => x.ModuleId,
-                        principalTable: "Modules",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_GroupTeachers_User_TeacherId",
-                        column: x => x.TeacherId,
-                        principalTable: "User",
+                        principalTable: "Students",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -294,9 +426,9 @@ namespace _.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Payments_User_StudentId",
+                        name: "FK_Payments_Students_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "User",
+                        principalTable: "Students",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -314,15 +446,46 @@ namespace _.Migrations
                 {
                     table.PrimaryKey("PK_StudentParents", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_StudentParents_User_ParentId",
+                        name: "FK_StudentParents_Parents_ParentId",
                         column: x => x.ParentId,
-                        principalTable: "User",
+                        principalTable: "Parents",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_StudentParents_User_StudentId",
+                        name: "FK_StudentParents_Students_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "User",
+                        principalTable: "Students",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Intakes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    FirstName = table.Column<string>(type: "TEXT", nullable: false),
+                    LastName = table.Column<string>(type: "TEXT", nullable: false),
+                    Email = table.Column<string>(type: "TEXT", nullable: false),
+                    Phone = table.Column<string>(type: "TEXT", nullable: false),
+                    GenderId = table.Column<int>(type: "INTEGER", nullable: false),
+                    LeadSourceId = table.Column<int>(type: "INTEGER", nullable: false),
+                    IntakeDate = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Intakes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Intakes_Genders_GenderId",
+                        column: x => x.GenderId,
+                        principalTable: "Genders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Intakes_LeadSources_LeadSourceId",
+                        column: x => x.LeadSourceId,
+                        principalTable: "LeadSources",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -351,9 +514,9 @@ namespace _.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Grades_User_StudentId",
+                        name: "FK_Grades_Students_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "User",
+                        principalTable: "Students",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -411,9 +574,9 @@ namespace _.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Absences_User_StudentId",
+                        name: "FK_Absences_Students_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "User",
+                        principalTable: "Students",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -427,6 +590,11 @@ namespace _.Migrations
                 name: "IX_Absences_StudentId",
                 table: "Absences",
                 column: "StudentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ads_PlatformID",
+                table: "Ads",
+                column: "PlatformID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Enrollments_GroupId",
@@ -489,6 +657,26 @@ namespace _.Migrations
                 column: "TeacherId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Intakes_GenderId",
+                table: "Intakes",
+                column: "GenderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Intakes_LeadSourceId",
+                table: "Intakes",
+                column: "LeadSourceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LeadSources_AdId",
+                table: "LeadSources",
+                column: "AdId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LeadSources_OpcId",
+                table: "LeadSources",
+                column: "OpcId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Payments_SessionId",
                 table: "Payments",
                 column: "SessionId");
@@ -519,19 +707,19 @@ namespace _.Migrations
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_User_GenderId",
-                table: "User",
-                column: "GenderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_User_GroupId",
-                table: "User",
+                name: "IX_Students_GroupId",
+                table: "Students",
                 column: "GroupId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_User_LevelId",
-                table: "User",
+                name: "IX_Students_LevelId",
+                table: "Students",
                 column: "LevelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_GenderId",
+                table: "Users",
+                column: "GenderId");
         }
 
         /// <inheritdoc />
@@ -550,6 +738,9 @@ namespace _.Migrations
                 name: "GroupTeacher");
 
             migrationBuilder.DropTable(
+                name: "Intakes");
+
+            migrationBuilder.DropTable(
                 name: "Payments");
 
             migrationBuilder.DropTable(
@@ -559,22 +750,37 @@ namespace _.Migrations
                 name: "Schedules");
 
             migrationBuilder.DropTable(
+                name: "LeadSources");
+
+            migrationBuilder.DropTable(
+                name: "Parents");
+
+            migrationBuilder.DropTable(
+                name: "Students");
+
+            migrationBuilder.DropTable(
                 name: "GroupTeachers");
 
             migrationBuilder.DropTable(
                 name: "Rooms");
 
             migrationBuilder.DropTable(
-                name: "Modules");
+                name: "Ads");
 
             migrationBuilder.DropTable(
-                name: "User");
-
-            migrationBuilder.DropTable(
-                name: "Gender");
+                name: "Opcs");
 
             migrationBuilder.DropTable(
                 name: "Groups");
+
+            migrationBuilder.DropTable(
+                name: "Modules");
+
+            migrationBuilder.DropTable(
+                name: "Teachers");
+
+            migrationBuilder.DropTable(
+                name: "Platforms");
 
             migrationBuilder.DropTable(
                 name: "Languages");
@@ -584,6 +790,12 @@ namespace _.Migrations
 
             migrationBuilder.DropTable(
                 name: "Sessions");
+
+            migrationBuilder.DropTable(
+                name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Genders");
         }
     }
 }
