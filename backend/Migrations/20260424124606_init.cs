@@ -196,8 +196,7 @@ namespace _.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false),
                     HireDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Salary = table.Column<decimal>(type: "TEXT", nullable: false),
-                    Position = table.Column<int>(type: "INTEGER", nullable: false)
+                    Salary = table.Column<decimal>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -236,8 +235,7 @@ namespace _.Migrations
                     PasswordHash = table.Column<string>(type: "TEXT", nullable: false),
                     Specialization = table.Column<string>(type: "TEXT", nullable: false),
                     HireDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Salary = table.Column<decimal>(type: "TEXT", nullable: false),
-                    Position = table.Column<int>(type: "INTEGER", nullable: false)
+                    Salary = table.Column<decimal>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {

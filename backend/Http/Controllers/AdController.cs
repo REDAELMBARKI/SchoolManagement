@@ -9,7 +9,7 @@ namespace SchoolManagement.Backend.Http.Controllers;
 
 
 [ApiController]
-[Route("api/opcs")]
+[Route("api/ads")]
 public class AdController : ControllerBase
 {
  
@@ -24,7 +24,7 @@ public class AdController : ControllerBase
    [HttpGet]
    public async Task<IActionResult> GetAll()
    {
-      var opcs = await _context.Ads.ToListAsync();
+      var opcs = await _context.Ads.Include(ad => ad.Platform).ToListAsync();
       return Ok(opcs);
    }
 

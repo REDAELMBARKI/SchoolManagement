@@ -1,0 +1,6 @@
+### 
+POST http://localhost:5298/api/opcs
+
+
+###
+GET http://localhost:5298/api/opcs

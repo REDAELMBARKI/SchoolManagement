@@ -8,7 +8,9 @@ namespace SchoolManagement.Backend.Models
     {
         [Key]
         public int Id { get; set; }
-        public string Name { get; set; }        // "Facebook", "Google Ads", "TikTok"
+        public string Slug {get;set;} = string.Empty ;
+
+        public string Name { get; set; } = string.Empty ;       // "Facebook", "Google Ads", "TikTok"
     }
 
 }

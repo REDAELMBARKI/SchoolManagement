@@ -11,7 +11,7 @@ using SchoolManagement.Backend;
 namespace _.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260424021253_init")]
+    [Migration("20260424124606_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -578,9 +578,6 @@ namespace _.Migrations
                     b.Property<DateTime>("HireDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Position")
-                        .HasColumnType("INTEGER");
-
                     b.Property<decimal>("Salary")
                         .HasColumnType("TEXT");
 
@@ -629,9 +626,6 @@ namespace _.Migrations
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("Position")
-                        .HasColumnType("INTEGER");
 
                     b.Property<decimal>("Salary")
                         .HasColumnType("TEXT");

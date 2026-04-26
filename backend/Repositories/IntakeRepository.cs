@@ -4,32 +4,82 @@ using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Backend.Interfaces;
 using SQLitePCL;
 using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Mappers;
+using SchoolManagement.Backend.Dtos;
+using SchoolManagement.Backend.Exceptions;
 
 namespace SchoolManagement.Backend.Repositories;
 
-public class IntakeRepository : Repository<Intake> ,  IIntakeRepository
+public class IntakeRepository : Repository<Intake> 
 {
      
      // read 
-    public IntakeRepository(AppDbContext context) : base(context) { }
-    public async Task<List<Intake>> GetAllAsync()
+    public IntakeRepository(AppDbContext context) : base(context)
     {
-         return await Query()
-               .Include(intake => intake.LeadSource)
-               .Include(intake => intake.Gender)
-               .Select(intake => new Intake{
-                   FirstName  = intake.FirstName , 
-                   LastName = intake.LastName ,
-                })
+    }
+    public async Task<List<IntakeResponseDto>> GetAllAsync()
+    {
+
+         var intakes =  await Query()
+                .Include(i => i.Gender)
+                .Include(i => i.LeadSource)
+                   .ThenInclude(ld => ld!.Ad)
+                     .ThenInclude(ad => ad!.Platform)
+                .Include(i => i.LeadSource)
+                   .ThenInclude(ld => ld!.Opc)
+                .Include(i => i.SchoolProgram)
+                .Include(i => i.CommercialAgent)
                .ToListAsync() ;
+
+         return intakes
+               .Select(intake => new IntakeResponseDto{
+                   Id = intake.Id ,
+                   IntakeDate = intake.IntakeDate ,
+                   Phone = intake.Phone ,
+                   FirstName  = intake.FirstName , 
+                   Email = intake.Email ,
+                   LastName = intake.LastName ,
+                   CreatedAt = intake.CreatedAt ,
+                   DateOfBirth = intake.DateOfBirth ,
+                   FollowUpDate = intake.FollowUpDate ,
+                   Notes = intake.Notes ,
+                   Status = intake.Status ,
+                   SchoolProgram = IntakeMapper.MapSchoolProgram(intake.SchoolProgram) ,
+                   Gender = IntakeMapper.MapGender(intake.Gender) ,
+                   CommercialAgent =  IntakeMapper.MapCommercialAgent(intake.CommercialAgent) ,
+                   Branch =  IntakeMapper.MapBranch(intake.Branch) ,
+                   LeadSource = IntakeMapper.MapLeadSource(intake.LeadSource)
+                   
+         })
+         .ToList() ;
         
     } 
-    public async Task<Intake?> GetOneAsync(int id)
+    public async Task<IntakeResponseDto?> GetOneAsync(int id)
     {
-         return await Query()
-                        .Include(intake => intake.LeadSource)
-                        .Include(intake => intake.Gender)
-                        .FirstAsync();
+          var intake =  await Query()
+                .Include(i => i.Gender)
+                .Include(i => i.LeadSource)
+                   .ThenInclude(ld => ld!.Ad)
+                     .ThenInclude(ad => ad!.Platform)
+                .Include(i => i.LeadSource)
+                   .ThenInclude(ld => ld!.Opc)
+               .FirstOrDefaultAsync(i => i.Id == id) ;
+
+         
+         if(intake is null ) throw new NotFoundException($"no intake found with id {id}");
+
+         return new IntakeResponseDto{
+                   Id = intake.Id ,
+                   IntakeDate = intake.IntakeDate ,
+                   Phone = intake.Phone ,
+                   FirstName  = intake.FirstName , 
+                   Email = intake.Email ,
+                   LastName = intake.LastName ,
+                   Gender = intake.Gender ,
+                   LeadSource = IntakeMapper.MapLeadSource(intake.LeadSource)
+         };
+         
+        
     } 
     public Task<bool> ExistsAsync(int id)
     {
@@ -38,25 +88,27 @@ public class IntakeRepository : Repository<Intake> ,  IIntakeRepository
     }
 
     //  write 
-    public async Task<Intake> AddAsync(Intake entity)
+    public async Task<IntakeResponseDto> AddAsync(Intake intake)
     {
-         await Context.AddAsync(entity);
+         await Context.AddAsync(intake);
          await Context.SaveChangesAsync();
-         return entity;
+         return (await  this.GetOneAsync(intake.Id))!;
     }
 
 
-    public async Task<Intake?> UpdateAsync(int id , Intake intake)
-    {
+    public async Task UpdateAsync(int id , Intake intake)
+    {   
         Intake? dbIntake = await Context.Intakes.FindAsync(id);
-        if(dbIntake is null ) return null ;
-        return dbIntake ;
+        if(dbIntake is null ) throw new NotFoundException($"no intake found with id {id}") ;
+        intake.Id = dbIntake.Id ;
+        Context.Entry(dbIntake).CurrentValues.SetValues(intake) ;
+        await Context.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(int id)
     {
         Intake? dbIntake = await Context.Intakes.FindAsync(id);
-        if(dbIntake is null ) return  ;
+        if(dbIntake is null ) throw new NotFoundException($"no intake found with id {id}")  ;
         Context.Intakes.Remove(dbIntake);
         await Context.SaveChangesAsync();
     }

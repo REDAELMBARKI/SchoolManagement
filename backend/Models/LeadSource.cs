@@ -10,13 +10,13 @@ public class LeadSource
 
 
     //fks
-    public int OpcId { get; set; }
-    public int AdId { get; set; }
+    public int? OpcId { get; set; }
+    public int? AdId { get; set; }
 
 
     // navigation properties
-    public Opc Opc { get; set; }
-    public Ad Ad { get; set; }
+    public Opc? Opc { get; set; }
+    public Ad? Ad { get; set; }
 
 }
 

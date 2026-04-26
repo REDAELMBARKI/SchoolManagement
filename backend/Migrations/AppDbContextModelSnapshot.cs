@@ -575,9 +575,6 @@ namespace _.Migrations
                     b.Property<DateTime>("HireDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Position")
-                        .HasColumnType("INTEGER");
-
                     b.Property<decimal>("Salary")
                         .HasColumnType("TEXT");
 
@@ -626,9 +623,6 @@ namespace _.Migrations
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("Position")
-                        .HasColumnType("INTEGER");
 
                     b.Property<decimal>("Salary")
                         .HasColumnType("TEXT");

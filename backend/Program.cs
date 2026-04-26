@@ -48,8 +48,9 @@ builder.Services.Scan(scan => scan
     .FromAssemblyOf<Program>()
     .AddClasses(c => 
           c.InNamespaces("SchoolManagement.Backend.Repositories",
-                         "SchoolManagement.Backend.Services" , 
-                            "SchoolManagement.Backend.Database.Factories"
+                         "SchoolManagement.Backend.Services" ,
+                         "SchoolManagement.Backend.Mappers" ,
+                         "SchoolManagement.Backend.Database.Factories"
                          ))
     .AsSelf()                  
     .AsMatchingInterface()     
@@ -175,7 +176,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+// app.UseAuthentication();
 app.MapControllers();
 app.Run();
 

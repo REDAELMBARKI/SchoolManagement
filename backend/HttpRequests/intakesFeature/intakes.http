@@ -1,0 +1,44 @@
+
+### Create a new intake
+POST http://localhost:5298/api/intakes
+Content-Type: application/json
+
+{
+    "firstName": "Tse",
+    "lastName": "Tes3",
+    "email": "john.doe@example.com",
+    "phone": "123-456-7890",
+    "dateOfBirth": "1990-01-01",
+    "genderId": 1,
+    "intakeDate": "2023-01-01",
+    "leadSourceId": 1
+}
+
+###  get intakes 
+GET http://localhost:5298/api/intakes
+
+
+###  get one intake
+GET http://localhost:5298/api/intakes/5
+
+
+
+### update intake
+PUT  http://localhost:5298/api/intakes/10
+Content-Type:  application/json
+
+{
+    "firstName": "Reda",
+    "lastName": "El Mbarki",
+    "email": "elm@gmail.com",
+    "phone": "123-456-7890",
+    "dateOfBirth": "1990-01-01",
+    "genderId": 1,
+    "intakeDate": "2023-01-01",
+    "leadSourceId": 2
+}
+
+
+### delete intake
+DELETE  http://localhost:5298/api/intakes/5
+

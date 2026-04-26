@@ -1,0 +1,6 @@
+### 
+GET http://localhost:5298/api/ads
+
+###
+POST  http://localhost:5298/api/ads
+

@@ -8,13 +8,14 @@ using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Backend.Dtos;
 using SchoolManagement.Backend.Services;
 using SchoolManagement.Backend.Models;
-    
+using SchoolManagement.Backend.Exceptions;
+using Microsoft.Extensions.FileProviders;
+
 
 namespace SchoolManagement.Backend.Http.Controllers;
 
 [ApiController]
 [Route("api/intakes")]
-
 public class IntakeController : ControllerBase
 {
     private readonly IntakeService _intakeService;
@@ -26,42 +27,35 @@ public class IntakeController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        // var intakes = await _intakeService.GetAllIntakesAsync();
-        // return Ok(intakes);
-        var items  = new List<Intake>
-        {
-            new Intake
-            {
-                Id = 1,
-                FirstName = "John",
-                LastName = "Doe",
-                Phone = "1234567890",
-                Email = "" ,
-            }
-            ,
-            new Intake
-            {
-                Id = 2,
-                FirstName = "Jane",
-                LastName = "Smith",
-                Phone = "0987654321",
-                Email = "" ,
-            }
-        } ;
-        
-        return Ok(items);
-
+        var intakes = await _intakeService.GetAllIntakesAsync();
+        return Ok(intakes);
     }
 
+    [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var intake = await _intakeService.GetIntakeByIdAsync(id);
-        return Ok(intake);
+        try
+        {
+           var intake = await _intakeService.GetIntakeByIdAsync(id);
+           return Ok(intake);
+            
+        }catch(NotFoundException)
+        {
+            return NotFound();
+        }
+        catch (Exception ex)
+        {
+            return Problem(
+                statusCode : 500 ,
+                title : "fetch error" ,
+                detail : ex.Message
+            ) ;
+        }
     }
 
 
     [HttpPost]
-    public async Task<IActionResult> AddIntake(IntakeDto intake)
+    public async Task<IActionResult> Add(IntakeDto intake)
     {
         IntakeDto dto = new IntakeDto
         {
@@ -72,30 +66,51 @@ public class IntakeController : ControllerBase
             IntakeDate = intake.IntakeDate,
             LeadSourceId = intake.LeadSourceId,
             GenderId = intake.GenderId,
-
+            DateOfBirth = intake.DateOfBirth  ,
         };
-        await _intakeService.AddIntakeAsync(dto);
-        return NoContent();
+        var newIntake = await _intakeService.AddIntakeAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = newIntake.Id }, newIntake);
     }
 
-    public async Task<IActionResult> Update(int id, Intake intake)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, IntakeDto intake)
     {
-        if (id != intake.Id)
+        try
         {
-            return BadRequest();
-        }
-
-        return NoContent();
-    }
-
-    public async Task<IActionResult> Delete(int id)
-    {
-        var intake = await _intakeService.GetIntakeByIdAsync(id);
-        if (intake == null)
+            await _intakeService.UpdateAsync(id , intake);
+            return NoContent();
+        }catch(NotFoundException)
         {
             return NotFound();
         }
+        catch (Exception ex)
+        {
+            return Problem(
+                statusCode : 500 ,
+                title : "update error" ,
+                detail : ex.Message
+            ) ;
+        }
+    }
 
-        return NoContent();
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        try
+        {
+            await _intakeService.DeleteIntakeAsync(id);
+            return NoContent();
+        }catch(NotFoundException)
+        {
+            return NotFound() ;
+        }
+        catch (Exception)
+        {
+            return Problem(
+             statusCode : 500 ,
+             title : "Delete Error" ,
+             detail : "field to delete intake"
+            );
+        }
     }
 }

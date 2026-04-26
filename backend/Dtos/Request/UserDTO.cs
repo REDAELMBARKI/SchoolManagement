@@ -18,8 +18,7 @@ public  class UserDto
         [Required,Phone ,  MaxLength(255)]
         public string Phone { get; set; } = string.Empty;
 
-        [Required]
-        public DateTime DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
  
         [Required]
         public int GenderId { get; set; }
