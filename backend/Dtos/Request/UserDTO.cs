@@ -11,10 +11,15 @@ public  class UserDto
  
         [Required, MaxLength(50)]
         public string LastName { get; set; } = string.Empty;
+
+        public string? Slug {get;set;} = string.Empty ;
  
         [Required, EmailAddress, MaxLength(255)]
         public string Email { get; set; } = string.Empty;
- 
+
+        [Required , MinLength(8)]
+        public string? Password {get;set;} = string.Empty ;
+
         [Required,Phone ,  MaxLength(255)]
         public string Phone { get; set; } = string.Empty;
 
@@ -22,8 +27,7 @@ public  class UserDto
  
         [Required]
         public int GenderId { get; set; }
-
         public bool IsActivated { get; set; } = false;
-
+   
 
 }

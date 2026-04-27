@@ -10,11 +10,9 @@ namespace SchoolManagement.Backend.Services;
 public class IntakeService
 {
     private readonly IntakeRepository _repository;
-    private readonly IMapper _autoMapper ;
-    public IntakeService(IntakeRepository repository , IMapper mapper)
+    public IntakeService(IntakeRepository repository)
     {
         _repository = repository;
-        _autoMapper = mapper ;
     }
 
     public async Task<IEnumerable<IntakeResponseDto>> GetAllIntakesAsync()
@@ -31,24 +29,7 @@ public class IntakeService
     public async Task<IntakeResponseDto> AddIntakeAsync(IntakeDto intakeDto)
     {   
 
-        var entity = new Intake
-        {
-            FirstName = intakeDto.FirstName,
-            LastName = intakeDto.LastName,
-            Phone = intakeDto.Phone,
-            Email = intakeDto.Email,
-            DateOfBirth = intakeDto.DateOfBirth,
-            IntakeDate = intakeDto.IntakeDate,
-            Status = intakeDto.Status,
-            FollowUpDate = intakeDto.FollowUpDate,
-            Notes = intakeDto.Notes,
-            GenderId = intakeDto.GenderId,
-            LeadSourceId = intakeDto.LeadSourceId,
-            ProgramId = intakeDto.ProgramId,
-            BranchId = intakeDto.BranchId,
-            CommercialAgentId = intakeDto.CommercialAgentId,
-        };
-        
+        var entity = IntakeMapper.ToEntity(intakeDto);
         var newEntity = await _repository.AddAsync(entity);
         return newEntity ; 
     }

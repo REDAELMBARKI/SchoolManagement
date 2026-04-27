@@ -1,5 +1,6 @@
 using Bogus;
 using Microsoft.VisualBasic;
+
 namespace SchoolManagement.Backend.Database.Factories ; 
 public abstract class Factory<T> where T : class 
 {  

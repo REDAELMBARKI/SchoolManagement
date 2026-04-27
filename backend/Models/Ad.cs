@@ -1,10 +1,8 @@
 using System.ComponentModel.DataAnnotations ;
 namespace SchoolManagement.Backend.Models ; 
 
-public class Ad
+public class Ad : BaseEntity
 {
-    [Key]
-    public int Id { get; set; }
     public string Name { get; set; } = null! ;
     public string Slug {get;set;} = string.Empty ;
     

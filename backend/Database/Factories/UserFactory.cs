@@ -6,6 +6,7 @@ using SchoolManagement.Backend;
 using SchoolManagement.Backend.Database.Factories;
 using SchoolManagement.Backend.Dtos;
 using SchoolManagement.Backend.Models;
+using Slugify;
 
 namespace SchoolManagement.Backend.Database.Factories;
 
@@ -20,29 +21,47 @@ public class UserFactory  : Factory<UserDto>
 
     protected override UserDto Make()
     {   
-
+       var firstName = faker.Name.FirstName();
+       var lastName = faker.Name.LastName();
         return new UserDto
         {
-            FirstName = "John",
-            LastName = "Doe",
-            Email = "studentEmail@gmail.com" ,
-            Phone = "1234567890",
-            GenderId = 1,
-            IsActivated = false , 
-
-
+            FirstName = firstName,
+            LastName = lastName,
+            Slug = new SlugHelper().GenerateSlug($"{firstName} {lastName}"),
+            Email = faker.Internet.Email(firstName, lastName),
+            Phone = faker.Phone.PhoneNumber(),
+            Password = BCrypt.Net.BCrypt.HashPassword("password"),
+            IsActivated = true,
+            GenderId = Context.Genders.OrderBy(g => Guid.NewGuid()).Select(g => g.Id).First()
         };
     }
 
 
     public Opc MakeOpc()
-    {
+    { 
+
+        
         var user = this.Make();
         var opc =  _mapper.Map<Opc>(user);
-        opc.HireDate = DateTime.Now.AddYears(-5);
-        opc.Salary = 10000;
+        DateTime creationDate = DateTime.Now ;
+        opc.HireDate = faker.Date.Past(5) ;
+        opc.Salary = faker.Finance.Amount(3000, 15000);
+        opc.CreatedAt = creationDate ;
+        opc.UpdatedAt = creationDate;
+
         return opc;
     }
-
+  
+    public CommercialAgent MakeCa()
+    {
+        var user =  this.Make() ;
+        var ca = _mapper.Map<CommercialAgent>(user) ;
+        DateTime creationDate = DateTime.Now ;
+        ca.CreatedAt = creationDate ;
+        ca.UpdatedAt = creationDate;
+        ca.HireDate = faker.Date.Past(5) ;
+        ca.Salary = faker.Finance.Amount(3000, 15000);
+        return ca ;
+    }
 
 }

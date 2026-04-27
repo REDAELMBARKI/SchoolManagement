@@ -1,12 +1,10 @@
 using System.ComponentModel.DataAnnotations ;
-using _.Models;
 namespace SchoolManagement.Backend.Models ;   
 
 
   
  public class Session  :  BaseEntity
     {
-        public int Id { get; set; }
  
         [Required, MaxLength(50)]
         public string Label { get; set; } = string.Empty;

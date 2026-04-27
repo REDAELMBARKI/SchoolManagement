@@ -7,8 +7,7 @@ namespace SchoolManagement.Backend.Mappers;
 
 public class IntakeMapper
 {
-   // Service — does the mapping using GetLeadSource()
-   public static LeadSourceResponseDto? MapLeadSource(LeadSource? leadSource)
+        public static LeadSourceResponseDto? MapLeadSource(LeadSource? leadSource)
     {
         if(leadSource is null ) return null ;
 
@@ -38,21 +37,43 @@ public class IntakeMapper
         return null ;
     }
    
-   public static BranchResponseDto? MapBranch(Branch? branch)
-    {
-        
-    }
+        public static BranchResponseDto MapBranch(Branch branch)
+        {
+            return new BranchResponseDto
+            {
+                Id = branch.Id,
+                Slug = branch.Slug,
+                Name = branch.Name,
+                City = branch.City,
+                Address = branch.Address,
+                Phone = branch.Phone
+            };
+        }
 
-     public static CommercialAgentResponseDto? MapCommercialAgent(CommercialAgent? commAgent)
-    {
-        
-    }
+        public static CommercialAgentResponseDto? MapCommercialAgent(CommercialAgent? commAgent)
+        {
+            if (commAgent is null) return null;
+            return new CommercialAgentResponseDto
+            {
+                Id = commAgent.Id,
+                Slug = commAgent.Slug,
+                FirstName = commAgent.FirstName,
+                LastName = commAgent.LastName,
+                Email = commAgent.Email,
+                Phone = commAgent.Phone
+            };
+        }
 
-     public static SchoolProgramResponseDto? MapSchoolProgram(SchoolProgram? schoolProgram)
-    {
-        
-    }
-
+        public static SchoolProgramResponseDto MapSchoolProgram(SchoolProgram schoolProgram)
+        {
+            return new SchoolProgramResponseDto
+            {
+                Id = schoolProgram.Id,
+                Slug = schoolProgram.Slug,
+                Name = schoolProgram.Name,
+                Description = schoolProgram.Description
+            };
+        }
      public static GenderResponseDto MapGender(Gender gender)
     {
         return new GenderResponseDto
@@ -63,18 +84,21 @@ public class IntakeMapper
         }   ;
     }
 
-   public static Intake ToEntity(IntakeDto intakeDto)
-   {
-        return new Intake
-        {
-            FirstName = intakeDto.FirstName ,
-            LastName  = intakeDto.FirstName , 
-            IntakeDate = intakeDto.IntakeDate ,
-            Phone = intakeDto.Phone ,
-            Email = intakeDto.Email ,
-            GenderId = intakeDto.GenderId ,
-            LeadSourceId = intakeDto.LeadSourceId , 
-            
-         };
-   }
+    public static Intake ToEntity(IntakeDto dto) => new()
+    {
+        FirstName = dto.FirstName,
+        LastName = dto.LastName,
+        Email = dto.Email,
+        Phone = dto.Phone,
+        DateOfBirth = dto.DateOfBirth,
+        IntakeDate = dto.IntakeDate,
+        Status = dto.Status,
+        FollowUpDate = dto.FollowUpDate,
+        Notes = dto.Notes,
+        GenderId = dto.GenderId,
+        LeadSourceId = dto.LeadSourceId,
+        SchoolProgramId = dto.SchoolProgramId,
+        BranchId = dto.BranchId,
+        CommercialAgentId = dto.CommercialAgentId
+    };
 }

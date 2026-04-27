@@ -10,10 +10,10 @@ public class DatabaseSeeder
 {
   public static async Task Seed(AppDbContext _context , UserFactory userFactory)
   {
-
-        await new OpcSeeder(userFactory , _context ).RunAsync();
+        await new PlatformSeeder(_context).RunAsync();
+        await new OpcSeeder(_context ).RunAsync();
         await new GenderSeeder(_context).RunAsync();
-        await new LanguageSeeder(_context).RunAsync();
+        await new SchoolProgramSeeder(_context).RunAsync();
         await new AdSeeder(_context).RunAsync();
         await new LeadSourceSeeder(_context).RunAsync();
         await new IntakeSeeder(_context).RunAsync();

@@ -56,36 +56,42 @@ public class IntakeRepository : Repository<Intake>
     } 
     public async Task<IntakeResponseDto?> GetOneAsync(int id)
     {
-          var intake =  await Query()
+        var intake = await Query()
                 .Include(i => i.Gender)
                 .Include(i => i.LeadSource)
-                   .ThenInclude(ld => ld!.Ad)
-                     .ThenInclude(ad => ad!.Platform)
+                .ThenInclude(ld => ld!.Ad)
+                    .ThenInclude(ad => ad!.Platform)
                 .Include(i => i.LeadSource)
-                   .ThenInclude(ld => ld!.Opc)
-               .FirstOrDefaultAsync(i => i.Id == id) ;
+                .ThenInclude(ld => ld!.Opc)
+                .Include(i => i.SchoolProgram)
+                .Include(i => i.CommercialAgent)
+                .Include(i => i.Branch)
+                .FirstOrDefaultAsync(i => i.Id == id);
 
-         
-         if(intake is null ) throw new NotFoundException($"no intake found with id {id}");
+        if(intake is null) throw new NotFoundException($"no intake found with id {id}");
 
-         return new IntakeResponseDto{
-                   Id = intake.Id ,
-                   IntakeDate = intake.IntakeDate ,
-                   Phone = intake.Phone ,
-                   FirstName  = intake.FirstName , 
-                   Email = intake.Email ,
-                   LastName = intake.LastName ,
-                   Gender = intake.Gender ,
-                   LeadSource = IntakeMapper.MapLeadSource(intake.LeadSource)
-         };
-         
-        
-    } 
-    public Task<bool> ExistsAsync(int id)
-    {
-        throw new NotImplementedException("sdjosjd");
-        
+        return new IntakeResponseDto
+        {
+            Id = intake.Id,
+            IntakeDate = intake.IntakeDate,
+            Phone = intake.Phone,
+            FirstName = intake.FirstName,
+            Email = intake.Email,
+            LastName = intake.LastName,
+            CreatedAt = intake.CreatedAt,
+            DateOfBirth = intake.DateOfBirth,
+            FollowUpDate = intake.FollowUpDate,
+            Notes = intake.Notes,
+            Status = intake.Status,
+            SchoolProgram = IntakeMapper.MapSchoolProgram(intake.SchoolProgram),
+            Gender = IntakeMapper.MapGender(intake.Gender),
+            CommercialAgent = IntakeMapper.MapCommercialAgent(intake.CommercialAgent),
+            Branch = IntakeMapper.MapBranch(intake.Branch),
+            LeadSource = IntakeMapper.MapLeadSource(intake.LeadSource)
+        };
     }
+   
+
 
     //  write 
     public async Task<IntakeResponseDto> AddAsync(Intake intake)

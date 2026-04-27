@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Backend.Interfaces;
+using SchoolManagement.Backend.Models;
 
 namespace SchoolManagement.Backend.Repositories;
 
-public abstract class Repository<T> where T : class
+public abstract class Repository<T> where T : BaseEntity
 {
     protected readonly AppDbContext _context;
 
@@ -30,5 +31,9 @@ public abstract class Repository<T> where T : class
         return entry.Entity;
     }
     
+    public async Task<bool> ExistsAsync(int id)
+    {
+       return await Context.Set<T>().AnyAsync(e => e.Id == id) ;
+    }
     protected AppDbContext Context => _context;
 }
