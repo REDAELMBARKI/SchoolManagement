@@ -4,6 +4,7 @@ using Bogus;
 using Bogus.DataSets;
 using SchoolManagement.Backend;
 using SchoolManagement.Backend.Database.Factories;
+using SchoolManagement.Backend.Database.Seeders;
 using SchoolManagement.Backend.Dtos;
 using SchoolManagement.Backend.Models;
 using Slugify;
@@ -21,6 +22,7 @@ public class UserFactory  : Factory<UserDto>
 
     protected override UserDto Make()
     {   
+       var genders =  Context.Genders.Select(g => g.Id).ToList();
        var firstName = faker.Name.FirstName();
        var lastName = faker.Name.LastName();
         return new UserDto
@@ -32,7 +34,7 @@ public class UserFactory  : Factory<UserDto>
             Phone = faker.Phone.PhoneNumber(),
             Password = BCrypt.Net.BCrypt.HashPassword("password"),
             IsActivated = true,
-            GenderId = Context.Genders.OrderBy(g => Guid.NewGuid()).Select(g => g.Id).First()
+            GenderId = faker.PickRandom(genders)
         };
     }
 
@@ -41,7 +43,7 @@ public class UserFactory  : Factory<UserDto>
     { 
 
         
-        var user = this.Make();
+        UserDto user = this.Make();
         var opc =  _mapper.Map<Opc>(user);
         DateTime creationDate = DateTime.Now ;
         opc.HireDate = faker.Date.Past(5) ;

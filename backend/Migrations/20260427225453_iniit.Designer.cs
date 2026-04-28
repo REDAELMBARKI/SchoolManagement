@@ -11,8 +11,8 @@ using SchoolManagement.Backend;
 namespace _.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260424124606_init")]
-    partial class init
+    [Migration("20260427225453_iniit")]
+    partial class iniit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -77,18 +77,64 @@ namespace _.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("PlatformID")
+                    b.Property<int>("PlatformId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PlatformID");
+                    b.HasIndex("PlatformId");
 
                     b.ToTable("Ads");
+                });
+
+            modelBuilder.Entity("SchoolManagement.Backend.Models.Branch", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Branches");
                 });
 
             modelBuilder.Entity("SchoolManagement.Backend.Models.Enrollment", b =>
@@ -132,6 +178,10 @@ namespace _.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Slug")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -204,14 +254,17 @@ namespace _.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("SchoolProgramId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("SessionId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LanguageId");
-
                     b.HasIndex("LevelId");
+
+                    b.HasIndex("SchoolProgramId");
 
                     b.HasIndex("SessionId");
 
@@ -230,6 +283,9 @@ namespace _.Migrations
                     b.Property<int>("ModuleId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("SchoolProgramId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("TeacherId")
                         .HasColumnType("INTEGER");
 
@@ -237,7 +293,7 @@ namespace _.Migrations
 
                     b.HasIndex("GroupId");
 
-                    b.HasIndex("ModuleId");
+                    b.HasIndex("SchoolProgramId");
 
                     b.HasIndex("TeacherId");
 
@@ -250,12 +306,27 @@ namespace _.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("BranchId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("CommercialAgentId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("FollowUpDate")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("GenderId")
@@ -271,33 +342,39 @@ namespace _.Migrations
                     b.Property<int>("LeadSourceId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Notes")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Phone")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("SchoolProgramId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("CommercialAgentId");
 
                     b.HasIndex("GenderId");
 
                     b.HasIndex("LeadSourceId");
 
+                    b.HasIndex("SchoolProgramId");
+
                     b.ToTable("Intakes");
-                });
-
-            modelBuilder.Entity("SchoolManagement.Backend.Models.Language", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Languages");
                 });
 
             modelBuilder.Entity("SchoolManagement.Backend.Models.LeadSource", b =>
@@ -306,13 +383,13 @@ namespace _.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("AdId")
+                    b.Property<int?>("AdId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("OpcId")
+                    b.Property<int?>("OpcId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -341,26 +418,6 @@ namespace _.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Levels");
-                });
-
-            modelBuilder.Entity("SchoolManagement.Backend.Models.Module", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(300)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Modules");
                 });
 
             modelBuilder.Entity("SchoolManagement.Backend.Models.Payment", b =>
@@ -413,8 +470,18 @@ namespace _.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -485,11 +552,38 @@ namespace _.Migrations
                     b.ToTable("Schedules");
                 });
 
+            modelBuilder.Entity("SchoolManagement.Backend.Models.SchoolProgram", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(300)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SchoolPrograms");
+                });
+
             modelBuilder.Entity("SchoolManagement.Backend.Models.Session", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("TEXT");
@@ -503,6 +597,9 @@ namespace _.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("StartDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -537,6 +634,9 @@ namespace _.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -562,6 +662,13 @@ namespace _.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.HasIndex("GenderId");
@@ -582,6 +689,19 @@ namespace _.Migrations
                         .HasColumnType("TEXT");
 
                     b.ToTable("Opcs", (string)null);
+                });
+
+            modelBuilder.Entity("SchoolManagement.Backend.Models.CommercialAgent", b =>
+                {
+                    b.HasBaseType("SchoolManagement.Backend.Models.User");
+
+                    b.Property<DateTime>("HireDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Salary")
+                        .HasColumnType("TEXT");
+
+                    b.ToTable("CommercialAgents");
                 });
 
             modelBuilder.Entity("SchoolManagement.Backend.Models.Parent", b =>
@@ -675,7 +795,7 @@ namespace _.Migrations
                 {
                     b.HasOne("SchoolManagement.Backend.Models.Platform", "Platform")
                         .WithMany()
-                        .HasForeignKey("PlatformID")
+                        .HasForeignKey("PlatformId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -730,15 +850,15 @@ namespace _.Migrations
 
             modelBuilder.Entity("SchoolManagement.Backend.Models.Group", b =>
                 {
-                    b.HasOne("SchoolManagement.Backend.Models.Language", "Language")
-                        .WithMany()
-                        .HasForeignKey("LanguageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("SchoolManagement.Backend.Models.Level", "Level")
                         .WithMany()
                         .HasForeignKey("LevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SchoolManagement.Backend.Models.SchoolProgram", "SchoolProgram")
+                        .WithMany()
+                        .HasForeignKey("SchoolProgramId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -748,9 +868,9 @@ namespace _.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Language");
-
                     b.Navigation("Level");
+
+                    b.Navigation("SchoolProgram");
 
                     b.Navigation("Session");
                 });
@@ -763,9 +883,9 @@ namespace _.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SchoolManagement.Backend.Models.Module", "Module")
+                    b.HasOne("SchoolManagement.Backend.Models.SchoolProgram", "SchoolProgram")
                         .WithMany()
-                        .HasForeignKey("ModuleId")
+                        .HasForeignKey("SchoolProgramId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -777,13 +897,23 @@ namespace _.Migrations
 
                     b.Navigation("Group");
 
-                    b.Navigation("Module");
+                    b.Navigation("SchoolProgram");
 
                     b.Navigation("Teacher");
                 });
 
             modelBuilder.Entity("SchoolManagement.Backend.Models.Intake", b =>
                 {
+                    b.HasOne("SchoolManagement.Backend.Models.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SchoolManagement.Backend.Models.CommercialAgent", "CommercialAgent")
+                        .WithMany()
+                        .HasForeignKey("CommercialAgentId");
+
                     b.HasOne("SchoolManagement.Backend.Models.Gender", "Gender")
                         .WithMany()
                         .HasForeignKey("GenderId")
@@ -796,24 +926,32 @@ namespace _.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("SchoolManagement.Backend.Models.SchoolProgram", "SchoolProgram")
+                        .WithMany()
+                        .HasForeignKey("SchoolProgramId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("CommercialAgent");
+
                     b.Navigation("Gender");
 
                     b.Navigation("LeadSource");
+
+                    b.Navigation("SchoolProgram");
                 });
 
             modelBuilder.Entity("SchoolManagement.Backend.Models.LeadSource", b =>
                 {
                     b.HasOne("SchoolManagement.Backend.Models.Ad", "Ad")
                         .WithMany()
-                        .HasForeignKey("AdId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AdId");
 
                     b.HasOne("Opc", "Opc")
                         .WithMany()
-                        .HasForeignKey("OpcId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("OpcId");
 
                     b.Navigation("Ad");
 
@@ -893,6 +1031,15 @@ namespace _.Migrations
                     b.HasOne("SchoolManagement.Backend.Models.User", null)
                         .WithOne()
                         .HasForeignKey("Opc", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SchoolManagement.Backend.Models.CommercialAgent", b =>
+                {
+                    b.HasOne("SchoolManagement.Backend.Models.User", null)
+                        .WithOne()
+                        .HasForeignKey("SchoolManagement.Backend.Models.CommercialAgent", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

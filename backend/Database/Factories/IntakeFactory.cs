@@ -9,6 +9,12 @@ public class IntakeFactory : Factory<Intake>
     }
     protected override Intake Make()
     {
+        var genderIds = Context.Genders.Select(g => g.Id).ToList();
+        var leadSourceIds = Context.LeadSources.Select(l => l.Id).ToList();
+        var programIds = Context.SchoolPrograms.Select(sp => sp.Id).ToList();
+        var branchIds = Context.Branches.Select(b => b.Id).ToList();
+        var agentIds = Context.CommercialAgents.Select(ca => ca.Id).ToList();
+
         return new Intake
         {   
             FirstName = faker.Name.FirstName(),
@@ -20,11 +26,11 @@ public class IntakeFactory : Factory<Intake>
             Status = faker.PickRandom<IntakeStatus>(),
             FollowUpDate = faker.Date.Future(),
             Notes = faker.Lorem.Sentence(),
-            GenderId = Context.Genders.OrderBy(g => Guid.NewGuid()).Select(g => g.Id).First(),
-            LeadSourceId = Context.LeadSources.OrderBy(l => Guid.NewGuid()).Select(l => l.Id).First(),
-            SchoolProgramId = Context.SchoolPrograms.OrderBy(sp => Guid.NewGuid()).Select(sp => sp.Id).First(),
-            BranchId = Context.Branches.OrderBy(b => Guid.NewGuid()).Select(b => b.Id).First(),
-            CommercialAgentId = Context.CommercialAgents.OrderBy(ca => Guid.NewGuid()).Select(ca => ca.Id).First()
+            GenderId = faker.PickRandom(genderIds),
+            LeadSourceId = faker.PickRandom(leadSourceIds),
+            SchoolProgramId = faker.PickRandom(programIds),
+            BranchId = faker.PickRandom(branchIds),
+            CommercialAgentId = faker.PickRandom(agentIds)
         };
     }
 }

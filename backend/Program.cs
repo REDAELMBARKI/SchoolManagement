@@ -6,6 +6,7 @@ using SchoolManagement.Backend;
 using SchoolManagement.Backend.Database.Seeders;
 using SchoolManagement.Backend.Database.Factories;
 using Serilog;
+using AutoMapper;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Error()
@@ -16,7 +17,7 @@ Log.Logger = new LoggerConfiguration()
 var builder = WebApplication.CreateBuilder(args);
 
 // auto mapper 
-builder.Services.AddAutoMapper(typeof(Program)) ;
+builder.Services.AddAutoMapper(typeof(Program).Assembly) ;
 // configure context 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ; 
 builder.Services.AddDbContext<AppDbContext>(
@@ -76,98 +77,13 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// fun seeders 
-var isDbCommand = false ; 
-using(var scope = app.Services.CreateScope())
+
+using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    var userFactory = scope.ServiceProvider.GetRequiredService<UserFactory>();
-
-    try
-    {    
-      if (args.Length > 0 && args[0] == "db")
-        {   
-            isDbCommand = true ;
-            switch (args[1])
-            {
-                case "migrate":
-                    await context.Database.MigrateAsync();
-                    Console.WriteLine("migrations applied");
-                    break;
-
-                case "migrate:fresh":
-                    await context.Database.EnsureDeletedAsync();
-                    await context.Database.MigrateAsync();
-                    Console.WriteLine("database freshed");
-                    break;
-
-                case "migrate:fresh:seed":
-                    await context.Database.EnsureDeletedAsync();
-                    await context.Database.MigrateAsync();
-                    await DatabaseSeeder.Seed(context , userFactory);
-                    Console.WriteLine("freshed and seeded");
-                    break;
-
-                case "seed":
-                    await DatabaseSeeder.Seed(context , userFactory);
-                    Console.WriteLine("seeded successfully");
-                    break;
-
-                default:
-                    var seedArg = args.FirstOrDefault(a => a.StartsWith("--seed-class="));
-
-                    if (seedArg == null)
-                    {
-                        Console.WriteLine("invalid command");
-                        break;
-                    }
-
-                    var className = seedArg.Split('=')[1];
-
-                    if (string.IsNullOrEmpty(className))
-                    {
-                        Console.WriteLine("no class name provided after =");
-                        break;
-                    }
-
-                    var seederType = AppDomain.CurrentDomain
-                        .GetAssemblies()
-                        .SelectMany(a => a.GetTypes())
-                        .FirstOrDefault(c => c.Name == className);
-
-                    if (seederType == null)
-                    {
-                        Console.WriteLine($"'{className}' not found");
-                        break;
-                    }
-
-                    if (!typeof(Seeder).IsAssignableFrom(seederType))
-                    {
-                        Console.WriteLine($"'{className}' is not a valid seeder");
-                        break;
-                    }
-
-                    var instance = Activator.CreateInstance(seederType, context);
-                    await (Task) seederType.GetMethod("RunAsync")!.Invoke(instance, null)!;
-                    break;
-            }
-
-        }
-    }
-    catch (Exception ex)
-    {
-        isDbCommand = true ;
-        var message = ex.InnerException?.InnerException?.Message 
-                ?? ex.InnerException?.Message 
-                ?? ex.Message;
-                
-        Log.Error("❌ {Message}", message);
-
-    }
+    var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+    await DatabaseSeeder.Seed(context, mapper);
 }
-
-           
-if(isDbCommand)  return; // never run server
 
 
 if (app.Environment.IsDevelopment())

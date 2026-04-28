@@ -14,7 +14,7 @@ namespace SchoolManagement.Backend.Models ;
  
         // navigations
         public Teacher Teacher { get; set; } = null!;
-        public Module Module { get; set; } = null!;
+        public SchoolProgram SchoolProgram { get; set; } = null!;
         public Group Group { get; set; } = null!;
 
 

@@ -29,6 +29,7 @@ public class IntakeRepository : Repository<Intake>
                    .ThenInclude(ld => ld!.Opc)
                 .Include(i => i.SchoolProgram)
                 .Include(i => i.CommercialAgent)
+                .Include(i => i.Branch)
                .ToListAsync() ;
 
          return intakes

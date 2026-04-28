@@ -29,7 +29,7 @@ namespace SchoolManagement.Backend.Models ;
  
         // navigations
         public Level Level { get; set; } = null!;
-        public Language Language { get; set; } = null!;
+        public SchoolProgram SchoolProgram { get; set; } = null!;
         public Session Session { get; set; } = null!;
 
   }

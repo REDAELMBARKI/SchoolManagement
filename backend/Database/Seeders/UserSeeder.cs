@@ -14,7 +14,7 @@ public class UserSeeder : Seeder
 
     public override async Task RunAsync()
     {
-        if (await Context.Genders.AnyAsync()) return;
+        if (await Context.Opcs.AnyAsync()) return;
 
         var opc = _userFactory.MakeOpc();
         // make opc 

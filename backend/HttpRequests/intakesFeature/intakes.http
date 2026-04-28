@@ -24,18 +24,24 @@ GET http://localhost:5298/api/intakes/5
 
 
 ### update intake
-PUT  http://localhost:5298/api/intakes/10
+PUT  http://localhost:5298/api/intakes/5
 Content-Type:  application/json
 
 {
-    "firstName": "Reda",
-    "lastName": "El Mbarki",
-    "email": "elm@gmail.com",
-    "phone": "123-456-7890",
-    "dateOfBirth": "1990-01-01",
-    "genderId": 1,
-    "intakeDate": "2023-01-01",
-    "leadSourceId": 2
+  "FirstName": "Antoniox",
+  "LastName": "Toy",
+  "Email": "Reina_Larson91@yahoo.com",
+  "Phone": "1-256-646-9121 x1732",
+  "IntakeDate": "2025-12-03T08:36:33.9868104",
+  "DateOfBirth": "1989-01-19T23:00:53.7874664",
+  "FollowUpDate": "2026-05-01T04:32:09.2940981",
+  "Notes": "Et minus nostrum aliquam quia numquam.",
+  "Status": 0,
+  "LeadSourceId": 1,
+  "GenderId":1 ,
+  "SchoolProgramId": 5 ,
+  "BranchId": 73 ,
+  "CommercialAgentId": 2
 }
 
 

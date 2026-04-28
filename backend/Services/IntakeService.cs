@@ -38,6 +38,7 @@ public class IntakeService
     public async Task UpdateAsync(int id , IntakeDto intakeDto)
     {
           var intake = IntakeMapper.ToEntity(intakeDto);
+          intake.UpdatedAt = DateTime.Now ;
           await _repository.UpdateAsync(id , intake);
     }
 

@@ -6,35 +6,42 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace _.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class iniit : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Branches",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Slug = table.Column<string>(type: "TEXT", nullable: false),
+                    City = table.Column<string>(type: "TEXT", nullable: false),
+                    Address = table.Column<string>(type: "TEXT", nullable: false),
+                    Phone = table.Column<string>(type: "TEXT", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Branches", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Genders",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    Slug = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Genders", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Languages",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Languages", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -52,26 +59,15 @@ namespace _.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Modules",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "TEXT", maxLength: 300, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Modules", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Platforms",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", nullable: false)
+                    Slug = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -95,6 +91,21 @@ namespace _.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SchoolPrograms",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Slug = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", maxLength: 300, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SchoolPrograms", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Sessions",
                 columns: table => new
                 {
@@ -103,7 +114,9 @@ namespace _.Migrations
                     Label = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     StartDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     EndDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    IsCurrent = table.Column<bool>(type: "INTEGER", nullable: false)
+                    IsCurrent = table.Column<bool>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -117,11 +130,14 @@ namespace _.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false),
                     FirstName = table.Column<string>(type: "TEXT", nullable: false),
                     LastName = table.Column<string>(type: "TEXT", nullable: false),
+                    Slug = table.Column<string>(type: "TEXT", nullable: false),
                     Email = table.Column<string>(type: "TEXT", nullable: false),
                     Password = table.Column<string>(type: "TEXT", nullable: true),
                     IsActivated = table.Column<bool>(type: "INTEGER", nullable: false),
                     Phone = table.Column<string>(type: "TEXT", nullable: false),
-                    GenderId = table.Column<int>(type: "INTEGER", nullable: false)
+                    GenderId = table.Column<int>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -141,14 +157,17 @@ namespace _.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
-                    PlatformID = table.Column<int>(type: "INTEGER", nullable: false)
+                    Slug = table.Column<string>(type: "TEXT", nullable: false),
+                    PlatformId = table.Column<int>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Ads", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Ads_Platforms_PlatformID",
-                        column: x => x.PlatformID,
+                        name: "FK_Ads_Platforms_PlatformId",
+                        column: x => x.PlatformId,
                         principalTable: "Platforms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -165,17 +184,12 @@ namespace _.Migrations
                     Period = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
                     LevelId = table.Column<int>(type: "INTEGER", nullable: false),
                     LanguageId = table.Column<int>(type: "INTEGER", nullable: false),
-                    SessionId = table.Column<int>(type: "INTEGER", nullable: false)
+                    SessionId = table.Column<int>(type: "INTEGER", nullable: false),
+                    SchoolProgramId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Groups", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Groups_Languages_LanguageId",
-                        column: x => x.LanguageId,
-                        principalTable: "Languages",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Groups_Levels_LevelId",
                         column: x => x.LevelId,
@@ -183,9 +197,34 @@ namespace _.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_Groups_SchoolPrograms_SchoolProgramId",
+                        column: x => x.SchoolProgramId,
+                        principalTable: "SchoolPrograms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Groups_Sessions_SessionId",
                         column: x => x.SessionId,
                         principalTable: "Sessions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CommercialAgents",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false),
+                    HireDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Salary = table.Column<decimal>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CommercialAgents", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CommercialAgents_Users_Id",
+                        column: x => x.Id,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -287,8 +326,8 @@ namespace _.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: true),
-                    OpcId = table.Column<int>(type: "INTEGER", nullable: false),
-                    AdId = table.Column<int>(type: "INTEGER", nullable: false)
+                    OpcId = table.Column<int>(type: "INTEGER", nullable: true),
+                    AdId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -297,14 +336,12 @@ namespace _.Migrations
                         name: "FK_LeadSources_Ads_AdId",
                         column: x => x.AdId,
                         principalTable: "Ads",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_LeadSources_Opcs_OpcId",
                         column: x => x.OpcId,
                         principalTable: "Opcs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -339,7 +376,8 @@ namespace _.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     TeacherId = table.Column<int>(type: "INTEGER", nullable: false),
                     ModuleId = table.Column<int>(type: "INTEGER", nullable: false),
-                    GroupId = table.Column<int>(type: "INTEGER", nullable: false)
+                    GroupId = table.Column<int>(type: "INTEGER", nullable: false),
+                    SchoolProgramId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -351,9 +389,9 @@ namespace _.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_GroupTeachers_Modules_ModuleId",
-                        column: x => x.ModuleId,
-                        principalTable: "Modules",
+                        name: "FK_GroupTeachers_SchoolPrograms_SchoolProgramId",
+                        column: x => x.SchoolProgramId,
+                        principalTable: "SchoolPrograms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -465,15 +503,36 @@ namespace _.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     FirstName = table.Column<string>(type: "TEXT", nullable: false),
                     LastName = table.Column<string>(type: "TEXT", nullable: false),
+                    Slug = table.Column<string>(type: "TEXT", nullable: false),
                     Email = table.Column<string>(type: "TEXT", nullable: false),
                     Phone = table.Column<string>(type: "TEXT", nullable: false),
+                    IntakeDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    DateOfBirth = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    FollowUpDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Notes = table.Column<string>(type: "TEXT", nullable: true),
+                    CommercialAgentId = table.Column<int>(type: "INTEGER", nullable: true),
                     GenderId = table.Column<int>(type: "INTEGER", nullable: false),
                     LeadSourceId = table.Column<int>(type: "INTEGER", nullable: false),
-                    IntakeDate = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    SchoolProgramId = table.Column<int>(type: "INTEGER", nullable: false),
+                    BranchId = table.Column<int>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Intakes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Intakes_Branches_BranchId",
+                        column: x => x.BranchId,
+                        principalTable: "Branches",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Intakes_CommercialAgents_CommercialAgentId",
+                        column: x => x.CommercialAgentId,
+                        principalTable: "CommercialAgents",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Intakes_Genders_GenderId",
                         column: x => x.GenderId,
@@ -484,6 +543,12 @@ namespace _.Migrations
                         name: "FK_Intakes_LeadSources_LeadSourceId",
                         column: x => x.LeadSourceId,
                         principalTable: "LeadSources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Intakes_SchoolPrograms_SchoolProgramId",
+                        column: x => x.SchoolProgramId,
+                        principalTable: "SchoolPrograms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -590,9 +655,9 @@ namespace _.Migrations
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Ads_PlatformID",
+                name: "IX_Ads_PlatformId",
                 table: "Ads",
-                column: "PlatformID");
+                column: "PlatformId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Enrollments_GroupId",
@@ -620,14 +685,14 @@ namespace _.Migrations
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Groups_LanguageId",
-                table: "Groups",
-                column: "LanguageId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Groups_LevelId",
                 table: "Groups",
                 column: "LevelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Groups_SchoolProgramId",
+                table: "Groups",
+                column: "SchoolProgramId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Groups_SessionId",
@@ -645,14 +710,24 @@ namespace _.Migrations
                 column: "GroupId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GroupTeachers_ModuleId",
+                name: "IX_GroupTeachers_SchoolProgramId",
                 table: "GroupTeachers",
-                column: "ModuleId");
+                column: "SchoolProgramId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GroupTeachers_TeacherId",
                 table: "GroupTeachers",
                 column: "TeacherId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Intakes_BranchId",
+                table: "Intakes",
+                column: "BranchId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Intakes_CommercialAgentId",
+                table: "Intakes",
+                column: "CommercialAgentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Intakes_GenderId",
@@ -663,6 +738,11 @@ namespace _.Migrations
                 name: "IX_Intakes_LeadSourceId",
                 table: "Intakes",
                 column: "LeadSourceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Intakes_SchoolProgramId",
+                table: "Intakes",
+                column: "SchoolProgramId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LeadSources_AdId",
@@ -748,6 +828,12 @@ namespace _.Migrations
                 name: "Schedules");
 
             migrationBuilder.DropTable(
+                name: "Branches");
+
+            migrationBuilder.DropTable(
+                name: "CommercialAgents");
+
+            migrationBuilder.DropTable(
                 name: "LeadSources");
 
             migrationBuilder.DropTable(
@@ -772,19 +858,16 @@ namespace _.Migrations
                 name: "Groups");
 
             migrationBuilder.DropTable(
-                name: "Modules");
-
-            migrationBuilder.DropTable(
                 name: "Teachers");
 
             migrationBuilder.DropTable(
                 name: "Platforms");
 
             migrationBuilder.DropTable(
-                name: "Languages");
+                name: "Levels");
 
             migrationBuilder.DropTable(
-                name: "Levels");
+                name: "SchoolPrograms");
 
             migrationBuilder.DropTable(
                 name: "Sessions");

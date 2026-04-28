@@ -11,11 +11,12 @@ public class AdFactory : Factory<Ad>
     protected override Ad Make()
     {
         var name = faker.Commerce.ProductName();
+        var platforms = Context.Platforms.Select(p => p.Id).ToList();
         return new Ad
         {
             Name = name,
             Slug = new SlugHelper().GenerateSlug(name),
-            PlatformId = Context.Platforms.OrderBy(p => Guid.NewGuid()).Select(p => p.Id).First()
+            PlatformId = faker.PickRandom(platforms) 
         };
     }
 }

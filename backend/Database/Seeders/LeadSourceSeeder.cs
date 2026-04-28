@@ -15,18 +15,20 @@ public class LeadSourceSeeder : Seeder
     }
 
     public override async Task RunAsync()
-    {
+    {  
+        var adsIds = _context.Ads.Select(a => a.Id).ToList() ;
+        var opcIds = _context.Opcs.Select(a => a.Id).ToList() ;
         IEnumerable<LeadSource> items =  new LeadSource[]
         {
              new LeadSource
              {
                  Name  = "Ad",
-                 AdId  = _context.Ads.OrderBy(a => Guid.NewGuid()).Select(a => a.Id).First()
+                 AdId  = Faker.PickRandom(adsIds)
              } ,
              new LeadSource
              {
                  Name  = "opc",
-                 OpcId  = _context.Users.OfType<Opc>().OrderBy(a => Guid.NewGuid()).Select(a => a.Id).First()
+                 OpcId  = Faker.PickRandom(opcIds)
              } ,
        
           

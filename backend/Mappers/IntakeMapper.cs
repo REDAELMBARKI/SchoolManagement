@@ -46,7 +46,7 @@ public class IntakeMapper
                 Name = branch.Name,
                 City = branch.City,
                 Address = branch.Address,
-                Phone = branch.Phone
+                Phone = branch.Phone   
             };
         }
 
