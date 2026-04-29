@@ -1,9 +1,8 @@
 using System.ComponentModel.DataAnnotations ;
 namespace SchoolManagement.Backend.Models ;   
- public class Grade
+ public class Grade  : BaseEntity
     {
-        public int Id { get; set; }
- 
+     
         // Quiz / Exam / Oral / Project
         [Required, MaxLength(50)]
         public string EvaluationType { get; set; } = string.Empty;
@@ -22,8 +21,11 @@ namespace SchoolManagement.Backend.Models ;
                 // FKs
         public int StudentId { get; set; }
         public int GroupTeacherId { get; set; }
- 
+        public int BranchId { get; set; }
+
         // navigations
+        public Branch Branch {get;set;} = null! ;
+
         public Student Student { get; set; } = null!;
         public GroupTeacher GroupTeacher { get; set; } = null!;
 

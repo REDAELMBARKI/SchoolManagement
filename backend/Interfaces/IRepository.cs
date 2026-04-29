@@ -21,4 +21,3 @@ public interface IBulkActionsRepository<T> where T : class
     Task           UpdateManyAsync(IEnumerable<T> entities);
     Task           DeleteManyAsync(IEnumerable<int> ids);
 }
-

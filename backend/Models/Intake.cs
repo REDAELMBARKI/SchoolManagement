@@ -24,6 +24,7 @@ public class Intake : BaseEntity
 
 
     // navigation
+
     public Gender Gender { get; set; } = null! ;
     public LeadSource? LeadSource { get; set; }
     public CommercialAgent? CommercialAgent { get; set; }

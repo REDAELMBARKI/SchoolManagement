@@ -1,9 +1,8 @@
 
 using System.ComponentModel.DataAnnotations ;
 namespace SchoolManagement.Backend.Models ; 
-public class Room
+public class Room : BaseEntity
 {
-        public int Id { get; set; }
  
         [Required, MaxLength(50)]
         public string Name { get; set; } = string.Empty;
@@ -16,4 +15,10 @@ public class Room
  
         [MaxLength(300)]
         public string? Description { get; set; }
+
+        // fk
+
+        public int BranchId { get; set; }
+        public Branch Branch {get;set;} = null! ;
+
 }

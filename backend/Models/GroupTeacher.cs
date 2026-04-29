@@ -3,7 +3,7 @@
 using System.ComponentModel.DataAnnotations ;
 namespace SchoolManagement.Backend.Models ; 
 
- public class GroupTeacher
+ public class GroupTeacher : BaseEntity
     {
         public int Id { get; set; }
         

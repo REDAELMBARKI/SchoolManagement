@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 namespace SchoolManagement.Backend.Models ; 
     public class Student : User
     {
-        [Required]
+       
         public DateOnly DateOfBirth { get; set; }
  
         public ICollection<Parent> Parents {get ; set; } = new List<Parent>(); 

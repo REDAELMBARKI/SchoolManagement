@@ -8,6 +8,7 @@ public static class TablePerTypeConfigs
 {
     public static void ConfigureUsersTptMethod(this ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<StaffUser>().ToTable("StaffUsers");
         modelBuilder.Entity<Student>().ToTable("Students");
         modelBuilder.Entity<Opc>().ToTable("Opcs");
         modelBuilder.Entity<Teacher>().ToTable("Teachers");

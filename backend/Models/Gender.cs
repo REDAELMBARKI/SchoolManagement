@@ -2,11 +2,10 @@ using System;
 
 namespace SchoolManagement.Backend.Models;
 
-public class Gender
+public class Gender : BaseEntity
 {
-   public int Id {get;set;}
     public string Slug {get;set;} = string.Empty ;
 
-   public string Name {get;set;} 
+   public string Name {get;set;}  = string.Empty;
 
 }

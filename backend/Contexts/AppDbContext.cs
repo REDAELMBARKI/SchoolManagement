@@ -12,6 +12,7 @@ public class AppDbContext : DbContext
 
     // ── People ──
     public DbSet<User> Users { get; set; }
+    public DbSet<StaffUser> StaffUsers { get; set; }
     public DbSet<Intake> Intakes { get; set; }  
     public DbSet<Student> Students  { get; set; }  
     public DbSet<Opc> Opcs  { get; set; }  

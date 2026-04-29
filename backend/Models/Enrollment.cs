@@ -1,10 +1,8 @@
 using System.ComponentModel.DataAnnotations ;
 namespace SchoolManagement.Backend.Models ;    
   
-public class Enrollment
+public class Enrollment  : BaseEntity
     {
-        public int Id { get; set; }
- 
         [Required]
         public DateTime EnrolledAt { get; set; } = DateTime.UtcNow;
  
@@ -16,8 +14,10 @@ public class Enrollment
         public int StudentId { get; set; }
         public int GroupId { get; set; }
         public int SessionId { get; set; }
- 
+       public int BranchId { get; set; }
+    
         // navigations
+        public Branch Branch {get;set;} = null! ;
         public Student Student { get; set; } = null!;
         public Group Group { get; set; } = null!;
         public Session Session { get; set; } = null!;

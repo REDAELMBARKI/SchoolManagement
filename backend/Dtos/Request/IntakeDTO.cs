@@ -28,8 +28,7 @@ public class IntakeDto
     public DateTime IntakeDate { get; set; }
 
     [Required]
-    [Range(1, int.MaxValue, ErrorMessage = "Please select a valid LeadSource")]
-    public int LeadSourceId { get; set; }
+    public LeadSourceDto LeadSource { get; set; }
 
     [Required]
     [Range(1, int.MaxValue, ErrorMessage = "Please select a valid SchoolProgram")]
@@ -48,4 +47,22 @@ public class IntakeDto
 
     [MinLength(3), MaxLength(300)]
     public string? Notes { get; set; }
+    
+    [Required]
+    public bool IsIndependent { get; set; } = false;
+}
+
+
+private class LeadSourceDto {
+
+    [Required]
+    public enum LeadSourceType { get; set; } = string.Empty;
+    [Range(1, int.MaxValue, ErrorMessage = "Please select a valid LeadSource")]
+    public int LeadSourceId { get; set; }
+
+}
+
+public enum LeadSourceType {
+    Opc,
+    Ad,
 }

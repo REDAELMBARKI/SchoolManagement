@@ -1,9 +1,8 @@
 using System.ComponentModel.DataAnnotations ;
 namespace SchoolManagement.Backend.Models ; 
 
- public class Schedule
+ public class Schedule : BaseEntity
 {
-        public int Id { get; set; }
  
         // Monday / Tuesday / ...
         [Required, MaxLength(15)]
@@ -20,10 +19,12 @@ namespace SchoolManagement.Backend.Models ;
         public string? Color { get; set; }
 
          // FKs
+           public int BranchId { get; set; }
         public int GroupTeacherId { get; set; }
         public int RoomId { get; set; }
  
         // navigations
+        public Branch Branch {get;set;} = null! ;
         public GroupTeacher GroupTeacher { get; set; } = null!;
         public Room Room { get; set; } = null!;
 }

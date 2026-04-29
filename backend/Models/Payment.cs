@@ -2,9 +2,8 @@
    
 using System.ComponentModel.DataAnnotations ;
 namespace SchoolManagement.Backend.Models ; 
-public class Payment
+public class Payment  : BaseEntity
     {
-        public int Id { get; set; }
  
         [Required, Range(0, double.MaxValue)]
         public decimal Amount { get; set; } = 0m;
@@ -28,8 +27,11 @@ public class Payment
          // FKs
         public int StudentId { get; set; }
         public int SessionId { get; set; }
- 
+        public int BranchId { get; set; }
+
         // navigations
+        public Branch Branch {get;set;} = null! ;
+
         public Student Student { get; set; } = null!;
         public Session Session { get; set; } = null!;
 }

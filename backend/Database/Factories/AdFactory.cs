@@ -12,9 +12,11 @@ public class AdFactory : Factory<Ad>
     {
         var name = faker.Commerce.ProductName();
         var platforms = Context.Platforms.Select(p => p.Id).ToList();
+        var branches = Context.Branches.Select(b => b.Id).ToList();
         return new Ad
         {
             Name = name,
+            BranchId = faker.PickRandom(branches) ,
             Slug = new SlugHelper().GenerateSlug(name),
             PlatformId = faker.PickRandom(platforms) 
         };

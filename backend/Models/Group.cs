@@ -2,9 +2,8 @@ using System.ComponentModel.DataAnnotations ;
 namespace SchoolManagement.Backend.Models ;   
 
 
-  public class Group
+  public class Group : BaseEntity
     {
-        public int Id { get; set; }
  
         [Required, MaxLength(100)]
         public string Name { get; set; } = string.Empty;
@@ -21,8 +20,11 @@ namespace SchoolManagement.Backend.Models ;
         // many  to many (group -> teachers )
 
         public ICollection<Teacher> Teachers {get;set; } =  new List<Teacher>() ; 
+        public Branch Branch {get;set;} = null! ;
 
          // FKs
+        public int BranchId { get; set; }
+
         public int LevelId { get; set; }
         public int LanguageId { get; set; }
         public int SessionId { get; set; }

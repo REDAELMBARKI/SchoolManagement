@@ -1,13 +1,14 @@
 using System.ComponentModel.DataAnnotations ;
 namespace SchoolManagement.Backend.Models ;   
 
-public class Level
+public class Level  : BaseEntity
 {
-    public int Id { get; set; }
+   
 
-    [Required, MaxLength(10)]
     public string Name { get; set; } = string.Empty;
+    public int BranchId { get; set; }
 
-    [Required, Range(1, 20)]
+    public Branch Branch {get;set;} = null! ;
+
     public int Order { get; set; } = 1;
 }
