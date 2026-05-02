@@ -42,7 +42,6 @@ public class OpcController : ControllerBase
                     Phone = "123-456-7890" ,
                     GenderId = 1 ,
                     HireDate = DateTime.UtcNow.AddYears(-2) ,
-                    IsActivated = false , 
                     Salary = 50000.00m ,
                     },
          new Opc {
@@ -52,7 +51,6 @@ public class OpcController : ControllerBase
                     Phone = "098-765-4321" ,
                     GenderId = 2 ,
                     HireDate = DateTime.UtcNow.AddYears(-1) ,
-                    IsActivated = true ,
                     Salary = 55000.00m
             }
       };

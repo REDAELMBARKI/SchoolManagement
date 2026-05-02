@@ -1,13 +1,12 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using SchoolManagement.Backend.Dtos;
 
 namespace SchoolManagement.Backend.Models ;
 
 
 public class LeadSource  : BaseEntity
 {
-    
-    public string? Name {get; set;}  = string.Empty ;
-    
+    public LeadSourceType LeadSourceType {get;set;}
 
     //fks
     public int? OpcId { get; set; }
@@ -19,6 +18,7 @@ public class LeadSource  : BaseEntity
     public Branch Branch {get;set;} = null! ;
     public Opc? Opc { get; set; }
     public Ad? Ad { get; set; }
+    public ICollection<Intake> Intakes { get; set; } = new List<Intake>();
 
 }
 

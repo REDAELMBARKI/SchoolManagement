@@ -1,9 +1,10 @@
-using SchoolManagement.Backend.Dtos;
-using SchoolManagement.Backend.Repositories;
-using SchoolManagement.Backend.Models;
-using SchoolManagement.Backend.Dtos.Responses;
 using AutoMapper;
+using SchoolManagement.Backend.Dtos;
+using SchoolManagement.Backend.Dtos.Responses;
 using SchoolManagement.Backend.Mappers;
+using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Repositories;
+using SchoolManagement.Backend.Utils;
 
 namespace SchoolManagement.Backend.Services;
 
@@ -27,17 +28,18 @@ public class IntakeService
     }
 
     public async Task<IntakeResponseDto> AddIntakeAsync(IntakeDto intakeDto)
-    {   
-
-        var entity = IntakeMapper.ToEntity(intakeDto);
+    {
+        Intake entity = IntakeMapper.ToEntity(intakeDto);
+        entity.Slug = CustomSluger.Slug(entity.FirstName , entity.LastName);
         var newEntity = await _repository.AddAsync(entity);
-        return newEntity ; 
+        return newEntity ;
     }
 
 
     public async Task UpdateAsync(int id , IntakeDto intakeDto)
     {
-          var intake = IntakeMapper.ToEntity(intakeDto);
+          Intake intake = IntakeMapper.ToEntity(intakeDto);
+          intake.Slug = CustomSluger.Slug(intake.FirstName, intake.LastName);
           intake.UpdatedAt = DateTime.Now ;
           await _repository.UpdateAsync(id , intake);
     }

@@ -1,31 +1,24 @@
 
+using SchoolManagement.Backend.Dtos;
+
 namespace SchoolManagement.Backend.Models;
-public class Intake : BaseEntity
+public class Intake : Person
 {
 
-    public string FirstName { get; set; } = string.Empty;
-    public string LastName { get; set; } = string.Empty;
-    public string Slug {get;set;} = string.Empty ;
-
-    public string Email { get; set;}  = string.Empty;
-    public string Phone { get; set; } = string.Empty;
     public DateTime IntakeDate { get; set; }
-    public DateTime? DateOfBirth { get; set; }
     public IntakeStatus Status {get;set;}
-   
     public DateTime? FollowUpDate { get; set; } 
     public string? Notes { get; set; }   
     //fk
     public int? CommercialAgentId { get; set; } 
-    public int GenderId { get; set; }  
-    public int LeadSourceId {get;set;}
+    public int? LeadSourceId { get; set; }
     public int SchoolProgramId { get; set; }
     public int BranchId {get;set;}
-
-
+    // financial properties
+    public bool IsIndependent { get; set; } = false;
+    public decimal TotalFees { get; set; }
+    public decimal AmountPaid { get; set; }
     // navigation
-
-    public Gender Gender { get; set; } = null! ;
     public LeadSource? LeadSource { get; set; }
     public CommercialAgent? CommercialAgent { get; set; }
     public SchoolProgram SchoolProgram {get;set;} = null!;

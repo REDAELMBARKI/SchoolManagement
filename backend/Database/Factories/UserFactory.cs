@@ -32,6 +32,7 @@ public class UserFactory  : Factory<UserDto>
             Slug = new SlugHelper().GenerateSlug($"{firstName} {lastName}"),
             Email = faker.Internet.Email(firstName, lastName),
             Phone = faker.Phone.PhoneNumber(),
+            DateOfBirth = faker.Date.Past(30, DateTime.Now.AddYears(-18)),
             Password = BCrypt.Net.BCrypt.HashPassword("password"),
             IsActivated = true,
             GenderId = faker.PickRandom(genders)
@@ -43,11 +44,13 @@ public class UserFactory  : Factory<UserDto>
     { 
 
         
+        var branchIds = Context.Branches.Select(b => b.Id).ToList();
         UserDto user = this.Make();
         var opc =  _mapper.Map<Opc>(user);
         DateTime creationDate = DateTime.Now ;
         opc.HireDate = faker.Date.Past(5) ;
         opc.Salary = faker.Finance.Amount(3000, 15000);
+        opc.BranchId = faker.PickRandom(branchIds);
         opc.CreatedAt = creationDate ;
         opc.UpdatedAt = creationDate;
 
@@ -56,6 +59,7 @@ public class UserFactory  : Factory<UserDto>
   
     public CommercialAgent MakeCa()
     {
+        var branchIds = Context.Branches.Select(b => b.Id).ToList();
         var user =  this.Make() ;
         var ca = _mapper.Map<CommercialAgent>(user) ;
         DateTime creationDate = DateTime.Now ;
@@ -63,6 +67,7 @@ public class UserFactory  : Factory<UserDto>
         ca.UpdatedAt = creationDate;
         ca.HireDate = faker.Date.Past(5) ;
         ca.Salary = faker.Finance.Amount(3000, 15000);
+        ca.BranchId = faker.PickRandom(branchIds);
         return ca ;
     }
 

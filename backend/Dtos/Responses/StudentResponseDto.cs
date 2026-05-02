@@ -11,7 +11,7 @@ public record StudentResponseDto
    string Gender , 
    string Group , 
    string Level ,
-   DateOnly DateOfBirth,
+   DateOnly? DateOfBirth,
    ICollection<Parent> Parents
 
 );

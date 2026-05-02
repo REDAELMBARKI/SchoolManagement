@@ -33,13 +33,11 @@ public class LeadSourceController : ControllerBase
           var leadSources = new List<LeadSource>
           {
               new LeadSource {  
-                    Name = "Google" ,  
                     AdId =  1 , 
                     OpcId = 1 ,
                 },
                 new LeadSource
                 {
-                    Name = "Facebook" ,
                     AdId = 2 ,
                     OpcId = 2
                     

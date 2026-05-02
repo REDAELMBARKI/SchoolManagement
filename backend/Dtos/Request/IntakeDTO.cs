@@ -17,18 +17,17 @@ public class IntakeDto
     [Required, Phone, MaxLength(20)]
     public string Phone { get; set; } = string.Empty;
 
-    public DateTime? DateOfBirth { get; set; }
+    public DateOnly? DateOfBirth { get; set; }
 
-    [Required]
     [Range(1, int.MaxValue, ErrorMessage = "Please select a valid Gender")]
-    public int GenderId { get; set; }
+    public int? GenderId { get; set; }
 
     [Required]
     [DataType(DataType.Date)]
     public DateTime IntakeDate { get; set; }
 
     [Required]
-    public LeadSourceDto LeadSource { get; set; }
+    public LeadSourceDto LeadSource { get; set; } = null! ; 
 
     [Required]
     [Range(1, int.MaxValue, ErrorMessage = "Please select a valid SchoolProgram")]
@@ -50,19 +49,25 @@ public class IntakeDto
     
     [Required]
     public bool IsIndependent { get; set; } = false;
+
+    public decimal TotalFees { get; set; }      
+    public decimal AmountPaid { get; set; }        
+    public decimal AmountRemaining => TotalFees - AmountPaid;
+    public bool IsFullyPaid => AmountRemaining <= 0;
 }
 
 
-private class LeadSourceDto {
+public  class LeadSourceDto {
 
-    [Required]
-    public enum LeadSourceType { get; set; } = string.Empty;
+    public  LeadSourceType  LeadSourceType { get; set; } 
+ 
     [Range(1, int.MaxValue, ErrorMessage = "Please select a valid LeadSource")]
-    public int LeadSourceId { get; set; }
+    public int? LeadSourceId { get; set; }
 
 }
 
 public enum LeadSourceType {
     Opc,
     Ad,
+    None
 }

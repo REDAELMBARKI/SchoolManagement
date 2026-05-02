@@ -8,18 +8,18 @@ public  class IntakeContext : IEntityTypeConfiguration<Intake> {
 
       public  void Configure(EntityTypeBuilder<Intake> builder)
       {
-                
+
             builder
             .HasOne(i => i.Gender)
             .WithMany()
             .HasForeignKey(i => i.GenderId)
             .OnDelete(DeleteBehavior.Restrict) ;
-      
+
             builder
             .HasOne(i => i.LeadSource)
-            .WithOne()
-            .HasForeignKey<Intake>(i => i.LeadSourceId)
-            .OnDelete(DeleteBehavior.Restrict) ;
+            .WithMany(ls => ls.Intakes)
+            .HasForeignKey(i => i.LeadSourceId)
+            .OnDelete(DeleteBehavior.SetNull);
 
             //  intake -> branch , branch -> intakes
 

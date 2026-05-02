@@ -2,9 +2,8 @@
 using System.ComponentModel.DataAnnotations;
 namespace SchoolManagement.Backend.Models;
 
- public class Absence
+ public class Absence : BaseEntity
     {
-        public int Id { get; set; }
        
         [Required]
         public DateTime Date { get; set; } = DateTime.UtcNow;

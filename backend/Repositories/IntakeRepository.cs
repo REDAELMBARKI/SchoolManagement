@@ -40,11 +40,15 @@ public class IntakeRepository : Repository<Intake>
                    FirstName  = intake.FirstName , 
                    Email = intake.Email ,
                    LastName = intake.LastName ,
+                   Slug = intake.Slug ,
                    CreatedAt = intake.CreatedAt ,
                    DateOfBirth = intake.DateOfBirth ,
                    FollowUpDate = intake.FollowUpDate ,
                    Notes = intake.Notes ,
                    Status = intake.Status ,
+                   IsIndependent = intake.IsIndependent ,
+                   TotalFees = intake.TotalFees ,
+                   AmountPaid = intake.AmountPaid ,
                    SchoolProgram = IntakeMapper.MapSchoolProgram(intake.SchoolProgram) ,
                    Gender = IntakeMapper.MapGender(intake.Gender) ,
                    CommercialAgent =  IntakeMapper.MapCommercialAgent(intake.CommercialAgent) ,
@@ -79,11 +83,15 @@ public class IntakeRepository : Repository<Intake>
             FirstName = intake.FirstName,
             Email = intake.Email,
             LastName = intake.LastName,
+            Slug = intake.Slug,
             CreatedAt = intake.CreatedAt,
             DateOfBirth = intake.DateOfBirth,
             FollowUpDate = intake.FollowUpDate,
             Notes = intake.Notes,
             Status = intake.Status,
+            IsIndependent = intake.IsIndependent,
+            TotalFees = intake.TotalFees,
+            AmountPaid = intake.AmountPaid,
             SchoolProgram = IntakeMapper.MapSchoolProgram(intake.SchoolProgram),
             Gender = IntakeMapper.MapGender(intake.Gender),
             CommercialAgent = IntakeMapper.MapCommercialAgent(intake.CommercialAgent),
@@ -116,7 +124,7 @@ public class IntakeRepository : Repository<Intake>
     {
         Intake? dbIntake = await Context.Intakes.FindAsync(id);
         if(dbIntake is null ) throw new NotFoundException($"no intake found with id {id}")  ;
-        Context.Intakes.Remove(dbIntake);
+        dbIntake.DeletedAt = DateTime.UtcNow;
         await Context.SaveChangesAsync();
     }
 }

@@ -96,9 +96,12 @@ public class IntakeMapper
         FollowUpDate = dto.FollowUpDate,
         Notes = dto.Notes,
         GenderId = dto.GenderId,
-        LeadSourceId = dto.LeadSourceId,
+        LeadSourceId = dto.LeadSource.LeadSourceId,
         SchoolProgramId = dto.SchoolProgramId,
         BranchId = dto.BranchId,
-        CommercialAgentId = dto.CommercialAgentId
+        CommercialAgentId = dto.CommercialAgentId,
+        IsIndependent = dto.IsIndependent,
+        TotalFees = dto.TotalFees,
+        AmountPaid = dto.AmountPaid
     };
 }
