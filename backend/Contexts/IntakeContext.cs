@@ -31,9 +31,9 @@ public  class IntakeContext : IEntityTypeConfiguration<Intake> {
 
 
              builder
-            .HasOne(i => i.SchoolProgram)
+            .HasOne(i => i.Subject)
             .WithMany()
-            .HasForeignKey(i => i.SchoolProgramId)
+            .HasForeignKey(i => i.SubjectId)
             .OnDelete(DeleteBehavior.Restrict) ;
 
 
@@ -41,6 +41,13 @@ public  class IntakeContext : IEntityTypeConfiguration<Intake> {
             .HasOne(i => i.CommercialAgent)
             .WithMany()
             .HasForeignKey(i => i.CommercialAgentId)
-            .OnDelete(DeleteBehavior.Restrict) ;
-      }
+            .OnDelete(DeleteBehavior.Restrict);
+
+
+            // ConvertedToStudent relationship
+            builder.HasOne(i => i.ConvertedToStudent)
+                  .WithMany()
+                  .HasForeignKey(i => i.ConvertedToStudentId)
+                  .OnDelete(DeleteBehavior.Restrict);
+    }
 }

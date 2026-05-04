@@ -5,19 +5,11 @@ namespace SchoolManagement.Backend.Models ;
 
  public class GroupTeacher : BaseEntity
     {
-        public int Id { get; set; }
-        
          // FKs
         public int TeacherId { get; set; }
-        public int ModuleId { get; set; }
         public int GroupId { get; set; }
- 
         // navigations
         public Teacher Teacher { get; set; } = null!;
-        public SchoolProgram SchoolProgram { get; set; } = null!;
         public Group Group { get; set; } = null!;
 
-
-
     }
-  

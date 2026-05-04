@@ -9,13 +9,13 @@ using AutoMapper;
 
 public class DatabaseSeeder
 {
-  public static async Task Seed(AppDbContext _context , IMapper mapper)
+  public static async Task Seed(AppDbContext _context)
   {
         await new GenderSeeder(_context).RunAsync();          
       await new PlatformSeeder(_context).RunAsync();        
       await new BranchSeeder(_context).RunAsync();           
-      await new SchoolProgramSeeder(_context).RunAsync();    
-      await new UserSeeder(_context, mapper).RunAsync();     
+      await new SubjectSeeder(_context).RunAsync();    
+      await new UserSeeder(_context).RunAsync();     
       await new AdSeeder(_context).RunAsync();               
       await new LeadSourceSeeder(_context).RunAsync();       
       await new IntakeSeeder(_context).RunAsync();

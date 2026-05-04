@@ -19,7 +19,7 @@ namespace SchoolManagement.Backend.Models ;
         public ICollection<Student> Students {get;set; } =  new List<Student>() ; 
         // many  to many (group -> teachers )
 
-        public ICollection<Teacher> Teachers {get;set; } =  new List<Teacher>() ; 
+        public ICollection<GroupTeacher> Teachers {get;set; } =  new List<GroupTeacher>() ; 
         public Branch Branch {get;set;} = null! ;
 
          // FKs
@@ -31,7 +31,7 @@ namespace SchoolManagement.Backend.Models ;
  
         // navigations
         public Level Level { get; set; } = null!;
-        public SchoolProgram SchoolProgram { get; set; } = null!;
+        public Subject Subject { get; set; } = null!;
         public Session Session { get; set; } = null!;
 
   }

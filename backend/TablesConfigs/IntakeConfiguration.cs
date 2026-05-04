@@ -11,38 +11,23 @@ public class IntakeConfiguration : IEntityTypeConfiguration<Intake>
         // TPC mapping for Intake entity
         entityTypeBuilder.ToTable("Intakes");
 
-        // FirstName validation
-        entityTypeBuilder.Property(i => i.FirstName)
-            .IsRequired()
-            .HasMaxLength(50);
-
-        // LastName validation
-        entityTypeBuilder.Property(i => i.LastName)
-            .IsRequired()
-            .HasMaxLength(50);
-
-        // Email validation
+        // Email is optional for Intakes
         entityTypeBuilder.Property(i => i.Email)
-            .IsRequired()
+            .IsRequired(false)
             .HasMaxLength(255);
 
-        // Phone validation
+        // Phone is optional for Intakes
         entityTypeBuilder.Property(i => i.Phone)
-            .IsRequired()
+            .IsRequired(false)
             .HasMaxLength(20);
 
-        // Slug validation
-        entityTypeBuilder.Property(i => i.Slug)
-            .IsRequired()
-            .HasMaxLength(100);
+        // DateOfBirth is optional for Intakes
+        entityTypeBuilder.Property(i => i.DateOfBirth)
+            .IsRequired(false);
 
         // IntakeDate validation
         entityTypeBuilder.Property(i => i.IntakeDate)
             .IsRequired();
-
-        // DateOfBirth validation
-        entityTypeBuilder.Property(i => i.DateOfBirth)
-            .IsRequired(false);
 
         // FollowUpDate validation
         entityTypeBuilder.Property(i => i.FollowUpDate)
@@ -67,24 +52,27 @@ public class IntakeConfiguration : IEntityTypeConfiguration<Intake>
         entityTypeBuilder.Property(i => i.LeadSourceId)
             .IsRequired(false);
 
-        entityTypeBuilder.Property(i => i.SchoolProgramId)
+        entityTypeBuilder.Property(i => i.SubjectId)
             .IsRequired();
 
         entityTypeBuilder.Property(i => i.BranchId)
             .IsRequired();
 
+        entityTypeBuilder.Property(i => i.ConvertedToStudentId)
+            .IsRequired(false);
+
         // Indexes for performance
         entityTypeBuilder.HasIndex(i => i.Email).IsUnique();
         entityTypeBuilder.HasIndex(i => i.Phone);
-        entityTypeBuilder.HasIndex(i => i.Slug);
+        entityTypeBuilder.HasIndex(i => i.DateOfBirth);
         entityTypeBuilder.HasIndex(i => i.IntakeDate);
         entityTypeBuilder.HasIndex(i => i.Status);
 
         // Check constraints for business rules
         entityTypeBuilder.ToTable("Intakes", tb =>
         {
-            tb.HasCheckConstraint("CK_Intake_IntakeDate", "IntakeDate <= GETDATE()");
-            tb.HasCheckConstraint("CK_Intake_DateOfBirth", "DateOfBirth IS NULL OR DateOfBirth < GETDATE()");
+            tb.HasCheckConstraint("CK_Intake_IntakeDate", "IntakeDate <= datetime('now')");
+            tb.HasCheckConstraint("CK_Intake_DateOfBirth", "DateOfBirth IS NULL OR DateOfBirth < datetime('now')");
             tb.HasCheckConstraint("CK_Intake_FollowUpDate", "FollowUpDate IS NULL OR FollowUpDate >= IntakeDate");
         });
     }

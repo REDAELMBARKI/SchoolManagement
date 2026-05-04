@@ -12,9 +12,10 @@ public class IntakeFactory : Factory<Intake>
     {
         var genderIds = Context.Genders.Select(g => g.Id).ToList();
         var leadSourceIds = Context.LeadSources.Select(l => l.Id).ToList();
-        var programIds = Context.SchoolPrograms.Select(sp => sp.Id).ToList();
+        var subjectIds = Context.Subjects.Select(s => s.Id).ToList();
         var branchIds = Context.Branches.Select(b => b.Id).ToList();
         var agentIds = Context.CommercialAgents.Select(ca => ca.Id).ToList();
+        var studentIds = Context.Users.OfType<Student>().Select(s => s.Id).ToList();
         string firstName = faker.Name.FirstName();
         string lastName = faker.Name.LastName();
         decimal totalFees = faker.Finance.Amount(500, 5000);
@@ -25,8 +26,8 @@ public class IntakeFactory : Factory<Intake>
             FirstName = firstName,
             LastName = lastName,
             Slug = CustomSluger.Slug(firstName, lastName),
-            Email = faker.Internet.Email(),
-            Phone = faker.Phone.PhoneNumber(),
+            Email = faker.Random.Bool() ? faker.Internet.Email() : null,
+            Phone = faker.Random.Bool() ? faker.Phone.PhoneNumber() : null,
             DateOfBirth = DateOnly.FromDateTime(faker.Date.Past(30, DateTime.Now.AddYears(-18))), 
             IntakeDate = faker.Date.Past(),
             Status = faker.PickRandom<IntakeStatus>(),
@@ -34,9 +35,10 @@ public class IntakeFactory : Factory<Intake>
             Notes = faker.Lorem.Sentence(),
             GenderId = faker.PickRandom(genderIds),
             LeadSourceId = faker.PickRandom(leadSourceIds),
-            SchoolProgramId = faker.PickRandom(programIds),
+            SubjectId = faker.PickRandom(subjectIds),
             BranchId = faker.PickRandom(branchIds),
             CommercialAgentId = faker.PickRandom(agentIds),
+            ConvertedToStudentId = faker.Random.Bool() ? (int?)null : faker.PickRandom(studentIds),
             IsIndependent = faker.Random.Bool(),
             TotalFees = totalFees,
             AmountPaid = amountPaid

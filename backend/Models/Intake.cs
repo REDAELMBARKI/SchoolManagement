@@ -4,6 +4,9 @@ using SchoolManagement.Backend.Dtos;
 namespace SchoolManagement.Backend.Models;
 public class Intake : Person
 {
+    public string? Email {get;set;} = string.Empty;
+    public string? Phone {get;set;} = string.Empty;
+    public DateOnly? DateOfBirth { get; set; }
 
     public DateTime IntakeDate { get; set; }
     public IntakeStatus Status {get;set;}
@@ -12,8 +15,9 @@ public class Intake : Person
     //fk
     public int? CommercialAgentId { get; set; } 
     public int? LeadSourceId { get; set; }
-    public int SchoolProgramId { get; set; }
+    public int SubjectId { get; set; }
     public int BranchId {get;set;}
+    public int? ConvertedToStudentId { get; set; }
     // financial properties
     public bool IsIndependent { get; set; } = false;
     public decimal TotalFees { get; set; }
@@ -21,8 +25,9 @@ public class Intake : Person
     // navigation
     public LeadSource? LeadSource { get; set; }
     public CommercialAgent? CommercialAgent { get; set; }
-    public SchoolProgram SchoolProgram {get;set;} = null!;
+    public Subject Subject {get;set;} = null!;
     public Branch Branch {get;set;} = null!;
+    public Student? ConvertedToStudent { get; set; }
 }
 
 

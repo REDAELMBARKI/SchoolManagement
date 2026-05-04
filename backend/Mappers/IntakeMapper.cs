@@ -64,14 +64,14 @@ public class IntakeMapper
             };
         }
 
-        public static SchoolProgramResponseDto MapSchoolProgram(SchoolProgram schoolProgram)
+        public static SubjectResponseDto MapSubject(Subject subject)
         {
-            return new SchoolProgramResponseDto
+            return new SubjectResponseDto
             {
-                Id = schoolProgram.Id,
-                Slug = schoolProgram.Slug,
-                Name = schoolProgram.Name,
-                Description = schoolProgram.Description
+                Id = subject.Id,
+                Slug = subject.Slug,
+                Name = subject.Name,
+                Description = subject.Description
             };
         }
      public static GenderResponseDto MapGender(Gender gender)
@@ -97,8 +97,9 @@ public class IntakeMapper
         Notes = dto.Notes,
         GenderId = dto.GenderId,
         LeadSourceId = dto.LeadSource.LeadSourceId,
-        SchoolProgramId = dto.SchoolProgramId,
+        SubjectId = dto.SubjectId,
         BranchId = dto.BranchId,
+        ConvertedToStudentId = dto.ConvertedToStudentId,
         CommercialAgentId = dto.CommercialAgentId,
         IsIndependent = dto.IsIndependent,
         TotalFees = dto.TotalFees,

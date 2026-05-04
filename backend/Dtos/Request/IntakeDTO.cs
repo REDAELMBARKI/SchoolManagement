@@ -11,11 +11,11 @@ public class IntakeDto
     [Required, MinLength(3), MaxLength(50)]
     public string LastName { get; set; } = string.Empty;
 
-    [Required, EmailAddress, MaxLength(255)]
-    public string Email { get; set; } = string.Empty;
+    [EmailAddress, MaxLength(255)]
+    public string? Email { get; set; } = string.Empty;
 
-    [Required, Phone, MaxLength(20)]
-    public string Phone { get; set; } = string.Empty;
+    [Phone, MaxLength(20)]
+    public string? Phone { get; set; } = string.Empty;
 
     public DateOnly? DateOfBirth { get; set; }
 
@@ -27,15 +27,18 @@ public class IntakeDto
     public DateTime IntakeDate { get; set; }
 
     [Required]
-    public LeadSourceDto LeadSource { get; set; } = null! ; 
+    public LeadSourceDto LeadSource { get; set; } = null! ;
 
     [Required]
-    [Range(1, int.MaxValue, ErrorMessage = "Please select a valid SchoolProgram")]
-    public int SchoolProgramId { get; set; }
+    [Range(1, int.MaxValue, ErrorMessage = "Please select a valid Subject")]
+    public int SubjectId { get; set; }
 
     [Required]
     [Range(1, int.MaxValue, ErrorMessage = "Please select a valid Branch")]
     public int BranchId { get; set; }
+
+    [Range(1, int.MaxValue, ErrorMessage = "Please select a valid Student")]
+    public int? ConvertedToStudentId { get; set; }
 
     [Range(1, int.MaxValue, ErrorMessage = "Please select a valid Agent")]
     public int? CommercialAgentId { get; set; }
@@ -59,7 +62,7 @@ public class IntakeDto
 
 public  class LeadSourceDto {
 
-    public  LeadSourceType  LeadSourceType { get; set; } 
+    public  LeadSourceType  LeadSourceType { get; set; }
  
     [Range(1, int.MaxValue, ErrorMessage = "Please select a valid LeadSource")]
     public int? LeadSourceId { get; set; }

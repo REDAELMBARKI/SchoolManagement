@@ -11,48 +11,42 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
         // Table mapping for Student entity (TPC inherited from Person)
         entityTypeBuilder.ToTable("Students");
         
-        // Property validations
-        entityTypeBuilder.Property(s => s.FirstName)
-            .IsRequired()
-            .HasMaxLength(50);
+
             
-        entityTypeBuilder.Property(s => s.LastName)
-            .IsRequired()
-            .HasMaxLength(50);
-            
-        entityTypeBuilder.Property(s => s.Slug)
-            .IsRequired()
-            .HasMaxLength(100);
-            
+        // Email is optional for Students
         entityTypeBuilder.Property(s => s.Email)
-            .IsRequired()
+            .IsRequired(false)
             .HasMaxLength(255);
             
+        // Phone is required for Students
         entityTypeBuilder.Property(s => s.Phone)
             .IsRequired()
             .HasMaxLength(20);
             
+        // DateOfBirth is required for Students
         entityTypeBuilder.Property(s => s.DateOfBirth)
-            .IsRequired(false);
-            
+            .IsRequired();
+
         entityTypeBuilder.Property(s => s.LevelId)
             .IsRequired();
             
         entityTypeBuilder.Property(s => s.GroupId)
+            .IsRequired();
+            
+        entityTypeBuilder.Property(s => s.IntakeId)
             .IsRequired(false);
             
         // Indexes
-        entityTypeBuilder.HasIndex(s => s.Email).IsUnique();
+        entityTypeBuilder.HasIndex(s => s.Email);
         entityTypeBuilder.HasIndex(s => s.Phone);
-        entityTypeBuilder.HasIndex(s => s.Slug);
+        entityTypeBuilder.HasIndex(s => s.DateOfBirth);
         entityTypeBuilder.HasIndex(s => s.LevelId);
         entityTypeBuilder.HasIndex(s => s.GroupId);
-        entityTypeBuilder.HasIndex(s => s.DateOfBirth);
         
         // Check constraints
         entityTypeBuilder.ToTable("Students", tb =>
         {
-            tb.HasCheckConstraint("CK_Student_DateOfBirth", "DateOfBirth IS NULL OR DateOfBirth < GETDATE()");
+            tb.HasCheckConstraint("CK_Student_DateOfBirth", "DateOfBirth < datetime('now')");
             tb.HasCheckConstraint("CK_Student_Email", "Email LIKE '%@%.%'");
         });
     }

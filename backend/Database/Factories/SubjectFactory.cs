@@ -3,17 +3,17 @@ using SchoolManagement.Backend.Models;
 using SchoolManagement.Backend.Utils;
 
 namespace SchoolManagement.Backend.Database.Factories ; 
-public class SchoolProgramFactory : Factory<SchoolProgram>
+public class SubjectFactory : Factory<Subject>
 {
-    public SchoolProgramFactory(AppDbContext context) : base(context)
+    public SubjectFactory(AppDbContext context) : base(context)
     {
     }
 
-    protected override SchoolProgram Make(){
+    protected override Subject Make(){
          string name  = faker.PickRandom("English", "French", "Spanish", "Arabic", "German", "Italian") ;
         var branches = Context.Branches.Select(b => b.Id).ToList();
 
-         return new SchoolProgram
+         return new Subject
          {
             Name = name  ,
             BranchId = faker.PickRandom(branches) ,

@@ -20,10 +20,10 @@ public  class UserDto
         [Required , MinLength(8)]
         public string? Password {get;set;} = string.Empty ;
 
-        [Required,Phone ,  MaxLength(255)]
-        public string Phone { get; set; } = string.Empty;
+        [Phone, MaxLength(20)]
+        public string? Phone { get; set; } = string.Empty;
 
-        public DateTime? DateOfBirth { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
  
         [Required]
         public int GenderId { get; set; }

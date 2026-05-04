@@ -20,7 +20,15 @@ public abstract class Repository<T> where T : BaseEntity
 
     protected virtual IQueryable<T> Query()
     {
-        return _context.Set<T>().AsNoTracking().AsQueryable();
+        var query = _context.Set<T>().AsNoTracking().AsQueryable();
+        
+        // Add soft delete filter for Person entities (TPC hierarchy)
+        if (typeof(Person).IsAssignableFrom(typeof(T)))
+        {
+            query = query.Where(e => EF.Property<DateTime?>(e, "DeletedAt") == null);
+        }
+        
+        return query;
     }
 
 

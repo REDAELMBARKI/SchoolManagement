@@ -1,4 +1,3 @@
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Backend.Database.Factories;
 namespace SchoolManagement.Backend.Database.Seeders;
@@ -7,9 +6,9 @@ public class UserSeeder : Seeder
 {
     private readonly UserFactory _userFactory;
 
-    public UserSeeder(AppDbContext context , IMapper mapper) : base(context)
+    public UserSeeder(AppDbContext context) : base(context)
     {  
-        _userFactory = new UserFactory(context , mapper);
+        _userFactory = new UserFactory(context);
     }
 
     public override async Task RunAsync()

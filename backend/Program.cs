@@ -7,6 +7,8 @@ using SchoolManagement.Backend.Database.Seeders;
 using SchoolManagement.Backend.Database.Factories;
 using Serilog;
 using AutoMapper;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Error()
@@ -24,6 +26,15 @@ builder.Services.AddDbContext<AppDbContext>(
     options => options.UseSqlite(connectionString)
 ) ; 
 
+// Add FluentValidation
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+// Add FluentValidation auto-validation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+
+// Add controllers
+builder.Services.AddControllers();
 
 // di
 // add jwt barear 
@@ -51,13 +62,14 @@ builder.Services.Scan(scan => scan
           c.InNamespaces("SchoolManagement.Backend.Repositories",
                          "SchoolManagement.Backend.Services" ,
                          "SchoolManagement.Backend.Mappers" ,
-                         "SchoolManagement.Backend.Database.Factories"
+                         "SchoolManagement.Backend.Database.Factories" ,
+                         "SchoolManagement.Backend.Interfaces.Repos" ,
+                         "SchoolManagement.Backend.Interfaces" ,
+                         "SchoolManagement.Backend.Dtos"
                          ))
     .AsSelf()                  
     .AsMatchingInterface()     
     .WithScopedLifetime());
-
-builder.Services.AddControllers(); 
 
 var app = builder.Build();
 
@@ -66,8 +78,7 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>() ; 
-        context.Database.CanConnect() ;
-        context.Database.CloseConnection() ;
+        context.Database.Migrate() ;
         Console.WriteLine("server runs successfullu") ; 
     }
     catch (Exception error)
@@ -81,8 +92,7 @@ using (var scope = app.Services.CreateScope())
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
-    await DatabaseSeeder.Seed(context, mapper);
+    await DatabaseSeeder.Seed(context);
 }
 
 

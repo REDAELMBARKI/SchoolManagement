@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore.Storage;
 using SchoolManagement.Backend.Dtos;
 using SchoolManagement.Backend.Interfaces;
 using SchoolManagement.Backend.Models;
-using SchoolManagement.Backend.Backend.Dtos.Responses;
 using SchoolManagement.Backend.Interfaces.Repos;
 
 namespace SchoolManagement.Backend.Repositories;
@@ -18,7 +17,14 @@ public class StudentRepository :  Repository<Student>
 
     protected override IQueryable<Student> Query()
     {
-        return this.Context.Users.OfType<Student>().AsNoTracking().AsQueryable();
+        return this.Context.Users.OfType<Student>()
+            .Include(s => s.Gender)
+            .Include(s => s.Group)
+            .Include(s => s.Level)
+            .Include(s => s.StudentParents)
+                .ThenInclude(sp => sp.Parent)
+            .Include(s => s.Intake)
+            .AsNoTracking().AsQueryable();
                 
     }
     public async Task<List<Student>> GetAllAsync()
@@ -35,25 +41,67 @@ public class StudentRepository :  Repository<Student>
     {
         await this.AddAsync(student);
         await Context.SaveChangesAsync(); 
-        return new StudentResponseDto(
-            student.Id,
-            student.FirstName ,
-            student.LastName , 
-            student.Gender.Name,
-            student.Group.Name ,
-            student.Level.Name ,
-            student.DateOfBirth ,
-            student.Parents
-        ); 
+        return new StudentResponseDto
+        {
+            Id = student.Id,
+            FirstName = student.FirstName,
+            LastName = student.LastName,
+            Gender = student.Gender.Name,
+            Group = student.Group.Name,
+            Level = student.Level.Name,
+            DateOfBirth = student.DateOfBirth,
+            IntakeId = student.IntakeId,
+            Intake = student.Intake != null ? new IntakeResponseDto
+            {
+                Id = student.Intake.Id,
+                FirstName = student.Intake.FirstName,
+                LastName = student.Intake.LastName,
+                Email = student.Intake.Email,
+                Phone = student.Intake.Phone,
+                IntakeDate = student.Intake.IntakeDate,
+                Status = student.Intake.Status,
+                Slug = student.Intake.Slug,
+                CreatedAt = student.Intake.CreatedAt,
+                DateOfBirth = student.Intake.DateOfBirth,
+                FollowUpDate = student.Intake.FollowUpDate,
+                Notes = student.Intake.Notes,
+                TotalFees = student.Intake.TotalFees,
+                AmountPaid = student.Intake.AmountPaid,
+                IsIndependent = student.Intake.IsIndependent,
+                Gender = new GenderResponseDto
+                {
+                    Id = student.Intake.Gender.Id,
+                    Slug = student.Intake.Gender.Slug,
+                    Name = student.Intake.Gender.Name
+                },
+                Subject = new SubjectResponseDto
+                {
+                    Id = student.Intake.Subject.Id,
+                    Slug = student.Intake.Subject.Slug,
+                    Name = student.Intake.Subject.Name,
+                    Description = student.Intake.Subject.Description
+                },
+                Branch = new BranchResponseDto
+                {
+                    Id = student.Intake.Branch.Id,
+                    Slug = student.Intake.Branch.Slug,
+                    Name = student.Intake.Branch.Name,
+                    City = student.Intake.Branch.City,
+                    Address = student.Intake.Branch.Address,
+                    Phone = student.Intake.Branch.Phone
+                }
+            } : null,
+            Parents = student.StudentParents.Select(sp => sp.Parent).ToList()
+        }; 
     }
 
 
     public async Task Destroy(int id )
     {
-        // var student = await Context.Users.OfType<Student>().FindAsync(id);
-        // if(student == null ) return  ; 
-        // Context.Users.OfType<Student>().Remove(student);
-        // await Context.SaveChangesAsync();
+        var student = await Query().FirstOrDefaultAsync(s => s.Id == id);
+        if(student == null ) return  ; 
+        Context.Remove(student);
+        await Context.SaveChangesAsync();
 
     }
 

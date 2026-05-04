@@ -1,11 +1,25 @@
 using System.Collections.ObjectModel;
-using System.ComponentModel.DataAnnotations ;
-namespace SchoolManagement.Backend.Models ;   
+using System.ComponentModel.DataAnnotations;
+namespace SchoolManagement.Backend.Models;
 
- public class Parent  : Person
-    {
+public class Parent : Person
+{
+    public string? Email {get;set;} = string.Empty;
+    public string Phone {get;set;} = string.Empty;
+    public RelationshipType Relationship { get; set; }
+    public ICollection<StudentParent> StudentParents { get; set; } = new List<StudentParent>();
+}
 
-        [Required, MaxLength(50)]
-        public string Relationship { get; set; } = string.Empty;
-        public ICollection<Student> Students  {get ; set ; } = new List<Student>();
-    }
+
+
+public enum RelationshipType
+{
+    Father,
+    Mother,
+    Guardian,
+    Grandfather,
+    Grandmother,
+    Uncle,
+    Aunt,
+    Other
+}

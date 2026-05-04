@@ -10,46 +10,30 @@ public class ParentConfiguration : IEntityTypeConfiguration<Parent>
     {
         // Table mapping for Parent entity (TPC inherited from Person)
         entityTypeBuilder.ToTable("Parents");
-        
-        // Property validations
-        entityTypeBuilder.Property(p => p.FirstName)
-            .IsRequired()
-            .HasMaxLength(50);
-            
-        entityTypeBuilder.Property(p => p.LastName)
-            .IsRequired()
-            .HasMaxLength(50);
-            
-        entityTypeBuilder.Property(p => p.Slug)
-            .IsRequired()
-            .HasMaxLength(100);
-            
+
+        // Email is optional for Parents
         entityTypeBuilder.Property(p => p.Email)
-            .IsRequired()
+            .IsRequired(false)
             .HasMaxLength(255);
             
+        // Phone is optional for Parents
         entityTypeBuilder.Property(p => p.Phone)
             .IsRequired()
             .HasMaxLength(20);
             
         entityTypeBuilder.Property(p => p.Relationship)
-            .IsRequired()
-            .HasMaxLength(50);
-            
-        entityTypeBuilder.Property(p => p.DateOfBirth)
-            .IsRequired(false);
-            
+            .IsRequired();
+
         // Indexes
         entityTypeBuilder.HasIndex(p => p.Email).IsUnique();
         entityTypeBuilder.HasIndex(p => p.Phone);
-        entityTypeBuilder.HasIndex(p => p.Slug);
         entityTypeBuilder.HasIndex(p => p.Relationship);
         
         // Check constraints
         entityTypeBuilder.ToTable("Parents", tb =>
         {
             tb.HasCheckConstraint("CK_Parent_Email", "Email LIKE '%@%.%'");
-            tb.HasCheckConstraint("CK_Parent_DateOfBirth", "DateOfBirth IS NULL OR DateOfBirth < GETDATE()");
+            tb.HasCheckConstraint("CK_Parent_DateOfBirth", "DateOfBirth IS NULL OR DateOfBirth < datetime('now')");
         });
     }
 }

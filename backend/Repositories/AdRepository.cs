@@ -1,4 +1,5 @@
-using SchoolManagement.Backend.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using SchoolManagement.Backend.Interfaces.Repos;
 using SchoolManagement.Backend.Models;
 
 namespace SchoolManagement.Backend.Repositories;
@@ -7,7 +8,7 @@ public class AdRepository : Repository<Ad> , IAdRepository
 {
     public AdRepository(AppDbContext context) : base(context) { }
     
-    public async Task<bool> ExistsAsync()
+    public new async Task<bool> ExistsAsync(int id)
     {
         return false;
     }

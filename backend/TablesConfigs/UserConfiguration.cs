@@ -10,29 +10,22 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     {
         // TPC mapping for User entity
         entityTypeBuilder.ToTable("Users");
-        
-        // Property validations
-        entityTypeBuilder.Property(u => u.FirstName)
-            .IsRequired()
-            .HasMaxLength(50);
             
-        entityTypeBuilder.Property(u => u.LastName)
-            .IsRequired()
-            .HasMaxLength(50);
-            
-        entityTypeBuilder.Property(u => u.Slug)
-            .IsRequired()
-            .HasMaxLength(100);
-            
+        // Email is required for Users
         entityTypeBuilder.Property(u => u.Email)
             .IsRequired()
             .HasMaxLength(255);
             
         entityTypeBuilder.Property(u => u.Phone)
-            .IsRequired()
+            .IsRequired(false)
             .HasMaxLength(20);
-            
+
+        // DateOfBirth is optional for Users
+        entityTypeBuilder.Property(u => u.DateOfBirth)
+            .IsRequired(false);
+
         entityTypeBuilder.Property(u => u.Password)
+            .IsRequired()
             .HasMaxLength(255);
             
         entityTypeBuilder.Property(u => u.IsActivated)
@@ -42,6 +35,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         // Indexes
         entityTypeBuilder.HasIndex(u => u.Email).IsUnique();
         entityTypeBuilder.HasIndex(u => u.Phone);
+        entityTypeBuilder.HasIndex(u => u.DateOfBirth);
         entityTypeBuilder.HasIndex(u => u.Slug);
         entityTypeBuilder.HasIndex(u => u.IsActivated);
         
@@ -49,7 +43,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         entityTypeBuilder.ToTable("Users", tb =>
         {
             tb.HasCheckConstraint("CK_User_Email", "Email LIKE '%@%.%'");
-            tb.HasCheckConstraint("CK_User_Phone", "Phone IS NOT NULL AND LEN(Phone) >= 10");
+            tb.HasCheckConstraint("CK_User_Phone", "Phone IS NULL OR LENGTH(Phone) >= 10");
+            tb.HasCheckConstraint("CK_User_DateOfBirth", "DateOfBirth IS NULL OR DateOfBirth < datetime('now')");
         });
     }
 }

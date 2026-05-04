@@ -22,12 +22,10 @@ public class LeadSourceSeeder : Seeder
         {
              new LeadSource
              {
-                 Name  = "Ad",
                  AdId  = Faker.PickRandom(adsIds)
              } ,
              new LeadSource
              {
-                 Name  = "opc",
                  OpcId  = Faker.PickRandom(opcIds)
              } ,
        

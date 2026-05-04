@@ -27,9 +27,10 @@ public class IntakeRepository : Repository<Intake>
                      .ThenInclude(ad => ad!.Platform)
                 .Include(i => i.LeadSource)
                    .ThenInclude(ld => ld!.Opc)
-                .Include(i => i.SchoolProgram)
+                .Include(i => i.Subject)
                 .Include(i => i.CommercialAgent)
                 .Include(i => i.Branch)
+                .Include(i => i.ConvertedToStudent)
                .ToListAsync() ;
 
          return intakes
@@ -49,7 +50,7 @@ public class IntakeRepository : Repository<Intake>
                    IsIndependent = intake.IsIndependent ,
                    TotalFees = intake.TotalFees ,
                    AmountPaid = intake.AmountPaid ,
-                   SchoolProgram = IntakeMapper.MapSchoolProgram(intake.SchoolProgram) ,
+                   Subject = IntakeMapper.MapSubject(intake.Subject) ,
                    Gender = IntakeMapper.MapGender(intake.Gender) ,
                    CommercialAgent =  IntakeMapper.MapCommercialAgent(intake.CommercialAgent) ,
                    Branch =  IntakeMapper.MapBranch(intake.Branch) ,
@@ -68,9 +69,10 @@ public class IntakeRepository : Repository<Intake>
                     .ThenInclude(ad => ad!.Platform)
                 .Include(i => i.LeadSource)
                 .ThenInclude(ld => ld!.Opc)
-                .Include(i => i.SchoolProgram)
+                .Include(i => i.Subject)
                 .Include(i => i.CommercialAgent)
                 .Include(i => i.Branch)
+                .Include(i => i.ConvertedToStudent)
                 .FirstOrDefaultAsync(i => i.Id == id);
 
         if(intake is null) throw new NotFoundException($"no intake found with id {id}");
@@ -92,7 +94,7 @@ public class IntakeRepository : Repository<Intake>
             IsIndependent = intake.IsIndependent,
             TotalFees = intake.TotalFees,
             AmountPaid = intake.AmountPaid,
-            SchoolProgram = IntakeMapper.MapSchoolProgram(intake.SchoolProgram),
+            Subject = IntakeMapper.MapSubject(intake.Subject),
             Gender = IntakeMapper.MapGender(intake.Gender),
             CommercialAgent = IntakeMapper.MapCommercialAgent(intake.CommercialAgent),
             Branch = IntakeMapper.MapBranch(intake.Branch),

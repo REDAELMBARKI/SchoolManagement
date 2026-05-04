@@ -26,10 +26,26 @@ public class IntakeResponseDto {
 
     public LeadSourceResponseDto? LeadSource { get; set; }
     public GenderResponseDto Gender { get; set; } = null!;
-    public SchoolProgramResponseDto SchoolProgram { get; set; } = null!;
+    public SubjectResponseDto Subject { get; set; } = null!;
     public BranchResponseDto Branch { get; set; } = null!;
     public CommercialAgentResponseDto? CommercialAgent { get; set; }
+    public StudentResponseDto? ConvertedToStudent { get; set; }
 } 
+
+// StudentResponseDto.cs
+public class StudentResponseDto
+{
+    public int Id { get; set; }
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+    public string Gender { get; set; } = string.Empty;
+    public string Group { get; set; } = string.Empty;
+    public string Level { get; set; } = string.Empty;
+    public DateOnly? DateOfBirth { get; set; }
+    public int? IntakeId { get; set; }
+    public IntakeResponseDto? Intake { get; set; }
+    public ICollection<Parent> Parents { get; set; } = new List<Parent>();
+}
 
 
 // GenderResponseDto.cs
@@ -40,8 +56,8 @@ public class GenderResponseDto
     public string Name { get; set; } = string.Empty;
 }
 
-// SchoolProgramResponseDto.cs
-public class SchoolProgramResponseDto
+// SubjectResponseDto.cs
+public class SubjectResponseDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;

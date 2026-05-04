@@ -39,7 +39,7 @@ Content-Type:  application/json
   "Status": 0,
   "LeadSourceId": 1,
   "GenderId":1 ,
-  "SchoolProgramId": 5 ,
+  "SubjectId": 5 ,
   "BranchId": 73 ,
   "CommercialAgentId": 2
 }

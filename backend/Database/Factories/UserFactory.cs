@@ -1,74 +1,88 @@
 using System;
-using AutoMapper;
 using Bogus;
 using Bogus.DataSets;
-using SchoolManagement.Backend;
 using SchoolManagement.Backend.Database.Factories;
-using SchoolManagement.Backend.Database.Seeders;
-using SchoolManagement.Backend.Dtos;
 using SchoolManagement.Backend.Models;
 using Slugify;
 
 namespace SchoolManagement.Backend.Database.Factories;
 
-public class UserFactory  : Factory<UserDto>
+public class UserFactory : Factory<User>
 {
-
-    protected IMapper _mapper ; 
-    public UserFactory(AppDbContext context , IMapper mapper) : base(context)
+    public UserFactory(AppDbContext context) : base(context)
     {
-        _mapper = mapper;
     }
 
-    protected override UserDto Make()
+    protected override User Make()
     {   
-       var genders =  Context.Genders.Select(g => g.Id).ToList();
+       var genders = Context.Genders.Select(g => g.Id).ToList();
        var firstName = faker.Name.FirstName();
        var lastName = faker.Name.LastName();
-        return new UserDto
+       var dateOfBirth = DateOnly.FromDateTime(faker.Date.Past(30, DateTime.Now.AddYears(-18)));
+       
+        return new User
         {
             FirstName = firstName,
             LastName = lastName,
             Slug = new SlugHelper().GenerateSlug($"{firstName} {lastName}"),
             Email = faker.Internet.Email(firstName, lastName),
-            Phone = faker.Phone.PhoneNumber(),
-            DateOfBirth = faker.Date.Past(30, DateTime.Now.AddYears(-18)),
+            Phone = faker.Random.Bool() ? faker.Phone.PhoneNumber() : null,
+            DateOfBirth = dateOfBirth,
             Password = BCrypt.Net.BCrypt.HashPassword("password"),
             IsActivated = true,
             GenderId = faker.PickRandom(genders)
         };
     }
 
-
     public Opc MakeOpc()
     { 
-
-        
         var branchIds = Context.Branches.Select(b => b.Id).ToList();
-        UserDto user = this.Make();
-        var opc =  _mapper.Map<Opc>(user);
-        DateTime creationDate = DateTime.Now ;
-        opc.HireDate = faker.Date.Past(5) ;
-        opc.Salary = faker.Finance.Amount(3000, 15000);
-        opc.BranchId = faker.PickRandom(branchIds);
-        opc.CreatedAt = creationDate ;
-        opc.UpdatedAt = creationDate;
-
-        return opc;
+        User user = this.Make();
+        DateTime creationDate = DateTime.Now;
+        
+        return new Opc
+        {
+            // Copy properties from User (Person properties)
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Slug = user.Slug,
+            Email = user.Email,
+            Phone = user.Phone,
+            DateOfBirth = user.DateOfBirth,
+            GenderId = user.GenderId,
+            
+            // Employee properties
+            HireDate = faker.Date.Past(5),
+            Salary = faker.Finance.Amount(3000, 15000),
+            BranchId = faker.PickRandom(branchIds),
+            CreatedAt = creationDate,
+            UpdatedAt = creationDate
+        };
     }
   
     public CommercialAgent MakeCa()
     {
         var branchIds = Context.Branches.Select(b => b.Id).ToList();
-        var user =  this.Make() ;
-        var ca = _mapper.Map<CommercialAgent>(user) ;
-        DateTime creationDate = DateTime.Now ;
-        ca.CreatedAt = creationDate ;
-        ca.UpdatedAt = creationDate;
-        ca.HireDate = faker.Date.Past(5) ;
-        ca.Salary = faker.Finance.Amount(3000, 15000);
-        ca.BranchId = faker.PickRandom(branchIds);
-        return ca ;
+        User user = this.Make();
+        DateTime creationDate = DateTime.Now;
+        
+        return new CommercialAgent
+        {
+            // Copy properties from User (Person properties)
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Slug = user.Slug,
+            Email = user.Email,
+            Phone = user.Phone,
+            DateOfBirth = user.DateOfBirth,
+            GenderId = user.GenderId,
+            
+            // Employee properties
+            HireDate = faker.Date.Past(5),
+            Salary = faker.Finance.Amount(3000, 15000),
+            BranchId = faker.PickRandom(branchIds),
+            CreatedAt = creationDate,
+            UpdatedAt = creationDate
+        };
     }
-
 }

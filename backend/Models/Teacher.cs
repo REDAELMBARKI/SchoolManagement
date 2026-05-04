@@ -3,8 +3,9 @@ using System.Text.Json.Serialization;
 namespace SchoolManagement.Backend.Models ;   
   
   public class Teacher : Employee
-    {
-        public string Specialization { get; set; } = null! ;
-        // navigation
-        public ICollection<Group> Groups {get ;set ; } = new List<Group>() ;
+{
+    public string Specialization { get; set; } = null!;
+    
+    // navigation
+    public ICollection<GroupTeacher> Groups {get ;set ; } = new List<GroupTeacher>() ;
     }

@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations ;
 namespace SchoolManagement.Backend.Models;
 
- public class SchoolProgram : BaseEntity
+ public class Subject : BaseEntity
     {
     
         [Required, MaxLength(100)]

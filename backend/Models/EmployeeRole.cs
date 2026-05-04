@@ -3,6 +3,5 @@ namespace SchoolManagement.Backend.Models ;
 
 public class EmployeeRole
 {
-    
-    
+
 }
