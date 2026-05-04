@@ -12,7 +12,7 @@ public class PlatformFactory : Factory<Platform>
     {
        var platforms = new[] { "Facebook", "Google Ads", "TikTok", "Instagram", "YouTube" };
         var name = faker.PickRandom(platforms);
-        var branches = Context.Branches.Select(b => b.Id).ToList();
+        List<int> branches = Context.Branches.Select(b => b.Id).ToList();
 
         return new Platform
         {

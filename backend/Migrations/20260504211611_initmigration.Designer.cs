@@ -11,8 +11,8 @@ using SchoolManagement.Backend;
 namespace _.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260504010124_CreateDatabaseWithoutTPCMapping")]
-    partial class CreateDatabaseWithoutTPCMapping
+    [Migration("20260504211611_initmigration")]
+    partial class initmigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -574,7 +574,6 @@ namespace _.Migrations
             modelBuilder.Entity("SchoolManagement.Backend.Models.Person", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("CreatedAt")
@@ -614,9 +613,9 @@ namespace _.Migrations
 
                     b.HasIndex("Slug");
 
-                    b.ToTable("Person");
+                    b.ToTable((string)null);
 
-                    b.UseTptMappingStrategy();
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("SchoolManagement.Backend.Models.Platform", b =>
@@ -1008,8 +1007,6 @@ namespace _.Migrations
 
                     b.ToTable("Parents", null, t =>
                         {
-                            t.HasCheckConstraint("CK_Parent_DateOfBirth", "DateOfBirth IS NULL OR DateOfBirth < datetime('now')");
-
                             t.HasCheckConstraint("CK_Parent_Email", "Email LIKE '%@%.%'");
                         });
                 });
@@ -1470,12 +1467,6 @@ namespace _.Migrations
                         .HasForeignKey("ConvertedToStudentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("SchoolManagement.Backend.Models.Person", null)
-                        .WithOne()
-                        .HasForeignKey("SchoolManagement.Backend.Models.Intake", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("SchoolManagement.Backend.Models.LeadSource", "LeadSource")
                         .WithMany("Intakes")
                         .HasForeignKey("LeadSourceId")
@@ -1502,26 +1493,11 @@ namespace _.Migrations
                     b.Navigation("Subject");
                 });
 
-            modelBuilder.Entity("SchoolManagement.Backend.Models.Parent", b =>
-                {
-                    b.HasOne("SchoolManagement.Backend.Models.Person", null)
-                        .WithOne()
-                        .HasForeignKey("SchoolManagement.Backend.Models.Parent", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("SchoolManagement.Backend.Models.Student", b =>
                 {
                     b.HasOne("SchoolManagement.Backend.Models.Group", "Group")
                         .WithMany("Students")
                         .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SchoolManagement.Backend.Models.Person", null)
-                        .WithOne()
-                        .HasForeignKey("SchoolManagement.Backend.Models.Student", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1541,15 +1517,6 @@ namespace _.Migrations
                     b.Navigation("Intake");
 
                     b.Navigation("Level");
-                });
-
-            modelBuilder.Entity("SchoolManagement.Backend.Models.User", b =>
-                {
-                    b.HasOne("SchoolManagement.Backend.Models.Person", null)
-                        .WithOne()
-                        .HasForeignKey("SchoolManagement.Backend.Models.User", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("SchoolManagement.Backend.Models.Group", b =>

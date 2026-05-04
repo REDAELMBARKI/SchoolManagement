@@ -11,9 +11,9 @@ public class DatabaseSeeder
 {
   public static async Task Seed(AppDbContext _context)
   {
+      await new BranchSeeder(_context).RunAsync();           
         await new GenderSeeder(_context).RunAsync();          
       await new PlatformSeeder(_context).RunAsync();        
-      await new BranchSeeder(_context).RunAsync();           
       await new SubjectSeeder(_context).RunAsync();    
       await new UserSeeder(_context).RunAsync();     
       await new AdSeeder(_context).RunAsync();               

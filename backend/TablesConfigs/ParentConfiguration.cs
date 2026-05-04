@@ -33,7 +33,6 @@ public class ParentConfiguration : IEntityTypeConfiguration<Parent>
         entityTypeBuilder.ToTable("Parents", tb =>
         {
             tb.HasCheckConstraint("CK_Parent_Email", "Email LIKE '%@%.%'");
-            tb.HasCheckConstraint("CK_Parent_DateOfBirth", "DateOfBirth IS NULL OR DateOfBirth < datetime('now')");
         });
     }
 }

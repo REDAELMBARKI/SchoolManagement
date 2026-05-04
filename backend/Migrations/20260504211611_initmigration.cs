@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace _.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateDatabaseWithoutTPCMapping : Migration
+    public partial class initmigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -205,7 +205,7 @@ namespace _.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Person",
+                name: "Parents",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false),
@@ -213,15 +213,51 @@ namespace _.Migrations
                     LastName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     Slug = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     GenderId = table.Column<int>(type: "INTEGER", nullable: true),
+                    Email = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
+                    Phone = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
+                    Relationship = table.Column<int>(type: "INTEGER", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Person", x => x.Id);
+                    table.PrimaryKey("PK_Parents", x => x.Id);
+                    table.CheckConstraint("CK_Parent_Email", "Email LIKE '%@%.%'");
                     table.ForeignKey(
-                        name: "FK_Person_Genders_GenderId",
+                        name: "FK_Parents_Genders_GenderId",
+                        column: x => x.GenderId,
+                        principalTable: "Genders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false),
+                    FirstName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    LastName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    Slug = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    GenderId = table.Column<int>(type: "INTEGER", nullable: true),
+                    Email = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    Phone = table.Column<string>(type: "TEXT", maxLength: 20, nullable: true),
+                    DateOfBirth = table.Column<DateOnly>(type: "TEXT", nullable: true),
+                    Password = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    IsActivated = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.CheckConstraint("CK_User_DateOfBirth", "DateOfBirth IS NULL OR DateOfBirth < datetime('now')");
+                    table.CheckConstraint("CK_User_Email", "Email LIKE '%@%.%'");
+                    table.CheckConstraint("CK_User_Phone", "Phone IS NULL OR LENGTH(Phone) >= 10");
+                    table.ForeignKey(
+                        name: "FK_Users_Genders_GenderId",
                         column: x => x.GenderId,
                         principalTable: "Genders",
                         principalColumn: "Id",
@@ -354,53 +390,6 @@ namespace _.Migrations
                         name: "FK_Teachers_Employees_Id",
                         column: x => x.Id,
                         principalTable: "Employees",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Parents",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
-                    Phone = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
-                    Relationship = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Parents", x => x.Id);
-                    table.CheckConstraint("CK_Parent_DateOfBirth", "DateOfBirth IS NULL OR DateOfBirth < datetime('now')");
-                    table.CheckConstraint("CK_Parent_Email", "Email LIKE '%@%.%'");
-                    table.ForeignKey(
-                        name: "FK_Parents_Person_Id",
-                        column: x => x.Id,
-                        principalTable: "Person",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
-                    Phone = table.Column<string>(type: "TEXT", maxLength: 20, nullable: true),
-                    DateOfBirth = table.Column<DateOnly>(type: "TEXT", nullable: true),
-                    Password = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
-                    IsActivated = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.Id);
-                    table.CheckConstraint("CK_User_DateOfBirth", "DateOfBirth IS NULL OR DateOfBirth < datetime('now')");
-                    table.CheckConstraint("CK_User_Email", "Email LIKE '%@%.%'");
-                    table.CheckConstraint("CK_User_Phone", "Phone IS NULL OR LENGTH(Phone) >= 10");
-                    table.ForeignKey(
-                        name: "FK_Users_Person_Id",
-                        column: x => x.Id,
-                        principalTable: "Person",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -615,6 +604,10 @@ namespace _.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false),
+                    FirstName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    LastName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    Slug = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    GenderId = table.Column<int>(type: "INTEGER", nullable: true),
                     Email = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
                     Phone = table.Column<string>(type: "TEXT", maxLength: 20, nullable: true),
                     DateOfBirth = table.Column<DateOnly>(type: "TEXT", nullable: true),
@@ -630,7 +623,10 @@ namespace _.Migrations
                     IsIndependent = table.Column<bool>(type: "INTEGER", nullable: false),
                     TotalFees = table.Column<decimal>(type: "TEXT", nullable: false),
                     AmountPaid = table.Column<decimal>(type: "TEXT", nullable: false),
-                    OpcId = table.Column<int>(type: "INTEGER", nullable: true)
+                    OpcId = table.Column<int>(type: "INTEGER", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -651,6 +647,12 @@ namespace _.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
+                        name: "FK_Intakes_Genders_GenderId",
+                        column: x => x.GenderId,
+                        principalTable: "Genders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_Intakes_LeadSources_LeadSourceId",
                         column: x => x.LeadSourceId,
                         principalTable: "LeadSources",
@@ -661,12 +663,6 @@ namespace _.Migrations
                         column: x => x.OpcId,
                         principalTable: "Opcs",
                         principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Intakes_Person_Id",
-                        column: x => x.Id,
-                        principalTable: "Person",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Intakes_Subjects_SubjectId",
                         column: x => x.SubjectId,
@@ -680,18 +676,31 @@ namespace _.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false),
+                    FirstName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    LastName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    Slug = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    GenderId = table.Column<int>(type: "INTEGER", nullable: true),
                     Email = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
                     Phone = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
                     DateOfBirth = table.Column<DateOnly>(type: "TEXT", nullable: false),
                     LevelId = table.Column<int>(type: "INTEGER", nullable: false),
                     GroupId = table.Column<int>(type: "INTEGER", nullable: false),
-                    IntakeId = table.Column<int>(type: "INTEGER", nullable: true)
+                    IntakeId = table.Column<int>(type: "INTEGER", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Students", x => x.Id);
                     table.CheckConstraint("CK_Student_DateOfBirth", "DateOfBirth < datetime('now')");
                     table.CheckConstraint("CK_Student_Email", "Email LIKE '%@%.%'");
+                    table.ForeignKey(
+                        name: "FK_Students_Genders_GenderId",
+                        column: x => x.GenderId,
+                        principalTable: "Genders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Students_Groups_GroupId",
                         column: x => x.GroupId,
@@ -708,12 +717,6 @@ namespace _.Migrations
                         name: "FK_Students_Levels_LevelId",
                         column: x => x.LevelId,
                         principalTable: "Levels",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Students_Person_Id",
-                        column: x => x.Id,
-                        principalTable: "Person",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -937,9 +940,24 @@ namespace _.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Intakes_FirstName",
+                table: "Intakes",
+                column: "FirstName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Intakes_GenderId",
+                table: "Intakes",
+                column: "GenderId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Intakes_IntakeDate",
                 table: "Intakes",
                 column: "IntakeDate");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Intakes_LastName",
+                table: "Intakes",
+                column: "LastName");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Intakes_LeadSourceId",
@@ -955,6 +973,11 @@ namespace _.Migrations
                 name: "IX_Intakes_Phone",
                 table: "Intakes",
                 column: "Phone");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Intakes_Slug",
+                table: "Intakes",
+                column: "Slug");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Intakes_Status",
@@ -993,6 +1016,21 @@ namespace _.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Parents_FirstName",
+                table: "Parents",
+                column: "FirstName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Parents_GenderId",
+                table: "Parents",
+                column: "GenderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Parents_LastName",
+                table: "Parents",
+                column: "LastName");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Parents_Phone",
                 table: "Parents",
                 column: "Phone");
@@ -1001,6 +1039,11 @@ namespace _.Migrations
                 name: "IX_Parents_Relationship",
                 table: "Parents",
                 column: "Relationship");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Parents_Slug",
+                table: "Parents",
+                column: "Slug");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payments_BranchId",
@@ -1016,26 +1059,6 @@ namespace _.Migrations
                 name: "IX_Payments_StudentId",
                 table: "Payments",
                 column: "StudentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Person_FirstName",
-                table: "Person",
-                column: "FirstName");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Person_GenderId",
-                table: "Person",
-                column: "GenderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Person_LastName",
-                table: "Person",
-                column: "LastName");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Person_Slug",
-                table: "Person",
-                column: "Slug");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Platforms_BranchId",
@@ -1083,6 +1106,16 @@ namespace _.Migrations
                 column: "Email");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Students_FirstName",
+                table: "Students",
+                column: "FirstName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Students_GenderId",
+                table: "Students",
+                column: "GenderId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Students_GroupId",
                 table: "Students",
                 column: "GroupId");
@@ -1093,6 +1126,11 @@ namespace _.Migrations
                 column: "IntakeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Students_LastName",
+                table: "Students",
+                column: "LastName");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Students_LevelId",
                 table: "Students",
                 column: "LevelId");
@@ -1101,6 +1139,11 @@ namespace _.Migrations
                 name: "IX_Students_Phone",
                 table: "Students",
                 column: "Phone");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Students_Slug",
+                table: "Students",
+                column: "Slug");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Subjects_BranchId",
@@ -1124,14 +1167,34 @@ namespace _.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_FirstName",
+                table: "Users",
+                column: "FirstName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_GenderId",
+                table: "Users",
+                column: "GenderId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_IsActivated",
                 table: "Users",
                 column: "IsActivated");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_LastName",
+                table: "Users",
+                column: "LastName");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_Phone",
                 table: "Users",
                 column: "Phone");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_Slug",
+                table: "Users",
+                column: "Slug");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Absences_Students_StudentId",
@@ -1226,9 +1289,6 @@ namespace _.Migrations
 
             migrationBuilder.DropTable(
                 name: "LeadSources");
-
-            migrationBuilder.DropTable(
-                name: "Person");
 
             migrationBuilder.DropTable(
                 name: "Subjects");

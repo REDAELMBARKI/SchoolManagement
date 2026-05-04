@@ -23,7 +23,7 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly) ;
 // configure context 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ; 
 builder.Services.AddDbContext<AppDbContext>(
-    options => options.UseSqlite(connectionString)
+    options => options.UseSqlServer(connectionString)
 ) ; 
 
 // Add FluentValidation
