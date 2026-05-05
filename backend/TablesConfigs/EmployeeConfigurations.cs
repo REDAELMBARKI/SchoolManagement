@@ -4,6 +4,7 @@ using SchoolManagement.Backend.Models;
 
 namespace SchoolManagement.Backend.TablesConfigs;
 
+
 public class EmployeeConfigurations : IEntityTypeConfiguration<Employee>
 {
     public void Configure(EntityTypeBuilder<Employee> entityTypeBuilder)
@@ -44,7 +45,7 @@ public class EmployeeConfigurations : IEntityTypeConfiguration<Employee>
             
         entityTypeBuilder.Property(e => e.HireDate)
             .IsRequired()
-            .HasDefaultValueSql("datetime('now')");
+            .HasDefaultValueSql("GETDATE()");
             
         entityTypeBuilder.Property(e => e.Salary)
             .IsRequired()
@@ -66,8 +67,8 @@ public class EmployeeConfigurations : IEntityTypeConfiguration<Employee>
         entityTypeBuilder.ToTable("Employees", tb =>
         {
             tb.HasCheckConstraint("CK_Employee_Salary", "Salary > 0");
-            tb.HasCheckConstraint("CK_Employee_HireDate", "HireDate <= datetime('now')");
-            tb.HasCheckConstraint("CK_Employee_DateOfBirth", "DateOfBirth IS NULL OR DateOfBirth < datetime('now')");
+            tb.HasCheckConstraint("CK_Employee_HireDate", "HireDate <= GETDATE()");
+            tb.HasCheckConstraint("CK_Employee_DateOfBirth", "DateOfBirth IS NULL OR DateOfBirth < GETDATE()");
         });
     }
 }

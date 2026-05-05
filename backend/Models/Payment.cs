@@ -2,37 +2,14 @@
    
 using System.ComponentModel.DataAnnotations ;
 namespace SchoolManagement.Backend.Models ; 
-public class Payment  : BaseEntity
-    {
- 
-        [Required, Range(0, double.MaxValue)]
-        public decimal Amount { get; set; } = 0m;
- 
-        [Required]
-        public DateTime DueDate { get; set; }
- 
-        public DateTime? PaymentDate { get; set; }
- 
-        // Cash / Transfer / Cheque
-        [Required, MaxLength(50)]
-        public string PaymentMethod { get; set; } = "Cash";
- 
-        // Paid / Pending / Partial / Cancelled
-        [Required, MaxLength(30)]
-        public string Status { get; set; } = "Pending";
- 
-        [MaxLength(300)]
-        public string? Note { get; set; }
+public class Payment : BaseEntity
+{
+    public int EnrollmentId { get; set; }
+    public decimal AmountPaid { get; set; }        // what they actually paid now
+    public decimal FeeAmount { get; set; }         // monthly fee for this period
+    public DateTime PeriodStart { get; set; }
+    public DateTime PeriodEnd { get; set; }
+    public string Status { get; set; } = "Pending"; // Paid / Partial / Failed
 
-         // FKs
-        public int StudentId { get; set; }
-        public int SessionId { get; set; }
-        public int BranchId { get; set; }
-
-        // navigations
-        public Branch Branch {get;set;} = null! ;
-
-        public Student Student { get; set; } = null!;
-        public Session Session { get; set; } = null!;
+    public Enrollment Enrollment { get; set; } = null!;
 }
- 

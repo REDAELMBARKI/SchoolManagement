@@ -13,10 +13,11 @@ public class DatabaseSeeder
   {
       await new BranchSeeder(_context).RunAsync();           
         await new GenderSeeder(_context).RunAsync();          
-      await new PlatformSeeder(_context).RunAsync();        
-      await new SubjectSeeder(_context).RunAsync();    
-      await new UserSeeder(_context).RunAsync();     
-      await new AdSeeder(_context).RunAsync();               
+        await new PlatformSeeder(_context).RunAsync();        
+        await new SubjectSeeder(_context).RunAsync();    
+        await new UserSeeder(_context).RunAsync();     
+        await new AdSeeder(_context).RunAsync();               
+        // LeadSource seeder must run after Branches, Ads, and Opcs are seeded       
       await new LeadSourceSeeder(_context).RunAsync();       
       await new IntakeSeeder(_context).RunAsync();
         // await new LevelSeeder(_context).RunAsync();    

@@ -11,6 +11,6 @@
     "\\Backend\\Services",
     "\\Backend\\Validators"
   ],
-  "SelectedNode": "\\Backend\\TablesConfigs",
+  "SelectedNode": "\\Backend\\Interfaces\\Repos\\IIntakeRepository.cs",
   "PreviewInSolutionExplorer": false
 }

@@ -2,7 +2,6 @@ using SchoolManagement.Backend.Dtos.Responses;
 using SchoolManagement.Backend.Interfaces.Repos;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Backend.Interfaces;
-using SQLitePCL;
 using SchoolManagement.Backend.Models;
 using SchoolManagement.Backend.Mappers;
 using SchoolManagement.Backend.Dtos;

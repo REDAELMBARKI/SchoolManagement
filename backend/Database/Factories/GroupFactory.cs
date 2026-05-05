@@ -21,7 +21,6 @@ public class GroupFactory : Factory<Group>
                 Period     = faker.PickRandom("Morning", "Afternoon", "Evening", "Weekend"),
                 LevelId    = faker.Random.Int(1, 5),
                 LanguageId = faker.Random.Int(1, 4),
-                SessionId  = faker.Random.Int(1, 3),
         } ; 
     }
 }

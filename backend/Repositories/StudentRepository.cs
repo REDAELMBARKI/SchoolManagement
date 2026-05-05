@@ -20,6 +20,7 @@ public class StudentRepository :  Repository<Student>
         return this.Context.Users.OfType<Student>()
             .Include(s => s.Gender)
             .Include(s => s.Group)
+            .Include(s => s.Subject)
             .Include(s => s.Level)
             .Include(s => s.StudentParents)
                 .ThenInclude(sp => sp.Parent)
