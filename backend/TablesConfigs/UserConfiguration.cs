@@ -43,8 +43,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         entityTypeBuilder.ToTable("Users", tb =>
         {
             tb.HasCheckConstraint("CK_User_Email", "Email LIKE '%@%.%'");
-            tb.HasCheckConstraint("CK_User_Phone", "Phone IS NULL OR LENGTH(Phone) >= 10");
-            tb.HasCheckConstraint("CK_User_DateOfBirth", "DateOfBirth IS NULL OR DateOfBirth < datetime('now')");
+            tb.HasCheckConstraint("CK_User_Phone", "Phone IS NULL OR LEN(Phone) >= 10");
+            tb.HasCheckConstraint("CK_User_DateOfBirth", "DateOfBirth IS NULL OR DateOfBirth < GETDATE()");
         });
     }
 }

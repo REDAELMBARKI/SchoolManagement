@@ -1,1 +1,18 @@
-{}
+{
+    "sqlserver.connections": [
+        {
+            "server": "localhost",
+            "database": "SchoolManagement",
+            "authenticationType": "Windows Authentication",
+            "profileName": "SchoolManagement DB"
+        }
+    ],
+    "editor.tabCompletion": "on",
+    "editor.quickSuggestions": {
+        "other": "on",
+        "comments": "on",
+        "strings": "on"
+    },
+    "editor.suggestSelection": "first",
+    "editor.acceptSuggestionOnEnter": "on"
+}

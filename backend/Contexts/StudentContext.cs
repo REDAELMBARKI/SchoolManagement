@@ -12,7 +12,7 @@ public class StudentContext : IEntityTypeConfiguration<Student>
         builder
         .HasOne(s => s.Intake)
         .WithMany()
-        .HasForeignKey(s => s.IntakeId)
-        .OnDelete(DeleteBehavior.Restrict);
+        .HasForeignKey(s => s.IntakeId);
+
     }
 }

@@ -43,8 +43,6 @@ public class AppDbContext : DbContext
      public DbSet<Group> Groups { get; set; }
     public DbSet<GroupTeacher> GroupTeachers { get; set; }
 
-    // ── Period ──
-    public DbSet<Session> Sessions { get; set; }
 
     // ── Schedules ──
     public DbSet<Schedule> Schedules { get; set; }
@@ -72,6 +70,11 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new TeacherConfiguration());
         modelBuilder.ApplyConfiguration(new CommercialAgentConfiguration());
         modelBuilder.ApplyConfiguration(new OpcConfiguration());
+        modelBuilder.ApplyConfiguration(new GroupConfiguration());
+        modelBuilder.ApplyConfiguration(new GroupTeacherConfiguration());
+        modelBuilder.ApplyConfiguration(new ScheduleConfiguration());
+        modelBuilder.ApplyConfiguration(new EnrollmentConfiguration());
+        modelBuilder.ApplyConfiguration(new GradeConfiguration());
 
         // Apply relationship configurations from Contexts folder
         modelBuilder.ApplyConfiguration(new IntakeContext());

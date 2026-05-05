@@ -46,7 +46,7 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
         // Check constraints
         entityTypeBuilder.ToTable("Students", tb =>
         {
-            tb.HasCheckConstraint("CK_Student_DateOfBirth", "DateOfBirth < datetime('now')");
+            tb.HasCheckConstraint("CK_Student_DateOfBirth", "DateOfBirth < GETDATE()");
             tb.HasCheckConstraint("CK_Student_Email", "Email LIKE '%@%.%'");
         });
     }

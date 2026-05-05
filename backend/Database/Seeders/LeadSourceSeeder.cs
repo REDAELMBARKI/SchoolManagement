@@ -18,16 +18,24 @@ public class LeadSourceSeeder : Seeder
     {  
         var adsIds = _context.Ads.Select(a => a.Id).ToList() ;
         var opcIds = _context.Opcs.Select(a => a.Id).ToList() ;
+        var branchIds = _context.Branches.Select(b => b.Id).ToList() ;
+        
         IEnumerable<LeadSource> items =  new LeadSource[]
         {
+
+
              new LeadSource
              {
-                 AdId  = Faker.PickRandom(adsIds)
+                 AdId  = Faker.PickRandom(adsIds),
+                 BranchId =  Faker.PickRandom(branchIds),
              } ,
              new LeadSource
              {
-                 OpcId  = Faker.PickRandom(opcIds)
+                 OpcId  = Faker.PickRandom(opcIds),
+                 BranchId =  Faker.PickRandom(branchIds),
+
              } ,
+
        
           
 

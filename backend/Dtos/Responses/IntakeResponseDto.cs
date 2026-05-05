@@ -7,8 +7,8 @@ public class IntakeResponseDto {
     public string FirstName { get; set; }  = string.Empty ;
     public string LastName { get; set; } = string.Empty ;
     public string Slug { get; set; } = string.Empty ;
-    public string Email { get; set; } = string.Empty ;
-    public string Phone { get; set; } = string.Empty ;
+    public string? Email { get; set; } = string.Empty ;
+    public string? Phone { get; set; } = string.Empty ;
     public DateTime IntakeDate { get; set; }
 
     public DateOnly? DateOfBirth { get; set; }
@@ -25,7 +25,7 @@ public class IntakeResponseDto {
     public bool IsFullyPaid => AmountRemaining <= 0;
 
     public LeadSourceResponseDto? LeadSource { get; set; }
-    public GenderResponseDto Gender { get; set; } = null!;
+    public GenderResponseDto? Gender { get; set; } = null!;
     public SubjectResponseDto Subject { get; set; } = null!;
     public BranchResponseDto Branch { get; set; } = null!;
     public CommercialAgentResponseDto? CommercialAgent { get; set; }

@@ -38,6 +38,12 @@ public class IntakeConfiguration : IEntityTypeConfiguration<Intake>
             .IsRequired()
             .HasConversion<string>();
 
+        // Intake → Subject relationship (FIXED: Use Restrict to avoid cascade cycles)
+        entityTypeBuilder.HasOne(i => i.Subject)
+            .WithMany()
+            .HasForeignKey(i => i.SubjectId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         // Notes validation
         entityTypeBuilder.Property(i => i.Notes)
             .HasMaxLength(300);
@@ -71,8 +77,8 @@ public class IntakeConfiguration : IEntityTypeConfiguration<Intake>
         // Check constraints for business rules
         entityTypeBuilder.ToTable("Intakes", tb =>
         {
-            tb.HasCheckConstraint("CK_Intake_IntakeDate", "IntakeDate <= datetime('now')");
-            tb.HasCheckConstraint("CK_Intake_DateOfBirth", "DateOfBirth IS NULL OR DateOfBirth < datetime('now')");
+            tb.HasCheckConstraint("CK_Intake_IntakeDate", "IntakeDate <= GETDATE()");
+            tb.HasCheckConstraint("CK_Intake_DateOfBirth", "DateOfBirth IS NULL OR DateOfBirth < GETDATE()");
             tb.HasCheckConstraint("CK_Intake_FollowUpDate", "FollowUpDate IS NULL OR FollowUpDate >= IntakeDate");
         });
     }

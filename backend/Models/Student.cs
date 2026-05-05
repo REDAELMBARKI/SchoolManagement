@@ -7,17 +7,12 @@ namespace SchoolManagement.Backend.Models ;
         public string Phone {get;set;} = string.Empty;
         public DateOnly DateOfBirth { get; set; }
 
-        // Navigation to StudentParent join entities
-        public ICollection<StudentParent> StudentParents { get; set; } = new List<StudentParent>();
-        
-        // fks
-        public int LevelId {get ; set ;}
-        public int GroupId {get ;  set ; }
+       // fks
         public int? IntakeId { get; set; }
 
         // navigation
-        public Group Group {get ;set ; } = null! ;
-        public Level Level {get ;set ; } = null! ;
+        public ICollection<StudentParent> StudentParents { get; set; } = new List<StudentParent>();
+        public ICollection<Enrollment> Enrollments {get;set;} = new List<Enrollment>();
         public Intake? Intake { get; set; }
 
     }

@@ -12,42 +12,36 @@ public  class IntakeContext : IEntityTypeConfiguration<Intake> {
             builder
             .HasOne(i => i.Gender)
             .WithMany()
-            .HasForeignKey(i => i.GenderId)
-            .OnDelete(DeleteBehavior.Restrict) ;
+            .HasForeignKey(i => i.GenderId);
 
             builder
             .HasOne(i => i.LeadSource)
             .WithMany(ls => ls.Intakes)
-            .HasForeignKey(i => i.LeadSourceId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .HasForeignKey(i => i.LeadSourceId);
 
             //  intake -> branch , branch -> intakes
 
             builder
             .HasOne(i => i.Branch)
             .WithMany()
-            .HasForeignKey(i => i.BranchId)
-            .OnDelete(DeleteBehavior.Restrict) ;
+            .HasForeignKey(i => i.BranchId) ;
 
 
              builder
             .HasOne(i => i.Subject)
             .WithMany()
-            .HasForeignKey(i => i.SubjectId)
-            .OnDelete(DeleteBehavior.Restrict) ;
+            .HasForeignKey(i => i.SubjectId) ;
 
 
              builder
             .HasOne(i => i.CommercialAgent)
             .WithMany()
-            .HasForeignKey(i => i.CommercialAgentId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .HasForeignKey(i => i.CommercialAgentId);
 
 
             // ConvertedToStudent relationship
             builder.HasOne(i => i.ConvertedToStudent)
                   .WithMany()
-                  .HasForeignKey(i => i.ConvertedToStudentId)
-                  .OnDelete(DeleteBehavior.Restrict);
+                  .HasForeignKey(i => i.ConvertedToStudentId);
     }
 }
