@@ -38,7 +38,6 @@ public class IntakeFactory : Factory<Intake>
             SubjectId = faker.PickRandom(subjectIds),
             BranchId = faker.PickRandom(branchIds),
             CommercialAgentId = faker.PickRandom(agentIds),
-            ConvertedToStudentId = faker.Random.Bool() ? (int?)null : faker.PickRandom(studentIds),
             IsIndependent = faker.Random.Bool(),
             TotalFees = totalFees,
             AmountPaid = amountPaid
