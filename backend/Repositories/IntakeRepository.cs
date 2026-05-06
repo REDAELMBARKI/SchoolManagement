@@ -1,10 +1,7 @@
 using SchoolManagement.Backend.Dtos.Responses;
-using SchoolManagement.Backend.Interfaces.Repos;
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Backend.Interfaces;
 using SchoolManagement.Backend.Models;
 using SchoolManagement.Backend.Mappers;
-using SchoolManagement.Backend.Dtos;
 using SchoolManagement.Backend.Exceptions;
 
 namespace SchoolManagement.Backend.Repositories;
@@ -49,11 +46,11 @@ public class IntakeRepository : Repository<Intake>
                    IsIndependent = intake.IsIndependent ,
                    TotalFees = intake.TotalFees ,
                    AmountPaid = intake.AmountPaid ,
-                   Subject = IntakeMapper.MapSubject(intake.Subject) ,
-                   Gender = IntakeMapper.MapGender(intake.Gender) ,
-                   CommercialAgent =  IntakeMapper.MapCommercialAgent(intake.CommercialAgent) ,
-                   Branch =  IntakeMapper.MapBranch(intake.Branch) ,
-                   LeadSource = IntakeMapper.MapLeadSource(intake.LeadSource)
+                   Subject = SubjectMapper.MapSubject(intake.Subject),
+                   Gender = GenderMapper.MapGender(intake.Gender),
+                   CommercialAgent = CommercialAgentMapper.MapCommercialAgent(intake.CommercialAgent),
+                   Branch = BranchMapper.MapBranch(intake.Branch),
+                   LeadSource = LeadSourceMapper.MapLeadSource(intake.LeadSource)
                    
          })
          .ToList() ;
@@ -93,11 +90,11 @@ public class IntakeRepository : Repository<Intake>
             IsIndependent = intake.IsIndependent,
             TotalFees = intake.TotalFees,
             AmountPaid = intake.AmountPaid,
-            Subject = IntakeMapper.MapSubject(intake.Subject),
-            Gender = IntakeMapper.MapGender(intake.Gender),
-            CommercialAgent = IntakeMapper.MapCommercialAgent(intake.CommercialAgent),
-            Branch = IntakeMapper.MapBranch(intake.Branch),
-            LeadSource = IntakeMapper.MapLeadSource(intake.LeadSource)
+            Subject = SubjectMapper.MapSubject(intake.Subject),
+            Gender = GenderMapper.MapGender(intake.Gender),
+            CommercialAgent = CommercialAgentMapper.MapCommercialAgent(intake.CommercialAgent),
+            Branch = BranchMapper.MapBranch(intake.Branch),
+            LeadSource = LeadSourceMapper.MapLeadSource(intake.LeadSource)
         };
     }
    

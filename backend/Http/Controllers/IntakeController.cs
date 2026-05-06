@@ -5,7 +5,7 @@ using System.Security;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using SchoolManagement.Backend.Dtos;
+using SchoolManagement.Backend.Dtos.Requests;
 using SchoolManagement.Backend.Services;
 using SchoolManagement.Backend.Models;
 using SchoolManagement.Backend.Exceptions;
@@ -55,14 +55,14 @@ public class IntakeController : ControllerBase
 
 
     [HttpPost]
-    public async Task<IActionResult> Add(IntakeDto intakeDto)
+    public async Task<IActionResult> Add(IntakeRequestDto intakeDto)
     {
         var newIntake = await _intakeService.AddIntakeAsync(intakeDto);
         return CreatedAtAction(nameof(GetById), new { id = newIntake.Id }, newIntake);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, IntakeDto intake)
+    public async Task<IActionResult> Update(int id, IntakeRequestDto intake)
     {
         try
         {

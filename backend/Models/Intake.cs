@@ -17,7 +17,7 @@ public class Intake : Person
     public int? LeadSourceId { get; set; }
     public int SubjectId { get; set; }
     public int BranchId {get;set;}
-    public int? ConvertedToStudentId { get; set; }
+
     // financial properties
     public bool IsIndependent { get; set; } = false;
     public decimal TotalFees { get; set; }

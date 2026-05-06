@@ -5,7 +5,7 @@ public class Enrollment  : BaseEntity
     {
         public DateTime EnrolledAt { get; set; } = DateTime.UtcNow;
         public string Status { get; set; } = "Active";// Active / Dropped / Completed
-
+        public string? Notes { get; set; } 
         // FKs
         public int StudentId { get; set; }
         public int SubjectId {get;set;}

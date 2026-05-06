@@ -1,5 +1,5 @@
 using AutoMapper;
-using SchoolManagement.Backend.Dtos;
+using SchoolManagement.Backend.Dtos.Requests;
 using SchoolManagement.Backend.Dtos.Responses;
 using SchoolManagement.Backend.Mappers;
 using SchoolManagement.Backend.Models;
@@ -27,7 +27,7 @@ public class IntakeService
         return await _repository.GetOneAsync(id);
     }
 
-    public async Task<IntakeResponseDto> AddIntakeAsync(IntakeDto intakeDto)
+    public async Task<IntakeResponseDto> AddIntakeAsync(IntakeRequestDto intakeDto)
     {
         Intake entity = IntakeMapper.ToEntity(intakeDto);
         entity.Slug = CustomSluger.Slug(entity.FirstName , entity.LastName);
@@ -36,7 +36,7 @@ public class IntakeService
     }
 
 
-    public async Task UpdateAsync(int id , IntakeDto intakeDto)
+    public async Task UpdateAsync(int id , IntakeRequestDto intakeDto)
     {
           Intake intake = IntakeMapper.ToEntity(intakeDto);
           intake.Slug = CustomSluger.Slug(intake.FirstName, intake.LastName);

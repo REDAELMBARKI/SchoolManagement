@@ -1,10 +1,11 @@
-using SchoolManagement.Backend.Dtos.Responses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using SchoolManagement.Backend.Dtos;
+using SchoolManagement.Backend.Dtos.Requests;
+using SchoolManagement.Backend.Dtos.Responses;
 using SchoolManagement.Backend.Interfaces;
-using SchoolManagement.Backend.Models;
 using SchoolManagement.Backend.Interfaces.Repos;
+using SchoolManagement.Backend.Models;
 
 namespace SchoolManagement.Backend.Repositories;
 
@@ -19,12 +20,10 @@ public class StudentRepository :  Repository<Student>
     {
         return this.Context.Users.OfType<Student>()
             .Include(s => s.Gender)
-            .Include(s => s.Group)
-            .Include(s => s.Subject)
-            .Include(s => s.Level)
             .Include(s => s.StudentParents)
                 .ThenInclude(sp => sp.Parent)
             .Include(s => s.Intake)
+            .Include(s => s.Enrollments)
             .AsNoTracking().AsQueryable();
                 
     }
@@ -47,9 +46,13 @@ public class StudentRepository :  Repository<Student>
             Id = student.Id,
             FirstName = student.FirstName,
             LastName = student.LastName,
-            Gender = student.Gender.Name,
-            Group = student.Group.Name,
-            Level = student.Level.Name,
+            Gender = new GenderResponseDto
+            {
+                Id = student.Gender.Id,
+                Slug = student.Gender.Slug,
+                Name = student.Gender.Name
+            },
+            Parents = student.StudentParents.Select(sp => sp.Parent).ToList() ,
             DateOfBirth = student.DateOfBirth,
             IntakeId = student.IntakeId,
             Intake = student.Intake != null ? new IntakeResponseDto
@@ -92,7 +95,6 @@ public class StudentRepository :  Repository<Student>
                     Phone = student.Intake.Branch.Phone
                 }
             } : null,
-            Parents = student.StudentParents.Select(sp => sp.Parent).ToList()
         }; 
     }
 

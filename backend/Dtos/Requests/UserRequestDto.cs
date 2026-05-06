@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using SchoolManagement.Backend.Models;
 
-namespace SchoolManagement.Backend.Dtos;
+namespace SchoolManagement.Backend.Dtos.Requests;
 
-public  class UserDto
+public class UserRequestDto
 {
  
         [Required, MaxLength(50)]

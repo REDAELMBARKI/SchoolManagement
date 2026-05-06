@@ -1,9 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using SchoolManagement.Backend.Models;
 
-namespace SchoolManagement.Backend.Dtos;
+namespace SchoolManagement.Backend.Dtos.Requests;
 
-public class StudentDto
+
+public class StudentRequestDto
 {
     [Required, MaxLength(50)]
     public string FirstName { get; set; } = string.Empty;

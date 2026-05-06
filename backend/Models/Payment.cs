@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations ;
 namespace SchoolManagement.Backend.Models ; 
 public class Payment : BaseEntity
 {
+    public DateTime? PaidAt { get; set; } 
     public int EnrollmentId { get; set; }
     public decimal AmountPaid { get; set; }        // what they actually paid now
     public decimal FeeAmount { get; set; }         // monthly fee for this period

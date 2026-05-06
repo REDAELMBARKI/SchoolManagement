@@ -11,8 +11,7 @@ public class StudentContext : IEntityTypeConfiguration<Student>
         // Student → Intake relationship (many students can come from one intake)
         builder
         .HasOne(s => s.Intake)
-        .WithMany()
-        .HasForeignKey(s => s.IntakeId);
-
+        .WithOne(i => i.ConvertedToStudent)
+        .HasForeignKey<Student>(s => s.IntakeId);
     }
 }
