@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolManagement.Backend.Contexts;
 using SchoolManagement.Backend.Models;
-using SchoolManagement.Backend.TablesConfigs;
+using SchoolManagement.Backend.Configurations;
 
 namespace SchoolManagement.Backend;
 
@@ -53,6 +53,7 @@ public class AppDbContext : DbContext
     public DbSet<Grade> Grades { get; set; }
     public DbSet<Payment> Payments { get; set; }
 
+    public DbSet<Media> Medias { get; set; }
 
 
 

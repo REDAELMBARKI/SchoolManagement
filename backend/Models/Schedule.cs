@@ -3,29 +3,74 @@ namespace SchoolManagement.Backend.Models ;
 
  public class Schedule : BaseEntity
 {
- 
-        // Monday / Tuesday / ...
-        [Required, MaxLength(15)]
-        public string DayOfWeek { get; set; } = string.Empty;
- 
-        [Required]
-        public TimeSpan StartTime { get; set; }
- 
-        [Required]
-        public TimeSpan EndTime { get; set; }
- 
-        // hex color for the planner UI e.g. "#4CAF50"
-        [MaxLength(10)]
-        public string? Color { get; set; }
-
-         // FKs
-           public int BranchId { get; set; }
-        public int GroupTeacherId { get; set; }
+        public int BranchId { get; set; }
+        public int TeacherId { get; set; }
         public int RoomId { get; set; }
+        public int DayId { get; set; }
+        public int TimeSlotId { get; set; }
  
         // navigations
         public Branch Branch {get;set;} = null! ;
-        public GroupTeacher GroupTeacher { get; set; } = null!;
+        public  Teacher Teacher { get; set; } = null!;
         public Room Room { get; set; } = null!;
+        public TimeSlot TimeSlot { get; set; } = null!;
+        public Day Day { get; set; } = null!;
 }
- 
+
+
+public class Day : BaseEntity
+{
+    public string Name { get; set; } = string.Empty;
+
+    // navigations\
+
+    public ICollection<TimeSlot> TimeSlots  = new List<TimeSlot>();
+}
+
+
+public class TimeSlot : BaseEntity
+{
+    public TimeOnly StartTime { get; set; }
+    public TimeOnly EndTime { get; set; }
+
+    public Schedule schedule
+
+
+
+  /*
+    Time Plam For A student 
+    
+    groupSchedule {
+     
+        day=monday : {
+            timeslot : 
+            {
+              Room
+              Teacher
+              
+               
+            },
+            timeslot : 
+            {
+            
+            } 
+                    
+                    
+        }
+                
+     }
+    */
+
+
+
+
+
+}
+
+
+
+
+
+
+
+

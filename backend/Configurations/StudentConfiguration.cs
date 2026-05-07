@@ -27,11 +27,6 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
         entityTypeBuilder.Property(s => s.DateOfBirth)
             .IsRequired();
 
-        entityTypeBuilder.Property(s => s.LevelId)
-            .IsRequired();
-            
-        entityTypeBuilder.Property(s => s.GroupId)
-            .IsRequired();
             
         entityTypeBuilder.Property(s => s.IntakeId)
             .IsRequired(false);
@@ -40,8 +35,6 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
         entityTypeBuilder.HasIndex(s => s.Email);
         entityTypeBuilder.HasIndex(s => s.Phone);
         entityTypeBuilder.HasIndex(s => s.DateOfBirth);
-        entityTypeBuilder.HasIndex(s => s.LevelId);
-        entityTypeBuilder.HasIndex(s => s.GroupId);
         
         // Check constraints
         entityTypeBuilder.ToTable("Students", tb =>

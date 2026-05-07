@@ -5,7 +5,7 @@ using SchoolManagement.Backend.Models;
 namespace SchoolManagement.Backend.Validators;
 
 
-public class IntakeValidator : AbstractValidator<IntakeDto>
+public class IntakeValidator : AbstractValidator<IntakeRequestDto>
 {
     public IntakeValidator(
         IGenderRepository gender_repo,

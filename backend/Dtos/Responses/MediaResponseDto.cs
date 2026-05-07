@@ -1,3 +1,5 @@
+
+using SchoolManagement.Backend.Models ;
 namespace SchoolManagement.Backend.Dtos.Responses;
 
 public class MediaResponseDto
@@ -10,7 +12,7 @@ public class MediaResponseDto
     public string? AltText { get; set; }
     public int? Width { get; set; }
     public int? Height { get; set; }
-    public string MediaType { get; set; } = string.Empty;
-    public string? Collection { get; set; }
+    public MediaType MediaType { get; set; }
+    public MediaCollection? Collection { get; set; }
     public bool IsMain { get; set; }
 }
