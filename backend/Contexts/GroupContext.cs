@@ -4,10 +4,12 @@ using SchoolManagement.Backend.Models;
 
 namespace SchoolManagement.Backend.Contexts;
 
-public class DayContext : IEntityTypeConfiguration<Day>
+public class GroupContext : IEntityTypeConfiguration<Group>
 {
-    public void Configure(EntityTypeBuilder<Day> builder)
+    public void Configure(EntityTypeBuilder<Group> builder)
     {
-        // TODO: Implement Day configuration
+        builder
+        .HasOne
+
     }
 }

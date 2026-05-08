@@ -46,6 +46,6 @@ public class MediaService
             
         };
 
-        return await _main_repo.Store(media);
+        return await _main_repo.Add(media);
     }
 }

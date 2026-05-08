@@ -6,10 +6,5 @@ public class LevelResponseDto
     
     public string Name { get; set; } = string.Empty;
     
-    public int BranchId { get; set; }
-    
-    // Navigation Properties
-    public BranchResponseDto? Branch { get; set; }
-    
     public ICollection<GroupResponseDto> Groups { get; set; } = new List<GroupResponseDto>();
 }

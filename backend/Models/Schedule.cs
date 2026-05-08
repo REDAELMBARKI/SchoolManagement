@@ -8,9 +8,13 @@ namespace SchoolManagement.Backend.Models ;
         public int RoomId { get; set; }
         public int DayId { get; set; }
         public int TimeSlotId { get; set; }
+        public int GroupId {get; set; }
+        public int SubjectId {get; set; }
  
-        // navigations
+        // navigations  
         public Branch Branch {get;set;} = null! ;
+        public Subject Subject {get;set;} = null! ;
+        public Group Group {get;set;} = null! ;
         public  Teacher Teacher { get; set; } = null!;
         public Room Room { get; set; } = null!;
         public TimeSlot TimeSlot { get; set; } = null!;
@@ -22,9 +26,6 @@ public class Day : BaseEntity
 {
     public string Name { get; set; } = string.Empty;
 
-    // navigations\
-
-    public ICollection<TimeSlot> TimeSlots  = new List<TimeSlot>();
 }
 
 
@@ -32,38 +33,6 @@ public class TimeSlot : BaseEntity
 {
     public TimeOnly StartTime { get; set; }
     public TimeOnly EndTime { get; set; }
-
-    public Schedule schedule
-
-
-
-  /*
-    Time Plam For A student 
-    
-    groupSchedule {
-     
-        day=monday : {
-            timeslot : 
-            {
-              Room
-              Teacher
-              
-               
-            },
-            timeslot : 
-            {
-            
-            } 
-                    
-                    
-        }
-                
-     }
-    */
-
-
-
-
 
 }
 

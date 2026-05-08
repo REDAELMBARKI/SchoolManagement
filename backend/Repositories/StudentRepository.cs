@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using SchoolManagement.Backend.Dtos;
 using SchoolManagement.Backend.Dtos.Requests;
 using SchoolManagement.Backend.Dtos.Responses;
+using SchoolManagement.Backend.Exceptions;
 using SchoolManagement.Backend.Interfaces;
 using SchoolManagement.Backend.Interfaces.Repos;
 using SchoolManagement.Backend.Models;
@@ -32,9 +33,11 @@ public class StudentRepository :  Repository<Student>
         return  await this.Query().ToListAsync() ;
     }
 
-    public async Task<Student?>  FindByIdAsync(int id)
+    public async Task<Student> FindByIdAsync(int id)
     {
-        return await this.Query().FirstAsync(s => s.Id == id) ;
+        var student = await this.Query().FirstOrDefaultAsync(s => s.Id == id);
+        if (student is null) throw new NotFoundException($"Student with id {id} not found");
+        return student;
     }
     
     public async Task<StudentResponseDto> AddAsync(Student student)
@@ -99,22 +102,21 @@ public class StudentRepository :  Repository<Student>
     }
 
 
-    public async Task Destroy(int id )
+    public async Task DeleteAsync(int id)
     {
         var student = await Query().FirstOrDefaultAsync(s => s.Id == id);
-        if(student == null ) return  ; 
-        Context.Remove(student);
+        if (student is null) throw new NotFoundException($"Student with id {id} not found");
+        student.DeletedAt = DateTime.UtcNow;
         await Context.SaveChangesAsync();
-
     }
 
-    public async Task Update(int id )
+    public async Task UpdateAsync(int id, Student student)
     {
-        // var student = await Context.Users.OfType<Student>().FindAsync(id);
-        // if(student == null ) return  ; 
-        // Context.Users.OfType<Student>().Update(student) ;
-        // await Context.SaveChangesAsync();
-        
+        var dbStudent = await Context.Users.OfType<Student>().FirstOrDefaultAsync(s => s.Id == id);
+        if (dbStudent is null) throw new NotFoundException($"Student with id {id} not found");
+        student.Id = dbStudent.Id;
+        Context.Entry(dbStudent).CurrentValues.SetValues(student);
+        await Context.SaveChangesAsync();
     }
 
 

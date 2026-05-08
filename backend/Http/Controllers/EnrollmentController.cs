@@ -7,20 +7,20 @@ namespace SchoolManagement.Backend.Http.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class StudentController : ControllerBase
+public class EnrollmentController : ControllerBase
 {
-    private readonly StudentService _studentService;
+    private readonly EnrollmentService _enrollmentService;
 
-    public StudentController(StudentService studentService)
+    public EnrollmentController(EnrollmentService enrollmentService)
     {
-        _studentService = studentService;
+        _enrollmentService = enrollmentService;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var students = await _studentService.GetAllAsync();
-        return Ok(students);
+        var enrollments = await _enrollmentService.GetAllAsync();
+        return Ok(enrollments);
     }
 
     [HttpGet("{id}")]
@@ -28,8 +28,8 @@ public class StudentController : ControllerBase
     {
         try
         {
-            var student = await _studentService.GetByIdAsync(id);
-            return Ok(student);
+            var enrollment = await _enrollmentService.GetByIdAsync(id);
+            return Ok(enrollment);
         }
         catch (NotFoundException)
         {
@@ -46,12 +46,16 @@ public class StudentController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] StudentRequestDto dto)
+    public async Task<IActionResult> Create([FromBody] EnrollmentRequestDto dto)
     {
         try
         {
-            var student = await _studentService.CreateAsync(dto);
-            return CreatedAtAction(nameof(GetById), new { id = student.Id }, student);
+            var enrollment = await _enrollmentService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = enrollment.Id }, enrollment);
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ex.Message);
         }
         catch (Exception ex)
         {
@@ -64,11 +68,11 @@ public class StudentController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] StudentRequestDto dto)
+    public async Task<IActionResult> Update(int id, [FromBody] EnrollmentRequestDto dto)
     {
         try
         {
-            await _studentService.UpdateAsync(id, dto);
+            await _enrollmentService.UpdateAsync(id, dto);
             return NoContent();
         }
         catch (NotFoundException)
@@ -90,7 +94,7 @@ public class StudentController : ControllerBase
     {
         try
         {
-            await _studentService.DeleteAsync(id);
+            await _enrollmentService.DeleteAsync(id);
             return NoContent();
         }
         catch (NotFoundException)
@@ -106,4 +110,10 @@ public class StudentController : ControllerBase
             );
         }
     }
+
+    // TODO: Additional endpoints for you to implement:
+    // - GET api/enrollments/student/{studentId} - Get student's enrollments
+    // - GET api/enrollments/group/{groupId} - Get group enrollments
+    // - POST api/enrollments/{id}/drop - Drop enrollment (change status)
+    // - POST api/enrollments/{id}/payment - Process payment
 }

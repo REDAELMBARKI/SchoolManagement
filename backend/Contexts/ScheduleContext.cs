@@ -18,6 +18,12 @@ public class ScheduleContext : IEntityTypeConfiguration<Schedule>
             .HasForeignKey(sc => sc.TeacherId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasOne(sc => sc.Subject)
+            .WithMany()
+            .HasForeignKey(sc => sc.SubjectId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            
         builder.HasOne(sc => sc.Room)
             .WithMany()
             .HasForeignKey(sc => sc.RoomId)
