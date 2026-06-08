@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SchoolManagement.Backend.Models;
 
 namespace SchoolManagement.Backend.Configurations;
-
 public class GradeConfiguration : IEntityTypeConfiguration<Grade>
 {
     public void Configure(EntityTypeBuilder<Grade> entityTypeBuilder)

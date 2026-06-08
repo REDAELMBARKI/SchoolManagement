@@ -5,6 +5,7 @@ using SchoolManagement.Backend.Models;
 namespace SchoolManagement.Backend.Configurations;
 
 
+
 public class EmployeeConfigurations : IEntityTypeConfiguration<Employee>
 {
     public void Configure(EntityTypeBuilder<Employee> entityTypeBuilder)

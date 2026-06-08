@@ -1,8 +1,10 @@
 using System.ComponentModel.DataAnnotations ;
 namespace SchoolManagement.Backend.Models ;
+namespace SchoolManagement.Backend.Models ;
 
 
   public class Group : BaseEntity
+  {
   {
         public string Name { get; set; } = string.Empty;
         public int Capacity { get; set; } = 15;
@@ -24,4 +26,5 @@ namespace SchoolManagement.Backend.Models ;
         public Level Level { get; set; } = null!;
         public Subject Subject { get; set; } = null!;
 
+}
 }
