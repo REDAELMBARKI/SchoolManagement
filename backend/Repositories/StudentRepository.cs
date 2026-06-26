@@ -7,6 +7,7 @@ using SchoolManagement.Backend.Exceptions;
 using SchoolManagement.Backend.Interfaces;
 using SchoolManagement.Backend.Interfaces.Repos;
 using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Contexts ;
 
 namespace SchoolManagement.Backend.Repositories;
 

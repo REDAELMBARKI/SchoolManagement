@@ -42,5 +42,12 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
             tb.HasCheckConstraint("CK_Student_DateOfBirth", "DateOfBirth < GETDATE()");
             tb.HasCheckConstraint("CK_Student_Email", "Email LIKE '%@%.%'");
         });
+
+
+        // relashioships 
+        entityTypeBuilder
+        .HasOne(s => s.Intake)
+        .WithOne(i => i.ConvertedToStudent)
+        .HasForeignKey<Student>(s => s.IntakeId);
     }
 }

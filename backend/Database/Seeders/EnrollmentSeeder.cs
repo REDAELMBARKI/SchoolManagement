@@ -1,6 +1,6 @@
 using SchoolManagement.Backend.Database.Factories;
 namespace SchoolManagement.Backend.Database.Seeders;
-
+using SchoolManagement.Backend.Contexts ;
 public class EnrollmentSeeder : Seeder
 {
     private readonly EnrollmentFactory _factory;

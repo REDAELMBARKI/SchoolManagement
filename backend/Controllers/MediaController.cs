@@ -3,7 +3,7 @@ using SchoolManagement.Backend.Dtos.Responses;
 using SchoolManagement.Backend.Models;
 using SchoolManagement.Backend.Services;
 
-namespace SchoolManagement.Backend.Http.Controllers;
+namespace SchoolManagement.Backend.Controllers;
 
 public class MediaController : ControllerBase
 {

@@ -30,28 +30,37 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
         entityTypeBuilder.HasIndex(e => e.BranchId);
         entityTypeBuilder.HasIndex(e => e.PlanId);
 
-        // Enrollment → Student relationship (FIXED: Use Restrict to avoid cascade cycles)
+
+
+        // relationships
+      
         entityTypeBuilder.HasOne(e => e.Student)
-            .WithMany()
+            .WithMany(s => s.Enrollments)
             .HasForeignKey(e => e.StudentId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Enrollment → Group relationship (FIXED: Use Restrict to avoid cascade cycles)
-        entityTypeBuilder.HasOne(e => e.Group)
-            .WithMany()
-            .HasForeignKey(e => e.GroupId)
-            .OnDelete(DeleteBehavior.Restrict);
+        entityTypeBuilder
+        .HasOne(e => e.Subject)
+        .WithMany(s =>  s.Enrollments)
+        .HasForeignKey(e => e.SubjectId);
 
-        // Enrollment → Branch relationship (FIXED: Use Restrict to avoid cascade cycles)
-        entityTypeBuilder.HasOne(e => e.Branch)
-            .WithMany()
-            .HasForeignKey(e => e.BranchId)
-            .OnDelete(DeleteBehavior.Restrict);
+        entityTypeBuilder
+        .HasOne(e => e.Branch)
+        .WithMany(b =>  b.Enrollments)
+        .HasForeignKey(e => e.BranchId)
+         .OnDelete(DeleteBehavior.Restrict);
 
-        // Enrollment → Plan relationship (FIXED: Use Restrict to avoid cascade cycles)
-        entityTypeBuilder.HasOne(e => e.Plan)
-            .WithMany()
-            .HasForeignKey(e => e.PlanId)
-            .OnDelete(DeleteBehavior.Restrict);
+        entityTypeBuilder
+        .HasOne(e => e.Plan)
+        .WithMany(p =>  p.Enrollments)
+        .HasForeignKey(e => e.PlanId)
+         .OnDelete(DeleteBehavior.Restrict);
+
+        entityTypeBuilder
+        .HasOne(e => e.Group)
+        .WithMany(g =>  g.Enrollments)
+        .HasForeignKey(e => e.GroupId)
+         .OnDelete(DeleteBehavior.Restrict);
+
     }
 }

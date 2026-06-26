@@ -1,5 +1,6 @@
 using Bogus;
 using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Contexts ;
 using SchoolManagement.Backend.Utils;
 
 namespace SchoolManagement.Backend.Database.Factories ; 

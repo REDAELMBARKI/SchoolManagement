@@ -12,7 +12,7 @@ using SchoolManagement.Backend.Exceptions;
 using Microsoft.Extensions.FileProviders;
 
 
-namespace SchoolManagement.Backend.Http.Controllers;
+namespace SchoolManagement.Backend.Controllers;
 
 [ApiController]
 [Route("api/intakes")]

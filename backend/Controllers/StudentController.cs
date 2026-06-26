@@ -3,7 +3,7 @@ using SchoolManagement.Backend.Dtos.Requests;
 using SchoolManagement.Backend.Exceptions;
 using SchoolManagement.Backend.Services;
 
-namespace SchoolManagement.Backend.Http.Controllers;
+namespace SchoolManagement.Backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

@@ -1,5 +1,5 @@
 using SchoolManagement.Backend.Models;
-
+using SchoolManagement.Backend.Contexts ;
 namespace SchoolManagement.Backend.Database.Factories;
 
 public class ScheduleFactory : Factory<Schedule>

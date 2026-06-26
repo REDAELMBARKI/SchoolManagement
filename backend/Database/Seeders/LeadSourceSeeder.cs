@@ -2,7 +2,7 @@ using Bogus;
 using Bogus.DataSets;
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Backend.Models;
-
+using SchoolManagement.Backend.Contexts ;
 namespace SchoolManagement.Backend.Database.Seeders;
 
 public class LeadSourceSeeder : Seeder

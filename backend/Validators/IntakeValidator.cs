@@ -1,7 +1,9 @@
 using FluentValidation;
-using SchoolManagement.Backend.Dtos;
+using SchoolManagement.Backend.Dtos.Requests;
 using SchoolManagement.Backend.Interfaces.Repos;
 using SchoolManagement.Backend.Models;
+using DtoLeadSourceType = SchoolManagement.Backend.Dtos.Requests.LeadSourceType;
+
 namespace SchoolManagement.Backend.Validators;
 
 
@@ -88,7 +90,7 @@ public class LeadSourceValidator : AbstractValidator<LeadSourceDto>
     {
         // Validate LeadSourceType first
         RuleFor(l => l.LeadSourceType)
-            .Must(type => type == LeadSourceType.Opc || type == LeadSourceType.Ad)
+            .Must(type => type == DtoLeadSourceType.Opc || type == DtoLeadSourceType.Ad)
             .WithMessage("Lead source type must be either OPC or Ad");
 
         // Validate LeadSourceId exists and matches the type
@@ -97,8 +99,8 @@ public class LeadSourceValidator : AbstractValidator<LeadSourceDto>
             .WithMessage("Lead source ID is required")
             .MustAsync(async (dto, leadSourceId, ct) => {
                 return dto.LeadSourceType switch {
-                    LeadSourceType.Opc => await opc_repo.ExistsAsync(leadSourceId.Value!) ,
-                    LeadSourceType.Ad => await ad_repo.ExistsAsync(leadSourceId.Value!) ,
+                    DtoLeadSourceType.Opc => await opc_repo.ExistsAsync(leadSourceId.Value!) ,
+                    DtoLeadSourceType.Ad => await ad_repo.ExistsAsync(leadSourceId.Value!) ,
                     _ => false
                 };
             })

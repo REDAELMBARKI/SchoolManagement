@@ -38,12 +38,7 @@ public class IntakeConfiguration : IEntityTypeConfiguration<Intake>
             .IsRequired()
             .HasConversion<string>();
 
-        // Intake → Subject relationship (FIXED: Use Restrict to avoid cascade cycles)
-        entityTypeBuilder.HasOne(i => i.Subject)
-            .WithMany()
-            .HasForeignKey(i => i.SubjectId)
-            .OnDelete(DeleteBehavior.Restrict);
-
+    
         // Notes validation
         entityTypeBuilder.Property(i => i.Notes)
             .HasMaxLength(300);
@@ -64,9 +59,6 @@ public class IntakeConfiguration : IEntityTypeConfiguration<Intake>
         entityTypeBuilder.Property(i => i.BranchId)
             .IsRequired();
 
-        entityTypeBuilder.Property(i => i.ConvertedToStudentId)
-            .IsRequired(false);
-
         // Indexes for performance
         entityTypeBuilder.HasIndex(i => i.Email).IsUnique();
         entityTypeBuilder.HasIndex(i => i.Phone);
@@ -81,5 +73,43 @@ public class IntakeConfiguration : IEntityTypeConfiguration<Intake>
             tb.HasCheckConstraint("CK_Intake_DateOfBirth", "DateOfBirth IS NULL OR DateOfBirth < GETDATE()");
             tb.HasCheckConstraint("CK_Intake_FollowUpDate", "FollowUpDate IS NULL OR FollowUpDate >= IntakeDate");
         });
+
+        // relationships
+            // Intake → Subject relationship (FIXED: Use Restrict to avoid cascade cycles)
+
+
+            entityTypeBuilder
+            .HasOne(i => i.Gender)
+            .WithMany()
+            .HasForeignKey(i => i.GenderId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            entityTypeBuilder
+            .HasOne(i => i.LeadSource)
+            .WithMany(ls => ls.Intakes)
+            .HasForeignKey(i => i.LeadSourceId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            //  intake -> branch , branch -> intakes
+
+            entityTypeBuilder
+            .HasOne(i => i.Branch)
+            .WithMany()
+            .HasForeignKey(i => i.BranchId) 
+            .OnDelete(DeleteBehavior.Restrict);
+
+
+             entityTypeBuilder
+            .HasOne(i => i.Subject)
+            .WithMany()
+            .HasForeignKey(i => i.SubjectId) 
+            .OnDelete(DeleteBehavior.Restrict);
+
+
+             entityTypeBuilder
+            .HasOne(i => i.CommercialAgent)
+            .WithMany()
+            .HasForeignKey(i => i.CommercialAgentId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

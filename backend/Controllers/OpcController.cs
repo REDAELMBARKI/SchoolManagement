@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Backend;
+using SchoolManagement.Backend.Contexts ;
 
-namespace SchoolManagement.Backend.Http.Controllers;
+namespace SchoolManagement.Backend.Controllers;
 
 
 [ApiController]

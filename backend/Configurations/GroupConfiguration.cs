@@ -25,13 +25,13 @@ public class GroupConfiguration : IEntityTypeConfiguration<Group>
         entityTypeBuilder.Property(g => g.LevelId)
             .IsRequired();
 
-        entityTypeBuilder.Property(g => g.LanguageId)
+        entityTypeBuilder.Property(g => g.SubjectId)
             .IsRequired();
 
         // Indexes for performance
         entityTypeBuilder.HasIndex(g => g.BranchId);
         entityTypeBuilder.HasIndex(g => g.LevelId);
-        entityTypeBuilder.HasIndex(g => g.LanguageId);
+        entityTypeBuilder.HasIndex(g => g.SubjectId);
 
         // Group → Branch relationship
         entityTypeBuilder.HasOne(g => g.Branch)
@@ -48,7 +48,7 @@ public class GroupConfiguration : IEntityTypeConfiguration<Group>
         // Group → Subject relationship (inferred from LanguageId)
         entityTypeBuilder.HasOne(g => g.Subject)
             .WithMany()
-            .HasForeignKey(g => g.LanguageId)
+            .HasForeignKey(g => g.SubjectId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

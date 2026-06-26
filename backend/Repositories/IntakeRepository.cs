@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Backend.Models;
 using SchoolManagement.Backend.Mappers;
 using SchoolManagement.Backend.Exceptions;
-
+using SchoolManagement.Backend.Contexts ;
 namespace SchoolManagement.Backend.Repositories;
 
 public class IntakeRepository : Repository<Intake> 

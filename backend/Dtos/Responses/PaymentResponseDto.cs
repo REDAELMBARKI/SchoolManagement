@@ -3,10 +3,12 @@ namespace SchoolManagement.Backend.Dtos.Responses;
 public class PaymentResponseDto
 {
     public int Id { get; set; }
-    public decimal Amount { get; set; }
-    public DateTime PaymentDate { get; set; }
-    public string PaymentMethod { get; set; } = string.Empty;
-    public string? Notes { get; set; }
+    public decimal AmountPaid { get; set; }
+    public decimal FeeAmount { get; set; }
+    public string Status { get; set; } = "Pending";
+    public DateTime? PaidAt { get; set; }
+    public DateTime PeriodStart { get; set; }
+    public DateTime PeriodEnd { get; set; }
     
     // Foreign Keys
     public int EnrollmentId { get; set; }

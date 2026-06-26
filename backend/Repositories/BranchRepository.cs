@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Backend.Interfaces.Repos;
-
 using SchoolManagement.Backend.Models;
-
+using SchoolManagement.Backend.Contexts ;
 namespace SchoolManagement.Backend.Repositories;
 
 public class BranchRepository : Repository<Branch> , IBranchRepository

@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Backend.Dtos.Responses;
 using SchoolManagement.Backend.Exceptions;
 using SchoolManagement.Backend.Models;
-
+using SchoolManagement.Backend.Contexts ;
 namespace SchoolManagement.Backend.Repositories;
 
 public class EnrollmentRepository : Repository<Enrollment>

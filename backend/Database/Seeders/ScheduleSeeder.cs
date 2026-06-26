@@ -1,4 +1,5 @@
 using SchoolManagement.Backend.Database.Factories;
+using SchoolManagement.Backend.Contexts ;
 using SchoolManagement.Backend.Models;
 
 namespace SchoolManagement.Backend.Database.Seeders;

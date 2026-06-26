@@ -7,7 +7,6 @@ namespace SchoolManagement.Backend.Models ;
 public class LeadSource  : BaseEntity
 {
     public LeadSourceType LeadSourceType {get;set;}
-
     //fks
     public int? OpcId { get; set; }
     public int? AdId { get; set; }
@@ -20,6 +19,11 @@ public class LeadSource  : BaseEntity
     public Ad? Ad { get; set; }
     public ICollection<Intake> Intakes { get; set; } = new List<Intake>();
 
+}
+
+
+public enum LeadSourceType  {
+    Opc ,  Ad
 }
 
 

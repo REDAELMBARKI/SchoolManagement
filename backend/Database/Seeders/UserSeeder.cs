@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Backend.Database.Factories;
+using SchoolManagement.Backend.Contexts ;
 namespace SchoolManagement.Backend.Database.Seeders;
 
 public class UserSeeder : Seeder

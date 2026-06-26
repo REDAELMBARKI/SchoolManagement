@@ -2,10 +2,10 @@
 
 using System.Threading.Tasks;
 using SchoolManagement.Backend.Database.Factories;
-using SchoolManagement.Backend;
-using SchoolManagement.Backend.Database.Seeders;
 using SchoolManagement.Backend.Models;
-using AutoMapper;
+using SchoolManagement.Backend.Contexts;
+
+namespace SchoolManagement.Backend.Database.Seeders;
 
 public class DatabaseSeeder
 {

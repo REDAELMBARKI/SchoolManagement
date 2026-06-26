@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Contexts ;
 
 namespace SchoolManagement.Backend.Database.Factories ; 
 public class GroupFactory : Factory<Group>

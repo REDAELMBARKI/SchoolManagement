@@ -1,10 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SchoolManagement.Backend.Contexts;
 using SchoolManagement.Backend.Models;
 using SchoolManagement.Backend.Configurations;
-
-namespace SchoolManagement.Backend;
+using SchoolManagement.Backend.Contexts ;
+namespace SchoolManagement.Backend.Contexts;
 
 public class AppDbContext : DbContext
 {
@@ -76,10 +75,6 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new ScheduleConfiguration());
         modelBuilder.ApplyConfiguration(new EnrollmentConfiguration());
         modelBuilder.ApplyConfiguration(new GradeConfiguration());
-
-        // Apply relationship configurations from Contexts folder
-        modelBuilder.ApplyConfiguration(new IntakeContext());
-        modelBuilder.ApplyConfiguration(new StudentContext());
 
         // Apply soft delete filter globally
         ApplySoftDeleteFilter(modelBuilder);

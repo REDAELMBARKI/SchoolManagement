@@ -3,14 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SchoolManagement.Backend.Models;
 
-namespace SchoolManagement.Backend.Contexts;
+namespace SchoolManagement.Backend.Configurations;
 
-public class LeadSourceContext : IEntityTypeConfiguration<LeadSource>
+public class LeadSourceConfiguration: IEntityTypeConfiguration<LeadSource>
 {
      public  void Configure(EntityTypeBuilder<LeadSource> builder)
     {
         
-            builder
+           builder
            .HasOne(ld => ld.Ad)
            .WithMany()
            .HasForeignKey(ld => ld.AdId);

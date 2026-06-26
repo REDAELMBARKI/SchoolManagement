@@ -1,6 +1,13 @@
-namespace _.TablesConfigs;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SchoolManagement.Backend.Models;
 
-public class MediaConfiguration
+namespace SchoolManagement.Backend.Configurations;
+
+public class MediaConfiguration : IEntityTypeConfiguration<Media>
 {
-    // TODO: Implement MediaConfiguration
+    public void Configure(EntityTypeBuilder<Media> entityTypeBuilder)
+    {
+        // TODO: Implement MediaConfiguration
+    }
 }

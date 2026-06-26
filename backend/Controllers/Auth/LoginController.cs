@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Backend.Models;
 using SchoolManagement.Backend.Services;
+using SchoolManagement.Backend.Contexts ;
 
-namespace SchoolManagement.Backend.Http.Auth.Controllers;
+namespace SchoolManagement.Backend.Auth.Controllers;
 
 [ApiController]
 [Route("api/auth")]

@@ -1,5 +1,7 @@
 using SchoolManagement.Backend.Models;
 using Slugify;
+using SchoolManagement.Backend.Contexts ;
+
 namespace SchoolManagement.Backend.Database.Factories;
 
 public class PlatformFactory : Factory<Platform>

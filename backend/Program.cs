@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SchoolManagement.Backend;
+using SchoolManagement.Backend.Contexts;
 using SchoolManagement.Backend.Database.Seeders;
 using SchoolManagement.Backend.Database.Factories;
 using Serilog;

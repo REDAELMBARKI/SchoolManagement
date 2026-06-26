@@ -3,7 +3,7 @@ using SchoolManagement.Backend;
 using SchoolManagement.Backend.Database.Factories;
 using SchoolManagement.Backend.Database.Seeders;
 using SchoolManagement.Backend.Models;
-
+using SchoolManagement.Backend.Contexts ;
 namespace SchoolManagement.Backend.Database.Seeders;
 public class AdSeeder : Seeder
 {
