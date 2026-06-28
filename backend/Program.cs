@@ -39,19 +39,7 @@ builder.Services.AddControllers();
 
 // di
 // add jwt barear 
-// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//     .AddJwtBearer(options =>
-//     {
-//         options.TokenValidationParameters = new TokenValidationParameters
-//         {
-//             ValidateIssuerSigningKey = true,
-//             IssuerSigningKey         = new SymmetricSecurityKey(
-//                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-//             ValidateIssuer   = false,  // skip for simple project
-//             ValidateAudience = false,  // skip for simple project
-//             ValidateLifetime = true,   // ✅ checks token expiry
-//         };
-// });
+builder.Services.AddJwtExtention();
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

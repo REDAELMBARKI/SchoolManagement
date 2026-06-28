@@ -8,11 +8,10 @@ namespace SchoolManagement.Backend.Repositories;
 
 public class IntakeRepository : Repository<Intake> 
 {
-     
-     // read 
     public IntakeRepository(AppDbContext context) : base(context)
     {
     }
+    
     public async Task<List<IntakeResponseDto>> GetAllAsync()
     {
 
@@ -26,7 +25,6 @@ public class IntakeRepository : Repository<Intake>
                 .Include(i => i.Subject)
                 .Include(i => i.CommercialAgent)
                 .Include(i => i.Branch)
-                .Include(i => i.ConvertedToStudent)
                .ToListAsync() ;
 
          return intakes
@@ -68,7 +66,6 @@ public class IntakeRepository : Repository<Intake>
                 .Include(i => i.Subject)
                 .Include(i => i.CommercialAgent)
                 .Include(i => i.Branch)
-                .Include(i => i.ConvertedToStudent)
                 .FirstOrDefaultAsync(i => i.Id == id);
 
         if(intake is null) throw new NotFoundException($"no intake found with id {id}");
@@ -98,7 +95,10 @@ public class IntakeRepository : Repository<Intake>
         };
     }
    
-
+    public async Task<bool> IsExistBySlug(string slug)
+    {
+        return await Query().AnyAsync(i => i.Slug == slug);
+    }
 
     //  write 
     public async Task<IntakeResponseDto> AddAsync(Intake intake)

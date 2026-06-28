@@ -1,16 +1,11 @@
 {
   "ExpandedNodes": [
     "",
+    "\\.sixth",
+    "\\.sixth\\skills",
     "\\Backend",
-    "\\Backend\\Http",
-    "\\Backend\\Http\\Controllers",
-    "\\Backend\\Interfaces",
-    "\\Backend\\Interfaces\\Repos",
-    "\\Backend\\Models",
-    "\\Backend\\Repositories",
-    "\\Backend\\Services",
     "\\Backend\\Validators"
   ],
-  "SelectedNode": "\\Backend\\Interfaces\\Repos\\IIntakeRepository.cs",
+  "SelectedNode": "\\Backend\\Program.cs",
   "PreviewInSolutionExplorer": false
 }

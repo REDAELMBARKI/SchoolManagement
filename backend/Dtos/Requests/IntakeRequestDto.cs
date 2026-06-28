@@ -71,6 +71,5 @@ public  class LeadSourceDto {
 
 public enum LeadSourceType {
     Opc,
-    Ad,
-    None
+    Ad
 }
