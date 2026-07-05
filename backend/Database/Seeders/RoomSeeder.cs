@@ -13,7 +13,7 @@ public class RoomSeeder : Seeder
 
     public override async Task RunAsync()
     {
-        var items = _factory.MakeMany(10);
+        var items = await _factory.MakeMany(10);
         await Context.Rooms.AddRangeAsync(items);
         await Context.SaveChangesAsync();
     }

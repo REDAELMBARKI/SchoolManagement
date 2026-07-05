@@ -11,9 +11,9 @@ namespace SchoolManagement.Backend.Models ;
         public int? IntakeId { get; set; }
 
         // navigation
-        public ICollection<StudentParent> StudentParents { get; set; } = new List<StudentParent>();
-        public ICollection<Enrollment> Enrollments {get;set;} = new List<Enrollment>();
-        public Intake? Intake { get; set; }
+        public virtual ICollection<StudentParent> StudentParents { get; set; } = new List<StudentParent>();
+        public virtual ICollection<Enrollment> Enrollments {get;set;} = new List<Enrollment>();
+        public virtual Intake? Intake { get; set; }
 
     }
  

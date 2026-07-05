@@ -3,9 +3,8 @@
     "",
     "\\.sixth",
     "\\.sixth\\skills",
-    "\\Backend",
     "\\Backend\\Validators"
   ],
-  "SelectedNode": "\\Backend\\Program.cs",
+  "SelectedNode": "\\Backend",
   "PreviewInSolutionExplorer": false
 }

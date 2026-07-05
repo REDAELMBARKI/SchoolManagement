@@ -95,11 +95,7 @@ public class IntakeRepository : Repository<Intake>
         };
     }
    
-    public async Task<bool> IsExistBySlug(string slug)
-    {
-        return await Query().AnyAsync(i => i.Slug == slug);
-    }
-
+   
     //  write 
     public async Task<IntakeResponseDto> AddAsync(Intake intake)
     {

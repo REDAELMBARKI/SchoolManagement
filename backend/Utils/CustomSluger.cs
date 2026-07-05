@@ -5,7 +5,7 @@ namespace SchoolManagement.Backend.Utils;
 
 public class CustomSluger
 { 
-    public delegate Task<bool> IsRecordExists(string slug) ; 
+  
     public static async Task<string> Slug(IsRecordExists isRecordExistsDelegate ,  params string[] strs  )
     {
          int max_attempts = 5; 
@@ -20,8 +20,11 @@ public class CustomSluger
         if (exists)
         {
             string fullGuid = Guid.NewGuid().ToString("N"); 
-            slug = $"{baseSlug}-{fullGuid}";
+            slug = $"{slug}-{fullGuid}";
         }
         return slug;
     }
 }
+
+
+public delegate Task<bool> IsRecordExists(string slug) ; 

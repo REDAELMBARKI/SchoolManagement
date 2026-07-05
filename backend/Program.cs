@@ -10,6 +10,8 @@ using Serilog;
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using SchoolManagement.Backend.Configurations.Extenstions;
+using SchoolManagement.Backend.Repositories;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Error()
@@ -25,6 +27,7 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly) ;
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ; 
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseSqlServer(connectionString)
+                .UseLazyLoadingProxies()
 ) ; 
 
 // Add FluentValidation
@@ -37,9 +40,9 @@ builder.Services.AddFluentValidationClientsideAdapters();
 // Add controllers
 builder.Services.AddControllers();
 
-// di
+
 // add jwt barear 
-builder.Services.AddJwtExtention();
+builder.Services.AddJwtConfigExtension(builder.Configuration);
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -60,7 +63,21 @@ builder.Services.Scan(scan => scan
     .AsMatchingInterface()     
     .WithScopedLifetime());
 
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
+
+builder.Services.AddSwaggerGen();
+
+
 var app = builder.Build();
+
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 using (var scope = app.Services.CreateScope())
 {
@@ -80,8 +97,8 @@ using (var scope = app.Services.CreateScope())
 
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await DatabaseSeeder.Seed(context);
+    var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
+    await seeder.Seed() ;
 }
 
 

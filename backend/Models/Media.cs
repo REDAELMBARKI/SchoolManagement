@@ -23,7 +23,7 @@ public class Media : BaseEntity
     // storage info
     public string StorageProvider { get; set; } = string.Empty; // "Cloudinary", "S3", "Azure"
     public int BranchId { get; set; }
-    public Branch Branch {get;set;} =  null!;
+    public virtual Branch Branch {get;set;} =  null!;
 }
 
 public enum MediaType

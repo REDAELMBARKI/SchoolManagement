@@ -8,11 +8,12 @@ public class RoomFactory : Factory<Room>
     {
     }
 
-    protected override Room Make()
+    protected override  Task<Room> Make()
     {
-        return new Room
+        var room = new Room
         {
             
         };
+        return Task.FromResult(room);
     }
 }

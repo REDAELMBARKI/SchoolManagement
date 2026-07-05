@@ -12,13 +12,13 @@ namespace SchoolManagement.Backend.Models ;
         public int SubjectId {get; set; }
  
         // navigations  
-        public Branch Branch {get;set;} = null! ;
-        public Subject Subject {get;set;} = null! ;
-        public Group Group {get;set;} = null! ;
-        public  Teacher Teacher { get; set; } = null!;
-        public Room Room { get; set; } = null!;
-        public TimeSlot TimeSlot { get; set; } = null!;
-        public Day Day { get; set; } = null!;
+        public virtual Branch Branch {get;set;} = null! ;
+        public virtual Subject Subject {get;set;} = null! ;
+        public virtual Group Group {get;set;} = null! ;
+        public virtual Teacher Teacher { get; set; } = null!;
+        public virtual Room Room { get; set; } = null!;
+        public virtual TimeSlot TimeSlot { get; set; } = null!;
+        public virtual Day Day { get; set; } = null!;
 }
 
 

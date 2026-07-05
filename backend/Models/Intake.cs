@@ -21,11 +21,11 @@ public class Intake : Person
     public decimal TotalFees { get; set; }
     public decimal AmountPaid { get; set; }
     // navigation
-    public LeadSource? LeadSource { get; set; }
-    public CommercialAgent? CommercialAgent { get; set; }
-    public Subject Subject {get;set;} = null!;
-    public Branch Branch {get;set;} = null!;
-    public Student? ConvertedToStudent { get; set; }
+    public virtual LeadSource? LeadSource { get; set; }
+    public virtual CommercialAgent? CommercialAgent { get; set; }
+    public virtual Subject Subject {get;set;} = null!;
+    public virtual Branch Branch {get;set;} = null!;
+    public virtual Student? ConvertedToStudent { get; set; }
 }
 
 

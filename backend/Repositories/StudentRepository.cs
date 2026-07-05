@@ -41,65 +41,16 @@ public class StudentRepository :  Repository<Student>
         return student;
     }
     
-    public async Task<StudentResponseDto> AddAsync(Student student)
+    public async Task<Student> AddAsync(Student student)
     {
         await this.AddAsync(student);
-        await Context.SaveChangesAsync(); 
-        return new StudentResponseDto
-        {
-            Id = student.Id,
-            FirstName = student.FirstName,
-            LastName = student.LastName,
-            Gender = new GenderResponseDto
-            {
-                Id = student.Gender.Id,
-                Slug = student.Gender.Slug,
-                Name = student.Gender.Name
-            },
-            Parents = student.StudentParents.Select(sp => sp.Parent).ToList() ,
-            DateOfBirth = student.DateOfBirth,
-            IntakeId = student.IntakeId,
-            Intake = student.Intake != null ? new IntakeResponseDto
-            {
-                Id = student.Intake.Id,
-                FirstName = student.Intake.FirstName,
-                LastName = student.Intake.LastName,
-                Email = student.Intake.Email,
-                Phone = student.Intake.Phone,
-                IntakeDate = student.Intake.IntakeDate,
-                Status = student.Intake.Status,
-                Slug = student.Intake.Slug,
-                CreatedAt = student.Intake.CreatedAt,
-                DateOfBirth = student.Intake.DateOfBirth,
-                FollowUpDate = student.Intake.FollowUpDate,
-                Notes = student.Intake.Notes,
-                TotalFees = student.Intake.TotalFees,
-                AmountPaid = student.Intake.AmountPaid,
-                IsIndependent = student.Intake.IsIndependent,
-                Gender = new GenderResponseDto
-                {
-                    Id = student.Intake.Gender.Id,
-                    Slug = student.Intake.Gender.Slug,
-                    Name = student.Intake.Gender.Name
-                },
-                Subject = new SubjectResponseDto
-                {
-                    Id = student.Intake.Subject.Id,
-                    Slug = student.Intake.Subject.Slug,
-                    Name = student.Intake.Subject.Name,
-                    Description = student.Intake.Subject.Description
-                },
-                Branch = new BranchResponseDto
-                {
-                    Id = student.Intake.Branch.Id,
-                    Slug = student.Intake.Branch.Slug,
-                    Name = student.Intake.Branch.Name,
-                    City = student.Intake.Branch.City,
-                    Address = student.Intake.Branch.Address,
-                    Phone = student.Intake.Branch.Phone
-                }
-            } : null,
-        }; 
+        await Context.SaveChangesAsync();
+        await Context.Entry(student).Reference(s => s.Gender).LoadAsync();
+        await Context.Entry(student).Collection(s => s.Enrollments).LoadAsync();
+        if (student.IntakeId != null) 
+            await Context.Entry(student).Reference(s => s.Intake).LoadAsync();  
+
+        return student;  
     }
 
 

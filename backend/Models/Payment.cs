@@ -12,5 +12,5 @@ public class Payment : BaseEntity
     public DateTime PeriodEnd { get; set; }
     public string Status { get; set; } = "Pending"; // Paid / Partial / Failed
 
-    public Enrollment Enrollment { get; set; } = null!;
+    public virtual Enrollment Enrollment { get; set; } = null!;
 }

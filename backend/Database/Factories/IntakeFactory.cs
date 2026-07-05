@@ -3,14 +3,18 @@ using SchoolManagement.Backend.Models;
 using SchoolManagement.Backend.Contexts ;
 
 using SchoolManagement.Backend.Utils;
+using SchoolManagement.Backend.Repositories;
 namespace SchoolManagement.Backend.Database.Factories;
 
 public class IntakeFactory : Factory<Intake>
 {
-    public IntakeFactory(AppDbContext context) : base(context)
+
+    private readonly IntakeRepository _repo;
+    public IntakeFactory(AppDbContext context , IntakeRepository repo) : base(context)
     {
+        _repo = repo;
     }
-    protected override Intake Make()
+    protected override async Task<Intake> Make()
     {
         var genderIds = Context.Genders.Select(g => g.Id).ToList();
         var leadSourceIds = Context.LeadSources.Select(l => l.Id).ToList();
@@ -27,7 +31,7 @@ public class IntakeFactory : Factory<Intake>
         {   
             FirstName = firstName,
             LastName = lastName,
-            Slug = CustomSluger.Slug(firstName, lastName),
+            Slug = await CustomSluger.Slug(slug => _repo.IsExistBySlug(slug) , firstName, lastName),
             Email = faker.Random.Bool() ? faker.Internet.Email() : null,
             Phone = faker.Random.Bool() ? faker.Phone.PhoneNumber() : null,
             DateOfBirth = DateOnly.FromDateTime(faker.Date.Past(30, DateTime.Now.AddYears(-18))), 

@@ -12,7 +12,7 @@ public class Subject : BaseEntity
         public int BranchId { get; set; }
 
         // navigation
-        public ICollection<Enrollment> Enrollments {get;set;} = new List<Enrollment>();
+        public virtual ICollection<Enrollment> Enrollments {get;set;} = new List<Enrollment>();
 
-        public Branch Branch {get;set;} = null! ;
+        public virtual Branch Branch {get;set;} = null! ;
 }

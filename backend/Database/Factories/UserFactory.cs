@@ -14,7 +14,7 @@ public class UserFactory : Factory<User>
     {
     }
 
-    protected override User Make()
+    protected override async Task<User> Make()
     {   
        var genders = Context.Genders.Select(g => g.Id).ToList();
        var firstName = faker.Name.FirstName();
@@ -35,10 +35,10 @@ public class UserFactory : Factory<User>
         };
     }
 
-    public Opc MakeOpc()
+    public async Task<Opc> MakeOpc()
     { 
         var branchIds = Context.Branches.Select(b => b.Id).ToList();
-        User user = this.Make();
+        User user = await this.Make();
         DateTime creationDate = DateTime.Now;
         
         return new Opc
@@ -61,10 +61,10 @@ public class UserFactory : Factory<User>
         };
     }
   
-    public CommercialAgent MakeCa()
+    public async Task<CommercialAgent> MakeCa()
     {
         var branchIds = Context.Branches.Select(b => b.Id).ToList();
-        User user = this.Make();
+        User user = await this.Make();
         DateTime creationDate = DateTime.Now;
         
         return new CommercialAgent

@@ -1,9 +1,13 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+
 namespace SchoolManagement.Backend.Configurations.Extenstions; 
 
 
 public static class JwtExtension
 {
-     public static IServiceCollection  AddJwtConfigExtension(this IServiceCollection services ,  IContiguration _configuration)
+     public static IServiceCollection  AddJwtConfigExtension(this IServiceCollection services , IConfiguration _configuration)
      {
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
@@ -13,9 +17,9 @@ public static class JwtExtension
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])),
-                    ValidateIssuer = false,  // skip for simple project
-                    ValidateAudience = false,  // skip for simple project
-                    ValidateLifetime = true,   // ✅ checks token expiry
+                    ValidateIssuer = false,  
+                    ValidateAudience = false, 
+                    ValidateLifetime = true,   
                 };
             });
 

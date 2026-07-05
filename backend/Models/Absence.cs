@@ -23,6 +23,6 @@ namespace SchoolManagement.Backend.Models;
         public int ScheduleId { get; set; }
  
         // navigations
-        public Student Student { get; set; } = null!;
-        public Schedule Schedule { get; set; } = null!;
+        public virtual Student Student { get; set; } = null!;
+        public virtual Schedule Schedule { get; set; } = null!;
     }

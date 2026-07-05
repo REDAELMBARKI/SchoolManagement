@@ -24,10 +24,10 @@ namespace SchoolManagement.Backend.Models ;
         public int BranchId { get; set; }
 
         // navigations
-        public Branch Branch {get;set;} = null! ;
+        public virtual Branch Branch {get;set;} = null! ;
 
-        public Student Student { get; set; } = null!;
-        public GroupTeacher GroupTeacher { get; set; } = null!;
+        public virtual Student Student { get; set; } = null!;
+        public virtual GroupTeacher GroupTeacher { get; set; } = null!;
 
     }
  

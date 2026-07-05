@@ -8,11 +8,12 @@ public class ScheduleFactory : Factory<Schedule>
     {
     }
 
-    protected override Schedule Make()
+    protected override  Task<Schedule> Make()
     {
-        return new Schedule
+        var schedule = new Schedule
         {
             
         };
+        return Task.FromResult(schedule);
     }
 }

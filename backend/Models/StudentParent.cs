@@ -8,7 +8,7 @@ public class StudentParent : BaseEntity
     public int ParentId { get; set; }
 
     // navigations
-    public Student Student { get; set; } = null!;
-    public Parent Parent { get; set; } = null!;
+    public virtual Student Student { get; set; } = null!;
+    public virtual Parent Parent { get; set; } = null!;
 
 }

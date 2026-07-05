@@ -10,6 +10,6 @@ public class Branch :BaseEntity
     public string Address { get; set; }  = string.Empty ;
     public string? Phone { get; set; }
 
-    public ICollection<Enrollment> Enrollments {get;set;} = new List<Enrollment>();
+    public virtual ICollection<Enrollment> Enrollments {get;set;} = new List<Enrollment>();
 
 }

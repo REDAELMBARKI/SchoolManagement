@@ -9,11 +9,11 @@ public class GroupFactory : Factory<Group>
     {
     }
 
-    protected override Group Make()
+    protected override Task<Group> Make()
     {
         var branches = Context.Branches.Select(b => b.Id).ToList();
 
-        return new Group
+        var group = new Group
         {
                 Name       = faker.Lorem.Letter(1).ToUpper() + faker.Random.Int(1, 9),  // e.g. "A3", "B7"
                 Capacity   = faker.Random.Int(10, 60),
@@ -22,5 +22,6 @@ public class GroupFactory : Factory<Group>
                 Period     = faker.PickRandom("Morning", "Afternoon", "Evening", "Weekend"),
                 LevelId    = faker.Random.Int(1, 5),
         } ; 
+        return Task.FromResult(group);
     }
 }

@@ -13,7 +13,7 @@ public class GradeSeeder : Seeder
 
     public override async Task RunAsync()
     {
-        var items = _factory.MakeMany(10);
+        var items = await _factory.MakeMany(10);
         await Context.Grades.AddRangeAsync(items);
         await Context.SaveChangesAsync();
     }

@@ -16,7 +16,7 @@ public class LevelSeeder : Seeder
 
     public override async Task RunAsync()
     {
-       List<Level> Levels = _factory.MakeMany(10);
+       List<Level> Levels = await _factory.MakeMany(10);
        await Context.Levels.AddRangeAsync(Levels);
        await Context.SaveChangesAsync() ;
     }

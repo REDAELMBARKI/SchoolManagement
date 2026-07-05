@@ -43,5 +43,19 @@ public abstract class Repository<T> where T : BaseEntity
     {
        return await Context.Set<T>().AnyAsync(e => e.Id == id) ;
     }
+     
+
+    public  async Task<bool> IsExistBySlug(string slug)
+    {
+        bool hasColumn = Context.Model.FindEntityType(typeof(T))
+                            .GetProperties()
+                            .Any(p => p.Name == "Slug");
+        if(!hasColumn)
+            throw new InvalidOperationException($"The entity '{typeof(T).Name}' does not have a 'Slug' column/property.");
+
+        return await this.Query().AnyAsync(e => EF.Property<string>(e, "Slug") == slug);
+    }
+
+
     protected AppDbContext Context => _context;
 }

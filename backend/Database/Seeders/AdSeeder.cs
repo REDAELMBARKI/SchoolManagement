@@ -17,7 +17,7 @@ public class AdSeeder : Seeder
 
     public override async Task RunAsync()
     {
-        var items =  _adFactory.MakeMany(3);
+        var items = await _adFactory.MakeMany(3);
         await Context.Ads.AddRangeAsync(items);
         await Context.SaveChangesAsync();
     }

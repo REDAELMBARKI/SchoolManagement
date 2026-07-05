@@ -6,7 +6,7 @@ namespace SchoolManagement.Backend.Models
         public int DurationMonths { get; set; }            // 1, 3, 6, 12
         public decimal? DiscountPercent { get; set; }
 
-        public ICollection<Enrollment> Enrollments {get;set;} = new List<Enrollment>();
+        public virtual ICollection<Enrollment> Enrollments {get;set;} = new List<Enrollment>();
 
 
     }

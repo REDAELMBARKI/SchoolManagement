@@ -1,6 +1,10 @@
+using MediatR;
 using SchoolManagement.Backend.Dtos.Requests;
 using SchoolManagement.Backend.Dtos.Responses;
+using SchoolManagement.Backend.Events.Students;
 using SchoolManagement.Backend.Exceptions;
+using SchoolManagement.Backend.Handlers;
+using SchoolManagement.Backend.Handlers.Mails;
 using SchoolManagement.Backend.Mappers;
 using SchoolManagement.Backend.Models;
 using SchoolManagement.Backend.Repositories;
@@ -11,11 +15,12 @@ public class StudentService
 {
     private readonly StudentRepository _repository;
     private readonly StudentMapper _mapper;
-
-    public StudentService(StudentRepository repository, StudentMapper mapper)
+    private readonly IMediator _mediator; 
+    public StudentService(StudentRepository repository, StudentMapper mapper, IMediator mediator)
     {
         _repository = repository;
         _mapper = mapper;
+        _mediator = mediator;
     }
 
     public async Task<List<StudentResponseDto>> GetAllAsync()
@@ -32,7 +37,7 @@ public class StudentService
 
     public async Task<StudentResponseDto> CreateAsync(StudentRequestDto dto)
     {
-        var student = new Student
+        var student_map = new Student
         {
             FirstName = dto.FirstName,
             LastName = dto.LastName,
@@ -43,7 +48,72 @@ public class StudentService
             IntakeId = dto.IntakeId
         };
 
-        return await _repository.AddAsync(student);
+        Student student  =  await _repository.AddAsync(student_map);
+        // student creation events
+        if (student.IntakeId != null)
+        {
+            this.ConvertFromIntakeMailer(student , _mediator);
+        }
+        else
+        {
+            this.NewStudentMailer(student , _mediator);
+        }
+
+        return new StudentResponseDto
+        {
+            Id = student.Id,
+            FirstName = student.FirstName,
+            LastName = student.LastName,
+            Gender = new GenderResponseDto
+            {
+                Id = student.Gender.Id,
+                Slug = student.Gender.Slug,
+                Name = student.Gender.Name
+            },
+            Parents = student.StudentParents.Select(sp => sp.Parent).ToList(),
+            DateOfBirth = student.DateOfBirth,
+            IntakeId = student.IntakeId,
+            Intake = student.Intake != null ? new IntakeResponseDto
+            {
+                Id = student.Intake.Id,
+                FirstName = student.Intake.FirstName,
+                LastName = student.Intake.LastName,
+                Email = student.Intake.Email,
+                Phone = student.Intake.Phone,
+                IntakeDate = student.Intake.IntakeDate,
+                Status = student.Intake.Status,
+                Slug = student.Intake.Slug,
+                CreatedAt = student.Intake.CreatedAt,
+                DateOfBirth = student.Intake.DateOfBirth,
+                FollowUpDate = student.Intake.FollowUpDate,
+                Notes = student.Intake.Notes,
+                TotalFees = student.Intake.TotalFees,
+                AmountPaid = student.Intake.AmountPaid,
+                IsIndependent = student.Intake.IsIndependent,
+                Gender = new GenderResponseDto
+                {
+                    Id = student.Intake.Gender.Id,
+                    Slug = student.Intake.Gender.Slug,
+                    Name = student.Intake.Gender.Name
+                },
+                Subject = new SubjectResponseDto
+                {
+                    Id = student.Intake.Subject.Id,
+                    Slug = student.Intake.Subject.Slug,
+                    Name = student.Intake.Subject.Name,
+                    Description = student.Intake.Subject.Description
+                },
+                Branch = new BranchResponseDto
+                {
+                    Id = student.Intake.Branch.Id,
+                    Slug = student.Intake.Branch.Slug,
+                    Name = student.Intake.Branch.Name,
+                    City = student.Intake.Branch.City,
+                    Address = student.Intake.Branch.Address,
+                    Phone = student.Intake.Branch.Phone
+                }
+            } : null,
+        };
     }
 
     public async Task<StudentResponseDto> UpdateAsync(int id, StudentRequestDto dto)
@@ -69,5 +139,21 @@ public class StudentService
     public async Task DeleteAsync(int id)
     {
         await _repository.DeleteAsync(id);
+    }
+
+
+
+    private void ConvertFromIntakeMailer(Student student  ,  IMediator _mediator)
+    {
+        // update the intake status 
+
+        IntakeConvertedToStudentEvent args = new IntakeConvertedToStudentEvent(student);
+        _mediator.Publish<IntakeConvertedToStudentEvent>(args);
+    }
+
+    private void NewStudentMailer(Student student, IMediator _mediator)
+    {
+        NewStudentAsignedEvent args = new NewStudentAsignedEvent(student);
+        _mediator.Publish<NewStudentAsignedEvent>(args);
     }
 }

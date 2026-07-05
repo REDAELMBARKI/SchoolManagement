@@ -13,11 +13,11 @@ public class Employee : BaseEntity
     public string Slug { get; set; } = string.Empty;
     public DateOnly? DateOfBirth { get; set; }
     public int? GenderId { get; set; }
-    public Gender Gender { get; set; } = null!;
+    public virtual Gender Gender { get; set; } = null!;
     public DateTime HireDate { get; set; } = DateTime.UtcNow;
     public decimal Salary { get; set; }
     // Foreign keys
     public int BranchId { get; set; }
     // Navigation properties
-    public Branch Branch { get; set; } = null!;
+    public virtual Branch Branch { get; set; } = null!;
 }

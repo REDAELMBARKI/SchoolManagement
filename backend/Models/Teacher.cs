@@ -7,5 +7,5 @@ namespace SchoolManagement.Backend.Models ;
     public string Specialization { get; set; } = null!;
     
     // navigation
-    public ICollection<GroupTeacher> Groups {get ;set ; } = new List<GroupTeacher>() ;
+    public virtual ICollection<GroupTeacher> Groups {get ;set ; } = new List<GroupTeacher>() ;
     }

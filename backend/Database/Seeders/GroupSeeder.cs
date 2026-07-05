@@ -17,7 +17,7 @@ public class GroupSeeder : Seeder
 
     public override async Task RunAsync()
     {
-       List<Group> groups = _factory.MakeMany(10);
+       List<Group> groups = await _factory.MakeMany(10);
        await Context.Groups.AddRangeAsync(groups);
        await Context.SaveChangesAsync() ;
     }

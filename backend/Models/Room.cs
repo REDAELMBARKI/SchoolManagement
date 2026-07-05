@@ -19,6 +19,6 @@ public class Room : BaseEntity
         // fk
 
         public int BranchId { get; set; }
-        public Branch Branch {get;set;} = null! ;
+        public virtual Branch Branch {get;set;} = null! ;
 
 }

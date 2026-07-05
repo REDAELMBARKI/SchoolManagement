@@ -10,14 +10,15 @@ public class PlatformFactory : Factory<Platform>
     {
     }
 
-    protected override Platform Make()
+    protected override  Task<Platform> Make()
     {
        var platforms = new[] { "Facebook", "Google Ads", "TikTok", "Instagram", "YouTube" };
         var name = faker.PickRandom(platforms);
-        return new Platform
+        var platform = new Platform
         {
             Name = name,
             Slug = new SlugHelper().GenerateSlug(name)
         };
+        return Task.FromResult(platform);
     }
 }

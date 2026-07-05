@@ -30,23 +30,18 @@ public class IntakeService
     public async Task<IntakeResponseDto> AddIntakeAsync(IntakeRequestDto intakeDto)
     {
         Intake entity = IntakeMapper.ToEntity(intakeDto);
-        entity.Slug = CustomSluger.Slug(slug => isIntakeSlugExist(slug) , entity.FirstName , entity.LastName);
+        entity.Slug = await  CustomSluger.Slug(slug => _repository.IsExistBySlug(slug) , entity.FirstName , entity.LastName);
         var newEntity = await _repository.AddAsync(entity);
         return newEntity ;
     }
 
-
-    private async IsRecordExists isIntakeSlugExist(string slug)
-    {
-        return await  _repository.IsExistBySlug(slug);
-    }
    
     
     public async Task UpdateAsync(int id , IntakeRequestDto intakeDto)
     {
           Intake intake = IntakeMapper.ToEntity(intakeDto);
           
-          intake.Slug = CustomSluger.Slug( slug => isIntakeSlugExist(slug) , intake.FirstName, intake.LastName);
+          intake.Slug =  await CustomSluger.Slug( slug => _repository.IsExistBySlug(slug) , intake.FirstName, intake.LastName);
           intake.UpdatedAt = DateTime.Now ;
           await _repository.UpdateAsync(id , intake);
     }

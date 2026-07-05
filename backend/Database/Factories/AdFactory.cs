@@ -10,17 +10,19 @@ public class AdFactory : Factory<Ad>
     {
     }
 
-    protected override Ad Make()
+    protected override Task<Ad> Make()
     {
         var name = faker.Commerce.ProductName();
         var platforms = Context.Platforms.Select(p => p.Id).ToList();
         var branches = Context.Branches.Select(b => b.Id).ToList();
-        return new Ad
+        var ad =  new Ad
         {
             Name = name,
             BranchId = faker.PickRandom(branches) ,
             Slug = new SlugHelper().GenerateSlug(name),
             PlatformId = faker.PickRandom(platforms) 
         };
+
+        return Task.FromResult(ad);
     }
 }

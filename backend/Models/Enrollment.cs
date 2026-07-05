@@ -13,10 +13,10 @@ public class Enrollment  : BaseEntity
         public int BranchId { get; set; }
         public int PlanId { get; set; }       // 1mo, 3mo, 6mo, 12mo
         // navigations
-        public ICollection<Payment> Payments { get; set; } = new List<Payment>();
-        public Subject Subject {get;set;} =null! ;
-        public Branch Branch {get;set;} = null! ;
-        public Plan Plan {get;set;} = null! ;
-        public Student Student { get; set; } = null!;
-        public Group Group { get; set; } = null!;
+        public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+        public virtual Subject Subject {get;set;} =null! ;
+        public virtual Branch Branch {get;set;} = null! ;
+        public virtual Plan Plan {get;set;} = null! ;
+        public virtual Student Student { get; set; } = null!;
+        public virtual Group Group { get; set; } = null!;
     }

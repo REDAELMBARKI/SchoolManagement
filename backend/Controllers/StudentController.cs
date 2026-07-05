@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Backend.Dtos.Requests;
+using SchoolManagement.Backend.Events;
 using SchoolManagement.Backend.Exceptions;
 using SchoolManagement.Backend.Services;
 
@@ -10,7 +11,7 @@ namespace SchoolManagement.Backend.Controllers;
 public class StudentController : ControllerBase
 {
     private readonly StudentService _studentService;
-
+  
     public StudentController(StudentService studentService)
     {
         _studentService = studentService;

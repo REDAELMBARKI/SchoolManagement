@@ -9,11 +9,13 @@ public class GradeFactory : Factory<Grade>
     {
     }
 
-    protected override Grade Make()
+    protected override Task<Grade> Make()
     {
-        return new Grade
+        var grad =  new Grade
         {
             
         };
+
+        return Task.FromResult(grad);
     }
 }

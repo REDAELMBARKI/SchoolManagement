@@ -16,12 +16,12 @@ public class UserSeeder : Seeder
     {
         if (await Context.Opcs.AnyAsync()) return;
 
-        var opc = _userFactory.MakeOpc();
+        var opc = await _userFactory.MakeOpc();
         // make opc 
         await Context.Opcs.AddAsync(opc);
 
         // ,male commercial agent
-        var ca = _userFactory.MakeCa();
+        var ca = await _userFactory.MakeCa();
         await Context.CommercialAgents.AddAsync(ca);
         await Context.SaveChangesAsync();
     }

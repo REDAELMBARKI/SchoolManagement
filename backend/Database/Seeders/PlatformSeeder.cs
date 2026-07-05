@@ -12,7 +12,7 @@ public class PlatformSeeder : Seeder
 
     public override async Task RunAsync()
     {
-        var items = _factory.MakeMany(5);
+        var items = await _factory.MakeMany(5);
         await Context.Platforms.AddRangeAsync(items);
         await Context.SaveChangesAsync();
     }

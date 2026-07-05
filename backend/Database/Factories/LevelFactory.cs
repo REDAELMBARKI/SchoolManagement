@@ -11,14 +11,15 @@ public class LevelFactory : Factory<Level>
     {
     }
 
-    protected override Level Make()
+    protected override  Task<Level> Make()
     {
         var branches = Context.Branches.Select(b => b.Id).ToList();
 
-       return  new Level{   
+        var level =   new Level{   
             BranchId = faker.PickRandom(branches) ,
             Name  = faker.PickRandom("A0" , "A1", "A2", "B1", "B2", "C1", "C2"),
             Order = _order++,
         };
+        return Task.FromResult(level);
     }
 }

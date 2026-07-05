@@ -12,13 +12,15 @@ public abstract class Factory<T> where T : class
         _context = context ;
     }
     protected readonly Faker faker = new Faker() ; 
-    protected abstract T Make() ; 
+    protected abstract  Task<T> Make() ; 
 
-    public List<T> MakeMany(int count)
+    public async  Task<List<T>> MakeMany(int count)
     {
-        return Enumerable.Range(0 , count)
-               .Select(_ => Make()) 
+        var tasks   = Enumerable.Range(0 , count)
+               .Select(_ =>  Make()) 
                .ToList() ;
+        var results  = await Task.WhenAll(tasks);
+        return results.ToList();
     } 
 
     protected AppDbContext Context => _context ;

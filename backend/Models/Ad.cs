@@ -8,6 +8,6 @@ public class Ad : BaseEntity
     public int PlatformId { get; set; }
     public int BranchId {get;set;}
 
-    public Branch Branch {get;set;} = null! ;
-    public  Platform Platform { get; set; } = null! ;
+    public virtual Branch Branch {get;set;} = null! ;
+    public virtual Platform Platform { get; set; } = null! ;
 }

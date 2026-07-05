@@ -9,11 +9,12 @@ public class EnrollmentFactory : Factory<Enrollment>
     {
     }
 
-    protected override Enrollment Make()
+    protected override Task<Enrollment> Make()
     {
-        return new Enrollment
+        var enrollment = new Enrollment
         {
             
         };
+        return Task.FromResult(enrollment);
     }
 }

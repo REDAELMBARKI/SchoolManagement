@@ -14,10 +14,10 @@ public class LeadSource  : BaseEntity
     public int BranchId { get; set; }
 
     // navigation properties
-    public Branch Branch {get;set;} = null! ;
-    public Opc? Opc { get; set; }
-    public Ad? Ad { get; set; }
-    public ICollection<Intake> Intakes { get; set; } = new List<Intake>();
+    public virtual Branch Branch {get;set;} = null! ;
+    public virtual Opc? Opc { get; set; }
+    public virtual Ad? Ad { get; set; }
+    public virtual ICollection<Intake> Intakes { get; set; } = new List<Intake>();
 
 }
 
