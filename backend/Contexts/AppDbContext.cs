@@ -93,11 +93,6 @@ public class AppDbContext : DbContext
         .WithMany()
         .HasForeignKey(ls => ls.AdId);
 
-        modelBuilder.Entity<LeadSource>()
-        .HasOne(ls => ls.Opc)
-        .WithMany()
-        .HasForeignKey(ls => ls.OpcId);
-    }
 
     private void ApplySoftDeleteFilter(ModelBuilder modelBuilder)
     {
