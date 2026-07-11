@@ -1,6 +1,6 @@
-﻿using MediatR;
+using MediatR;
 using SchoolManagement.Backend.Events.Students;
-using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Entities;
 
 namespace SchoolManagement.Backend.Handlers.Mails
 {

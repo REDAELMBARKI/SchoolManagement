@@ -1,9 +1,9 @@
 using SchoolManagement.Backend.Dtos.Responses;
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Entities;
 using SchoolManagement.Backend.Mappers;
 using SchoolManagement.Backend.Exceptions;
-using SchoolManagement.Backend.Contexts ;
+using SchoolManagement.Backend.Data ;
 namespace SchoolManagement.Backend.Repositories;
 
 public class IntakeRepository : Repository<Intake> 

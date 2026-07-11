@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Entities;
 
 namespace SchoolManagement.Backend.Configurations;
 
@@ -8,9 +8,16 @@ public class TeacherConfiguration : IEntityTypeConfiguration<Teacher>
 {
     public void Configure(EntityTypeBuilder<Teacher> entityTypeBuilder)
     {
-        // Table mapping for Teacher entity (inherits from Employee using TPT)
-        entityTypeBuilder.ToTable("Teachers");
-        
+        // Explicitly set auto-increment Id for TPC
+        entityTypeBuilder.Property(t => t.Id)
+            .ValueGeneratedOnAdd();
+                
+        // Table mapping for Teacher entity (TPC inherited from Employee)
+        entityTypeBuilder.ToTable("Teachers", tb =>
+        {
+            tb.HasCheckConstraint("CK_Teacher_Salary", "Salary > 0");
+        });
+
         // Teacher-specific properties
         entityTypeBuilder.Property(t => t.Specialization)
             .IsRequired()

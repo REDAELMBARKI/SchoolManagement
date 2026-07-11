@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using SchoolManagement.Backend.Events.Students;
 
 namespace SchoolManagement.Backend.Handlers.Mails

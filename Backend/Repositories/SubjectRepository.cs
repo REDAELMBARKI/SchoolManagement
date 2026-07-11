@@ -1,5 +1,5 @@
-﻿using SchoolManagement.Backend.Contexts;
-using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Data;
+using SchoolManagement.Backend.Entities;
 
 namespace SchoolManagement.Backend.Repositories
 {

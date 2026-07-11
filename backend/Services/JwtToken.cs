@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Bogus.DataSets;
 using Microsoft.IdentityModel.Tokens;
-using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Entities;
 
 namespace SchoolManagement.Backend.Services;
 

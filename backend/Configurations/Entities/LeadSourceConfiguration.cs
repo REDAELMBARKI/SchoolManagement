@@ -1,7 +1,8 @@
-using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Entities;
+using System;
+using System.Reflection.Emit;
 
 namespace SchoolManagement.Backend.Configurations;
 
@@ -19,6 +20,13 @@ public class LeadSourceConfiguration: IEntityTypeConfiguration<LeadSource>
            .HasOne(ld => ld.Opc)
            .WithMany()
            .HasForeignKey(ld => ld.OpcId);
+
+            builder
+            .HasOne(ls => ls.Branch)
+            .WithMany()
+            .HasForeignKey(ls => ls.BranchId);
+
+  
 
     }
 }

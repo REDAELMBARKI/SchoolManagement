@@ -1,6 +1,6 @@
 using SchoolManagement.Backend.Dtos.Requests;
 using SchoolManagement.Backend.Dtos.Responses;
-using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Entities;
 
 namespace SchoolManagement.Backend.Mappers;
 

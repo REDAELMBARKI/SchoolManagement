@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SchoolManagement.Backend;
-using SchoolManagement.Backend.Contexts;
-using SchoolManagement.Backend.Database.Seeders;
-using SchoolManagement.Backend.Database.Factories;
+using SchoolManagement.Backend.Data;
+using SchoolManagement.Backend.Data.Seeders;
+using SchoolManagement.Backend.Data.Factories;
 using Serilog;
 using AutoMapper;
 using FluentValidation;
@@ -54,7 +54,8 @@ builder.Services.Scan(scan => scan
           c.InNamespaces("SchoolManagement.Backend.Repositories",
                          "SchoolManagement.Backend.Services" ,
                          "SchoolManagement.Backend.Mappers" ,
-                         "SchoolManagement.Backend.Database.Factories" ,
+                         "SchoolManagement.Backend.Data.Factories" ,
+                    "SchoolManagement.Backend.Data.Seeders",
                          "SchoolManagement.Backend.Interfaces.Repos" ,
                          "SchoolManagement.Backend.Interfaces" ,
                          "SchoolManagement.Backend.Dtos"
@@ -85,7 +86,7 @@ using (var scope = app.Services.CreateScope())
     {
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>() ; 
         context.Database.Migrate() ;
-        Console.WriteLine("server runs successfullu") ; 
+        Console.WriteLine("server runs succesfully") ; 
     }
     catch (Exception error)
     {

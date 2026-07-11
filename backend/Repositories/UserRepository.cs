@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Backend.Models;
-using SchoolManagement.Backend.Contexts ;
+using SchoolManagement.Backend.Entities;
+using SchoolManagement.Backend.Data ;
 
 namespace SchoolManagement.Backend.Repositories;
 

@@ -2,7 +2,7 @@ using AutoMapper;
 using SchoolManagement.Backend.Dtos.Requests;
 using SchoolManagement.Backend.Dtos.Responses;
 using SchoolManagement.Backend.Mappers;
-using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Entities;
 using SchoolManagement.Backend.Repositories;
 using SchoolManagement.Backend.Utils;
 

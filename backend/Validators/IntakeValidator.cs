@@ -1,7 +1,7 @@
 using FluentValidation;
 using SchoolManagement.Backend.Dtos.Requests;
 using SchoolManagement.Backend.Interfaces.Repos;
-using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Entities;
 using DtoLeadSourceType = SchoolManagement.Backend.Dtos.Requests.LeadSourceType;
 
 namespace SchoolManagement.Backend.Validators;

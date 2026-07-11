@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Entities;
 using SchoolManagement.Backend.Services;
-using SchoolManagement.Backend.Contexts ;
+using SchoolManagement.Backend.Data ;
 
 namespace SchoolManagement.Backend.Auth.Controllers;
 

@@ -1,7 +1,7 @@
 using SchoolManagement.Backend.Dtos.Requests;
 using SchoolManagement.Backend.Dtos.Responses;
 using SchoolManagement.Backend.Exceptions;
-using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Entities;
 using SchoolManagement.Backend.Repositories;
 
 namespace SchoolManagement.Backend.Services;

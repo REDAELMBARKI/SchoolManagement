@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Entities;
 
 namespace SchoolManagement.Backend.Configurations;
 
@@ -8,8 +8,19 @@ public class IntakeConfiguration : IEntityTypeConfiguration<Intake>
 {
     public void Configure(EntityTypeBuilder<Intake> entityTypeBuilder)
     {
-        // TPC mapping for Intake entity
-        entityTypeBuilder.ToTable("Intakes");
+        // Explicitly set auto-increment Id for TPC
+        entityTypeBuilder.Property(i => i.Id)
+            .ValueGeneratedOnAdd();
+                
+  
+        // Check constraints for business rules
+        entityTypeBuilder.ToTable("Intakes", tb =>
+        {
+            tb.HasCheckConstraint("CK_Intake_FollowUpDate", "FollowUpDate IS NULL OR FollowUpDate >= IntakeDate");
+            // NOTE: Date validation moved to C# logic/FluentValidation
+        });
+
+
 
         // Email is optional for Intakes
         entityTypeBuilder.Property(i => i.Email)
@@ -66,14 +77,7 @@ public class IntakeConfiguration : IEntityTypeConfiguration<Intake>
         entityTypeBuilder.HasIndex(i => i.IntakeDate);
         entityTypeBuilder.HasIndex(i => i.Status);
 
-        // Check constraints for business rules
-        entityTypeBuilder.ToTable("Intakes", tb =>
-        {
-            tb.HasCheckConstraint("CK_Intake_IntakeDate", "IntakeDate <= GETDATE()");
-            tb.HasCheckConstraint("CK_Intake_DateOfBirth", "DateOfBirth IS NULL OR DateOfBirth < GETDATE()");
-            tb.HasCheckConstraint("CK_Intake_FollowUpDate", "FollowUpDate IS NULL OR FollowUpDate >= IntakeDate");
-        });
-
+        
         // relationships
             // Intake → Subject relationship (FIXED: Use Restrict to avoid cascade cycles)
 

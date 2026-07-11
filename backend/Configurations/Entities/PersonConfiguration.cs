@@ -1,7 +1,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Entities;
 
 namespace SchoolManagement.Backend.Configurations;
 
@@ -9,9 +9,11 @@ public class PersonConfiguration : IEntityTypeConfiguration<Person>
 {
     public void Configure(EntityTypeBuilder<Person> entityTypeBuilder)
     {
-        // TPT mapping for Person hierarchy (excluding Employee which uses TPT)
-        entityTypeBuilder.UseTpcMappingStrategy();
+        // Configure Id for auto-increment for TPC
+        entityTypeBuilder.Property(p => p.Id)
+            .ValueGeneratedOnAdd();
 
+        entityTypeBuilder.UseTpcMappingStrategy();
         // Shared Person property validations
         entityTypeBuilder.Property(p => p.FirstName)
             .IsRequired()

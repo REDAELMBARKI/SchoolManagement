@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Entities;
 
 namespace SchoolManagement.Backend.Configurations;
 
@@ -8,6 +8,10 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
 {
     public void Configure(EntityTypeBuilder<Student> entityTypeBuilder)
     {
+        // Explicitly set auto-increment Id for TPC
+        entityTypeBuilder.Property(s => s.Id)
+            .ValueGeneratedOnAdd();
+                
         // Table mapping for Student entity (TPC inherited from Person)
         entityTypeBuilder.ToTable("Students");
         
@@ -36,12 +40,6 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
         entityTypeBuilder.HasIndex(s => s.Phone);
         entityTypeBuilder.HasIndex(s => s.DateOfBirth);
         
-        // Check constraints
-        entityTypeBuilder.ToTable("Students", tb =>
-        {
-            tb.HasCheckConstraint("CK_Student_DateOfBirth", "DateOfBirth < GETDATE()");
-            tb.HasCheckConstraint("CK_Student_Email", "Email LIKE '%@%.%'");
-        });
 
 
         // relashioships 

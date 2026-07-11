@@ -1,6 +1,6 @@
 using AutoMapper;
 using SchoolManagement.Backend.Dtos.Responses;
-using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Entities;
 
 namespace SchoolManagement.Backend.Mappers;
 

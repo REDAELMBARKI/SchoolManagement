@@ -1,4 +1,4 @@
-using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Entities;
 
 namespace SchoolManagement.Backend.Interfaces.Repos ;
 

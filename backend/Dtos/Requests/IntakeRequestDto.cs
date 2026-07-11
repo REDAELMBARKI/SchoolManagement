@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Entities;
 
 namespace SchoolManagement.Backend.Dtos.Requests;
 

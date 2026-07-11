@@ -6,7 +6,7 @@ using SchoolManagement.Backend.Exceptions;
 using SchoolManagement.Backend.Handlers;
 using SchoolManagement.Backend.Handlers.Mails;
 using SchoolManagement.Backend.Mappers;
-using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Entities;
 using SchoolManagement.Backend.Repositories;
 
 namespace SchoolManagement.Backend.Services;

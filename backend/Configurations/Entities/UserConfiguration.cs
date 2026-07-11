@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Entities;
 
 namespace SchoolManagement.Backend.Configurations;
 
@@ -8,6 +8,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> entityTypeBuilder)
     {
+        // Explicitly set auto-increment Id for TPC
+        entityTypeBuilder.Property(u => u.Id)
+            .ValueGeneratedOnAdd();
+                
         // TPC mapping for User entity
         entityTypeBuilder.ToTable("Users");
             
@@ -16,9 +20,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(255);
             
-        entityTypeBuilder.Property(u => u.Phone)
-            .IsRequired(false)
-            .HasMaxLength(20);
+    
 
         // DateOfBirth is optional for Users
         entityTypeBuilder.Property(u => u.DateOfBirth)
@@ -34,7 +36,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             
         // Indexes
         entityTypeBuilder.HasIndex(u => u.Email).IsUnique();
-        entityTypeBuilder.HasIndex(u => u.Phone);
         entityTypeBuilder.HasIndex(u => u.DateOfBirth);
         entityTypeBuilder.HasIndex(u => u.Slug);
         entityTypeBuilder.HasIndex(u => u.IsActivated);
@@ -43,8 +44,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         entityTypeBuilder.ToTable("Users", tb =>
         {
             tb.HasCheckConstraint("CK_User_Email", "Email LIKE '%@%.%'");
-            tb.HasCheckConstraint("CK_User_Phone", "Phone IS NULL OR LEN(Phone) >= 10");
-            tb.HasCheckConstraint("CK_User_DateOfBirth", "DateOfBirth IS NULL OR DateOfBirth < GETDATE()");
         });
     }
 }

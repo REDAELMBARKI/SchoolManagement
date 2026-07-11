@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Backend.Dtos.Requests;
 using SchoolManagement.Backend.Services;
-using SchoolManagement.Backend.Models;
+using SchoolManagement.Backend.Entities;
 using SchoolManagement.Backend.Exceptions;
 using Microsoft.Extensions.FileProviders;
 
