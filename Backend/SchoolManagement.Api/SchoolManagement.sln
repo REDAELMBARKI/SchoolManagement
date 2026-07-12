@@ -1,14 +1,14 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.8.11925.187
+VisualStudioVersion = 18.8.11925.187 insiders
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolManagement.Api", "SchoolManagement.Api\SchoolManagement.Api.csproj", "{CCC51E08-92E0-727F-AD14-D0C7FEE842AB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolManagement.Api", "SchoolManagement.Api.csproj", "{CCC51E08-92E0-727F-AD14-D0C7FEE842AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolManagement.Domain", "SchoolManagement.Domain\SchoolManagement.Domain.csproj", "{838427FB-836C-4849-A73D-33EF86B64D1F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolManagement.Domain", "..\SchoolManagement.Domain\SchoolManagement.Domain.csproj", "{838427FB-836C-4849-A73D-33EF86B64D1F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolManagement.Application", "SchoolManagement.Application\SchoolManagement.Application.csproj", "{0A016E12-D649-458D-886B-C97759D26CB6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolManagement.Application", "..\SchoolManagement.Application\SchoolManagement.Application.csproj", "{0A016E12-D649-458D-886B-C97759D26CB6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolManagement.Infrastructure", "SchoolManagement.Infrastructure\SchoolManagement.Infrastructure.csproj", "{1E036F8F-77F9-4841-A87A-0C40D9950CF0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolManagement.Infrastructure", "..\SchoolManagement.Infrastructure\SchoolManagement.Infrastructure.csproj", "{1E036F8F-77F9-4841-A87A-0C40D9950CF0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

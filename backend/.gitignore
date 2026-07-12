@@ -1,25 +1,38 @@
-# Visual Studio
-.vs/
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+/.vs/
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
 
-# Build results
-bin/
-obj/
-*.dll
-*.exe
-*.pdb
+# testing
+/coverage
 
-# NuGet
-packages/
-*.nupkg
-*.nuget.props
-*.nuget.targets
+# next.js (legacy)
+/.next/
+/out/
 
-# Logs and temp files
-*.log
-*.tmp
-TestResults/
+# production
+/build
+/dist
 
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
