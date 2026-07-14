@@ -1,9 +1,8 @@
 using MediatR;
-using SchoolManagement.Backend.Events.Students;
-using SchoolManagement.Backend.Entities;
+using SchoolManagement.Application.Events.Students;
+using SchoolManagement.Domain.Entities;
 
-namespace SchoolManagement.Backend.Handlers.Mails
-{
+namespace SchoolManagement.Application.Handlers.Mails;
     public class NewStudentMailHandler : INotificationHandler<NewStudentAsignedEvent>
     {
         public Task Handle(NewStudentAsignedEvent e, CancellationToken cancellationToken)
@@ -12,4 +11,4 @@ namespace SchoolManagement.Backend.Handlers.Mails
             return Task.CompletedTask;
         }
     }
-}
+

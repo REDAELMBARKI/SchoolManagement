@@ -1,8 +1,7 @@
 using MediatR;
-using SchoolManagement.Backend.Entities;
+using SchoolManagement.Domain.Entities;
 
-namespace SchoolManagement.Backend.Events.Students;
-
+namespace SchoolManagement.Application.Events.Students;
 public class NewStudentAsignedEvent : INotification
 {
     public Student Student { get; }

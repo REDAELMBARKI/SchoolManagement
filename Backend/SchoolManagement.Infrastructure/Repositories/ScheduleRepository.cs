@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Backend.Dtos.Responses;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Data ;
+using SchoolManagement.Application.Dtos.Responses;
+using SchoolManagement.Domain.Entities;
+using SchoolManagement.Infrastructure.Data ;
 
-namespace SchoolManagement.Backend.Repositories;
+namespace SchoolManagement.Infrastructure.Repositories;
 
 public class ScheduleRepository : Repository<Schedule>
 {

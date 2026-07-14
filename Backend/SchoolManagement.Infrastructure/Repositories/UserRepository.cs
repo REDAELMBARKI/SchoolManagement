@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Data ;
+using SchoolManagement.Domain.Entities;
+using SchoolManagement.Infrastructure.Data ;
 
-namespace SchoolManagement.Backend.Repositories;
+namespace SchoolManagement.Infrastructure.Repositories;
 
 public class UserRepository : Repository<User>
 {

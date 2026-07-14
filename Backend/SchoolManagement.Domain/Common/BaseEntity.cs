@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SchoolManagement.Backend.Entities;
+namespace SchoolManagement.Domain.Common;
 
 public abstract class BaseEntity
 {

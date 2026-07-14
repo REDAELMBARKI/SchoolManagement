@@ -1,6 +1,6 @@
 using System;
 
-namespace SchoolManagement.Backend.Entities;
+namespace SchoolManagement.Domain.Entities;
 
 public class CommercialAgent : Employee
 {

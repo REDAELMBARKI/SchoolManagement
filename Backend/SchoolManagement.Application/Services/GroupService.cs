@@ -1,11 +1,11 @@
-using SchoolManagement.Backend.Dtos.Requests;
-using SchoolManagement.Backend.Dtos.Responses;
-using SchoolManagement.Backend.Exceptions;
-using SchoolManagement.Backend.Mappers;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Repositories;
+using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Application.Dtos.Responses;
+using SchoolManagement.Domain.Exceptions;
+using SchoolManagement.Application.Mappers;
+using SchoolManagement.Domain.Entities;
+using SchoolManagement.Infrastructure.Repositories;
 
-namespace SchoolManagement.Backend.Services;
+namespace SchoolManagement.Application.Services;
 
 public class GroupService
 {

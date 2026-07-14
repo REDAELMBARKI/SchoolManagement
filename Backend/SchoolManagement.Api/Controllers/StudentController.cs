@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using SchoolManagement.Backend.Dtos.Requests;
-using SchoolManagement.Backend.Events;
-using SchoolManagement.Backend.Exceptions;
-using SchoolManagement.Backend.Services;
-
-namespace SchoolManagement.Backend.Controllers;
+using SchoolManagement.Application.Dtos.Requests;
+ using SchoolManagement.Domain.Events;
+ using SchoolManagement.Domain.Exceptions; 
+ using SchoolManagement.Application.Services; 
+ namespace SchoolManagement.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

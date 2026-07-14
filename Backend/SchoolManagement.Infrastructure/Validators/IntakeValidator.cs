@@ -1,10 +1,10 @@
 using FluentValidation;
-using SchoolManagement.Backend.Dtos.Requests;
-using SchoolManagement.Backend.Interfaces.Repos;
-using SchoolManagement.Backend.Entities;
-using DtoLeadSourceType = SchoolManagement.Backend.Dtos.Requests.LeadSourceType;
+using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.;
+using SchoolManagement.Domain.Entities;
+using DtoLeadSourceType = SchoolManagement.Application.Dtos.Requests.LeadSourceType;
 
-namespace SchoolManagement.Backend.Validators;
+namespace SchoolManagement.Application.Validators;
 
 
 public class IntakeValidator : AbstractValidator<IntakeRequestDto>

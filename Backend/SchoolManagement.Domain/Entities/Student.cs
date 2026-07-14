@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-namespace SchoolManagement.Backend.Entities;
+namespace SchoolManagement.Domain.Entities;
     public class Student : Person
     {
 

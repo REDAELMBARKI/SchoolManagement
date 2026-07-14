@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using SchoolManagement.Backend.Dtos;
-using SchoolManagement.Backend.Interfaces.Models;
+using SchoolManagement.Domain.Common;
+using SchoolManagement.Domain.Interfaces;
 
-namespace SchoolManagement.Backend.Entities;
+namespace SchoolManagement.Domain.Entities;
 
 
 public class LeadSource  : BaseEntity

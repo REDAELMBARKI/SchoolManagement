@@ -1,10 +1,9 @@
 using System;
-using SchoolManagement.Backend;
-using SchoolManagement.Backend.Data.Factories;
-using SchoolManagement.Backend.Data.Seeders;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Data ;
-namespace SchoolManagement.Backend.Data.Seeders;
+using SchoolManagement.Infrastructure.Data.Factories;
+using SchoolManagement.Infrastructure.Data.Seeders;
+using SchoolManagement.Domain.Entities;
+using SchoolManagement.Infrastructure.Data ;
+namespace SchoolManagement.Infrastructure.Data.Seeders;
 public class AdSeeder : Seeder
 {
 

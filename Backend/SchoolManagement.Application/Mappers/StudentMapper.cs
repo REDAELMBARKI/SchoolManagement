@@ -1,8 +1,8 @@
 using AutoMapper;
-using SchoolManagement.Backend.Dtos.Responses;
-using SchoolManagement.Backend.Entities;
+using SchoolManagement.Application.Dtos.Responses;
+using SchoolManagement.Domain.Entities;
 
-namespace SchoolManagement.Backend.Mappers;
+namespace SchoolManagement.Application.Mappers;
 
 public class StudentMapper
 {

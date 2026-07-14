@@ -1,7 +1,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SchoolManagement.Backend.Entities;
+using SchoolManagement.Domain.Entities;
 
 namespace SchoolManagement.Infrastructure.Data.Configurations.Entities;
 

@@ -2,10 +2,10 @@
 
 
 using System.Text.Json.Serialization;
-using SchoolManagement.Backend.Entities;
+
 
 using System.ComponentModel.DataAnnotations.Schema;
-namespace SchoolManagement.Backend.Entities; 
+namespace SchoolManagement.Domain.Entities; 
  public class User  : Person
  {
        

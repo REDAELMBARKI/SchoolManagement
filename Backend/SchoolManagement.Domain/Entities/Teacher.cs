@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations ;
 using System.Text.Json.Serialization;
-namespace SchoolManagement.Backend.Entities;
+namespace SchoolManagement.Domain.Entities;
   
   public class Teacher : Employee
 {

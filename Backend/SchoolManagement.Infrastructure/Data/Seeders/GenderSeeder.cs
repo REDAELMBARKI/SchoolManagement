@@ -1,10 +1,7 @@
 using Bogus;
 using Bogus.DataSets;
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Backend.Data.Factories;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Data ;
-namespace SchoolManagement.Backend.Data.Seeders;
+using SchoolManagement.Infrastructure.Data.Factories; using SchoolManagement.Domain.Entities; using SchoolManagement.Infrastructure.Data ; namespace SchoolManagement.Infrastructure.Data.Seeders;
 
 public class GenderSeeder : Seeder
 {

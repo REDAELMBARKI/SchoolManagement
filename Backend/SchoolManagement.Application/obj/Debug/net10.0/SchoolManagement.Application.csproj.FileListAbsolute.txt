@@ -1,0 +1,6 @@
+C:\SchoolManagement\Backend\SchoolManagement.Application\obj\Debug\net10.0\SchoolManagement.Application.csproj.AssemblyReference.cache
+C:\SchoolManagement\Backend\SchoolManagement.Application\obj\Debug\net10.0\SchoolManagement.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\SchoolManagement\Backend\SchoolManagement.Application\obj\Debug\net10.0\SchoolManagement.Application.AssemblyInfoInputs.cache
+C:\SchoolManagement\Backend\SchoolManagement.Application\obj\Debug\net10.0\SchoolManagement.Application.AssemblyInfo.cs
+C:\SchoolManagement\Backend\SchoolManagement.Application\obj\Debug\net10.0\SchoolManagement.Application.csproj.CoreCompileInputs.cache
+C:\SchoolManagement\Backend\SchoolManagement.Application\obj\Debug\net10.0\SchoolManagement.Application.sourcelink.json

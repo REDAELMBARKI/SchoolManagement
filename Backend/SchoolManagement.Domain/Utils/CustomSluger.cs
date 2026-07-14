@@ -1,7 +1,7 @@
 
 using Slugify;
 
-namespace SchoolManagement.Backend.Utils;
+namespace SchoolManagement.Domain.Utils;
 
 public class CustomSluger
 { 

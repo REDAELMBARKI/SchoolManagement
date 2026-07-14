@@ -1,10 +1,10 @@
 using Bogus;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Data ;
-using SchoolManagement.Backend.Repositories;
-using SchoolManagement.Backend.Utils;
+using SchoolManagement.Infrastructure.Data ;
+using SchoolManagement.Domain.Entities;
+using SchoolManagement.Infrastructure.Repositories;
+using SchoolManagement.Domain.Utils;
 
-namespace SchoolManagement.Backend.Data.Factories ; 
+namespace SchoolManagement.Infrastructure.Data.Factories ; 
 public class SubjectFactory : Factory<Subject>
 {
     private readonly SubjectRepository _repository;

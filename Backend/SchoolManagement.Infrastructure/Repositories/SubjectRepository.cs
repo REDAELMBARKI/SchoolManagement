@@ -1,7 +1,7 @@
-using SchoolManagement.Backend.Data;
-using SchoolManagement.Backend.Entities;
+using SchoolManagement.Infrastructure.Data;
+using SchoolManagement.Domain.Entities;
 
-namespace SchoolManagement.Backend.Repositories
+namespace SchoolManagement.Infrastructure.Repositories
 {
     public class SubjectRepository : Repository<Subject>
     {

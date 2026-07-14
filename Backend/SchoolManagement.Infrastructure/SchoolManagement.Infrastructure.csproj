@@ -6,5 +6,17 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
+	<ItemGroup>
+		<PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
+		<PackageReference Include="Bogus" Version="35.6.5" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="10.0.9" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.9" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.9" />
+	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SchoolManagement.Application\SchoolManagement.Application.csproj" />
+    <ProjectReference Include="..\SchoolManagement.Domain\SchoolManagement.Domain.csproj" />
+  </ItemGroup>
 </Project>

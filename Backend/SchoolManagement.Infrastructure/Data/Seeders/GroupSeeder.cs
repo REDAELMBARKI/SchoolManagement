@@ -1,9 +1,9 @@
 
-using SchoolManagement.Backend.Data.Factories;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Data ;
+using SchoolManagement.Infrastructure.Data.Factories;
+using SchoolManagement.Domain.Entities;
+using SchoolManagement.Infrastructure.Data ;
 
-namespace  SchoolManagement.Backend.Data.Seeders ; 
+namespace  SchoolManagement.Infrastructure.Data.Seeders ; 
 
 public class GroupSeeder : Seeder
 {

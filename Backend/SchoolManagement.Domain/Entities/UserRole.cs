@@ -1,6 +1,6 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations ;
-namespace SchoolManagement.Backend.Entities;
+namespace SchoolManagement.Domain.Entities;
 
 public class UserRole
 {

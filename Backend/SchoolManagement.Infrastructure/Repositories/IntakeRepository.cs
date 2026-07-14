@@ -1,10 +1,11 @@
-using SchoolManagement.Backend.Dtos.Responses;
+using SchoolManagement.Application.Dtos.Responses;
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Mappers;
-using SchoolManagement.Backend.Exceptions;
-using SchoolManagement.Backend.Data ;
-namespace SchoolManagement.Backend.Repositories;
+using SchoolManagement.Domain.Entities;
+using SchoolManagement.Application.Mappers;
+using SchoolManagement.Domain.Exceptions;
+using SchoolManagement.Infrastructure.Data ;
+
+namespace SchoolManagement.Infrastructure.Repositories;
 
 public class IntakeRepository : Repository<Intake> 
 {
@@ -18,10 +19,10 @@ public class IntakeRepository : Repository<Intake>
          var intakes =  await Query()
                 .Include(i => i.Gender)
                 .Include(i => i.LeadSource)
-                   .ThenInclude(ld => ld!.Ad)
-                     .ThenInclude(ad => ad!.Platform)
-                .Include(i => i.LeadSource)
-                   .ThenInclude(ld => ld!.Opc)
+                //   .ThenInclude(ld => ld!.Ad)
+                //     .ThenInclude(ad => ad!.Platform)
+                //.Include(i => i.LeadSource)
+                //   .ThenInclude(ld => ld!.Opc)
                 .Include(i => i.Subject)
                 .Include(i => i.CommercialAgent)
                 .Include(i => i.Branch)
@@ -59,10 +60,10 @@ public class IntakeRepository : Repository<Intake>
         var intake = await Query()
                 .Include(i => i.Gender)
                 .Include(i => i.LeadSource)
-                .ThenInclude(ld => ld!.Ad)
-                    .ThenInclude(ad => ad!.Platform)
-                .Include(i => i.LeadSource)
-                .ThenInclude(ld => ld!.Opc)
+                //.ThenInclude(ld => ld!.Ad)
+                //    .ThenInclude(ad => ad!.Platform)
+                //.Include(i => i.LeadSource)
+                //.ThenInclude(ld => ld!.Opc)
                 .Include(i => i.Subject)
                 .Include(i => i.CommercialAgent)
                 .Include(i => i.Branch)

@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using SchoolManagement.Backend.Entities;
+using SchoolManagement.Domain.Entities;
 
-namespace SchoolManagement.Backend.Dtos.Requests;
+namespace SchoolManagement.Application.Dtos.Requests;
 
 public class UserRequestDto
 {

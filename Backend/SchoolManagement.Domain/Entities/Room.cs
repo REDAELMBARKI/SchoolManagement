@@ -1,6 +1,7 @@
 
+using SchoolManagement.Domain.Common;
 using System.ComponentModel.DataAnnotations ;
-namespace SchoolManagement.Backend.Entities;
+namespace SchoolManagement.Domain.Entities;
 public class Room : BaseEntity
 {
  

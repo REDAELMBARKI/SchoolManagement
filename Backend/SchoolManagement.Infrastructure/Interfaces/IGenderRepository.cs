@@ -1,6 +1,5 @@
-using SchoolManagement.Backend.Entities;
-
-namespace SchoolManagement.Infrastructure.Interfaces ;
+using SchoolManagement.Domain.Entities; 
+namespace SchoolManagement.Domain.Interfaces ;
 
 public interface IGenderRepository : IReadRepository<Gender>
 {

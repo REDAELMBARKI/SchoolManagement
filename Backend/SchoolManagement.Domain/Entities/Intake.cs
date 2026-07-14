@@ -1,9 +1,9 @@
 
-using SchoolManagement.Backend.Dtos;
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SchoolManagement.Backend.Entities;
+namespace SchoolManagement.Domain.Entities;
 public class Intake : Person
 {
     public string? Email {get;set;} = string.Empty;

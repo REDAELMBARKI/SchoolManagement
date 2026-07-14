@@ -1,4 +1,6 @@
-namespace SchoolManagement.Backend.Entities;
+using SchoolManagement.Domain.Common;
+
+namespace SchoolManagement.Domain.Entities;
 
 
 public class Role : BaseEntity

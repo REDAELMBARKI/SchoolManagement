@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations ;
-namespace SchoolManagement.Backend.Entities;  
+namespace SchoolManagement.Domain.Entities;  
 
 public class EmployeeRole
 {

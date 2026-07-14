@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace SchoolManagement.Backend.Dtos.Requests;
+namespace SchoolManagement.Application.Dtos.Requests;
 
 public class EnrollmentRequestDto
 {

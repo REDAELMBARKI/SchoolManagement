@@ -1,15 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using SchoolManagement.Backend.Dtos;
-using SchoolManagement.Backend.Dtos.Requests;
-using SchoolManagement.Backend.Dtos.Responses;
-using SchoolManagement.Backend.Exceptions;
-using SchoolManagement.Backend.Interfaces;
-using SchoolManagement.Backend.Interfaces.Repos;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Data ;
+using SchoolManagement.Application.Dtos;
+using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Application.Dtos.Responses;
+using SchoolManagement.Domain.Exceptions;
+using SchoolManagement.Infrastructure.Interfaces;
+using SchoolManagement.Domain.Entities;
+using SchoolManagement.Infrastructure.Data ;
 
-namespace SchoolManagement.Backend.Repositories;
+namespace SchoolManagement.Infrastructure.Repositories;
 
 public class StudentRepository :  Repository<Student> 
 {

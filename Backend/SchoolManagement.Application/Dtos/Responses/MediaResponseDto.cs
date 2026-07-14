@@ -1,6 +1,6 @@
 
-using SchoolManagement.Backend.Entities ;
-namespace SchoolManagement.Backend.Dtos.Responses;
+using SchoolManagement.Domain.Entities ;
+namespace SchoolManagement.Application.Dtos.Responses;
 
 public class MediaResponseDto
 {

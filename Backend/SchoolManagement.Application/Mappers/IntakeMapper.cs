@@ -1,7 +1,7 @@
-using SchoolManagement.Backend.Dtos.Requests;
-using SchoolManagement.Backend.Entities;
+using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Domain.Entities;
 
-namespace SchoolManagement.Backend.Mappers;
+namespace SchoolManagement.Application.Mappers;
 
 public static class IntakeMapper
 {

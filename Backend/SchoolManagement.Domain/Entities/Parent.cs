@@ -1,8 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-namespace SchoolManagement.Backend.Entities;
+namespace SchoolManagement.Domain.Entities;
 
 public class Parent : Person
 {

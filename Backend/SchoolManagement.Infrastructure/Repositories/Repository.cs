@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Backend.Interfaces;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Data ;
-namespace SchoolManagement.Backend.Repositories;
+using SchoolManagement.Domain.Interfaces; 
+using SchoolManagement.Domain.Entities;
+ using SchoolManagement.Infrastructure.Data ;
+using SchoolManagement.Domain.Common;
+namespace SchoolManagement.Infrastructure.Repositories;
 
 public abstract class Repository<T> where T : BaseEntity
 {

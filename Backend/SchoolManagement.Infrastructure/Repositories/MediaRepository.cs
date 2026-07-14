@@ -1,8 +1,8 @@
-using SchoolManagement.Backend.Dtos.Requests;
-using SchoolManagement.Backend.Dtos.Responses;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Data ;
-namespace SchoolManagement.Backend.Repositories;
+using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Application.Dtos.Responses;
+using SchoolManagement.Domain.Entities;
+using SchoolManagement.Infrastructure.Data ;
+namespace SchoolManagement.Infrastructure.Repositories;
 
 public class MediaRepository : Repository<Media>
 {

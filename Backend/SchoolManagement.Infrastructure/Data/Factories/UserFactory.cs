@@ -1,12 +1,12 @@
 using System;
 using Bogus;
 using Bogus.DataSets;
-using SchoolManagement.Backend.Data ;
-using SchoolManagement.Backend.Data.Factories;
-using SchoolManagement.Backend.Entities;
+using SchoolManagement.Infrastructure.Data ;
+ using SchoolManagement.Infrastructure.Data.Factories; 
+ using SchoolManagement.Domain.Entities;
 using Slugify;
 
-namespace SchoolManagement.Backend.Data.Factories;
+namespace SchoolManagement.Infrastructure.Data.Factories;
 
 public class UserFactory : Factory<User>
 {

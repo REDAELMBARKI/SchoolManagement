@@ -1,7 +1,8 @@
+using SchoolManagement.Domain.Common;
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace SchoolManagement.Backend.Entities
+namespace SchoolManagement.Domain.Entities
 {
 
     public class Platform : BaseEntity

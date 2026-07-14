@@ -1,4 +1,4 @@
-namespace SchoolManagement.Backend.Interfaces;
+namespace SchoolManagement.Domain.Interfaces;
 public interface IReadRepository<T> where T : class
 {
     Task<List<T>>  GetAllAsync();

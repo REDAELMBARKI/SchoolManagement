@@ -1,14 +1,14 @@
+using SchoolManagement.Domain.Common;
 using System.ComponentModel.DataAnnotations;
-using Scalar.AspNetCore;
 
-namespace SchoolManagement.Backend.Entities;
+namespace SchoolManagement.Domain.Entities;
 
 public abstract class Employee : BaseEntity
 {
 
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
-    public string? Email { get; set; } = string.Empty;
+    public Email? Email { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
     public string Slug { get; set; } = string.Empty;
     public DateOnly? DateOfBirth { get; set; }

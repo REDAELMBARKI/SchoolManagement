@@ -1,8 +1,8 @@
-using SchoolManagement.Backend.Entities;
+using SchoolManagement.Domain.Entities;
 using Slugify;
-using SchoolManagement.Backend.Data ;
+using SchoolManagement.Infrastructure.Data ;
 
-namespace SchoolManagement.Backend.Data.Factories;
+namespace SchoolManagement.Infrastructure.Data.Factories;
 
 public class PlatformFactory : Factory<Platform>
 {

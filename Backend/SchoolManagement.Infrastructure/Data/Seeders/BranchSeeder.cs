@@ -1,6 +1,6 @@
-using SchoolManagement.Backend.Data.Factories;
-namespace SchoolManagement.Backend.Data.Seeders;
-using SchoolManagement.Backend.Data ;
+using SchoolManagement.Infrastructure.Data.Factories;
+namespace SchoolManagement.Infrastructure.Data.Seeders;
+using SchoolManagement.Infrastructure.Data ;
 public class BranchSeeder : Seeder
 {
     private readonly AppDbContext _context;

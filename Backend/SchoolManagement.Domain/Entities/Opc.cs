@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using SchoolManagement.Backend.Entities;
 
-namespace SchoolManagement.Backend.Entities;
+
+namespace SchoolManagement.Domain.Entities;
 
 public class Opc : Employee
 { 

@@ -1,7 +1,8 @@
-   
-   
+
+
+using SchoolManagement.Domain.Common;
 using System.ComponentModel.DataAnnotations ;
-namespace SchoolManagement.Backend.Entities;
+namespace SchoolManagement.Domain.Entities;
 public class Payment : BaseEntity
 {
     public DateTime? PaidAt { get; set; } 

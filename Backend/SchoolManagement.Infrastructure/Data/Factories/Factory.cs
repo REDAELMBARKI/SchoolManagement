@@ -1,9 +1,7 @@
 using Bogus;
 using Microsoft.VisualBasic;
-using SchoolManagement.Backend.Data ;
-
-
-namespace SchoolManagement.Backend.Data.Factories ; 
+using SchoolManagement.Infrastructure.Data ; 
+namespace SchoolManagement.Infrastructure.Data.Factories; 
 public abstract class Factory<T> where T : class 
 {  
     protected AppDbContext _context;

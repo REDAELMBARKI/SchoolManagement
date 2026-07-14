@@ -2,10 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SchoolManagement.Backend.Configurations;
-using SchoolManagement.Backend.Entities;
+using SchoolManagement.Domain.Common;
+using SchoolManagement.Domain.Entities;
 using System.Linq;
-namespace SchoolManagement.Backend.Data;
+namespace SchoolManagement.Infrastructure.Data;
 
 public class AppDbContext : DbContext
 {

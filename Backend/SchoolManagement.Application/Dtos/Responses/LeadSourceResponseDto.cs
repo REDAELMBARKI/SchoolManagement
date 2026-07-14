@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace SchoolManagement.Backend.Dtos.Responses;
+namespace SchoolManagement.Application.Dtos.Responses;
 
 
 [JsonPolymorphic]

@@ -2,16 +2,15 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using SchoolManagement.Backend;
-using SchoolManagement.Backend.Data;
-using SchoolManagement.Backend.Data.Seeders;
-using SchoolManagement.Backend.Data.Factories;
+using SchoolManagement.Infrastructure.Data;
+using SchoolManagement.Infrastructure.Data.Seeders;
+using SchoolManagement.Infrastructure.Data.Factories;
 using Serilog;
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using SchoolManagement.Backend.Configurations.Extenstions;
-using SchoolManagement.Backend.Repositories;
+using SchoolManagement.Infrastructure.Data.Configurations.Extensions;
+using SchoolManagement.Infrastructure.Repositories;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Error()
@@ -51,14 +50,13 @@ builder.Services.AddOpenApi();
 builder.Services.Scan(scan => scan
     .FromAssemblyOf<Program>()
     .AddClasses(c => 
-          c.InNamespaces("SchoolManagement.Backend.Repositories",
-                         "SchoolManagement.Backend.Services" ,
-                         "SchoolManagement.Backend.Mappers" ,
-                         "SchoolManagement.Backend.Data.Factories" ,
-                    "SchoolManagement.Backend.Data.Seeders",
-                         "SchoolManagement.Backend.Interfaces.Repos" ,
-                         "SchoolManagement.Backend.Interfaces" ,
-                         "SchoolManagement.Backend.Dtos"
+          c.InNamespaces("SchoolManagement.Infrastructure.Repositories",
+                         "SchoolManagement.Application.Services" ,
+                         "SchoolManagement.Application.Mappers" ,
+                         "SchoolManagement.Infrastructure.Data.Factories" ,
+                    "SchoolManagement.Infrastructure.Data.Seeders",
+                         "SchoolManagement.Domain.Interfaces" ,
+                         "SchoolManagement.Application.Dtos"
                          ))
     .AsSelf()                  
     .AsMatchingInterface()     

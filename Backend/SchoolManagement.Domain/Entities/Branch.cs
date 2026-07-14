@@ -1,6 +1,7 @@
+using SchoolManagement.Domain.Common;
 using System;
 
-namespace SchoolManagement.Backend.Entities;
+namespace SchoolManagement.Domain.Entities;
 
 public class Branch :BaseEntity
 {

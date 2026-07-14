@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace SchoolManagement.Backend.Dtos.Responses;
+namespace SchoolManagement.Application.Dtos.Responses;
 
 public class GroupTeacherResponseDto
 {

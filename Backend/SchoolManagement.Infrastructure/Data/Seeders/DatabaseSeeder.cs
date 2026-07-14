@@ -1,12 +1,11 @@
 
 
 using System.Threading.Tasks;
-using SchoolManagement.Backend.Data.Factories;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Data;
-using SchoolManagement.Backend.Repositories;
-
-namespace SchoolManagement.Backend.Data.Seeders;
+using SchoolManagement.Infrastructure.Data.Factories;
+ using SchoolManagement.Domain.Entities; 
+ using SchoolManagement.Infrastructure.Data; 
+ using SchoolManagement.Infrastructure.Repositories;
+  namespace SchoolManagement.Infrastructure.Data.Seeders;
 
 public class DatabaseSeeder
 {

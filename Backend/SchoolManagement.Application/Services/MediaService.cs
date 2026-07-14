@@ -1,10 +1,9 @@
-using SchoolManagement.Backend.Dtos.Requests;
-using SchoolManagement.Backend.Dtos.Responses;
-using SchoolManagement.Backend.Controllers;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Repositories;
-using SchoolManagement.Backend.Data ;
-namespace SchoolManagement.Backend.Services;
+using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Application.Dtos.Responses;
+using SchoolManagement.Domain.Entities;
+using SchoolManagement.Infrastructure.Repositories;
+using SchoolManagement.Infrastructure.Data;
+namespace SchoolManagement.Application.Services;
 
 public class MediaService
 {

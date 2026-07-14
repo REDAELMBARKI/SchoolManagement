@@ -1,7 +1,7 @@
-using SchoolManagement.Backend.Dtos.Responses;
-using SchoolManagement.Backend.Repositories;
+using SchoolManagement.Application.Dtos.Responses;
+using SchoolManagement.Infrastructure.Repositories;
 
-namespace SchoolManagement.Backend.Services;
+namespace SchoolManagement.Application.Services;
 
 public class ScheduleService
 {

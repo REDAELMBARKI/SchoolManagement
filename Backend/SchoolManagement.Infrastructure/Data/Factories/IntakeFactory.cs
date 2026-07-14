@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Data ;
+using SchoolManagement.Domain.Entities;
+using SchoolManagement.Infrastructure.Data ;
 
-using SchoolManagement.Backend.Utils;
-using SchoolManagement.Backend.Repositories;
+using SchoolManagement.Domain.Utils;
+using SchoolManagement.Infrastructure.Repositories;
 using Slugify;
-namespace SchoolManagement.Backend.Data.Factories;
+namespace SchoolManagement.Infrastructure.Data.Factories;
 
 public class IntakeFactory : Factory<Intake>
 {

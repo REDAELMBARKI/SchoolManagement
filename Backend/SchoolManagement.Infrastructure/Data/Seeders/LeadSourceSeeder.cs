@@ -1,9 +1,8 @@
 using Bogus;
 using Bogus.DataSets;
-using Microsoft.AspNetCore.Mvc;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Data ;
-namespace SchoolManagement.Backend.Data.Seeders;
+using SchoolManagement.Domain.Entities;
+using SchoolManagement.Infrastructure.Data ;
+namespace SchoolManagement.Infrastructure.Data.Seeders;
 
 public class LeadSourceSeeder : Seeder
 {

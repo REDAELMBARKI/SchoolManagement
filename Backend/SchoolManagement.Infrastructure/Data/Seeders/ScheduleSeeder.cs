@@ -1,8 +1,8 @@
-using SchoolManagement.Backend.Data.Factories;
-using SchoolManagement.Backend.Data ;
-using SchoolManagement.Backend.Entities;
+using SchoolManagement.Infrastructure.Data.Factories;
+using SchoolManagement.Infrastructure.Data ;
+using SchoolManagement.Domain.Entities;
 
-namespace SchoolManagement.Backend.Data.Seeders;
+namespace SchoolManagement.Infrastructure.Data.Seeders;
 
 public class ScheduleSeeder : Seeder
 {

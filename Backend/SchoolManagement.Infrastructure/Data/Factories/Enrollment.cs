@@ -1,7 +1,7 @@
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Data ;
+using SchoolManagement.Domain.Entities;
+using SchoolManagement.Infrastructure.Data ;
 
-namespace SchoolManagement.Backend.Data.Factories;
+namespace SchoolManagement.Infrastructure.Data.Factories;
 
 public class EnrollmentFactory : Factory<Enrollment>
 {

@@ -1,10 +1,7 @@
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Repositories;
-using SchoolManagement.Backend.Utils;
-
-using SchoolManagement.Backend.Data ;
-
-namespace SchoolManagement.Backend.Data.Factories;
+using SchoolManagement.Domain.Entities;
+ using SchoolManagement.Infrastructure.Repositories;
+using SchoolManagement.Infrastructure.Data ;
+namespace SchoolManagement.Infrastructure.Data.Factories;
 
 public class BranchFactory : Factory<Branch>
 {

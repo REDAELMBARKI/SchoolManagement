@@ -1,7 +1,7 @@
-using SchoolManagement.Backend.Data.Factories;
-namespace SchoolManagement.Backend.Data.Seeders;
-using SchoolManagement.Backend.Data ;
-using SchoolManagement.Backend.Repositories;
+using SchoolManagement.Infrastructure.Data.Factories;
+namespace SchoolManagement.Infrastructure.Data.Seeders;
+using SchoolManagement.Infrastructure.Data ;
+using SchoolManagement.Infrastructure.Repositories;
 
 public class IntakeSeeder : Seeder
 {

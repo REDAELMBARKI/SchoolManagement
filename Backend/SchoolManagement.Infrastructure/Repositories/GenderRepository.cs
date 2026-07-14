@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Data;
-using SchoolManagement.Infrastructure.Interfaces;
-namespace SchoolManagement.Backend.Repositories;
+using SchoolManagement.Domain.Entities; 
+using SchoolManagement.Infrastructure.Data; 
+using SchoolManagement.Domain.Interfaces; 
+namespace SchoolManagement.Infrastructure.Repositories;
 
 public class GenderRepository : Repository<Gender> , IGenderRepository
 {

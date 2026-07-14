@@ -1,4 +1,4 @@
-namespace SchoolManagement.Backend.Exceptions
+namespace SchoolManagement.Domain.Exceptions
 {
     public class NotFoundException : Exception
     {
