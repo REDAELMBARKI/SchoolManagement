@@ -3,7 +3,7 @@ using System;
 
 namespace SchoolManagement.Domain.Entities;
 
-public class Gender : BaseEntity
+public class Gender : AggregateRoot
 {
     public string Slug {get;set;} = string.Empty ;
 

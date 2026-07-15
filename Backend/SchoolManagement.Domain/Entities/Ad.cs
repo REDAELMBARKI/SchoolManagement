@@ -2,7 +2,7 @@ using SchoolManagement.Domain.Common;
 using System.ComponentModel.DataAnnotations ;
 namespace SchoolManagement.Domain.Entities;
 
-public class Ad : BaseEntity
+public class Ad : AggregateRoot
 {
     public string Name { get; set; } = null! ;
     public string Slug {get;set;} = string.Empty ;

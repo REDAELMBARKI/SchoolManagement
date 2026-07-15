@@ -2,7 +2,7 @@
 using SchoolManagement.Domain.Common;
 using System.ComponentModel.DataAnnotations ;
 namespace SchoolManagement.Domain.Entities;
-public class Room : BaseEntity
+public class Room : AggregateRoot
 {
  
         [Required, MaxLength(50)]

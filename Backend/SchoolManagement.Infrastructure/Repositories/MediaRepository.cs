@@ -1,10 +1,11 @@
 using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Entities;
+using SchoolManagement.Domain.Interfaces.Repositories;
 using SchoolManagement.Infrastructure.Data ;
 namespace SchoolManagement.Infrastructure.Repositories;
 
-public class MediaRepository : Repository<Media>
+public class MediaRepository : Repository<Media> , IMediaRepository
 {
     public MediaRepository(AppDbContext context) : base(context)
     {

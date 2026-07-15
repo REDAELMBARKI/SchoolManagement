@@ -1,16 +1,16 @@
 using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Exceptions;
-using SchoolManagement.Domain.Entities;
-using SchoolManagement.Infrastructure.Repositories;
+using SchoolManagement.Domain.Interfaces.Repositories;
+using SchoolManagement.Domain.Entities.Enrollment;
 
 namespace SchoolManagement.Application.Services;
 
 public class EnrollmentService
 {
-    private readonly EnrollmentRepository _repository;
+    private readonly IEnrollmentRepository _repository;
 
-    public EnrollmentService(EnrollmentRepository repository)
+    public EnrollmentService(IEnrollmentRepository repository)
     {
         _repository = repository;
     }

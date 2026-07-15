@@ -1,7 +1,7 @@
 using MediatR;
-using SchoolManagement.Backend.Events.Students;
+using SchoolManagement.Application.Events.Students;
 
-namespace SchoolManagement.Backend.Handlers.Mails
+namespace SchoolManagement.Application.Handlers.Mails
 {
     public class IntakeConvertedToStudentMailHandler : INotificationHandler<IntakeConvertedToStudentEvent>
     {

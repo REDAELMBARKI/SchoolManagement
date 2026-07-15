@@ -1,8 +1,9 @@
 using SchoolManagement.Domain.Common;
-using System.ComponentModel.DataAnnotations ;
-namespace SchoolManagement.Domain.Entities;
+using SchoolManagement.Domain.Entities;
+using System.ComponentModel.DataAnnotations;
+namespace SchoolManagement.Domain.Entities.EnrollmentAggregate;
   
-public class Enrollment  : BaseEntity
+public class Enrollment  : AggregateRoot
     {
         public DateTime EnrolledAt { get; set; } = DateTime.UtcNow;
         public string Status { get; set; } = "Active";// Active / Dropped / Completed

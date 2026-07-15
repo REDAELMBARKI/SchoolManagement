@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Entities;
+using SchoolManagement.Domain.Entities.Enrollment;
 using System.Linq;
 namespace SchoolManagement.Infrastructure.Data;
 
@@ -42,7 +43,6 @@ public class AppDbContext : DbContext
 
     // ── Academic ──
      public DbSet<Group> Groups { get; set; }
-    public DbSet<GroupTeacher> GroupTeachers { get; set; }
 
 
     // ── Schedules ──

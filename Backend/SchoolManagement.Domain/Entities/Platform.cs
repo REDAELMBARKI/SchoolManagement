@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 namespace SchoolManagement.Domain.Entities
 {
 
-    public class Platform : BaseEntity
+    public class Platform : AggregateRoot
     {
         public string Slug {get;set;} = string.Empty ;
       

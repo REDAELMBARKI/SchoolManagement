@@ -2,7 +2,7 @@ using SchoolManagement.Domain.Common;
 
 namespace SchoolManagement.Domain.Entities;
 
-public class Media : BaseEntity
+public class Media : AggregateRoot
 {
     // file info
     public string Url { get; set; } = string.Empty;

@@ -10,6 +10,9 @@ public class EmployeeConfigurations : IEntityTypeConfiguration<Employee>
 {
     public void Configure(EntityTypeBuilder<Employee> entityTypeBuilder)
     {
+
+        entityTypeBuilder.UseTpcMappingStrategy();
+
         // Configure Id for auto-increment for TPC
         entityTypeBuilder.Property(e => e.Id)
             .ValueGeneratedOnAdd();

@@ -1,8 +1,8 @@
 using SchoolManagement.Domain.Common;
 using System.ComponentModel.DataAnnotations ;
 namespace SchoolManagement.Domain.Entities;
- public class Grade  : BaseEntity
-    {
+public class Grade  : AggregateRoot
+{
      
         // Quiz / Exam / Oral / Project
         [Required, MaxLength(50)]
@@ -26,9 +26,7 @@ namespace SchoolManagement.Domain.Entities;
 
         // navigations
         public virtual Branch Branch {get;set;} = null! ;
-
         public virtual Student Student { get; set; } = null!;
-        public virtual GroupTeacher GroupTeacher { get; set; } = null!;
 
-    }
+}
  

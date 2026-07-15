@@ -4,10 +4,13 @@ using SchoolManagement.Domain.Entities;
 using SchoolManagement.Application.Mappers;
 using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Infrastructure.Data ;
+using SchoolManagement.Domain.Interfaces.Repositories;
+using SchoolManagement.Domain.Interfaces.Repositories.Common;
+using SchoolManagement.Domain.Interfaces.Queries.Common;
 
 namespace SchoolManagement.Infrastructure.Repositories;
 
-public class IntakeRepository : Repository<Intake> 
+public class IntakeRepository : Repository<Intake>  , IIntakeRepository
 {
     public IntakeRepository(AppDbContext context) : base(context)
     {
@@ -121,5 +124,25 @@ public class IntakeRepository : Repository<Intake>
         if(dbIntake is null ) throw new NotFoundException($"no intake found with id {id}")  ;
         dbIntake.DeletedAt = DateTime.UtcNow;
         await Context.SaveChangesAsync();
+    }
+
+    Task<Intake> IRepository<Intake>.AddAsync(Intake entity)
+    {
+        throw new NotImplementedException();
+    }
+
+    Task<Intake?> IRepository<Intake>.UpdateAsync(int id, Intake entity)
+    {
+        throw new NotImplementedException();
+    }
+
+    Task<List<Intake>> IQuery<Intake>.GetAllAsync()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Intake?> GetByIdAsync(int id)
+    {
+        throw new NotImplementedException();
     }
 }

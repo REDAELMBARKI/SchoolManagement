@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Exceptions;
-using SchoolManagement.Domain.Entities;
-using SchoolManagement.Infrastructure.Data ;
+using SchoolManagement.Infrastructure.Data;
+using SchoolManagement.Domain.Interfaces.Repositories;
+using SchoolManagement.Domain.Interfaces.Repositories.Common;
+using SchoolManagement.Domain.Entities.EnrollmentAggregate;
 namespace SchoolManagement.Infrastructure.Repositories;
 
-public class EnrollmentRepository : Repository<Enrollment>
+public class EnrollmentRepository : Repository<Enrollment>  , IEnrollmentRepository
 {
     public EnrollmentRepository(AppDbContext context) : base(context)
     {
@@ -59,11 +61,15 @@ public class EnrollmentRepository : Repository<Enrollment>
         await Context.SaveChangesAsync();
     }
 
-    // TODO: Add business logic methods for you to implement:
-    // - Check if student already enrolled in this subject
-    // - Validate group capacity before enrollment
-    // - Calculate fees based on Plan
-    // - Get enrollments by student
-    // - Get enrollments by group
-    // - Process payment for enrollment
+    Task<Enrollment?> IRepository<Enrollment>.UpdateAsync(int id, Enrollment entity)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Enrollment?> GetByIdAsync(int id)
+    {
+        throw new NotImplementedException();
+    }
+
+
 }

@@ -5,7 +5,7 @@ using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Common;
 namespace SchoolManagement.Infrastructure.Repositories;
 
-public abstract class Repository<T> where T : BaseEntity
+public abstract class Repository<T> where T : AggregateRoot
 {
     protected readonly AppDbContext _context;
 
@@ -16,18 +16,15 @@ public abstract class Repository<T> where T : BaseEntity
 
     protected virtual IQueryable<T> QueryWithTracking()
     {
-        return _context.Set<T>().AsQueryable();
+        var query = _context.Set<T>().AsQueryable();
+        query = query.Where(e => EF.Property<DateTime?>(e, "DeletedAt") == null);
+        return query;
     }
 
     protected virtual IQueryable<T> Query()
     {
         var query =  _context.Set<T>().AsNoTracking().AsQueryable();
-        
-        // Add soft delete filter for Person entities (TPC hierarchy)
-        if (typeof(Person).IsAssignableFrom(typeof(T)))
-        {
-            query = query.Where(e => EF.Property<DateTime?>(e, "DeletedAt") == null);
-        }
+        query = query.Where(e => EF.Property<DateTime?>(e, "DeletedAt") == null);
         
         return query;
     }
@@ -48,7 +45,7 @@ public abstract class Repository<T> where T : BaseEntity
 
     public  async Task<bool> IsExistBySlug(string slug)
     {
-        bool hasColumn = Context.Model.FindEntityType(typeof(T))
+        bool hasColumn =    _context.Model.FindEntityType(typeof(T))
                             .GetProperties()
                             .Any(p => p.Name == "Slug");
         if(!hasColumn)

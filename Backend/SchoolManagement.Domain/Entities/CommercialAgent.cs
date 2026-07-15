@@ -1,3 +1,4 @@
+using SchoolManagement.Domain.Common;
 using System;
 
 namespace SchoolManagement.Domain.Entities;

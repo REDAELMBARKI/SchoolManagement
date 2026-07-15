@@ -1,13 +1,13 @@
 using SchoolManagement.Application.Dtos.Responses;
-using SchoolManagement.Infrastructure.Repositories;
+using SchoolManagement.Domain.Interfaces.Repositories;
 
 namespace SchoolManagement.Application.Services;
 
 public class ScheduleService
 {
-    private readonly ScheduleRepository _repository;
+    private readonly IScheduleRepository _repository;
 
-    public ScheduleService(ScheduleRepository repository)
+    public ScheduleService(IScheduleRepository repository)
     {
         _repository = repository;
     }
@@ -17,3 +17,4 @@ public class ScheduleService
         return await _repository.GetGroupSchedule(groupId);
     }
 }
+

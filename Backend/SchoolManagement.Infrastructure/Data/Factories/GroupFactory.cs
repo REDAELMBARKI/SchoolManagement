@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using SchoolManagement.Domain.Entities;
-using SchoolManagement.Infrastructure.Data ;
+using SchoolManagement.Infrastructure.Data;
 
 namespace SchoolManagement.Infrastructure.Data.Factories ; 
 public class GroupFactory : Factory<Group>

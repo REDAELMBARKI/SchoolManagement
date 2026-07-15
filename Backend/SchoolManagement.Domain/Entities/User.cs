@@ -13,6 +13,9 @@ namespace SchoolManagement.Domain.Entities;
         public DateOnly? DateOfBirth { get; set; }
         public string Password { get; set; } = string.Empty ;
         public bool IsActivated { get; set; }
+        
+        // navigation
+        public List<Role> Roles { get; set; } = new List<Role>();
 
- }
+}
 

@@ -3,7 +3,7 @@ using SchoolManagement.Domain.Common;
 using System.ComponentModel.DataAnnotations;
 namespace SchoolManagement.Domain.Entities;
 
- public class Absence : BaseEntity
+ public class Absence : AggregateRoot
     {
        
         [Required]

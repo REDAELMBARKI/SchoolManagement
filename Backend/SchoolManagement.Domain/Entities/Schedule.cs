@@ -1,8 +1,8 @@
 using SchoolManagement.Domain.Common;
-using System.ComponentModel.DataAnnotations ;
+using System.ComponentModel.DataAnnotations;
 namespace SchoolManagement.Domain.Entities;
 
- public class Schedule : BaseEntity
+ public class Schedule : AggregateRoot
 {
         public int BranchId { get; set; }
         public int TeacherId { get; set; }

@@ -4,13 +4,14 @@ using SchoolManagement.Application.Dtos;
 using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Exceptions;
-using SchoolManagement.Infrastructure.Interfaces;
+using SchoolManagement.Domain.Interfaces.Repositories;
 using SchoolManagement.Domain.Entities;
 using SchoolManagement.Infrastructure.Data ;
+using SchoolManagement.Domain.Interfaces.Repositories.Common;
 
 namespace SchoolManagement.Infrastructure.Repositories;
 
-public class StudentRepository :  Repository<Student> 
+public class StudentRepository :  Repository<Student>  , IStudentRepository
 {
     public StudentRepository(AppDbContext context) : base(context)
     {
@@ -21,8 +22,7 @@ public class StudentRepository :  Repository<Student>
     {
         return this.Context.Users.OfType<Student>()
             .Include(s => s.Gender)
-            .Include(s => s.StudentParents)
-                .ThenInclude(sp => sp.Parent)
+            .Include(s => s.Parents)
             .Include(s => s.Intake)
             .Include(s => s.Enrollments)
             .AsNoTracking().AsQueryable();
@@ -68,6 +68,16 @@ public class StudentRepository :  Repository<Student>
         student.Id = dbStudent.Id;
         Context.Entry(dbStudent).CurrentValues.SetValues(student);
         await Context.SaveChangesAsync();
+    }
+
+    Task<Student?> IRepository<Student>.UpdateAsync(int id, Student entity)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Student?> GetByIdAsync(int id)
+    {
+        throw new NotImplementedException();
     }
 
 

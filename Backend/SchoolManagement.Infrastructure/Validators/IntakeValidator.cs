@@ -1,6 +1,6 @@
 using FluentValidation;
 using SchoolManagement.Application.Dtos.Requests;
-using SchoolManagement.;
+using SchoolManagement.Domain.Interfaces.Repositories;
 using SchoolManagement.Domain.Entities;
 using DtoLeadSourceType = SchoolManagement.Application.Dtos.Requests.LeadSourceType;
 

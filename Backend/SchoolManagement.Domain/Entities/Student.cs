@@ -1,3 +1,4 @@
+using SchoolManagement.Domain.Entities.EnrollmentAggregate;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace SchoolManagement.Domain.Entities;
@@ -12,7 +13,7 @@ namespace SchoolManagement.Domain.Entities;
         public int? IntakeId { get; set; }
 
         // navigation
-        public virtual ICollection<StudentParent> StudentParents { get; set; } = new List<StudentParent>();
+        public virtual ICollection<Parent> Parents { get; set; } = new List<Parent>();
         public virtual ICollection<Enrollment> Enrollments {get;set;} = new List<Enrollment>();
         public virtual Intake? Intake { get; set; }
 
