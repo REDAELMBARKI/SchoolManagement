@@ -10,7 +10,7 @@ public class Subject : AggregateRoot
 
         public string? Description { get; set; }
 
-        public int BranchId { get; set; }
+        public Guid BranchId { get; set; }
 
         // navigation
         public virtual ICollection<Enrollment> Enrollments {get;set;} = new List<Enrollment>();

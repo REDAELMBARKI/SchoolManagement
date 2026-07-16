@@ -12,10 +12,10 @@ public class Group : AggregateRoot
 
 
          // FKs
-        public int BranchId { get; set; }
+        public Guid BranchId { get; set; }
 
-        public int LevelId { get; set; }
-        public int SubjectId { get; set; }
+        public Guid LevelId { get; set; }
+        public Guid SubjectId { get; set; }
         // navigations
         public virtual ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
         public virtual ICollection<GroupTeacher> Teachers { get; set; } = new List<GroupTeacher>();

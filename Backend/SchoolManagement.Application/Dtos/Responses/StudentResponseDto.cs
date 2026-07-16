@@ -4,7 +4,7 @@ namespace SchoolManagement.Application.Dtos.Responses;
 
 public class StudentResponseDto
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     
     public string FirstName { get; set; } = string.Empty;
     
@@ -19,7 +19,7 @@ public class StudentResponseDto
     public DateOnly DateOfBirth { get; set; }
     
     // Foreign Keys
-    public int? IntakeId { get; set; }
+    public Guid? IntakeId { get; set; }
 
     // Navigation Properties
     public IntakeResponseDto? Intake { get; set; }

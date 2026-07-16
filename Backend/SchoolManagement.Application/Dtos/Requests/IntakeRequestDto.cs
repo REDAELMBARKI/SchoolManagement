@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using SchoolManagement.Domain.Entities;
+using SchoolManagement.Domain.Enums;
+using SchoolManagement.Domain.ValueObjects;
 
 namespace SchoolManagement.Application.Dtos.Requests;
 
@@ -12,15 +14,14 @@ public class IntakeRequestDto
     public string LastName { get; set; } = string.Empty;
 
     [EmailAddress, MaxLength(255)]
-    public string? Email { get; set; } = string.Empty;
+    public Email? Email { get; set; } = null!;
 
     [Phone, MaxLength(20)]
     public string? Phone { get; set; } = string.Empty;
 
     public DateOnly? DateOfBirth { get; set; }
 
-    [Range(1, int.MaxValue, ErrorMessage = "Please select a valid Gender")]
-    public int? GenderId { get; set; }
+    public Guid? GenderId { get; set; }
 
     [Required]
     [DataType(DataType.Date)]
@@ -30,18 +31,14 @@ public class IntakeRequestDto
     public LeadSourceDto LeadSource { get; set; } = null! ;
 
     [Required]
-    [Range(1, int.MaxValue, ErrorMessage = "Please select a valid Subject")]
-    public int SubjectId { get; set; }
+    public Guid SubjectId { get; set; }
 
     [Required]
-    [Range(1, int.MaxValue, ErrorMessage = "Please select a valid Branch")]
-    public int BranchId { get; set; }
+    public Guid BranchId { get; set; }
 
-    [Range(1, int.MaxValue, ErrorMessage = "Please select a valid Student")]
-    public int? ConvertedToStudentId { get; set; }
+    public Guid? ConvertedToStudentId { get; set; }
 
-    [Range(1, int.MaxValue, ErrorMessage = "Please select a valid Agent")]
-    public int? CommercialAgentId { get; set; }
+    public Guid? CommercialAgentId { get; set; }
 
     public IntakeStatus Status { get; set; } = IntakeStatus.New;
 
@@ -64,8 +61,7 @@ public  class LeadSourceDto {
 
     public  LeadSourceType  LeadSourceType { get; set; }
  
-    [Range(1, int.MaxValue, ErrorMessage = "Please select a valid LeadSource")]
-    public int? LeadSourceId { get; set; }
+    public Guid? LeadSourceId { get; set; }
 
 }
 

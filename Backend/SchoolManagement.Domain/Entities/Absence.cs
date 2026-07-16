@@ -20,8 +20,8 @@ namespace SchoolManagement.Domain.Entities;
 
         
         // FKs
-        public int StudentId { get; set; }
-        public int ScheduleId { get; set; }
+        public Guid StudentId { get; set; }
+        public Guid ScheduleId { get; set; }
  
         // navigations
         public virtual Student Student { get; set; } = null!;

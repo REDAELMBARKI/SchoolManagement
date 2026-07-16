@@ -22,7 +22,7 @@ public class IntakeQueryService : QueryServiceBase<Intake>, IIntakeQueryService
             .ToListAsync();
     }
 
-    public override async Task<Intake?> GetByIdAsync(int id)
+    public override async Task<Intake?> GetByIdAsync(Guid id)
     {
         return await Query()
             .Include(i => i.Gender)
@@ -32,4 +32,11 @@ public class IntakeQueryService : QueryServiceBase<Intake>, IIntakeQueryService
             .Include(i => i.Branch)
             .FirstOrDefaultAsync(i => i.Id == id);
     }
+
+    public async Task<bool> IsExistBySlug(string slug)
+    {
+        return await Query().AnyAsync(i => i.Slug == slug);
+    }   
+
+
 }

@@ -2,18 +2,18 @@ namespace SchoolManagement.Application.Dtos.Responses;
 
 public class EnrollmentResponseDto
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     
     public DateTime EnrolledAt { get; set; }
     
     public string Status { get; set; } = "Active"; // Active / Dropped / Completed
     
     // Foreign Keys
-    public int StudentId { get; set; }
-    public int SubjectId { get; set; }
-    public int GroupId { get; set; }
-    public int BranchId { get; set; }
-    public int PlanId { get; set; }
+    public Guid StudentId { get; set; }
+    public Guid SubjectId { get; set; }
+    public Guid GroupId { get; set; }
+    public Guid BranchId { get; set; }
+    public Guid PlanId { get; set; }
     
     // Navigation Properties
     public StudentResponseDto? Student { get; set; }

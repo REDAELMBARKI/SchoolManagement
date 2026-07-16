@@ -4,13 +4,13 @@ namespace SchoolManagement.Domain.Entities;
 
  public class Schedule : AggregateRoot
 {
-        public int BranchId { get; set; }
-        public int TeacherId { get; set; }
-        public int RoomId { get; set; }
+        public Guid BranchId { get; set; }
+        public Guid TeacherId { get; set; }
+        public Guid RoomId { get; set; }
         public int DayId { get; set; }
         public int TimeSlotId { get; set; }
-        public int GroupId {get; set; }
-        public int SubjectId {get; set; }
+        public Guid GroupId {get; set; }
+        public Guid SubjectId {get; set; }
  
         // navigations  
         public virtual Branch Branch {get;set;} = null! ;

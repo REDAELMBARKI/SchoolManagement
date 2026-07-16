@@ -14,7 +14,7 @@ public class Media : AggregateRoot
 
     // polymorphic owner
     public string OwnerType { get; set; } = string.Empty;  // "Student", "Teacher", "Branch"
-    public int OwnerId { get; set; }
+    public Guid OwnerId { get; set; }
 
     // media classification
     public MediaType MediaType { get; set; }         // Photo, Banner, Document, Video
@@ -24,7 +24,7 @@ public class Media : AggregateRoot
 
     // storage info
     public string StorageProvider { get; set; } = string.Empty; // "Cloudinary", "S3", "Azure"
-    public int BranchId { get; set; }
+    public Guid BranchId { get; set; }
     public virtual Branch Branch {get;set;} =  null!;
 }
 

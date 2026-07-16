@@ -11,7 +11,7 @@ namespace SchoolManagement.Application.Dtos.Responses;
 public abstract class LeadSourceResponseDto 
 { 
 
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string Type { get; set; } = string.Empty;
 
 }

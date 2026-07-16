@@ -7,7 +7,7 @@ namespace SchoolManagement.Domain.Entities;
 
 public class LeadSource  : AggregateRoot
 {
-    public int BranchId { get; set; }
+    public Guid BranchId { get; set; }
     public virtual Branch Branch {get;set;} = null! ;
     public virtual ICollection<Intake> Intakes { get; set; } = new List<Intake>();
 
@@ -17,12 +17,12 @@ public class LeadSource  : AggregateRoot
 public class  OpcLeadSource : LeadSource 
 {
 
-     public int OpcId { get; set; }
+     public Guid OpcId { get; set; }
      public virtual Opc Opc { get; set; } = null!;
 }
 public class  AdLeadSource  : LeadSource 
 {
-    public int AdId { get; set; }
+    public Guid AdId { get; set; }
     public virtual Ad Ad { get; set; } = null!;
 }
 

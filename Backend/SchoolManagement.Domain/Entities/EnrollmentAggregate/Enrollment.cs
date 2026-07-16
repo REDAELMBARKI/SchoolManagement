@@ -9,11 +9,11 @@ public class Enrollment  : AggregateRoot
         public string Status { get; set; } = "Active";// Active / Dropped / Completed
         public string? Notes { get; set; } 
         // FKs
-        public int StudentId { get; set; }
-        public int SubjectId { get; set; }
-        public int GroupId { get; set; }
-        public int BranchId { get; set; }
-        public int PlanId { get; set; }       // 1mo, 3mo, 6mo, 12mo
+        public Guid StudentId { get; set; }
+        public Guid SubjectId { get; set; }
+        public Guid GroupId { get; set; }
+        public Guid BranchId { get; set; }
+        public Guid PlanId { get; set; }       // 1mo, 3mo, 6mo, 12mo
         // navigations
         public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
         public virtual Subject Subject {get;set;} =null! ;

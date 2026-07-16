@@ -26,12 +26,12 @@ public abstract class QueryServiceBase<T> : IQuery<T> where T : BaseEntity
         return await Query().ToListAsync();
     }
 
-    public virtual async Task<T?> GetByIdAsync(int id)
+    public virtual async Task<T?> GetByIdAsync(Guid id)
     {
         return await Query().FirstOrDefaultAsync(e => e.Id == id);
     }
 
-    public virtual async Task<bool> ExistsAsync(int id)
+    public virtual async Task<bool> ExistsAsync(Guid id)
     {
         return await Context.Set<T>().AnyAsync(e => e.Id == id);
     }

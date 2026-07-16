@@ -10,7 +10,7 @@ namespace SchoolManagement.Domain.Entities;
         public DateOnly DateOfBirth { get; set; }
 
        // fks
-        public int? IntakeId { get; set; }
+        public Guid? IntakeId { get; set; }
 
         // navigation
         public virtual ICollection<Parent> Parents { get; set; } = new List<Parent>();

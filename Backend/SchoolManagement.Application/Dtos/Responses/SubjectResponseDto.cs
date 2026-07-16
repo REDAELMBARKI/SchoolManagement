@@ -4,7 +4,7 @@ namespace SchoolManagement.Application.Dtos.Responses;
 
 public class SubjectResponseDto
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     
     public string Name { get; set; } = string.Empty;
     
@@ -13,7 +13,7 @@ public class SubjectResponseDto
     public string? Description { get; set; }
     
     // Foreign Keys
-    public int BranchId { get; set; }
+    public Guid BranchId { get; set; }
     
     // Navigation Properties
     public BranchResponseDto? Branch { get; set; }

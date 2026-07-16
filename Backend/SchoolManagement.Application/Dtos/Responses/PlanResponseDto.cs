@@ -2,7 +2,7 @@ namespace SchoolManagement.Application.Dtos.Responses;
 
 public class PlanResponseDto
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     
     public string Name { get; set; } = string.Empty; // "1 Month", "3 Months", "Full Year"
     

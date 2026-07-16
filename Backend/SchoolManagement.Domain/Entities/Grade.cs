@@ -20,9 +20,9 @@ public class Grade  : AggregateRoot
         public string? Comment { get; set; }
 
                 // FKs
-        public int StudentId { get; set; }
-        public int GroupTeacherId { get; set; }
-        public int BranchId { get; set; }
+        public Guid StudentId { get; set; }
+        public Guid GroupTeacherId { get; set; }
+        public Guid BranchId { get; set; }
 
         // navigations
         public virtual Branch Branch {get;set;} = null! ;

@@ -2,7 +2,7 @@ namespace SchoolManagement.Application.Dtos.Responses;
 
 public class StudentParentResponseDto
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     
     public string FirstName { get; set; } = string.Empty;
     

@@ -4,8 +4,8 @@
     {
       
             Task<List<T>> GetAllAsync();
-            Task<T?> GetByIdAsync(int id);
-            Task<bool> ExistsAsync(int id);
+            Task<T?> GetByIdAsync(Guid id);
+            Task<bool> ExistsAsync(Guid id);
 
     }
 }

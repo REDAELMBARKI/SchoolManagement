@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Domain.Common;
+using SchoolManagement.Domain.Interfaces.Repositories.Common;
 using SchoolManagement.Infrastructure.Data;
 
 namespace SchoolManagement.Infrastructure.Repositories;
 
-public abstract class Repository<T> where T : AggregateRoot
+public abstract class Repository<T> : IRepository<T> where T : AggregateRoot
 {
     protected readonly AppDbContext _context;
 
@@ -20,20 +21,20 @@ public abstract class Repository<T> where T : AggregateRoot
         return query;
     }
 
-    protected async Task<T> AddAsync(T entity)
+    public async Task<T> AddAsync(T entity)
     {
         var entry = await _context.Set<T>().AddAsync(entity);
         await _context.SaveChangesAsync();
         return entry.Entity;
     }
 
-    protected async Task UpdateAsync(T entity)
+    public async Task UpdateAsync(T entity)
     {
         _context.Set<T>().Update(entity);
         await _context.SaveChangesAsync();
     }
 
-    protected async Task DeleteAsync(int id)
+    public async Task DeleteAsync(Guid id)
     {
         var entity = await Query().FirstOrDefaultAsync(e => e.Id == id);
         if (entity != null)
@@ -43,7 +44,7 @@ public abstract class Repository<T> where T : AggregateRoot
         }
     }
 
-    protected async Task<T?> GetByIdForUpdateAsync(int id)
+    protected async Task<T?> GetByIdForUpdateAsync(Guid id)
     {
         return await Query().FirstOrDefaultAsync(e => e.Id == id);
     }

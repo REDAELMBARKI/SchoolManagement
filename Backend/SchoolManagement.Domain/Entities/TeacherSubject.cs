@@ -6,7 +6,7 @@ public class TeacherSubject
     public virtual Teacher Teacher { get; set; } = null!;
     public virtual Subject Subject { get; set; } = null!;
 
-    public  int TeacherId  {get;set;}
-    public  int SubjectId  {get;set;}
+    public  Guid TeacherId  {get;set;}
+    public  Guid SubjectId  {get;set;}
 
 }

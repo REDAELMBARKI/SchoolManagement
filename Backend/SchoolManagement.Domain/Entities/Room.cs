@@ -19,7 +19,7 @@ public class Room : AggregateRoot
 
         // fk
 
-        public int BranchId { get; set; }
+        public Guid BranchId { get; set; }
         public virtual Branch Branch {get;set;} = null! ;
 
 }

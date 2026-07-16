@@ -1,6 +1,8 @@
 using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Domain.Interfaces.Repositories;
+using SchoolManagement.Domain.Interfaces.Repositories.Common;
+using SchoolManagement.Infrastructure.Data;
 
 namespace SchoolManagement.Infrastructure.Repositories;
 
@@ -15,17 +17,20 @@ public class IntakeRepository : Repository<Intake>, IIntakeRepository
         return await base.AddAsync(intake);
     }
 
-    public async Task UpdateAsync(int id, Intake intake)
+    public async Task UpdateAsync(Intake intake)
     {
-        var dbIntake = await GetByIdForUpdateAsync(id);
-        if (dbIntake is null) throw new NotFoundException($"No intake found with id {id}");
-        intake.Id = dbIntake.Id;
-        Context.Entry(dbIntake).CurrentValues.SetValues(intake);
-        await Context.SaveChangesAsync();
+        await base.UpdateAsync(intake);
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(Guid id) 
     {
         await base.DeleteAsync(id);
     }
+    
+    public  async Task<Intake?> GetByIdForTrackingAsync(Guid id)
+    {
+        return await base.GetByIdForTrackingAsync(id);
+    }
+
+   
 }

@@ -4,11 +4,11 @@ namespace SchoolManagement.Application.Dtos.Responses;
 
 public class GroupTeacherResponseDto
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     
     // Foreign Keys
-    public int TeacherId { get; set; }
-    public int GroupId { get; set; }
+    public Guid TeacherId { get; set; }
+    public Guid GroupId { get; set; }
     
     // Navigation Properties
     public TeacherResponseDto? Teacher { get; set; }

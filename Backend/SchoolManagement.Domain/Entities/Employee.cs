@@ -13,7 +13,7 @@ public abstract class Employee : Person
     public DateTime HireDate { get; set; } = DateTime.UtcNow;
     public decimal Salary { get; set; }
     // Foreign keys
-    public int BranchId { get; set; }
+    public Guid BranchId { get; set; }
     // Navigation properties
     public virtual Branch Branch { get; set; } = null!;
 }
