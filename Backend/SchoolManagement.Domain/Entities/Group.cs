@@ -17,10 +17,9 @@ public class Group : AggregateRoot
         public int LevelId { get; set; }
         public int SubjectId { get; set; }
         // navigations
-        public virtual ICollection<Enrollment> Enrollments {get;set;} = new List<Enrollment>();
-        public virtual ICollection<Teacher> Teachers {get;set; } =  new List<Teacher>() ;
-        public virtual Branch Branch {get;set;} = null! ;
+        public virtual ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
+        public virtual ICollection<GroupTeacher> Teachers { get; set; } = new List<GroupTeacher>();
+        public virtual Branch Branch { get; set; } = null!;
         public virtual Level Level { get; set; } = null!;
         public virtual Subject Subject { get; set; } = null!;
-
 }

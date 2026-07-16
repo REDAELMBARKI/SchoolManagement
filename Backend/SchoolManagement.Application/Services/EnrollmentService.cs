@@ -2,7 +2,7 @@ using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Domain.Interfaces.Repositories;
-using SchoolManagement.Domain.Entities.Enrollment;
+using SchoolManagement.Domain.Entities.EnrollmentAggregate;
 
 namespace SchoolManagement.Application.Services;
 
@@ -23,7 +23,7 @@ public class EnrollmentService
 
     public async Task<EnrollmentResponseDto?> GetByIdAsync(int id)
     {
-        var enrollment = await _repository.GetOneAsync(id);
+        var enrollment = await _repository.GetByIdAsync(id);
         if (enrollment is null) throw new NotFoundException($"Enrollment with id {id} not found");
         return MapToDto(enrollment);
     }
@@ -54,7 +54,7 @@ public class EnrollmentService
 
     public async Task<EnrollmentResponseDto> UpdateAsync(int id, EnrollmentRequestDto dto)
     {
-        var existing = await _repository.GetOneAsync(id);
+        var existing = await _repository.GetByIdAsync(id);
         if (existing is null) throw new NotFoundException($"Enrollment with id {id} not found");
 
         // TODO: Business logic for you to implement:

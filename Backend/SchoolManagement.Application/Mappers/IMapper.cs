@@ -7,6 +7,6 @@ namespace SchoolManagement.Application.Mappers
     internal interface IMapper<T> where T : class
     {
         T MapToEntity<Rq>(Rq requestDto) where Rq : class;
-        R MapToResponseDto<R>(T entity) where R : class;
+        Rs MapToResponseDto<Rs>(T entity) where Rs : class;
     }
 }

@@ -1,148 +1,31 @@
-using SchoolManagement.Application.Dtos.Responses;
-using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Domain.Entities;
-using SchoolManagement.Application.Mappers;
 using SchoolManagement.Domain.Exceptions;
-using SchoolManagement.Infrastructure.Data ;
 using SchoolManagement.Domain.Interfaces.Repositories;
-using SchoolManagement.Domain.Interfaces.Repositories.Common;
-using SchoolManagement.Domain.Interfaces.Queries.Common;
 
 namespace SchoolManagement.Infrastructure.Repositories;
 
-public class IntakeRepository : Repository<Intake>  , IIntakeRepository
+public class IntakeRepository : Repository<Intake>, IIntakeRepository
 {
     public IntakeRepository(AppDbContext context) : base(context)
     {
     }
-    
-    public async Task<List<IntakeResponseDto>> GetAllAsync()
+
+    public async Task<Intake> AddAsync(Intake intake)
     {
-
-         var intakes =  await Query()
-                .Include(i => i.Gender)
-                .Include(i => i.LeadSource)
-                //   .ThenInclude(ld => ld!.Ad)
-                //     .ThenInclude(ad => ad!.Platform)
-                //.Include(i => i.LeadSource)
-                //   .ThenInclude(ld => ld!.Opc)
-                .Include(i => i.Subject)
-                .Include(i => i.CommercialAgent)
-                .Include(i => i.Branch)
-               .ToListAsync() ;
-
-         return intakes
-               .Select(intake => new IntakeResponseDto{
-                   Id = intake.Id ,
-                   IntakeDate = intake.IntakeDate ,
-                   Phone = intake.Phone ,
-                   FirstName  = intake.FirstName , 
-                   Email = intake.Email ,
-                   LastName = intake.LastName ,
-                   Slug = intake.Slug ,
-                   CreatedAt = intake.CreatedAt ,
-                   DateOfBirth = intake.DateOfBirth ,
-                   FollowUpDate = intake.FollowUpDate ,
-                   Notes = intake.Notes ,
-                   Status = intake.Status ,
-                   IsIndependent = intake.IsIndependent ,
-                   TotalFees = intake.TotalFees ,
-                   AmountPaid = intake.AmountPaid ,
-                   Subject = SubjectMapper.MapSubject(intake.Subject),
-                   Gender = GenderMapper.MapGender(intake.Gender),
-                   CommercialAgent = CommercialAgentMapper.MapCommercialAgent(intake.CommercialAgent),
-                   Branch = BranchMapper.MapBranch(intake.Branch),
-                   LeadSource = LeadSourceMapper.MapLeadSource(intake.LeadSource)
-                   
-         })
-         .ToList() ;
-        
-    } 
-    public async Task<IntakeResponseDto?> GetOneAsync(int id)
-    {
-        var intake = await Query()
-                .Include(i => i.Gender)
-                .Include(i => i.LeadSource)
-                //.ThenInclude(ld => ld!.Ad)
-                //    .ThenInclude(ad => ad!.Platform)
-                //.Include(i => i.LeadSource)
-                //.ThenInclude(ld => ld!.Opc)
-                .Include(i => i.Subject)
-                .Include(i => i.CommercialAgent)
-                .Include(i => i.Branch)
-                .FirstOrDefaultAsync(i => i.Id == id);
-
-        if(intake is null) throw new NotFoundException($"no intake found with id {id}");
-
-        return new IntakeResponseDto
-        {
-            Id = intake.Id,
-            IntakeDate = intake.IntakeDate,
-            Phone = intake.Phone,
-            FirstName = intake.FirstName,
-            Email = intake.Email,
-            LastName = intake.LastName,
-            Slug = intake.Slug,
-            CreatedAt = intake.CreatedAt,
-            DateOfBirth = intake.DateOfBirth,
-            FollowUpDate = intake.FollowUpDate,
-            Notes = intake.Notes,
-            Status = intake.Status,
-            IsIndependent = intake.IsIndependent,
-            TotalFees = intake.TotalFees,
-            AmountPaid = intake.AmountPaid,
-            Subject = SubjectMapper.MapSubject(intake.Subject),
-            Gender = GenderMapper.MapGender(intake.Gender),
-            CommercialAgent = CommercialAgentMapper.MapCommercialAgent(intake.CommercialAgent),
-            Branch = BranchMapper.MapBranch(intake.Branch),
-            LeadSource = LeadSourceMapper.MapLeadSource(intake.LeadSource)
-        };
-    }
-   
-   
-    //  write 
-    public async Task<IntakeResponseDto> AddAsync(Intake intake)
-    {
-         await Context.AddAsync(intake);
-         await Context.SaveChangesAsync();
-         return (await  this.GetOneAsync(intake.Id))!;
+        return await base.AddAsync(intake);
     }
 
-
-    public async Task UpdateAsync(int id , Intake intake)
-    {   
-        Intake? dbIntake = await Context.Intakes.FindAsync(id);
-        if(dbIntake is null ) throw new NotFoundException($"no intake found with id {id}") ;
-        intake.Id = dbIntake.Id ;
-        Context.Entry(dbIntake).CurrentValues.SetValues(intake) ;
+    public async Task UpdateAsync(int id, Intake intake)
+    {
+        var dbIntake = await GetByIdForUpdateAsync(id);
+        if (dbIntake is null) throw new NotFoundException($"No intake found with id {id}");
+        intake.Id = dbIntake.Id;
+        Context.Entry(dbIntake).CurrentValues.SetValues(intake);
         await Context.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(int id)
     {
-        Intake? dbIntake = await Context.Intakes.FindAsync(id);
-        if(dbIntake is null ) throw new NotFoundException($"no intake found with id {id}")  ;
-        dbIntake.DeletedAt = DateTime.UtcNow;
-        await Context.SaveChangesAsync();
-    }
-
-    Task<Intake> IRepository<Intake>.AddAsync(Intake entity)
-    {
-        throw new NotImplementedException();
-    }
-
-    Task<Intake?> IRepository<Intake>.UpdateAsync(int id, Intake entity)
-    {
-        throw new NotImplementedException();
-    }
-
-    Task<List<Intake>> IQuery<Intake>.GetAllAsync()
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<Intake?> GetByIdAsync(int id)
-    {
-        throw new NotImplementedException();
+        await base.DeleteAsync(id);
     }
 }

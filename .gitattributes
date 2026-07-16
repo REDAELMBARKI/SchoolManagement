@@ -1,0 +1,25 @@
+# .gitattributes file for .NET projects
+# Auto-normalize line endings
+* text=auto
+
+# C# files use CRLF on Windows, LF on Linux/macOS
+*.cs text diff=csharp
+
+# Solution files use CRLF
+*.sln text eol=crlf
+*.csproj text eol=crlf
+*.csproj.user text eol=crlf
+
+# JSON, YAML, Markdown
+*.json text eol=lf
+*.yml text eol=lf
+*.md text eol=lf
+
+# Binary files don't change line endings
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary
+*.zip binary
+*.dll binary
+*.exe binary

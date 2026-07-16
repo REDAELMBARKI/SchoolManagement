@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Domain.Interfaces; 
-using SchoolManagement.Domain.Entities;
- using SchoolManagement.Infrastructure.Data ;
 using SchoolManagement.Domain.Common;
+using SchoolManagement.Infrastructure.Data;
+
 namespace SchoolManagement.Infrastructure.Repositories;
 
 public abstract class Repository<T> where T : AggregateRoot
@@ -14,21 +13,12 @@ public abstract class Repository<T> where T : AggregateRoot
         _context = context;
     }
 
-    protected virtual IQueryable<T> QueryWithTracking()
+    protected virtual IQueryable<T> Query()
     {
         var query = _context.Set<T>().AsQueryable();
         query = query.Where(e => EF.Property<DateTime?>(e, "DeletedAt") == null);
         return query;
     }
-
-    protected virtual IQueryable<T> Query()
-    {
-        var query =  _context.Set<T>().AsNoTracking().AsQueryable();
-        query = query.Where(e => EF.Property<DateTime?>(e, "DeletedAt") == null);
-        
-        return query;
-    }
-
 
     protected async Task<T> AddAsync(T entity)
     {
@@ -36,24 +26,27 @@ public abstract class Repository<T> where T : AggregateRoot
         await _context.SaveChangesAsync();
         return entry.Entity;
     }
-    
-    public async Task<bool> ExistsAsync(int id)
-    {
-       return await Context.Set<T>().AnyAsync(e => e.Id == id) ;
-    }
-     
 
-    public  async Task<bool> IsExistBySlug(string slug)
+    protected async Task UpdateAsync(T entity)
     {
-        bool hasColumn =    _context.Model.FindEntityType(typeof(T))
-                            .GetProperties()
-                            .Any(p => p.Name == "Slug");
-        if(!hasColumn)
-            throw new InvalidOperationException($"The entity '{typeof(T).Name}' does not have a 'Slug' column/property.");
-
-        return await this.Query().AnyAsync(e => EF.Property<string>(e, "Slug") == slug);
+        _context.Set<T>().Update(entity);
+        await _context.SaveChangesAsync();
     }
 
+    protected async Task DeleteAsync(int id)
+    {
+        var entity = await Query().FirstOrDefaultAsync(e => e.Id == id);
+        if (entity != null)
+        {
+            _context.Entry(entity).Property("DeletedAt").CurrentValue = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    protected async Task<T?> GetByIdForUpdateAsync(int id)
+    {
+        return await Query().FirstOrDefaultAsync(e => e.Id == id);
+    }
 
     protected AppDbContext Context => _context;
 }

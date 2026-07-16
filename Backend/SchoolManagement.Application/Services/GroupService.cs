@@ -11,6 +11,7 @@ namespace SchoolManagement.Application.Services;
 public class GroupService
 {
     private readonly IGroupRepository _repository;
+    private readonly IGroupRepository _repository;
 
     public GroupService(IGroupRepository repository)
     {
@@ -26,7 +27,7 @@ public class GroupService
 
     public async Task<GroupResponseDto?> GetByIdAsync(int id)
     {
-        return await _repository.GetOneAsync(id);
+        return await _repository.GetByIdAsync(id);
     }
 
     public async Task<List<GroupResponseDto>> GetAllAsync()
@@ -36,13 +37,13 @@ public class GroupService
 
     public async Task<GroupResponseDto?> UpdateAsync(int id, GroupRequestDto dto)
     {
-        var existing = await _repository.GetOneAsync(id);
+        var existing = await _repository.GetByIdAsync(id);
         if (existing is null) throw new NotFoundException($"Group with id {id} not found");
 
         Group entity = GroupMapper.ToEntity(dto);
         entity.Id = id;
         await _repository.UpdateAsync(id, entity);
-        return await _repository.GetOneAsync(id);
+        return await _repository.GetByIdAsync(id);
     }
 
     public async Task<bool> DeleteAsync(int id)

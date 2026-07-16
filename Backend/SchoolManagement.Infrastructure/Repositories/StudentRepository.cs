@@ -1,90 +1,43 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using SchoolManagement.Application.Dtos;
-using SchoolManagement.Application.Dtos.Requests;
-using SchoolManagement.Application.Dtos.Responses;
+using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Domain.Interfaces.Repositories;
-using SchoolManagement.Domain.Entities;
-using SchoolManagement.Infrastructure.Data ;
-using SchoolManagement.Domain.Interfaces.Repositories.Common;
 
 namespace SchoolManagement.Infrastructure.Repositories;
 
-public class StudentRepository :  Repository<Student>  , IStudentRepository
+public class StudentRepository : Repository<Student>, IStudentRepository
 {
     public StudentRepository(AppDbContext context) : base(context)
     {
     }
 
-
     protected override IQueryable<Student> Query()
     {
-        return this.Context.Users.OfType<Student>()
-            .Include(s => s.Gender)
-            .Include(s => s.Parents)
-            .Include(s => s.Intake)
-            .Include(s => s.Enrollments)
-            .AsNoTracking().AsQueryable();
-                
-    }
-    public async Task<List<Student>> GetAllAsync()
-    { 
-        return  await this.Query().ToListAsync() ;
+        return Context.Users.OfType<Student>()
+            .Where(e => EF.Property<DateTime?>(e, "DeletedAt") == null);
     }
 
-    public async Task<Student> FindByIdAsync(int id)
+    protected override async Task<Student?> GetByIdForUpdateAsync(int id)
     {
-        var student = await this.Query().FirstOrDefaultAsync(s => s.Id == id);
-        if (student is null) throw new NotFoundException($"Student with id {id} not found");
-        return student;
+        return await Query().FirstOrDefaultAsync(s => s.Id == id);
     }
-    
+
     public async Task<Student> AddAsync(Student student)
     {
-        await this.AddAsync(student);
-        await Context.SaveChangesAsync();
-        await Context.Entry(student).Reference(s => s.Gender).LoadAsync();
-        await Context.Entry(student).Collection(s => s.Enrollments).LoadAsync();
-        if (student.IntakeId != null) 
-            await Context.Entry(student).Reference(s => s.Intake).LoadAsync();  
-
-        return student;  
+        return await base.AddAsync(student);
     }
-
 
     public async Task DeleteAsync(int id)
     {
-        var student = await Query().FirstOrDefaultAsync(s => s.Id == id);
-        if (student is null) throw new NotFoundException($"Student with id {id} not found");
-        student.DeletedAt = DateTime.UtcNow;
-        await Context.SaveChangesAsync();
+        await base.DeleteAsync(id);
     }
 
     public async Task UpdateAsync(int id, Student student)
     {
-        var dbStudent = await Context.Users.OfType<Student>().FirstOrDefaultAsync(s => s.Id == id);
+        var dbStudent = await GetByIdForUpdateAsync(id);
         if (dbStudent is null) throw new NotFoundException($"Student with id {id} not found");
         student.Id = dbStudent.Id;
         Context.Entry(dbStudent).CurrentValues.SetValues(student);
         await Context.SaveChangesAsync();
     }
-
-    Task<Student?> IRepository<Student>.UpdateAsync(int id, Student entity)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<Student?> GetByIdAsync(int id)
-    {
-        throw new NotImplementedException();
-    }
-
-
-    // public async Task<int> checkGroupAvailabilityAsync(int levelId)
-    // {
-    //    var group = await Context.Groups.Where(g => g.Users.OfType<Student>().Count() < g.Capacity).FirstAsync();
-    //    return group.Id ;
-    // }
 }
-

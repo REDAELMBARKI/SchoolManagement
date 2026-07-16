@@ -1,10 +1,8 @@
 using SchoolManagement.Domain.Entities;
-using SchoolManagement.Domain.Interfaces.Queries.Common;
 using SchoolManagement.Domain.Interfaces.Repositories.Common;
 
-namespace SchoolManagement.Domain.Interfaces.Repositories ;
+namespace SchoolManagement.Domain.Interfaces.Repositories;
 
-public interface IAdRepository  : IRepository<Ad> , IQuery<Ad>
+public interface IAdRepository : IRepository<Ad>
 {
-
 }
