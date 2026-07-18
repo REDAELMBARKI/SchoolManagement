@@ -53,8 +53,6 @@ public static class IntakeMapper
                 Id = intake.Subject.Id,
                 Name = intake.Subject.Name,
                 Slug = intake.Subject.Slug,
-                Description = intake.Subject.Description,
-                BranchId = intake.Subject.BranchId
             } : null!,
             Branch = intake.Branch != null ? new BranchResponseDto
             {

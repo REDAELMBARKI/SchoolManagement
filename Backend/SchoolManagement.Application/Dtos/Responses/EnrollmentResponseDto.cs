@@ -8,6 +8,8 @@ public class EnrollmentResponseDto
     
     public string Status { get; set; } = "Active"; // Active / Dropped / Completed
     
+    public string? Notes { get; set; }
+    
     // Foreign Keys
     public Guid StudentId { get; set; }
     public Guid SubjectId { get; set; }

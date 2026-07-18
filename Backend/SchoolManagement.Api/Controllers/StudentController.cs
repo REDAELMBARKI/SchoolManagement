@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Dtos.Requests;
- using SchoolManagement.Domain.Events;
  using SchoolManagement.Domain.Exceptions; 
  using SchoolManagement.Application.Services; 
  namespace SchoolManagement.Api.Controllers;

@@ -1,10 +1,10 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Backend;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Data ;
-namespace SchoolManagement.Backend.Controllers;
+using SchoolManagement.Domain.Entities;
+using SchoolManagement.Infrastructure.Data;
+namespace SchoolManagement.Api.Controllers;
 
 
 [ApiController]
@@ -29,14 +29,6 @@ public class GenderController : ControllerBase
       [HttpPost]
       public async Task<IActionResult> AddGender()
       {   
-          var genders = new List<Gender>
-            {
-                new Gender { Id = 1, Name = "Male" },
-                new Gender { Id = 2, Name = "Female" }
-            };
-
-          await _context.Genders.AddRangeAsync(genders);
-          await _context.SaveChangesAsync();
-          return Ok(genders);
+           throw new NotImplementedException();
       }
 }

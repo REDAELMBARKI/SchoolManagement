@@ -1,11 +1,17 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Backend;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Data ;
+using System.Security;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Extensions.FileProviders;
+using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Infrastructure.Data;
+using SchoolManagement.Application.Services;
+using SchoolManagement.Domain.Exceptions;
+using SchoolManagement.Domain.Interfaces.Services;
 
-namespace SchoolManagement.Backend.Controllers;
+namespace SchoolManagement.Api.Controllers;
 
 
 

@@ -7,8 +7,8 @@ namespace SchoolManagement.Domain.Entities;
         public Guid BranchId { get; set; }
         public Guid TeacherId { get; set; }
         public Guid RoomId { get; set; }
-        public int DayId { get; set; }
-        public int TimeSlotId { get; set; }
+        public Guid DayId { get; set; }
+        public Guid TimeSlotId { get; set; }
         public Guid GroupId {get; set; }
         public Guid SubjectId {get; set; }
  

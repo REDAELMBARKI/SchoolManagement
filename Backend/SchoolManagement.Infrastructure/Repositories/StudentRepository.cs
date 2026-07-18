@@ -17,9 +17,9 @@ public class StudentRepository : Repository<Student>, IStudentRepository
             .Where(e => EF.Property<DateTime?>(e, "DeletedAt") == null);
     }
 
-    protected override async Task<Student?> GetByIdForUpdateAsync(int id)
+    protected async Task<Student?> GetByIdForUpdateAsync(int id)
     {
-        return await Query().FirstOrDefaultAsync(s => s.Id == id);
+        return await Query().FirstOrDefaultAsync(s => s.Id == new Guid(id.ToString()));
     }
 
     public async Task<Student> AddAsync(Student student)
@@ -29,7 +29,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
 
     public async Task DeleteAsync(int id)
     {
-        await base.DeleteAsync(id);
+        await base.DeleteAsync(new Guid(id.ToString()));
     }
 
     public async Task UpdateAsync(int id, Student student)

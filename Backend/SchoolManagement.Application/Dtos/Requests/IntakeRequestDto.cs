@@ -14,7 +14,7 @@ public class IntakeRequestDto
     public string LastName { get; set; } = string.Empty;
 
     [EmailAddress, MaxLength(255)]
-    public Email? Email { get; set; } = null!;
+    public string? Email { get; set; } = null!;
 
     [Phone, MaxLength(20)]
     public string? Phone { get; set; } = string.Empty;

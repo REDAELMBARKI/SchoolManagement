@@ -1,9 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
-using SchoolManagement.Backend.Dtos.Responses;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Services;
+using System.Security;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Extensions.FileProviders;
+using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Application.Services;
+using SchoolManagement.Domain.Entities;
+using SchoolManagement.Application.Dtos.Responses;
 
-namespace SchoolManagement.Backend.Controllers;
+namespace SchoolManagement.Api.Controllers;
 
 public class MediaController : ControllerBase
 {

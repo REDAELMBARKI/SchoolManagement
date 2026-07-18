@@ -44,7 +44,22 @@ public abstract class Repository<T> : IRepository<T> where T : AggregateRoot
         }
     }
 
-    protected async Task<T?> GetByIdForUpdateAsync(Guid id)
+    public async Task<T?> GetByIdAsync(Guid id)
+    {
+        return await Query().FirstOrDefaultAsync(e => e.Id == id);
+    }
+
+    public async Task<T?> FindByIdAsync(int id)
+    {
+        return await Query().FirstOrDefaultAsync(e => e.Id == new Guid(id.ToString()));
+    }
+
+    public async Task<List<T>> GetAllAsync()
+    {
+        return await Query().ToListAsync();
+    }
+
+    protected virtual async Task<T?> GetByIdForUpdateAsync(Guid id)
     {
         return await Query().FirstOrDefaultAsync(e => e.Id == id);
     }

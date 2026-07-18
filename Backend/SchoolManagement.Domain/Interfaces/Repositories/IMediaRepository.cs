@@ -1,6 +1,9 @@
+using SchoolManagement.Application.Dtos.Responses;
+using SchoolManagement.Domain.Entities;
+
 namespace SchoolManagement.Domain.Interfaces.Repositories;
 
 public interface IMediaRepository 
 {
-    // TODO: Define IMediaRepository methods
+    Task<MediaResponseDto> Add(Media media);
 }

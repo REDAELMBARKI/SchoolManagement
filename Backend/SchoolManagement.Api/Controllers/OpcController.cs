@@ -2,10 +2,16 @@ using System;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Data ;
+using System.Threading.Tasks;
+using Microsoft.Extensions.FileProviders;
+using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Infrastructure.Data;
+using SchoolManagement.Application.Services;
+using SchoolManagement.Domain.Exceptions;
+using SchoolManagement.Domain.Interfaces.Services;
+using SchoolManagement.Domain.Entities;
 
-namespace SchoolManagement.Backend.Controllers;
+namespace SchoolManagement.Api.Controllers;
 
 
 [ApiController]
@@ -34,31 +40,7 @@ public class OpcController : ControllerBase
 
    public  async Task<IActionResult> AddOpc()
    {
-      var opcs = new List<Opc>
-      {
-         new Opc {  
-                    FirstName = "Morning" ,
-                    LastName = "Session" ,
-                    Email = "morning.session@example.com" ,
-                    Phone = "123-456-7890" ,
-                    GenderId = 1 ,
-                    HireDate = DateTime.UtcNow.AddYears(-2) ,
-                    Salary = 50000.00m ,
-                    },
-         new Opc {
-                    FirstName = "Afternoon" ,
-                    LastName = "Session" ,
-                    Email = "test@exampple.com" ,
-                    Phone = "098-765-4321" ,
-                    GenderId = 2 ,
-                    HireDate = DateTime.UtcNow.AddYears(-1) ,
-                    Salary = 55000.00m
-            }
-      };
-
-      await _context.Opcs.AddRangeAsync(opcs);
-      await _context.SaveChangesAsync();
-      return Ok(opcs);
-   }
+       throw new NotImplementedException();
+    }
 
 }

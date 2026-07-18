@@ -8,15 +8,7 @@ public class SubjectResponseDto
     
     public string Name { get; set; } = string.Empty;
     
-    public string? Slug { get; set; }
+    public string Slug { get; set; } = string.Empty;
     
-    public string? Description { get; set; }
-    
-    // Foreign Keys
-    public Guid BranchId { get; set; }
-    
-    // Navigation Properties
-    public BranchResponseDto? Branch { get; set; }
-    
-    public ICollection<EnrollmentResponseDto> Enrollments { get; set; } = new List<EnrollmentResponseDto>();
+
 }

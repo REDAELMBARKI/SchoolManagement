@@ -2,10 +2,9 @@ using System;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Backend;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Data ;
-namespace SchoolManagement.Backend.Controllers;
+using SchoolManagement.Domain.Entities;
+using SchoolManagement.Infrastructure.Data;
+namespace SchoolManagement.Api.Controllers;
 
 
 [ApiController]

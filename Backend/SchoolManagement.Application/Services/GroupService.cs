@@ -3,14 +3,14 @@ using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Application.Mappers;
 using SchoolManagement.Domain.Interfaces.Repositories;
+using SchoolManagement.Domain.Interfaces.Services;
 using SchoolManagement.Domain.Entities;
 
 
 namespace SchoolManagement.Application.Services;
 
-public class GroupService
+public class GroupService : IGroupService
 {
-    private readonly IGroupRepository _repository;
     private readonly IGroupRepository _repository;
 
     public GroupService(IGroupRepository repository)

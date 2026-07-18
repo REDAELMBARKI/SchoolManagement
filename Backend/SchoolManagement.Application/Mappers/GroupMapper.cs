@@ -6,16 +6,7 @@ namespace SchoolManagement.Application.Mappers;
 
 public static class GroupMapper
 {
-    public static Group ToEntity(GroupRequestDto dto) => new()
-    {
-        Name = dto.Name,
-        Capacity = dto.Capacity,
-        Period = dto.Period,
-        LevelId = dto.LevelId,
-        SubjectId = dto.SubjectId
-    };
-
-    public static GroupResponseDto MapGroup(Group group) => new()
+    public static GroupResponseDto ToResponse(Group group) => new()
     {
         Id = group.Id,
         Name = group.Name,
@@ -26,7 +17,7 @@ public static class GroupMapper
             Id = group.Level.Id,
             Name = group.Level.Name
         },
-        Subject = SubjectMapper.MapSubject(group.Subject),
+        Subject = SubjectMapper.ToResponse(group.Subject),
         Teachers = group.Teachers.Select(gt => new GroupTeacherResponseDto
         {
             Id = gt.Id,
@@ -38,7 +29,7 @@ public static class GroupMapper
                 FirstName = gt.Teacher.FirstName,
                 LastName = gt.Teacher.LastName,
                 Slug = gt.Teacher.Slug,
-                Email = gt.Teacher.Email,
+                Email = null,
                 Phone = gt.Teacher.Phone,
                 DateOfBirth = gt.Teacher.DateOfBirth ?? default
             }

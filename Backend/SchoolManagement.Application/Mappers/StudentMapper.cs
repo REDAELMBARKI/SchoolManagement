@@ -1,19 +1,11 @@
-using AutoMapper;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Entities;
 
 namespace SchoolManagement.Application.Mappers;
 
-public class StudentMapper
+public static class StudentMapper
 {
-    private readonly IMapper _mapper;
-
-    public StudentMapper(IMapper mapper)
-    {
-        _mapper = mapper;
-    }
-
-    public StudentResponseDto ToStudentDto(Student student)
+    public static StudentResponseDto ToResponse(Student student)
     {
         return new StudentResponseDto
         {
@@ -30,14 +22,13 @@ public class StudentMapper
                 Id = student.Intake.Id,
                 FirstName = student.Intake.FirstName,
                 LastName = student.Intake.LastName,
-                Email = student.Intake.Email,
+                Email = student.Intake.Email?.Value ?? "Email Empty",
                 Phone = student.Intake.Phone,
                 DateOfBirth = student.Intake.DateOfBirth,
                 TotalFees = student.Intake.TotalFees,
                 AmountPaid = student.Intake.AmountPaid,
             } : null,
-            StudentParents = _mapper.Map<ICollection<StudentParentResponseDto>>(student.StudentParents),
-            Enrollments = _mapper.Map<ICollection<EnrollmentResponseDto>>(student.Enrollments),
+            Parents = student.Parents != null ? student.Parents.Select(p => ParentMapper.ToResponse(p)).ToList() : null,
             Gender = MapGender(student.Gender)
         };
     }

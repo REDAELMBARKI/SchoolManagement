@@ -5,19 +5,37 @@ using SchoolManagement.Infrastructure.Data;
 
 namespace SchoolManagement.Infrastructure.Queries;
 
-public class AdQueryService : QueryServiceBase<Ad>, IAdQueryService
+public class AdQueryService : IAdQueryService
 {
-    public AdQueryService(AppDbContext context) : base(context)
+    private readonly AppDbContext _context;
+
+    public AdQueryService(AppDbContext context)
     {
+        _context = context;
     }
 
-    public Task<List<Ad>> GetAllAsync()
+    public async Task<List<Ad>> GetAllAsync()
     {
-        return Query().ToListAsync();
+        return await _context.Ads
+            .Include(a => a.Platform)
+            .Include(a => a.Branch)
+            .Where(a => EF.Property<DateTime?>(a, "DeletedAt") == null)
+            .ToListAsync();
     }
 
-    public Task<Ad?> GetByIdAsync(int id)
+    public async Task<Ad?> GetByIdAsync(Guid id)
     {
-        return Query().FirstOrDefaultAsync(a => a.Id == id);
+        return await _context.Ads
+            .Include(a => a.Platform)
+            .Include(a => a.Branch)
+            .Where(a => EF.Property<DateTime?>(a, "DeletedAt") == null)
+            .FirstOrDefaultAsync(a => a.Id == id);
+    }
+
+    public async Task<bool> IsExistsAsync(Guid id)
+    {
+        return await _context.Ads
+            .Where(a => EF.Property<DateTime?>(a, "DeletedAt") == null)
+            .AnyAsync(a => a.Id == id);
     }
 }

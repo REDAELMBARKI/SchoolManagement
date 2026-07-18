@@ -3,14 +3,9 @@ using SchoolManagement.Domain.Entities;
 
 namespace SchoolManagement.Application.Mappers;
 
-public  class CommercialAgentMapper 
+public static class CommercialAgentMapper
 {
-    public CommercialAgent MapToEntity<CommercialAgentRequestDto>(CommercialAgentRequestDto requestDto)
-    {
-        throw new NotImplementedException();
-    }
-
-    public  CommercialAgentResponseDto MapToResponseDto(CommercialAgent? commAgent) 
+    public static CommercialAgentResponseDto ToResponse(CommercialAgent commAgent)
     {
         return new CommercialAgentResponseDto
         {
@@ -18,10 +13,8 @@ public  class CommercialAgentMapper
             Slug = commAgent.Slug,
             FirstName = commAgent.FirstName,
             LastName = commAgent.LastName,
-            Email = commAgent.Email ,
+            Email = null, // Email value object not fully implemented
             Phone = commAgent.Phone
         };
     }
-
-  
 }

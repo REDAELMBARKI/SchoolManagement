@@ -1,23 +1,50 @@
 using Microsoft.EntityFrameworkCore;
+using SchoolManagement.Application.Dtos.Responses;
+using SchoolManagement.Application.Mappers;
 using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Interfaces.Queries;
 using SchoolManagement.Infrastructure.Data;
 
 namespace SchoolManagement.Infrastructure.Queries;
 
-public class SubjectQueryService : QueryServiceBase<Subject>, ISubjectQueryService
+public class SubjectQueryService : ISubjectQueryService
 {
-    public SubjectQueryService(AppDbContext context) : base(context)
+    private readonly AppDbContext _context;
+
+    public SubjectQueryService(AppDbContext context)
     {
+        _context = context;
     }
 
-    public Task<List<Subject>> GetAllAsync()
+    public async Task<List<Subject>> GetAllAsync()
     {
-        return Query().ToListAsync();
+        return await _context.Subjects
+            .Include(s => s.Branch)
+            .ToListAsync();
     }
 
-    public Task<Subject?> GetByIdAsync(int id)
+    public async Task<Subject?> GetByIdAsync(Guid id)
     {
-        return Query().FirstOrDefaultAsync(s => s.Id == id);
+        return await _context.Subjects
+            .Include(s => s.Branch)
+            .FirstOrDefaultAsync(s => s.Id == id);
+    }
+
+    public async Task<bool> IsExistsAsync(Guid id)
+    {
+        return await _context.Subjects
+            .AnyAsync(s => s.Id == id);
+    }
+
+    public async Task<List<SubjectResponseDto>> GetAllResponsesAsync()
+    {
+        var subjects = await GetAllAsync();
+        return subjects.Select(SubjectMapper.ToResponse).ToList();
+    }
+
+    public async Task<SubjectResponseDto?> GetResponseByIdAsync(Guid id)
+    {
+        var subject = await GetByIdAsync(id);
+        return subject == null ? null : SubjectMapper.ToResponse(subject);
     }
 }

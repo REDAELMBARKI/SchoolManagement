@@ -1,15 +1,26 @@
-﻿using System;
+﻿using SchoolManagement.Domain.Common;
+using SchoolManagement.Domain.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace SchoolManagement.Domain.ValueObjects
 {
-    public class Email
+    public class Email : ValueObject
     {
 
-        private Email(string email)
-        {
+        public string Value { get; }
 
+        public Email(string value)
+        {
+            if (!value.Contains("@"))
+                throw new DomainException("Invalid email");
+            Value = value;
+        }
+
+        protected override IEnumerable<object> GetEqualityComponents()
+        {
+            yield return Value;
         }
     }
 } 

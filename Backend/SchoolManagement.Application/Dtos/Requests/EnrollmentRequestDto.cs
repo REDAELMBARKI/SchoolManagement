@@ -5,19 +5,19 @@ namespace SchoolManagement.Application.Dtos.Requests;
 public class EnrollmentRequestDto
 {
     [Required]
-    public int StudentId { get; set; }
+    public Guid StudentId { get; set; }
     
     [Required]
-    public int SubjectId { get; set; }
+    public Guid SubjectId { get; set; }
     
     [Required]
-    public int GroupId { get; set; }
+    public Guid GroupId { get; set; }
     
     [Required]
-    public int BranchId { get; set; }
+    public Guid BranchId { get; set; }
     
     [Required]
-    public int PlanId { get; set; }
+    public Guid PlanId { get; set; }
     
     public string? Notes { get; set; }
 }

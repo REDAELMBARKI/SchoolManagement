@@ -6,26 +6,24 @@ namespace SchoolManagement.Application.Mappers;
 
 public static class LeadSourceMapper
 {
-    public static LeadSourceResponseDto? MapLeadSource(ILeadSource? leadSource)
+    public static LeadSourceResponseDto? MapLeadSource(LeadSource leadSource)
     {
-        if (leadSource is null) return null;
-
-        if (leadSource is  typeof(AdLeadSource))
+        if (leadSource is AdLeadSource adLeadSource)
         {
             return new AdResponseDto
             {
-                Id = leadSource.AdId.Value,
-                PlatFormName = leadSource.Ad.Platform.Name,
+                Id = adLeadSource.AdId,
+                PlatFormName = adLeadSource.Ad.Platform.Name,
                 Type = nameof(Ad)
             };
         }
 
-        if (typeof(leadSource) == typeof(OpcLeadSource))
+        if (leadSource is OpcLeadSource opcLeadSource)
         {
             return new OpcResponseDto
             {
-                Id = leadSource.OpcId.Value,
-                FullName = leadSource.Opc.FirstName + " " + leadSource.Opc.LastName,
+                Id = opcLeadSource.OpcId,
+                FullName = opcLeadSource.Opc.FirstName + " " + opcLeadSource.Opc.LastName,
                 Type = nameof(Opc)
             };
         }

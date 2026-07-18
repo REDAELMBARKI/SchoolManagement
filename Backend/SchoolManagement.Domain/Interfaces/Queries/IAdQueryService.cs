@@ -3,6 +3,6 @@ using SchoolManagement.Domain.Interfaces.Queries.Common;
 
 namespace SchoolManagement.Domain.Interfaces.Queries;
 
-public interface IAdQueryService : IQuery<Ad>
+public interface IAdQueryService : IEntityQuery<Ad>
 {
 }

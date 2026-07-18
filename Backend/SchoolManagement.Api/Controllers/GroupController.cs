@@ -1,16 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
-using SchoolManagement.Backend.Dtos.Requests;
-using SchoolManagement.Backend.Services;
+using SchoolManagement.Domain.Interfaces.Services;
 
-namespace SchoolManagement.Backend.Controllers;
+namespace SchoolManagement.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class GroupController : ControllerBase
 {
-    private readonly GroupService _service;
+    private readonly IGroupService _service;
 
-    public GroupController(GroupService service)
+    public GroupController(IGroupService service)
     {
         _service = service;
     }

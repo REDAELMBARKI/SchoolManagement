@@ -8,11 +8,8 @@ public class IntakeConfiguration : IEntityTypeConfiguration<Intake>
 {
     public void Configure(EntityTypeBuilder<Intake> entityTypeBuilder)
     {
-        // Explicitly set auto-increment Id for TPC
-        entityTypeBuilder.Property(i => i.Id)
-            .ValueGeneratedOnAdd();
-                
-  
+        
+ 
         // Check constraints for business rules
         entityTypeBuilder.ToTable("Intakes", tb =>
         {

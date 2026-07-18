@@ -5,21 +5,21 @@ using System.Security;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using SchoolManagement.Backend.Dtos.Requests;
-using SchoolManagement.Backend.Services;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Exceptions;
 using Microsoft.Extensions.FileProviders;
+using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Application.Services;
+using SchoolManagement.Domain.Exceptions;
+using SchoolManagement.Domain.Interfaces.Services;
 
 
-namespace SchoolManagement.Backend.Controllers;
+namespace SchoolManagement.Api.Controllers;
 
 [ApiController]
 [Route("api/intakes")]
 public class IntakeController : ControllerBase
 {
-    private readonly IntakeService _intakeService;
-    public IntakeController(IntakeService intakeService)
+    private readonly IIntakeService _intakeService;
+    public IntakeController(IIntakeService intakeService)
     {
         _intakeService = intakeService;
     }
@@ -32,7 +32,7 @@ public class IntakeController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetById(Guid id)
     {
         try
         {
@@ -62,7 +62,7 @@ public class IntakeController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, IntakeRequestDto intake)
+    public async Task<IActionResult> Update(Guid id, IntakeRequestDto intake)
     {
         try
         {
@@ -83,7 +83,7 @@ public class IntakeController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(Guid id)
     {
         try
         {

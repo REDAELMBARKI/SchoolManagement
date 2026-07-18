@@ -3,15 +3,9 @@ using SchoolManagement.Domain.Entities;
 
 namespace SchoolManagement.Application.Mappers;
 
-public static class BranchMapper : IMapper<Branch>
+public static class BranchMapper
 {
-
-    public static Branch MapToEntity<BranchResponseDto>(BranchResponseDto dto)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static BranchResponseDto MapToResponseDto<BranchResponseDto>(Branch branch)
+    public static BranchResponseDto ToResponse(Branch branch)
     {
         return new BranchResponseDto
         {

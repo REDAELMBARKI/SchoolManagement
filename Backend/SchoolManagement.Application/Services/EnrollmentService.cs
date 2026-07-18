@@ -2,11 +2,12 @@ using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Domain.Interfaces.Repositories;
+using SchoolManagement.Domain.Interfaces.Services;
 using SchoolManagement.Domain.Entities.EnrollmentAggregate;
 
 namespace SchoolManagement.Application.Services;
 
-public class EnrollmentService
+public class EnrollmentService : IEnrollmentService
 {
     private readonly IEnrollmentRepository _repository;
 
@@ -21,7 +22,7 @@ public class EnrollmentService
         return enrollments.Select(MapToDto).ToList();
     }
 
-    public async Task<EnrollmentResponseDto?> GetByIdAsync(int id)
+    public async Task<EnrollmentResponseDto?> GetByIdAsync(Guid id)
     {
         var enrollment = await _repository.GetByIdAsync(id);
         if (enrollment is null) throw new NotFoundException($"Enrollment with id {id} not found");
@@ -52,7 +53,7 @@ public class EnrollmentService
         return MapToDto(created);
     }
 
-    public async Task<EnrollmentResponseDto> UpdateAsync(int id, EnrollmentRequestDto dto)
+    public async Task<EnrollmentResponseDto> UpdateAsync(Guid id, EnrollmentRequestDto dto)
     {
         var existing = await _repository.GetByIdAsync(id);
         if (existing is null) throw new NotFoundException($"Enrollment with id {id} not found");
@@ -78,7 +79,7 @@ public class EnrollmentService
         return await GetByIdAsync(id) ?? throw new NotFoundException($"Enrollment with id {id} not found after update");
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(Guid id)
     {
         await _repository.DeleteAsync(id);
     }
@@ -97,6 +98,7 @@ public class EnrollmentService
             Id = e.Id,
             EnrolledAt = e.EnrolledAt,
             Status = e.Status,
+            Notes = e.Notes,
             StudentId = e.StudentId,
             SubjectId = e.SubjectId,
             GroupId = e.GroupId,

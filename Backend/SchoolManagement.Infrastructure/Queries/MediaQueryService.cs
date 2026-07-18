@@ -4,5 +4,5 @@ namespace SchoolManagement.Infrastructure.Queries;
 
 public class MediaQueryService : IMediaQueryService
 {
-    // TODO: Implement MediaQueryService methods
+    // TODO: Implement when needed
 }

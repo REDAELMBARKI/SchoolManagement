@@ -3,15 +3,15 @@ using SchoolManagement.Domain.Entities;
 
 namespace SchoolManagement.Application.Mappers;
 
-public class GenderMapper
+public static class GenderMapper
 {
-    public static GenderResponseDto MapGender(Gender gender)
+    public static GenderResponseDto ToResponse(Gender gender)
     {
         return new GenderResponseDto
         {  
-            Id = gender.Id ,
-            Slug = gender.Slug ,
+            Id = gender.Id,
+            Slug = gender.Slug,
             Name = gender.Name 
-        }   ;
+        };
     }
 }

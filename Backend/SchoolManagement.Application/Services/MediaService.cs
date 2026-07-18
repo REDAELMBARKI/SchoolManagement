@@ -1,16 +1,17 @@
-using SchoolManagement.Application.Dtos.Requests;
+using Microsoft.AspNetCore.Http;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Entities;
-using SchoolManagement.Infrastructure.Repositories;
-using SchoolManagement.Infrastructure.Data;
+using SchoolManagement.Domain.Interfaces.Repositories;
+using SchoolManagement.Domain.Interfaces.Services;
+
 namespace SchoolManagement.Application.Services;
 
-public class MediaService
+public class MediaService : IMediaService
 {
 
-    private readonly MediaRepository _main_repo;
+    private readonly IMediaRepository _main_repo;
 
-    public MediaService(MediaRepository main_repo)
+    public MediaService(IMediaRepository main_repo)
     {
         _main_repo = main_repo;
     }

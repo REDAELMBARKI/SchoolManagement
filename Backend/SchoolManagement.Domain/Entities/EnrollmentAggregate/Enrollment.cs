@@ -13,7 +13,7 @@ public class Enrollment  : AggregateRoot
         public Guid SubjectId { get; set; }
         public Guid GroupId { get; set; }
         public Guid BranchId { get; set; }
-        public Guid PlanId { get; set; }       // 1mo, 3mo, 6mo, 12mo
+        public Guid PlanId { get; set; }      
         // navigations
         public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
         public virtual Subject Subject {get;set;} =null! ;

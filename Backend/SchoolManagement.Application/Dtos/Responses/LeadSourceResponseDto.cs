@@ -8,7 +8,7 @@ namespace SchoolManagement.Application.Dtos.Responses;
 [JsonDerivedType(typeof(AdResponseDto), "Ad")]
 [JsonDerivedType(typeof(OpcResponseDto), "Opc")]
 
-public abstract class LeadSourceResponseDto 
+public abstract class  LeadSourceResponseDto 
 { 
 
     public Guid Id { get; set; }

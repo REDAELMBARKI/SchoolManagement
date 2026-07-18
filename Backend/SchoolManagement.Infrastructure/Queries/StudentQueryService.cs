@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using SchoolManagement.Application.Dtos.Responses;
+using SchoolManagement.Application.Mappers;
 using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Domain.Interfaces.Queries;
@@ -6,37 +8,81 @@ using SchoolManagement.Infrastructure.Data;
 
 namespace SchoolManagement.Infrastructure.Queries;
 
-public class StudentQueryService : QueryServiceBase<Student>, IStudentQueryService
+public class StudentQueryService : IStudentQueryService
 {
-    public StudentQueryService(AppDbContext context) : base(context)
+    private readonly AppDbContext _context;
+
+    public StudentQueryService(AppDbContext context)
     {
+        _context = context;
     }
 
-    protected override IQueryable<Student> Query()
+    public async Task<List<Student>> GetAllAsync()
     {
-        return this.Context.Users.OfType<Student>()
+        return await _context.Users.OfType<Student>()
             .Include(s => s.Gender)
             .Include(s => s.Parents)
             .Include(s => s.Intake)
             .Include(s => s.Enrollments)
-            .AsNoTracking().AsQueryable()
-            .Where(e => EF.Property<DateTime?>(e, "DeletedAt") == null);
+            .Where(s => EF.Property<DateTime?>(s, "DeletedAt") == null)
+            .ToListAsync();
     }
 
-    public override async Task<List<Student>> GetAllAsync()
+    public async Task<Student?> GetByIdAsync(Guid id)
     {
-        return await this.Query().ToListAsync();
+        return await _context.Users.OfType<Student>()
+            .Include(s => s.Gender)
+            .Include(s => s.Parents)
+            .Include(s => s.Intake)
+            .Include(s => s.Enrollments)
+            .Where(s => EF.Property<DateTime?>(s, "DeletedAt") == null)
+            .FirstOrDefaultAsync(s => s.Id == id);
     }
 
-    public async Task<Student> FindByIdAsync(int id)
+    public async Task<bool> IsExistsAsync(Guid id)
     {
-        var student = await this.Query().FirstOrDefaultAsync(s => s.Id == id);
+        return await _context.Users.OfType<Student>()
+            .Where(s => EF.Property<DateTime?>(s, "DeletedAt") == null)
+            .AnyAsync(s => s.Id == id);
+    }
+
+    public async Task<Student> FindByIdAsync(Guid id)
+    {
+        var student = await GetByIdAsync(id);
         if (student is null) throw new NotFoundException($"Student with id {id} not found");
         return student;
     }
 
-    public override async Task<Student?> GetByIdAsync(int id)
+    public async Task<List<StudentResponseDto>> GetAllResponsesAsync()
     {
-        return await this.Query().FirstOrDefaultAsync(s => s.Id == id);
+        var students = await GetAllAsync();
+        return students.Select(s => new StudentResponseDto
+        {
+            Id = s.Id,
+            FirstName = s.FirstName,
+            LastName = s.LastName,
+            Slug = s.Slug,
+            Email = null,
+            Phone = s.Phone,
+            DateOfBirth = s.DateOfBirth,
+            IntakeId = s.IntakeId
+        }).ToList();
+    }
+
+    public async Task<StudentResponseDto?> GetResponseByIdAsync(Guid id)
+    {
+        var student = await GetByIdAsync(id);
+        if (student is null) return null;
+        return new StudentResponseDto
+        {
+            Id = student.Id,
+            FirstName = student.FirstName,
+            LastName = student.LastName,
+            Slug = student.Slug,
+            Email = null,
+            Phone = student.Phone,
+            DateOfBirth = student.DateOfBirth,
+            IntakeId = student.IntakeId
+        };
     }
 }
