@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Http;
 using SchoolManagement.Application.Dtos.Responses;
+using SchoolManagement.Application.Mappers;
 using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Interfaces.Repositories;
-using SchoolManagement.Domain.Interfaces.Services;
+using SchoolManagement.Application.Interfaces.Services;
 
 namespace SchoolManagement.Application.Services;
 
 public class MediaService : IMediaService
 {
-
     private readonly IMediaRepository _main_repo;
 
     public MediaService(IMediaRepository main_repo)
@@ -28,11 +28,10 @@ public class MediaService : IMediaService
         string uniqueName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName).ToLower();
         string finalPath = Path.Combine(filePath, uniqueName);
 
-        using (var stream = new FileStream(finalPath , FileMode.Create))
+        using (var stream = new FileStream(finalPath, FileMode.Create))
         {
-             file.CopyToAsync(stream);
+            await file.CopyToAsync(stream);
         }
-
 
         Media media = new Media
         {
@@ -43,9 +42,10 @@ public class MediaService : IMediaService
             Height = null, // TODO: Add ImageSharp package to get dimensions
             MediaType = mediaType,
             Collection = collection
-            
         };
 
-        return await _main_repo.Add(media);
+        Media storedMedia = await _main_repo.Add(media);
+
+        return MediaMapper.ToResponse(storedMedia);
     }
 }

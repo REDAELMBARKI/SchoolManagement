@@ -1,13 +1,13 @@
 using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
 
-namespace SchoolManagement.Domain.Interfaces.Services;
+namespace SchoolManagement.Application.Interfaces.Services;
 
 public interface IGroupService
 {
     Task<GroupResponseDto> CreateAsync(GroupRequestDto dto);
-    Task<GroupResponseDto?> GetByIdAsync(int id);
+    Task<GroupResponseDto?> GetByIdAsync(Guid id);
     Task<List<GroupResponseDto>> GetAllAsync();
-    Task<GroupResponseDto?> UpdateAsync(int id, GroupRequestDto dto);
-    Task<bool> DeleteAsync(int id);
+    Task<GroupResponseDto?> UpdateAsync(Guid id, GroupRequestDto dto);
+    Task<bool> DeleteAsync(Guid id);
 }

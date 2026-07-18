@@ -1,3 +1,4 @@
+using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Entities;
 
@@ -5,6 +6,20 @@ namespace SchoolManagement.Application.Mappers;
 
 public static class StudentMapper
 {
+    public static Student ToDomain(StudentResponseDto dto)
+    {
+        return new Student
+        {
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            Email = dto.Email,
+            Phone = dto.Phone,
+            DateOfBirth = dto.DateOfBirth,
+            GenderId = dto.GenderId,
+            IntakeId = dto.IntakeId
+        };
+    }
+
     public static StudentResponseDto ToResponse(Student student)
     {
         return new StudentResponseDto

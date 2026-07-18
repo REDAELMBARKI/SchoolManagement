@@ -11,10 +11,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         // Explicitly set auto-increment Id for TPC
         entityTypeBuilder.Property(u => u.Id)
             .ValueGeneratedOnAdd();
-                
-        // TPC mapping for User entity
-        entityTypeBuilder.ToTable("Users");
-            
+
         // Email is required for Users
         entityTypeBuilder.Property(u => u.Email)
             .IsRequired()

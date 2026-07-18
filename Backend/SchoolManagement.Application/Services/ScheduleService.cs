@@ -1,21 +1,20 @@
 using SchoolManagement.Application.Dtos.Responses;
-using SchoolManagement.Domain.Interfaces.Repositories;
-using SchoolManagement.Domain.Interfaces.Services;
+using SchoolManagement.Domain.Interfaces.Queries;
+using SchoolManagement.Application.Interfaces.Services;
 
 namespace SchoolManagement.Application.Services;
 
 public class ScheduleService : IScheduleService
 {
-    private readonly IScheduleRepository _repository;
+    private readonly IScheduleQueryService _queryService;
 
-    public ScheduleService(IScheduleRepository repository)
+    public ScheduleService(IScheduleQueryService queryService)
     {
-        _repository = repository;
+        _queryService = queryService;
     }
 
     public async Task<GroupedScheduleDto> GetGroupScheduleAsync(int groupId)
     {
-        return await _repository.GetGroupSchedule(groupId);
+        return await _queryService.GetGroupScheduleAsync(groupId);
     }
 }
-

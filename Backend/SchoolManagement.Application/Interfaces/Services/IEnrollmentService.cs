@@ -1,7 +1,7 @@
 using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
 
-namespace SchoolManagement.Domain.Interfaces.Services;
+namespace SchoolManagement.Application.Interfaces.Services;
 
 public interface IEnrollmentService
 {

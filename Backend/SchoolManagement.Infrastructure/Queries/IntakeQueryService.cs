@@ -60,15 +60,13 @@ public class IntakeQueryService : IIntakeQueryService
     }
 
     // ISluged implementation
-    public async Task<bool> IsExistsBySlug(string slug)
+    public async Task<bool> IsExistsBySlugAsync(string slug)
     {
         return await _context.Intakes
             .AnyAsync(i => i.Slug == slug);
     }
 
-    // Keep IsExistBySlug for backward compatibility
-    public async Task<bool> IsExistBySlug(string slug)
-    {
-        return await IsExistsBySlug(slug);
-    }
+  
+
+
 }

@@ -11,6 +11,7 @@ public static class IntakeMapper
         return Intake.Register(
             firstName: dto.FirstName,
             lastName: dto.LastName,
+            slug: dto.Slug,
             genderId: dto.GenderId,
             email: dto.Email,
             phone: dto.Phone,

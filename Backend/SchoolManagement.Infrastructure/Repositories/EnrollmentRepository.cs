@@ -15,7 +15,7 @@ public class EnrollmentRepository : Repository<Enrollment>, IEnrollmentRepositor
         return await base.AddAsync(enrollment);
     }
 
-    public async Task UpdateAsync(Guid id, Enrollment enrollment)
+    public async Task UpdateAsync(int id, Enrollment enrollment)
     {
         var dbEnrollment = await GetByIdForUpdateAsync(id);
         if (dbEnrollment is null) throw new NotFoundException($"Enrollment with id {id} not found");
@@ -24,7 +24,7 @@ public class EnrollmentRepository : Repository<Enrollment>, IEnrollmentRepositor
         await Context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(int id)
     {
         await base.DeleteAsync(id);
     }

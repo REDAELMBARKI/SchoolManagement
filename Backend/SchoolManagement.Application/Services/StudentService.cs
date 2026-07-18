@@ -6,80 +6,71 @@ using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Application.Mappers;
 using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Interfaces.Repositories;
-using SchoolManagement.Domain.Interfaces.Services;
+using SchoolManagement.Application.Interfaces.Services;
+using SchoolManagement.Domain.Interfaces.Queries;
 
 namespace SchoolManagement.Application.Services;
 
 public class StudentService : IStudentService
 {
     private readonly IStudentRepository _repository;
+    private readonly IStudentQueryService _query;
     private readonly IMediator _mediator; 
-    public StudentService(IStudentRepository repository, IMediator mediator)
+    public StudentService(IStudentRepository repository, IStudentQueryService query, IMediator mediator)
     {
         _repository = repository;
+        _query = query;
         _mediator = mediator;
     }
 
     public async Task<List<StudentResponseDto>> GetAllAsync()
     {
-        var students = await _repository.GetAllAsync();
-        return students.Select(s => StudentMapper.ToResponse(s)).ToList();
+        return await _query.GetAllResponsesAsync();
     }
 
-    public async Task<StudentResponseDto> GetByIdAsync(int id)
+    public async Task<StudentResponseDto> GetByIdAsync(Guid id)
     {
-        var student = await _repository.FindByIdAsync(id);
-        return StudentMapper.ToResponse(student);
+        var student = await _query.GetResponseByIdAsync(id);
+        if(student == null ) {
+            throw new NotFoundException($"No student found with id {id}");
+        }
+        return student;
     }
 
     public async Task<StudentResponseDto> CreateAsync(StudentRequestDto dto)
     {
-        var student_map = new Student
-        {
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
-            Email = dto.Email,
-            Phone = dto.Phone,
-            DateOfBirth = dto.DateOfBirth,
-            GenderId = dto.GenderId,
-            IntakeId = dto.IntakeId
-        };
-
-        Student student  =  await _repository.AddAsync(student_map);
+        var student = StudentMapper.ToDomain(dto);
+        var createdStudent = await _repository.AddAsync(student);
+        
         // student creation events
-        if (student.IntakeId != null)
+        if (createdStudent.IntakeId != null)
         {
-            this.ConvertFromIntakeMailer(student , _mediator);
+            this.ConvertFromIntakeMailer(createdStudent, _mediator);
         }
         else
         {
-            this.NewStudentMailer(student , _mediator);
+            this.NewStudentMailer(createdStudent, _mediator);
         }
 
-        return StudentMapper.ToResponse(student);
+        return StudentMapper.ToResponse(createdStudent);
     }
 
-    public async Task<StudentResponseDto> UpdateAsync(int id, StudentRequestDto dto)
+    public async Task<StudentResponseDto> UpdateAsync(Guid id, StudentRequestDto dto)
     {
-        var existing = await _repository.FindByIdAsync(id);
-
-        var student = new Student
+        var existing = await _repository.GetByIdAsync(id);
+        if (existing == null)
         {
-            Id = new Guid(id.ToString()),
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
-            Email = dto.Email,
-            Phone = dto.Phone,
-            DateOfBirth = dto.DateOfBirth,
-            GenderId = dto.GenderId,
-            IntakeId = dto.IntakeId
-        };
-
-        await _repository.UpdateAsync(id, student);
-        return await GetByIdAsync(id);
+            throw new NotFoundException($"No student found with id {id}");
+        }
+        
+        var student = StudentMapper.ToDomain(dto);
+        student.Id = id;
+        
+        var updated = await _repository.UpdateAsync(student);
+        return StudentMapper.ToResponse(updated);
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(Guid id)
     {
         await _repository.DeleteAsync(id);
     }

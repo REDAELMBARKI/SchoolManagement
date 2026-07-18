@@ -35,4 +35,13 @@ public static class GroupMapper
             }
         }).ToList()
     };
+
+    public static Group ToDomain(GroupRequestDto dto) => new()
+    {
+        Name = dto.Name,
+        Capacity = dto.Capacity,
+        Period = dto.Period,
+        LevelId = new Guid(dto.LevelId.ToString()),
+        SubjectId = new Guid(dto.SubjectId.ToString())
+    };
 }

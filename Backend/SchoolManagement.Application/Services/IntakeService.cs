@@ -5,7 +5,7 @@ using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Domain.Interfaces.Queries;
 using SchoolManagement.Domain.Interfaces.Repositories;
-using SchoolManagement.Domain.Interfaces.Services;
+using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Domain.Utils;
 
 namespace SchoolManagement.Application.Services;
@@ -33,25 +33,26 @@ public class IntakeService : IIntakeService
     public async Task<IntakeResponseDto> AddIntakeAsync(IntakeRequestDto intakeDto)
     {
         Intake intake = IntakeMapper.ToDomain(intakeDto);
-        var generatedSlug = await CustomSluger.Slug(slug => _query.IsExistsBySlug(slug), intake.FirstName, intake.LastName);
+        var generatedSlug = await CustomSluger.Slug(slug => _query.IsExistsBySlugAsync(slug), intake.FirstName, intake.LastName);
         intake.UpdateSlug(generatedSlug);
         var newEntity = await _repository.AddAsync(intake);
         return IntakeMapper.ToResponse(newEntity);
     }
 
+
    
     
-    public async Task UpdateAsync(Guid id, IntakeRequestDto intakeDto)
+    public async Task<IntakeResponseDto?> UpdateAsync(Guid id, IntakeRequestDto intakeDto)
     {
         // First get the existing entity from the repository
-        var existingIntake = await _repository.GetByIdForUpdateAsync(id);
+        var existingIntake = await _repository.GetByIdAsync(id);
         if (existingIntake is null)
         {
             throw new NotFoundException($"No intake found with id {id}");
         }
         
         // Generate new slug if needed
-        var generatedSlug = await CustomSluger.Slug(slug => _query.IsExistBySlug(slug), intakeDto.FirstName, intakeDto.LastName);
+        var generatedSlug = await CustomSluger.Slug(slug => _query.IsExistsBySlugAsync(slug), intakeDto.FirstName, intakeDto.LastName);
         
         // Now call all the update methods on the existing entity directly from the DTO
         existingIntake.UpdateFirstName(intakeDto.FirstName);
@@ -75,7 +76,8 @@ public class IntakeService : IIntakeService
         
         existingIntake.UpdatedAt = DateTime.UtcNow;
         // Now save the updated entity via repository
-        await _repository.UpdateAsync(existingIntake);
+        Intake  updatedIntake = await _repository.UpdateAsync(existingIntake);
+        return IntakeMapper.ToResponse(updatedIntake); 
     }
 
 

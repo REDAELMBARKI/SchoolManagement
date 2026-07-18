@@ -32,10 +32,15 @@ public class EmployeeConfigurations : IEntityTypeConfiguration<Employee>
             .HasMaxLength(100);
             
         // Email is optional for Employees
-        entityTypeBuilder.Property(e => e.Email)
-            .IsRequired(false)
-            .HasMaxLength(255);
-            
+        entityTypeBuilder
+            .OwnsOne(emp => emp.Email , email =>
+            {
+                email.Property(e => e.Value)
+                    .HasColumnName("Email")
+                    .HasMaxLength(100)
+                    .IsRequired(false);
+            });
+
         // Phone is required for Employees
         entityTypeBuilder.Property(e => e.Phone)
             .IsRequired()

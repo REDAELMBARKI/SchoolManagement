@@ -19,10 +19,13 @@ public class IntakeConfiguration : IEntityTypeConfiguration<Intake>
 
 
 
-        // Email is optional for Intakes
-        entityTypeBuilder.Property(i => i.Email)
-            .IsRequired(false)
-            .HasMaxLength(255);
+        // Email Value object is optional for Intakes
+        entityTypeBuilder.OwnsOne(i => i.Email, email =>
+           email.Property(e => e.Value)
+           .HasColumnName("Email")
+           .IsRequired(false)
+        );
+
 
         // Phone is optional for Intakes
         entityTypeBuilder.Property(i => i.Phone)

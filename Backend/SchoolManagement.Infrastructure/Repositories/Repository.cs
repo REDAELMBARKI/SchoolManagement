@@ -28,10 +28,12 @@ public abstract class Repository<T> : IRepository<T> where T : AggregateRoot
         return entry.Entity;
     }
 
-    public async Task UpdateAsync(T entity)
+    public async Task<T> UpdateAsync(T entity)
     {
-        _context.Set<T>().Update(entity);
+        _context.Set<T>()
+         .Update(entity);
         await _context.SaveChangesAsync();
+        return entity;
     }
 
     public async Task DeleteAsync(Guid id)
@@ -45,21 +47,6 @@ public abstract class Repository<T> : IRepository<T> where T : AggregateRoot
     }
 
     public async Task<T?> GetByIdAsync(Guid id)
-    {
-        return await Query().FirstOrDefaultAsync(e => e.Id == id);
-    }
-
-    public async Task<T?> FindByIdAsync(int id)
-    {
-        return await Query().FirstOrDefaultAsync(e => e.Id == new Guid(id.ToString()));
-    }
-
-    public async Task<List<T>> GetAllAsync()
-    {
-        return await Query().ToListAsync();
-    }
-
-    protected virtual async Task<T?> GetByIdForUpdateAsync(Guid id)
     {
         return await Query().FirstOrDefaultAsync(e => e.Id == id);
     }

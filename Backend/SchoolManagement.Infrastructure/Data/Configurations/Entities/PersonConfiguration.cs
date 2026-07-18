@@ -9,10 +9,7 @@ public class PersonConfiguration : IEntityTypeConfiguration<Person>
 {
     public void Configure(EntityTypeBuilder<Person> entityTypeBuilder)
     {
-        // Configure Id for auto-increment for TPC
-        entityTypeBuilder.Property(p => p.Id)
-            .ValueGeneratedOnAdd();
-
+   
         entityTypeBuilder.UseTpcMappingStrategy();
         // Shared Person property validations
         entityTypeBuilder.Property(p => p.FirstName)

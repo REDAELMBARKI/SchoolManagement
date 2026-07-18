@@ -12,7 +12,7 @@ public abstract class Person : AggregateRoot
     public Guid? GenderId { get; protected set; }
     public virtual Gender? Gender { get; protected set; }
 
-    protected void RegisterPerson(string firstName, string lastName, Guid? genderId)
+    protected void RegisterPerson(string firstName, string lastName, string slug ,  Guid? genderId)
     {
         if (string.IsNullOrWhiteSpace(firstName))
         {

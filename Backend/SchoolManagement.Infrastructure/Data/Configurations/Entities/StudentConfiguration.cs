@@ -12,11 +12,7 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
         entityTypeBuilder.Property(s => s.Id)
             .ValueGeneratedOnAdd();
                 
-        // Table mapping for Student entity (TPC inherited from Person)
-        entityTypeBuilder.ToTable("Students");
-        
-
-            
+  
         // Email is optional for Students
         entityTypeBuilder.Property(s => s.Email)
             .IsRequired(false)

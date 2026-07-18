@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Domain.Entities;
-using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Domain.Interfaces.Repositories;
 
 namespace SchoolManagement.Infrastructure.Repositories;
@@ -17,9 +16,9 @@ public class StudentRepository : Repository<Student>, IStudentRepository
             .Where(e => EF.Property<DateTime?>(e, "DeletedAt") == null);
     }
 
-    protected async Task<Student?> GetByIdForUpdateAsync(int id)
+    protected override async Task<Student?> GetByIdForUpdateAsync(int id)
     {
-        return await Query().FirstOrDefaultAsync(s => s.Id == new Guid(id.ToString()));
+        return await Query().FirstOrDefaultAsync(s => s.Id == id);
     }
 
     public async Task<Student> AddAsync(Student student)
@@ -29,7 +28,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
 
     public async Task DeleteAsync(int id)
     {
-        await base.DeleteAsync(new Guid(id.ToString()));
+        await base.DeleteAsync(id);
     }
 
     public async Task UpdateAsync(int id, Student student)

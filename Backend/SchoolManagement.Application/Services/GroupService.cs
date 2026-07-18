@@ -3,50 +3,52 @@ using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Application.Mappers;
 using SchoolManagement.Domain.Interfaces.Repositories;
-using SchoolManagement.Domain.Interfaces.Services;
+using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Domain.Entities;
-
+using SchoolManagement.Domain.Interfaces.Queries;
 
 namespace SchoolManagement.Application.Services;
 
 public class GroupService : IGroupService
 {
     private readonly IGroupRepository _repository;
+    private readonly IGroupQueryService _query;
 
-    public GroupService(IGroupRepository repository)
+    public GroupService(IGroupRepository repository, IGroupQueryService query)
     {
         _repository = repository;
+        _query = query;
     }
 
     public async Task<GroupResponseDto> CreateAsync(GroupRequestDto dto)
     {
-        Group entity = GroupMapper.ToEntity(dto);
+        Group entity = GroupMapper.ToDomain(dto);
         var newEntity = await _repository.AddAsync(entity);
-        return newEntity;
+        return GroupMapper.ToResponse(newEntity);
     }
 
-    public async Task<GroupResponseDto?> GetByIdAsync(int id)
+    public async Task<GroupResponseDto?> GetByIdAsync(Guid id)
     {
-        return await _repository.GetByIdAsync(id);
+        return await _query.GetResponseByIdAsync(id);
     }
 
     public async Task<List<GroupResponseDto>> GetAllAsync()
     {
-        return await _repository.GetAllAsync();
+        return await _query.GetAllResponsesAsync();
     }
 
-    public async Task<GroupResponseDto?> UpdateAsync(int id, GroupRequestDto dto)
+    public async Task<GroupResponseDto?> UpdateAsync(Guid id, GroupRequestDto dto)
     {
         var existing = await _repository.GetByIdAsync(id);
         if (existing is null) throw new NotFoundException($"Group with id {id} not found");
 
-        Group entity = GroupMapper.ToEntity(dto);
+        var entity = GroupMapper.ToDomain(dto);
         entity.Id = id;
-        await _repository.UpdateAsync(id, entity);
-        return await _repository.GetByIdAsync(id);
+        var updated = await _repository.UpdateAsync(entity);
+        return GroupMapper.ToResponse(updated);
     }
 
-    public async Task<bool> DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(Guid id)
     {
         await _repository.DeleteAsync(id);
         return true;
