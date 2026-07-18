@@ -4,3 +4,13 @@ C:\SchoolManagement\Backend\SchoolManagement.Application\obj\Debug\net10.0\Schoo
 C:\SchoolManagement\Backend\SchoolManagement.Application\obj\Debug\net10.0\SchoolManagement.Application.AssemblyInfo.cs
 C:\SchoolManagement\Backend\SchoolManagement.Application\obj\Debug\net10.0\SchoolManagement.Application.csproj.CoreCompileInputs.cache
 C:\SchoolManagement\Backend\SchoolManagement.Application\obj\Debug\net10.0\SchoolManagement.Application.sourcelink.json
+C:\SchoolManagement\Backend\SchoolManagement.Application\bin\Debug\net10.0\SchoolManagement.Application.deps.json
+C:\SchoolManagement\Backend\SchoolManagement.Application\bin\Debug\net10.0\SchoolManagement.Application.dll
+C:\SchoolManagement\Backend\SchoolManagement.Application\bin\Debug\net10.0\SchoolManagement.Application.pdb
+C:\SchoolManagement\Backend\SchoolManagement.Application\bin\Debug\net10.0\SchoolManagement.Domain.dll
+C:\SchoolManagement\Backend\SchoolManagement.Application\bin\Debug\net10.0\SchoolManagement.Domain.pdb
+C:\SchoolManagement\Backend\SchoolManagement.Application\obj\Debug\net10.0\SchoolMa.1175F4A4.Up2Date
+C:\SchoolManagement\Backend\SchoolManagement.Application\obj\Debug\net10.0\SchoolManagement.Application.dll
+C:\SchoolManagement\Backend\SchoolManagement.Application\obj\Debug\net10.0\refint\SchoolManagement.Application.dll
+C:\SchoolManagement\Backend\SchoolManagement.Application\obj\Debug\net10.0\SchoolManagement.Application.pdb
+C:\SchoolManagement\Backend\SchoolManagement.Application\obj\Debug\net10.0\ref\SchoolManagement.Application.dll
