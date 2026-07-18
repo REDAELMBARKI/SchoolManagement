@@ -1,17 +1,19 @@
 using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace SchoolManagement.Application.Mappers;
 
 public static class IntakeMapper
 {
     public static Intake ToDomain(IntakeRequestDto dto)
-    {
+    {  
+        string initialSlug  =  $"{dto.FirstName}-{dto.LastName}".ToLower();
         return Intake.Register(
             firstName: dto.FirstName,
             lastName: dto.LastName,
-            slug: dto.Slug,
+            slug: initialSlug,
             genderId: dto.GenderId,
             email: dto.Email,
             phone: dto.Phone,
@@ -38,7 +40,7 @@ public static class IntakeMapper
             FirstName = intake.FirstName,
             LastName = intake.LastName,
             Slug = intake.Slug,
-            Email = null, 
+            Email = intake.Email?.Value ?? null, 
             Phone = intake.Phone,
             IntakeDate = intake.IntakeDate,
             DateOfBirth = intake.DateOfBirth,

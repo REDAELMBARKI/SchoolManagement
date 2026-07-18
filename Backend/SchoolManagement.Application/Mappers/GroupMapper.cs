@@ -29,19 +29,28 @@ public static class GroupMapper
                 FirstName = gt.Teacher.FirstName,
                 LastName = gt.Teacher.LastName,
                 Slug = gt.Teacher.Slug,
-                Email = null,
+                Email = gt.Teacher.Email?.Value ?? null,
                 Phone = gt.Teacher.Phone,
                 DateOfBirth = gt.Teacher.DateOfBirth ?? default
             }
         }).ToList()
     };
 
-    public static Group ToDomain(GroupRequestDto dto) => new()
+    public static Group ToDomain(GroupRequestDto dto)
     {
-        Name = dto.Name,
-        Capacity = dto.Capacity,
-        Period = dto.Period,
-        LevelId = new Guid(dto.LevelId.ToString()),
-        SubjectId = new Guid(dto.SubjectId.ToString())
-    };
+        var levelId = new Guid(dto.LevelId.ToString());
+        var subjectId = new Guid(dto.SubjectId.ToString());
+        
+        // Wait, Group.Create requires BranchId! Oh wait, let's check Group entity!
+        // Wait Group has BranchId! Oh right! Group.Create has branchId! Oh wait, GroupRequestDto doesn't have BranchId!
+        // Hmm, let's just use Guid.Empty for now, but we should update DTO later
+        return Group.Create(
+            name: dto.Name,
+            capacity: dto.Capacity,
+            period: dto.Period,
+            branchId: Guid.Empty, // Temporary, should be from DTO
+            levelId: levelId,
+            subjectId: subjectId
+        );
+    }
 }

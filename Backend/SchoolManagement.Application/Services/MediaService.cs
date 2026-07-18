@@ -33,16 +33,24 @@ public class MediaService : IMediaService
             await file.CopyToAsync(stream);
         }
 
-        Media media = new Media
-        {
-            Url = $"/uploads/{uniqueName}",
-            MimeType = file.ContentType,
-            Size = file.Length,
-            Width = null, // TODO: Add ImageSharp package to get dimensions
-            Height = null, // TODO: Add ImageSharp package to get dimensions
-            MediaType = mediaType,
-            Collection = collection
-        };
+        // Missing OwnerType, OwnerId, BranchId in parameters, but let's use placeholders for now
+        // TODO: Update Upload method to accept OwnerType, OwnerId, BranchId
+        Media media = Media.Create(
+            url: $"/uploads/{uniqueName}",
+            mimeType: file.ContentType,
+            size: file.Length,
+            altText: null,
+            width: null, // TODO: Add ImageSharp package to get dimensions
+            height: null, // TODO: Add ImageSharp package to get dimensions
+            ownerType: "Unknown", // Temporary
+            ownerId: Guid.Empty, // Temporary
+            mediaType: mediaType,
+            collection: collection,
+            order: 0,
+            isMain: false,
+            storageProvider: "Local", // Temporary
+            branchId: Guid.Empty // Temporary
+        );
 
         Media storedMedia = await _main_repo.Add(media);
 

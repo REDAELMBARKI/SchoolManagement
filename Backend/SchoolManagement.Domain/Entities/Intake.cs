@@ -33,7 +33,7 @@ public class Intake : Person
     public virtual Student? ConvertedToStudent { get; private set; }
 
 
-    public static Intake Register(string firstName, string lastName,string slug  ,  Guid? genderId, string? email, string? phone, DateOnly? dateOfBirth, DateTime intakeDate, IntakeStatus status, DateTime? followUpDate, string? notes, Guid? commercialAgentId, Guid? leadSourceId, Guid subjectId, Guid branchId, bool isIndependent, decimal totalFees, decimal amountPaid)
+    public static Intake Register(string firstName, string lastName, string slug  ,  Guid? genderId, string? email, string? phone, DateOnly? dateOfBirth, DateTime intakeDate, IntakeStatus status, DateTime? followUpDate, string? notes, Guid? commercialAgentId, Guid? leadSourceId, Guid subjectId, Guid branchId, bool isIndependent, decimal totalFees, decimal amountPaid)
     {
         if (subjectId == Guid.Empty)
         {

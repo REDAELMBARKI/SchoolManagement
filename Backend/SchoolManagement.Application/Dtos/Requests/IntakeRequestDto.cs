@@ -13,9 +13,6 @@ public class IntakeRequestDto
     [Required, MinLength(3), MaxLength(50)]
     public string LastName { get; set; } = string.Empty;
 
-    [MinLength(3), MaxLength(50)]
-    public string Slug { get; set; } = string.Empty;
-
     [EmailAddress, MaxLength(255)]
     public string? Email { get; set; } = null!;
 

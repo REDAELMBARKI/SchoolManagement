@@ -46,12 +46,14 @@ public class EnrollmentService : IEnrollmentService
         // - Validate status transitions (Active -> Dropped, etc.)
         // - Handle group change (check new group capacity)
 
-        var enrollment = EnrollmentMapper.ToDomain(dto);
-        enrollment.Id = id;
-        enrollment.Status = existing.Status;
-        enrollment.EnrolledAt = existing.EnrolledAt;
+        existing.UpdateStudentId(dto.StudentId);
+        existing.UpdateSubjectId(dto.SubjectId);
+        existing.UpdateGroupId(dto.GroupId);
+        existing.UpdateBranchId(dto.BranchId);
+        existing.UpdatePlanId(dto.PlanId);
+        existing.UpdateNotes(dto.Notes);
         
-        var updated = await _repository.UpdateAsync(enrollment);
+        var updated = await _repository.UpdateAsync(existing);
         return EnrollmentMapper.ToResponse(updated);
     }
 

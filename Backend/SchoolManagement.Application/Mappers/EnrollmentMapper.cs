@@ -9,17 +9,14 @@ public static class EnrollmentMapper
 {
     public static Enrollment ToDomain(EnrollmentRequestDto dto)
     {
-        return new Enrollment
-        {
-            StudentId = dto.StudentId,
-            SubjectId = dto.SubjectId,
-            GroupId = dto.GroupId,
-            BranchId = dto.BranchId,
-            PlanId = dto.PlanId,
-            Notes = dto.Notes,
-            Status = "Active",
-            EnrolledAt = DateTime.UtcNow
-        };
+        return Enrollment.Create(
+            studentId: dto.StudentId,
+            subjectId: dto.SubjectId,
+            groupId: dto.GroupId,
+            branchId: dto.BranchId,
+            planId: dto.PlanId,
+            notes: dto.Notes
+        );
     }
 
     public static EnrollmentResponseDto ToResponse(Enrollment e)
@@ -41,7 +38,7 @@ public static class EnrollmentMapper
                 FirstName = e.Student.FirstName,
                 LastName = e.Student.LastName,
                 Slug = e.Student.Slug,
-                Email = e.Student.Email,
+                Email = e.Student.Email?.Value ?? string.Empty,
                 Phone = e.Student.Phone,
                 DateOfBirth = e.Student.DateOfBirth
             } : null,

@@ -6,6 +6,16 @@ namespace SchoolManagement.Application.Mappers;
 
 public static class LeadSourceMapper
 {
+    public static LeadSource? ToDomain(LeadSourceResponseDto dto, Guid branchId)
+    {
+        return dto switch
+        {
+            AdResponseDto => AdLeadSource.Create(branchId: branchId, adId: dto.Id),
+            OpcResponseDto => OpcLeadSource.Create(branchId: branchId, opcId: dto.Id),
+            _ => null
+        };
+    }
+
     public static LeadSourceResponseDto? MapLeadSource(LeadSource leadSource)
     {
         if (leadSource is AdLeadSource adLeadSource)

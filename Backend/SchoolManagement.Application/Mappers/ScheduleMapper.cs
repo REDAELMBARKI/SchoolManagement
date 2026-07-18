@@ -1,3 +1,4 @@
+using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Entities;
 
@@ -5,6 +6,19 @@ namespace SchoolManagement.Application.Mappers;
 
 public static class ScheduleMapper
 {
+    public static Schedule ToDomain(ScheduleRequestDto dto)
+    {
+        return Schedule.Create(
+            branchId: dto.BranchId,
+            teacherId: dto.TeacherId,
+            roomId: dto.RoomId,
+            dayId: dto.DayId,
+            timeSlotId: dto.TimeSlotId,
+            groupId: dto.GroupId,
+            subjectId: dto.SubjectId
+        );
+    }
+
     public static ScheduleResponseDto ToResponse(Schedule schedule)
     {
         return new ScheduleResponseDto
@@ -15,7 +29,9 @@ public static class ScheduleMapper
             {
                 Id = schedule.Teacher.Id,
                 FirstName = schedule.Teacher.FirstName,
-                LastName = schedule.Teacher.LastName
+                LastName = schedule.Teacher.LastName,
+                Email = schedule.Teacher.Email?.Value ?? null,
+                Phone = schedule.Teacher.Phone
             } : null,
             Room = schedule.Room != null ? new RoomResponseDto
             {
