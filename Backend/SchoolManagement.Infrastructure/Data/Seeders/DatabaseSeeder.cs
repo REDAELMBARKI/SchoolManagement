@@ -35,6 +35,8 @@ public class DatabaseSeeder
         await new GenderSeeder(_context).RunAsync();          
         await new PlatformSeeder(_context).RunAsync();        
         await new SubjectSeeder(_context , _subjectRepo).RunAsync();    
+        await new DaySeeder(_context).RunAsync();
+        await new TimeSlotSeeder(_context).RunAsync();
         await new UserSeeder(_context).RunAsync();     
         await new AdSeeder(_context).RunAsync();               
         // LeadSource seeder must run after Branches, Ads, and Opcs are seeded       

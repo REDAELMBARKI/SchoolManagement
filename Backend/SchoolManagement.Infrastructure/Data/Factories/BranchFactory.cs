@@ -1,6 +1,7 @@
 using SchoolManagement.Domain.Entities;
  using SchoolManagement.Infrastructure.Repositories;
 using SchoolManagement.Infrastructure.Data ;
+using System.ComponentModel.DataAnnotations;
 namespace SchoolManagement.Infrastructure.Data.Factories;
 
 public class BranchFactory : Factory<Branch>
@@ -15,16 +16,12 @@ public class BranchFactory : Factory<Branch>
     {
         var companyName = faker.Company.CompanyName() ;
         var creationDate = DateTime.Now ;
-        return new Branch
-        {
-            Name = companyName ,
-            Slug = this.GenerateSlug(companyName),
-            Phone = faker.Phone.PhoneNumber() ,
-            Address = faker.Address.FullAddress() ,
-            City = faker.Address.City() ,
-            CreatedAt = creationDate ,
-            UpdatedAt = creationDate
-            
-        };
+        return  Branch.Create(
+            name : companyName ,
+            slug : this.GenerateSlug(companyName),
+            phone : faker.Phone.PhoneNumber() ,
+            address : faker.Address.FullAddress() ,
+            city : faker.Address.City()
+        );
     }
 }

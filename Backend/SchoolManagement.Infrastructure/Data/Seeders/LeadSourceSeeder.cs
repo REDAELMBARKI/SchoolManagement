@@ -1,45 +1,38 @@
 using Bogus;
-using Bogus.DataSets;
+using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Domain.Entities;
-using SchoolManagement.Infrastructure.Data ;
+using SchoolManagement.Infrastructure.Data;
+
 namespace SchoolManagement.Infrastructure.Data.Seeders;
 
 public class LeadSourceSeeder : Seeder
 {
-    private readonly AppDbContext _context;
-
     public LeadSourceSeeder(AppDbContext context) : base(context)
     {
-        _context = context;
     }
 
     public override async Task RunAsync()
-    {  
-        var adsIds = _context.Ads.Select(a => a.Id).ToList() ;
-        var opcIds = _context.Opcs.Select(a => a.Id).ToList() ;
-        var branchIds = _context.Branches.Select(b => b.Id).ToList() ;
-        
-        IEnumerable<LeadSource> items =  new LeadSource[]
+    {
+        var adsIds = await Context.Ads.Select(a => a.Id).ToListAsync();
+        var opcIds = await Context.Opcs.Select(a => a.Id).ToListAsync();
+        var branchIds = await Context.Branches.Select(b => b.Id).ToListAsync();
+
+        if (!adsIds.Any() || !opcIds.Any() || !branchIds.Any())
+            return;
+
+        IEnumerable<LeadSource> items = new LeadSource[]
         {
-
-
-             new AdLeadSource
-             {
-                 AdId  = Faker.PickRandom(adsIds),
-                 BranchId =  Faker.PickRandom(branchIds),
-             } ,
-             new OpcLeadSource
-             {
-                 OpcId  = Faker.PickRandom(opcIds),
-                 BranchId =  Faker.PickRandom(branchIds),
-                 
-             } ,
-
-       
-          
-
+            AdLeadSource.Create(
+                branchId: Faker.PickRandom(branchIds),
+                adId: Faker.PickRandom(adsIds)
+            ),
+            OpcLeadSource.Create(
+                branchId: Faker.PickRandom(branchIds),
+                opcId: Faker.PickRandom(opcIds)
+            )
         };
-        await _context.LeadSources.AddRangeAsync(items);
-        await _context.SaveChangesAsync();
+
+        await Context.LeadSources.AddRangeAsync(items);
+        await Context.SaveChangesAsync();
     }
 }

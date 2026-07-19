@@ -28,7 +28,7 @@ public class IntakeRequestDto
     public DateTime IntakeDate { get; set; }
 
     [Required]
-    public LeadSourceDto LeadSource { get; set; } = null! ;
+    public LeadSourceRequestDto LeadSource { get; set; } = null! ;
 
     [Required]
     public Guid SubjectId { get; set; }
@@ -57,15 +57,4 @@ public class IntakeRequestDto
 }
 
 
-public  class LeadSourceDto {
 
-    public  LeadSourceType  LeadSourceType { get; set; }
- 
-    public Guid? LeadSourceId { get; set; }
-
-}
-
-public enum LeadSourceType {
-    Opc,
-    Ad
-}

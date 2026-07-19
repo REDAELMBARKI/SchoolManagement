@@ -15,6 +15,6 @@ public class ScheduleService : IScheduleService
 
     public async Task<GroupedScheduleDto> GetGroupScheduleAsync(int groupId)
     {
-        return await _queryService.GetGroupScheduleAsync(groupId);
+        throw new NotImplementedException();
     }
 }

@@ -2,8 +2,12 @@ namespace SchoolManagement.Application.Dtos.Requests;
 
 public class LeadSourceRequestDto
 {
-    public Guid BranchId { get; set; }
-    public string Type { get; set; } = string.Empty;
+    public LeadSourceType SourceType { get; set; } = LeadSourceType.Opc;
     public Guid SourceId { get; set; }
 }
 
+public enum LeadSourceType
+{
+    Opc,
+    Ad
+}

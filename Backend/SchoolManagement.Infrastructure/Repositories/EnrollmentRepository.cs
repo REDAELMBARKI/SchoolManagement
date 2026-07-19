@@ -1,6 +1,7 @@
 using SchoolManagement.Domain.Entities.EnrollmentAggregate;
 using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Domain.Interfaces.Repositories;
+using SchoolManagement.Infrastructure.Data;
 
 namespace SchoolManagement.Infrastructure.Repositories;
 
@@ -9,23 +10,6 @@ public class EnrollmentRepository : Repository<Enrollment>, IEnrollmentRepositor
     public EnrollmentRepository(AppDbContext context) : base(context)
     {
     }
-
-    public async Task<Enrollment> AddAsync(Enrollment enrollment)
-    {
-        return await base.AddAsync(enrollment);
-    }
-
-    public async Task UpdateAsync(int id, Enrollment enrollment)
-    {
-        var dbEnrollment = await GetByIdForUpdateAsync(id);
-        if (dbEnrollment is null) throw new NotFoundException($"Enrollment with id {id} not found");
-        enrollment.Id = dbEnrollment.Id;
-        Context.Entry(dbEnrollment).CurrentValues.SetValues(enrollment);
-        await Context.SaveChangesAsync();
-    }
-
-    public async Task DeleteAsync(int id)
-    {
-        await base.DeleteAsync(id);
-    }
+    
+ 
 }

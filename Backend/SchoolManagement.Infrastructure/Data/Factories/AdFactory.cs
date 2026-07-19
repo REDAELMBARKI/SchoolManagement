@@ -15,14 +15,10 @@ public class AdFactory : Factory<Ad>
         var name = faker.Commerce.ProductName();
         var platforms = Context.Platforms.Select(p => p.Id).ToList();
         var branches = Context.Branches.Select(b => b.Id).ToList();
-        var ad =  new Ad
-        {
-            Name = name,
-            BranchId = faker.PickRandom(branches) ,
-            Slug = new SlugHelper().GenerateSlug(name),
-            PlatformId = faker.PickRandom(platforms) 
-        };
-
+        var ad = Ad.Create( name : name, 
+                   slug : new SlugHelper().GenerateSlug(name), 
+                   platformId : faker.PickRandom(platforms),
+                   branchId : faker.PickRandom(branches));  
         return Task.FromResult(ad);
     }
 }

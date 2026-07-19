@@ -3,6 +3,8 @@ using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Domain.Interfaces.Repositories;
 using SchoolManagement.Domain.Entities;
 using DtoLeadSourceType = SchoolManagement.Application.Dtos.Requests.LeadSourceType;
+using SchoolManagement.Domain.Interfaces.Queries;
+using SchoolManagement.Application.Stratigies.LeadSourceExistence;
 
 namespace SchoolManagement.Application.Validators;
 
@@ -10,11 +12,12 @@ namespace SchoolManagement.Application.Validators;
 public class IntakeValidator : AbstractValidator<IntakeRequestDto>
 {
     public IntakeValidator(
-        IGenderRepository gender_repo,
-        IBranchRepository branch_repo,
-        ICommercialAgentRepository commercialAgent_repo,
-        IOpcRepository opc_repo,
-        IAdRepository ad_repo
+        IGenderQueryService gender_query,
+        IBranchQueryService branch_query,
+        ICommercialAgentQueryService commercialAgent_query,
+        IOpcQueryService opc_query,
+        IAdQueryService ad_query ,
+        LeadSourceExistenceCheckerResolver _leadSourceResolver
     )
     {
         // Basic property validations
@@ -42,24 +45,22 @@ public class IntakeValidator : AbstractValidator<IntakeRequestDto>
             .LessThanOrEqualTo(i => i.TotalFees)
             .WithMessage("Amount paid cannot exceed total fees");
 
-        // LeadSource validation (only when not independent)
+         // LeadSource validation (only when not independent)
         RuleFor(i => i.LeadSource)
-        .NotEmpty()
-        .SetValidator(new LeadSourceValidator(ad_repo, opc_repo))
+        .SetValidator(new LeadSourceValidator(ad_query, opc_query , _leadSourceResolver))
         .When(i => i.IsIndependent == false)
         .WithMessage("Lead source is required when intake is not independent");
 
-        // Subject validation - basic check only (no repository available)
+        // Subject validation - basic check only (no querysitory available)
         RuleFor(i => i.SubjectId)
         .NotEmpty()
-        .GreaterThan(0)
         .WithMessage("Subject must be selected");
 
         // Gender validation
         RuleFor(i => i.GenderId)
         .MustAsync(async (genderId, ct) =>
         {
-            return await gender_repo.ExistsAsync(genderId.Value);
+            return await gender_query.IsExistsAsync(genderId.Value);
         })
         .When(i => i.GenderId.HasValue)
         .WithMessage("Selected gender does not exist");
@@ -69,7 +70,7 @@ public class IntakeValidator : AbstractValidator<IntakeRequestDto>
         .NotEmpty()
         .MustAsync(async (branchId, ct) =>
         {
-            return await branch_repo.ExistsAsync(branchId);
+            return await branch_query.IsExistsAsync(branchId);
         })
         .WithMessage("Selected branch does not exist");
 
@@ -77,33 +78,26 @@ public class IntakeValidator : AbstractValidator<IntakeRequestDto>
         RuleFor(i => i.CommercialAgentId)
         .MustAsync(async (commercialAgentId, ct) =>
         {
-            return await commercialAgent_repo.ExistsAsync(commercialAgentId!.Value);
+            return await commercialAgent_query.IsExistsAsync(commercialAgentId!.Value);
         })
         .When(i => i.CommercialAgentId.HasValue)
         .WithMessage("Selected commercial agent does not exist");
     }
 }
 
-public class LeadSourceValidator : AbstractValidator<LeadSourceDto>
+public class LeadSourceValidator : AbstractValidator<LeadSourceRequestDto>
 {
-    public LeadSourceValidator(IAdRepository ad_repo, IOpcRepository opc_repo)
+    public LeadSourceValidator(IAdQueryService ad_query, IOpcQueryService opc_query , LeadSourceExistenceCheckerResolver _resolver)
     {
-        // Validate LeadSourceType first
-        RuleFor(l => l.LeadSourceType)
-            .Must(type => type == DtoLeadSourceType.Opc || type == DtoLeadSourceType.Ad)
-            .WithMessage("Lead source type must be either OPC or Ad");
 
         // Validate LeadSourceId exists and matches the type
-        RuleFor(l => l.LeadSourceId)
+        RuleFor(l => l.SourceId)
             .NotEmpty()
-            .WithMessage("Lead source ID is required")
-            .MustAsync(async (dto, leadSourceId, ct) => {
-                return dto.LeadSourceType switch {
-                    DtoLeadSourceType.Opc => await opc_repo.ExistsAsync(leadSourceId.Value!) ,
-                    DtoLeadSourceType.Ad => await ad_repo.ExistsAsync(leadSourceId.Value!) ,
-                    _ => false
-                };
+            .MustAsync(async (l , sourceId, ct) =>
+            {
+                return await _resolver.IsExistsResolver(l.SourceType, sourceId);
             })
+            .WithMessage("Lead source ID is required")
             .WithMessage("Selected lead source does not exist or does not match the specified type");
     }
 }

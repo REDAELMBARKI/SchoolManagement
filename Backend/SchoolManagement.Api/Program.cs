@@ -54,7 +54,7 @@ builder.Services.Scan(scan => scan
                          "SchoolManagement.Application.Services" ,
                          "SchoolManagement.Application.Mappers" ,
                          "SchoolManagement.Infrastructure.Data.Factories" ,
-                    "SchoolManagement.Infrastructure.Data.Seeders",
+                         "SchoolManagement.Infrastructure.Data.Seeders",
                          "SchoolManagement.Domain.Interfaces" ,
                          "SchoolManagement.Application.Dtos"
                          ))
@@ -67,9 +67,11 @@ builder.Services.AddMediatR(cfg =>
 
 
 builder.Services.AddSwaggerGen();
+builder.Services.AddFluentValidationAutoValidation();
 
 
 var app = builder.Build();
+
 
 
 if (app.Environment.IsDevelopment())

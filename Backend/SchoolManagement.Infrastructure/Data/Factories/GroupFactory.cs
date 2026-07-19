@@ -12,16 +12,17 @@ public class GroupFactory : Factory<Group>
     protected override Task<Group> Make()
     {
         var branches = Context.Branches.Select(b => b.Id).ToList();
+        var levels  = Context.Levels.Select(l => l.Id).ToList();
+        var subjects = Context.Subjects.Select(s => s.Id).ToList();
 
-        var group = new Group
-        {
-                Name       = faker.Lorem.Letter(1).ToUpper() + faker.Random.Int(1, 9),  // e.g. "A3", "B7"
-                Capacity   = faker.Random.Int(10, 60),
-                BranchId = faker.PickRandom(branches) ,
-
-                Period     = faker.PickRandom("Morning", "Afternoon", "Evening", "Weekend"),
-                LevelId    = faker.Random.Int(1, 5),
-        } ; 
+        var group = Group.Create(
+                name       : faker.Lorem.Letter(1).ToUpper() + faker.Random.Int(1, 9),  // e.g. "A3", "B7"
+                capacity   : faker.Random.Int(10, 60),
+                period     : faker.PickRandom("Morning", "Afternoon", "Evening", "Weekend"),
+                branchId : faker.PickRandom(branches) ,
+                levelId    : faker.PickRandom(levels) , 
+                subjectId: faker.PickRandom(subjects)
+        ); 
         return Task.FromResult(group);
     }
 }

@@ -34,11 +34,6 @@ public class GradeConfiguration : IEntityTypeConfiguration<Grade>
             .HasForeignKey(g => g.StudentId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Grade → GroupTeacher relationship (FIXED: Use Restrict to avoid cascade cycles)
-        entityTypeBuilder.HasOne(g => g.GroupTeacher)
-            .WithMany()
-            .HasForeignKey(g => g.GroupTeacherId)
-            .OnDelete(DeleteBehavior.Restrict);
 
         // Grade → Branch relationship (FIXED: Use Restrict to avoid cascade cycles)
         entityTypeBuilder.HasOne(g => g.Branch)

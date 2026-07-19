@@ -1,6 +1,5 @@
 using SchoolManagement.Domain.Entities;
-using Slugify;
-using SchoolManagement.Infrastructure.Data ;
+using SchoolManagement.Infrastructure.Data;
 
 namespace SchoolManagement.Infrastructure.Data.Factories;
 
@@ -10,15 +9,13 @@ public class PlatformFactory : Factory<Platform>
     {
     }
 
-    protected override  Task<Platform> Make()
+    protected override Task<Platform> Make()
     {
-       var platforms = new[] { "Facebook", "Google Ads", "TikTok", "Instagram", "YouTube" };
+        var platforms = new[] { "Facebook", "Google Ads", "TikTok", "Instagram", "YouTube" };
         var name = faker.PickRandom(platforms);
-        var platform = new Platform
-        {
-            Name = name,
-            Slug = this.GenerateSlug(name)
-        };
-        return Task.FromResult(platform);
+        return Task.FromResult(Platform.Create(
+            name: name,
+            slug: this.GenerateSlug(name)
+        ));
     }
 }

@@ -23,7 +23,7 @@ public static class IntakeMapper
             followUpDate: dto.FollowUpDate,
             notes: dto.Notes,
             commercialAgentId: dto.CommercialAgentId,
-            leadSourceId: dto.LeadSource.LeadSourceId,
+            leadSourceId: dto.LeadSource.SourceId,
             subjectId: dto.SubjectId,
             branchId: dto.BranchId,
             isIndependent: dto.IsIndependent,
@@ -112,7 +112,7 @@ public static class IntakeMapper
                 FirstName = intake.ConvertedToStudent.FirstName,
                 LastName = intake.ConvertedToStudent.LastName,
                 Slug = intake.ConvertedToStudent.Slug,
-                Email = intake.ConvertedToStudent.Email,
+                Email = intake.ConvertedToStudent.Email?.Value ?? null,
                 Phone = intake.ConvertedToStudent.Phone,
                 DateOfBirth = intake.ConvertedToStudent.DateOfBirth,
                 IntakeId = intake.ConvertedToStudent.IntakeId

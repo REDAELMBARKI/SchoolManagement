@@ -1,8 +1,8 @@
-using Microsoft.EntityFrameworkCore.Storage;
 using SchoolManagement.Domain.Entities;
-using SchoolManagement.Infrastructure.Data ;
+using SchoolManagement.Infrastructure.Data;
 
-namespace SchoolManagement.Infrastructure.Data.Factories ; 
+namespace SchoolManagement.Infrastructure.Data.Factories;
+
 public class LevelFactory : Factory<Level>
 {
     private int _order = 1;
@@ -11,15 +11,14 @@ public class LevelFactory : Factory<Level>
     {
     }
 
-    protected override  Task<Level> Make()
+    protected override Task<Level> Make()
     {
         var branches = Context.Branches.Select(b => b.Id).ToList();
 
-        var level =   new Level{   
-            BranchId = faker.PickRandom(branches) ,
-            Name  = faker.PickRandom("A0" , "A1", "A2", "B1", "B2", "C1", "C2"),
-            Order = _order++,
-        };
-        return Task.FromResult(level);
+        return Task.FromResult(Level.Create(
+            name: faker.PickRandom("A0", "A1", "A2", "B1", "B2", "C1", "C2"),
+            branchId: faker.PickRandom(branches),
+            order: _order++
+        ));
     }
 }

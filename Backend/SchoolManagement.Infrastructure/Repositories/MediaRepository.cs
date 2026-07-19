@@ -12,10 +12,10 @@ public class MediaRepository : Repository<Media>, IMediaRepository
     {
     }
 
-    public async Task<MediaResponseDto> Add(Media media)
+    public async Task<Media> Add(Media media)
     {
         await Context.Medias.AddAsync(media);
         await Context.SaveChangesAsync();
-        return MediaMapper.ToResponse(media);
+        return (media);
     }
 }

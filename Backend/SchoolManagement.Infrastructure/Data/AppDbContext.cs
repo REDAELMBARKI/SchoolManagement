@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Entities.EnrollmentAggregate;
+using SchoolManagement.Infrastructure.Data.Configurations.Entities;
 using System.Linq;
 namespace SchoolManagement.Infrastructure.Data;
 
@@ -46,12 +47,16 @@ public class AppDbContext : DbContext
 
     // ── Schedules ──
     public DbSet<Schedule> Schedules { get; set; }
+    public DbSet<Day> Days { get; set; }
+    public DbSet<TimeSlot> TimeSlots { get; set; }
+    public DbSet<GroupTeacher> GroupTeachers { get; set; }
 
     // ── Operations ──
     public DbSet<Enrollment> Enrollments { get; set; }
     public DbSet<Absence> Absences { get; set; }
     public DbSet<Grade> Grades { get; set; }
     public DbSet<Payment> Payments { get; set; }
+    public DbSet<Plan> Plans { get; set; }
 
     public DbSet<Media> Medias { get; set; }
 
@@ -89,7 +94,6 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new CommercialAgentConfiguration());
         modelBuilder.ApplyConfiguration(new OpcConfiguration());
         modelBuilder.ApplyConfiguration(new GroupConfiguration());
-        modelBuilder.ApplyConfiguration(new GroupTeacherConfiguration());
         modelBuilder.ApplyConfiguration(new ScheduleConfiguration());
         modelBuilder.ApplyConfiguration(new EnrollmentConfiguration());
         modelBuilder.ApplyConfiguration(new GradeConfiguration());

@@ -67,7 +67,7 @@ public class IntakeService : IIntakeService
         existingIntake.UpdateFollowUpDate(intakeDto.FollowUpDate);
         existingIntake.UpdateNotes(intakeDto.Notes);
         existingIntake.UpdateCommercialAgentId(intakeDto.CommercialAgentId);
-        existingIntake.UpdateLeadSourceId(intakeDto.LeadSource.LeadSourceId);
+        existingIntake.UpdateLeadSourceId(intakeDto.LeadSource.SourceId);
         existingIntake.UpdateSubjectId(intakeDto.SubjectId);
         existingIntake.UpdateBranchId(intakeDto.BranchId);
         existingIntake.UpdateIsIndependent(intakeDto.IsIndependent);

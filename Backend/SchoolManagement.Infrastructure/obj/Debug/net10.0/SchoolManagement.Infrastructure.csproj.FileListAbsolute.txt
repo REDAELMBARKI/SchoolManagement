@@ -4,3 +4,17 @@ C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\obj\Debug\net10.0\Sc
 C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\obj\Debug\net10.0\SchoolManagement.Infrastructure.AssemblyInfo.cs
 C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\obj\Debug\net10.0\SchoolManagement.Infrastructure.csproj.CoreCompileInputs.cache
 C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\obj\Debug\net10.0\SchoolManagement.Infrastructure.sourcelink.json
+C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\bin\Debug\net10.0\SchoolManagement.Infrastructure.deps.json
+C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\bin\Debug\net10.0\SchoolManagement.Infrastructure.runtimeconfig.json
+C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\bin\Debug\net10.0\SchoolManagement.Infrastructure.dll
+C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\bin\Debug\net10.0\SchoolManagement.Infrastructure.pdb
+C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\bin\Debug\net10.0\SchoolManagement.Application.dll
+C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\bin\Debug\net10.0\SchoolManagement.Domain.dll
+C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\bin\Debug\net10.0\SchoolManagement.Application.pdb
+C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\bin\Debug\net10.0\SchoolManagement.Domain.pdb
+C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\obj\Debug\net10.0\SchoolMa.324EA75F.Up2Date
+C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\obj\Debug\net10.0\SchoolManagement.Infrastructure.dll
+C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\obj\Debug\net10.0\refint\SchoolManagement.Infrastructure.dll
+C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\obj\Debug\net10.0\SchoolManagement.Infrastructure.pdb
+C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\obj\Debug\net10.0\SchoolManagement.Infrastructure.genruntimeconfig.cache
+C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\obj\Debug\net10.0\ref\SchoolManagement.Infrastructure.dll

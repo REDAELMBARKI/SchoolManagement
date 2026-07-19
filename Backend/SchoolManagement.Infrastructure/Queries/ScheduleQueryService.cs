@@ -58,4 +58,7 @@ public class ScheduleQueryService : IScheduleQueryService
         var schedule = await GetByIdAsync(id);
         return schedule == null ? null : ScheduleMapper.ToResponse(schedule);
     }
+
+
+
 }
