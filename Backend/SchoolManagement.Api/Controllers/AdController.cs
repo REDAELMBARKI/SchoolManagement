@@ -33,27 +33,7 @@ public class AdController : ControllerBase
 
    public  async Task<IActionResult> AddAd()
    {
-      var platform1 =  new Platform { Name = "Google" } ;
-      var platform2 =  new Platform { Name = "Facebook" } ;
-      
-     
-      var opcs = new List<Ad>
-      {
-         new Ad
-         {
-               Name = "Google Ads" ,
-               Platform  = platform1 ,
-         },
-            new Ad
-            {
-                Name = "Facebook Ads" ,
-                Platform = platform2 ,
-            }
-      };
-
-      await _context.Ads.AddRangeAsync(opcs);
-      await _context.SaveChangesAsync();
-      return Ok(opcs);
-   }
+       throw new NotImplementedException();
+    }
 
 }

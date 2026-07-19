@@ -4,5 +4,5 @@ namespace SchoolManagement.Application.Interfaces.Services;
 
 public interface IScheduleService
 {
-    Task<GroupedScheduleDto> GetGroupScheduleAsync(int groupId);
+    Task<GroupedScheduleDto> GetGroupScheduleAsync(Guid groupId);
 }

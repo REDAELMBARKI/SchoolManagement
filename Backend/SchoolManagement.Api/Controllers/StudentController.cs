@@ -1,16 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Dtos.Requests;
  using SchoolManagement.Domain.Exceptions; 
- using SchoolManagement.Application.Services; 
- namespace SchoolManagement.Api.Controllers;
+ using SchoolManagement.Application.Services;
+using SchoolManagement.Application.Interfaces.Services;
+namespace SchoolManagement.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class StudentController : ControllerBase
 {
-    private readonly StudentService _studentService;
+    private readonly IStudentService _studentService;
   
-    public StudentController(StudentService studentService)
+    public StudentController(IStudentService studentService)
     {
         _studentService = studentService;
     }
@@ -23,7 +24,7 @@ public class StudentController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetById(Guid id)
     {
         try
         {
@@ -63,7 +64,7 @@ public class StudentController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] StudentRequestDto dto)
+    public async Task<IActionResult> Update(Guid id, [FromBody] StudentRequestDto dto)
     {
         try
         {
@@ -85,7 +86,7 @@ public class StudentController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(Guid id)
     {
         try
         {

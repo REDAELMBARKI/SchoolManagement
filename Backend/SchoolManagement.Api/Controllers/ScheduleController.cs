@@ -6,7 +6,7 @@ using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Infrastructure.Data;
 using SchoolManagement.Application.Services;
 using SchoolManagement.Domain.Exceptions;
-using SchoolManagement.Domain.Interfaces.Services;
+using SchoolManagement.Application.Interfaces.Services;
 
 namespace SchoolManagement.Api.Controllers;
 
@@ -14,15 +14,15 @@ namespace SchoolManagement.Api.Controllers;
 [Route("api/[controller]")]
 public class ScheduleController : ControllerBase
 {
-    private readonly ScheduleService _scheduleService;
+    private readonly IScheduleService _scheduleService;
 
-    public ScheduleController(ScheduleService scheduleService)
+    public ScheduleController(IScheduleService scheduleService)
     {
         _scheduleService = scheduleService;
     }
 
     [HttpGet("group/{groupId}")]
-    public async Task<IActionResult> GetGroupSchedule(int groupId)
+    public async Task<IActionResult> GetGroupSchedule(Guid groupId)
     {
         var schedule = await _scheduleService.GetGroupScheduleAsync(groupId);
         return Ok(schedule);

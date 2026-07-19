@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using SchoolManagement.Domain.Interfaces.Services;
+using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Application.Interfaces.Services;
 
 namespace SchoolManagement.Api.Controllers;
 
@@ -22,7 +23,7 @@ public class GroupController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetById(Guid id)
     {
         // TODO: Implement
         throw new NotImplementedException();
@@ -36,14 +37,14 @@ public class GroupController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] GroupRequestDto dto)
+    public async Task<IActionResult> Update(Guid id, [FromBody] GroupRequestDto dto)
     {
         // TODO: Implement
         throw new NotImplementedException();
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(Guid id)
     {
         // TODO: Implement
         throw new NotImplementedException();

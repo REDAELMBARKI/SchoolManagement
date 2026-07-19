@@ -13,7 +13,7 @@ public class ScheduleService : IScheduleService
         _queryService = queryService;
     }
 
-    public async Task<GroupedScheduleDto> GetGroupScheduleAsync(int groupId)
+    public async Task<GroupedScheduleDto> GetGroupScheduleAsync(Guid groupId)
     {
         throw new NotImplementedException();
     }

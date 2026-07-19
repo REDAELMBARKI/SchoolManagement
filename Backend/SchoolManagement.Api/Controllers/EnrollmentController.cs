@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Dtos.Requests;
-using SchoolManagement.Application.Services;
+using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Domain.Exceptions;
 
 namespace SchoolManagement.Api.Controllers;
@@ -9,9 +9,9 @@ namespace SchoolManagement.Api.Controllers;
 [Route("api/[controller]")]
 public class EnrollmentController : ControllerBase
 {
-    private readonly EnrollmentService _enrollmentService;
+    private readonly IEnrollmentService _enrollmentService;
 
-    public EnrollmentController(EnrollmentService enrollmentService)
+    public EnrollmentController(IEnrollmentService enrollmentService)
     {
         _enrollmentService = enrollmentService;
     }

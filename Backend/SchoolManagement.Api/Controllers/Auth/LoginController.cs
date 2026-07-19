@@ -4,37 +4,32 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Backend.Entities;
-using SchoolManagement.Backend.Services;
-using SchoolManagement.Backend.Data ;
+using SchoolManagement.Domain.Entities;
+using SchoolManagement.Application.Services;
+using SchoolManagement.Infrastructure.Data ;
+using SchoolManagement.Domain.Interfaces.Queries;
 
-namespace SchoolManagement.Backend.Auth.Controllers;
+namespace SchoolManagement.Api.Auth.Controllers;
 
 [ApiController]
 [Route("api/auth")]
 public class LoginController : ControllerBase
 {
-    AppDbContext _context ;
     JwtService _jwtService ;
-    public LoginController(AppDbContext context , JwtService jwtService)
+    IUserQueryService _user_query;
+    public LoginController(IUserQueryService Userquery, JwtService jwtService)
     {
-        _context = context ;
         _jwtService= jwtService ;
+        _user_query = Userquery;
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequest request)
     {
-        bool exists = await _context.Users.AnyAsync(u => u.Email == request.Email);
-        if (!exists)
+        User? user = await _user_query.GetByEmailAsync(request.Email);
+        if (user is null)
         {
             return BadRequest(new {message = "wrong credentials "}) ;
-        }
-        User? user = await _context.Users.OfType<User>().Where(u => u.Email == request.Email)
-                                            .FirstOrDefaultAsync();
-        if(user is null)
-        {
-            return BadRequest() ;
         }
 
         if(user.Password is null) return BadRequest(new {message = " your account is not activated "}) ;

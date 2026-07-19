@@ -9,7 +9,7 @@ using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Infrastructure.Data;
 using SchoolManagement.Application.Services;
 using SchoolManagement.Domain.Exceptions;
-using SchoolManagement.Domain.Interfaces.Services;
+using SchoolManagement.Application.Interfaces.Services;
 
 namespace SchoolManagement.Api.Controllers;
 

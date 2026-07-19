@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.FileProviders;
 using SchoolManagement.Application.Dtos.Requests;
-using SchoolManagement.Application.Services;
+using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Domain.Entities;
 using SchoolManagement.Application.Dtos.Responses;
 
@@ -12,9 +12,9 @@ namespace SchoolManagement.Api.Controllers;
 
 public class MediaController : ControllerBase
 {
-    private readonly MediaService _main_service;
+    private readonly IMediaService _main_service;
 
-    public MediaController(MediaService main_service)
+    public MediaController(IMediaService main_service)
     {
       this._main_service = main_service ;
     }

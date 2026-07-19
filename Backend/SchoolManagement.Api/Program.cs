@@ -21,7 +21,8 @@ Log.Logger = new LoggerConfiguration()
 var builder = WebApplication.CreateBuilder(args);
 
 // auto mapper 
-builder.Services.AddAutoMapper(typeof(Program).Assembly) ;
+builder.Services.AddAutoMapper(cfg => { }  , 
+typeof(Program).Assembly) ;
 // configure context 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ; 
 builder.Services.AddDbContext<AppDbContext>(
@@ -56,7 +57,8 @@ builder.Services.Scan(scan => scan
                          "SchoolManagement.Infrastructure.Data.Factories" ,
                          "SchoolManagement.Infrastructure.Data.Seeders",
                          "SchoolManagement.Domain.Interfaces" ,
-                         "SchoolManagement.Application.Dtos"
+                         "SchoolManagement.Application.Dtos",
+                         "SchoolManagement.Infrastructure.Queries"
                          ))
     .AsSelf()                  
     .AsMatchingInterface()     
