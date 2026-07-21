@@ -14,7 +14,7 @@ public class Media : AggregateRoot
     public string OwnerType { get; private set; } = string.Empty;
     public Guid OwnerId { get; private set; }
     public MediaType MediaType { get; private set; }
-    public MediaCollection? Collection { get; private set; }
+    public MediaCollection? Collection { get; private set; } // vidoo / avatar / thumanail / banner / document / photo
     public int Order { get; private set; } = 0;
     public bool IsMain { get; private set; } = false;
     public string StorageProvider { get; private set; } = string.Empty;

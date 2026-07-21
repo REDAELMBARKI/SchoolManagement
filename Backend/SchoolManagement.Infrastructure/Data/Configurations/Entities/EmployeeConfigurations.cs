@@ -13,6 +13,7 @@ public class EmployeeConfigurations : IEntityTypeConfiguration<Employee>
 
         entityTypeBuilder.UseTpcMappingStrategy();
 
+      
         // Configure Id for auto-increment for TPC
         entityTypeBuilder.Property(e => e.Id)
             .ValueGeneratedOnAdd();
@@ -31,15 +32,6 @@ public class EmployeeConfigurations : IEntityTypeConfiguration<Employee>
             .IsRequired()
             .HasMaxLength(100);
             
-        // Email is optional for Employees
-        entityTypeBuilder
-            .OwnsOne(emp => emp.Email , email =>
-            {
-                email.Property(e => e.Value)
-                    .HasColumnName("Email")
-                    .HasMaxLength(100)
-                    .IsRequired(false);
-            });
 
         // Phone is required for Employees
         entityTypeBuilder.Property(e => e.Phone)
@@ -68,7 +60,7 @@ public class EmployeeConfigurations : IEntityTypeConfiguration<Employee>
             .IsRequired();
             
         // Indexes
-        entityTypeBuilder.HasIndex(e => e.Email).IsUnique();
+       
         entityTypeBuilder.HasIndex(e => e.Phone);
         entityTypeBuilder.HasIndex(e => e.DateOfBirth);
         entityTypeBuilder.HasIndex(e => e.GenderId);

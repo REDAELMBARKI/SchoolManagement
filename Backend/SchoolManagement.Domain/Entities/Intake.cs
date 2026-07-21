@@ -14,7 +14,7 @@ public class Intake : Person
     public DateOnly? DateOfBirth { get; private set; }
 
     public DateTime IntakeDate { get; private set; }
-    public IntakeStatus Status {get;private set;}
+    public IntakeStatus Status {get;private set;} 
     public DateTime? FollowUpDate { get; private set; } 
     public string? Notes { get; private set; }   
     //fk

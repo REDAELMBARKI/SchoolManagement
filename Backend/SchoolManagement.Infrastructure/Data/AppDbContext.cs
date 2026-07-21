@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -9,7 +11,7 @@ using SchoolManagement.Infrastructure.Data.Configurations.Entities;
 using System.Linq;
 namespace SchoolManagement.Infrastructure.Data;
 
-public class AppDbContext : DbContext
+public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -28,7 +30,7 @@ public class AppDbContext : DbContext
     public DbSet<Branch> Branches { get; set; }
 
     // ── People ──
-    public DbSet<User> Users { get; set; }
+ 
     public DbSet<Teacher> Teachers { get; set; }
     public DbSet<Parent> Parents { get; set; }
     public DbSet<CommercialAgent> CommercialAgents { get; set; }
@@ -85,7 +87,6 @@ public class AppDbContext : DbContext
 
     private void ApplyEntityConfigurations(ModelBuilder modelBuilder){
         modelBuilder.ApplyConfiguration(new PersonConfiguration());
-        modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new EmployeeConfigurations());
         modelBuilder.ApplyConfiguration(new IntakeConfiguration());
         modelBuilder.ApplyConfiguration(new StudentConfiguration());

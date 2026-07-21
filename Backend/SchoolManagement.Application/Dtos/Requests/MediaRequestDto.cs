@@ -13,5 +13,5 @@ public class MediaRequestDto
     public string? Collection { get; set; } // "gallery", "principal", "certificates"
     // Owner info - set by backend based on context or provided
     public string OwnerType { get; set; } = string.Empty;
-    public int OwnerId { get; set; }
+    public Guid OwnerId { get; set; }
 }

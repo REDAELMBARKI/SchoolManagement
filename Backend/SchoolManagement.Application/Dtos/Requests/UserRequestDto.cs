@@ -26,7 +26,7 @@ public class UserRequestDto
         public DateOnly? DateOfBirth { get; set; }
  
         [Required]
-        public int GenderId { get; set; }
+        public Guid GenderId { get; set; }
         public bool IsActivated { get; set; } = false;
    
 

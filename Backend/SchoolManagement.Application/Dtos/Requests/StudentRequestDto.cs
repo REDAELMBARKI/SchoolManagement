@@ -21,16 +21,13 @@ public class StudentRequestDto
     [Required]
     public DateOnly DateOfBirth { get; set; }
 
-    [Range(1, int.MaxValue, ErrorMessage = "Please select a valid Gender")]
-    public int? GenderId { get; set; }
+    public Guid? GenderId { get; set; }
 
     [Required]
-    [Range(1, int.MaxValue, ErrorMessage = "Please select a valid Level")]
-    public int LevelId { get; set; }
+    public Guid LevelId { get; set; }
 
-    [Required, Range(1, int.MaxValue, ErrorMessage = "Please select a valid Group")]
-    public int GroupId { get; set; }
+    [Required]
+    public Guid GroupId { get; set; }
 
-    [Range(1, int.MaxValue, ErrorMessage = "Please select a valid Intake")]
-    public int? IntakeId { get; set; }
+    public Guid? IntakeId { get; set; }
 }

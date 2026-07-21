@@ -18,11 +18,16 @@ namespace SchoolManagement.Api.Controllers;
 [Route("api/intakes")]
 public class IntakeController : ControllerBase
 {
+
+
     private readonly IIntakeService _intakeService;
     public IntakeController(IIntakeService intakeService)
     {
         _intakeService = intakeService;
     }
+
+
+
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
@@ -30,6 +35,9 @@ public class IntakeController : ControllerBase
         var intakes = await _intakeService.GetAllIntakesAsync();
         return Ok(intakes);
     }
+
+
+
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(Guid id)
@@ -54,12 +62,17 @@ public class IntakeController : ControllerBase
     }
 
 
+
+
+
     [HttpPost]
     public async Task<IActionResult> Add(IntakeRequestDto intakeDto)
     {
         var newIntake = await _intakeService.AddIntakeAsync(intakeDto);
         return CreatedAtAction(nameof(GetById), new { id = newIntake.Id }, newIntake);
     }
+
+
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(Guid id, IntakeRequestDto intake)
@@ -82,6 +95,12 @@ public class IntakeController : ControllerBase
         }
     }
 
+
+
+
+
+
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
@@ -98,8 +117,18 @@ public class IntakeController : ControllerBase
             return Problem(
              statusCode : 500 ,
              title : "Delete Error" ,
-             detail : "field to delete intake"
+             detail : "Failed to delete intake"
             );
         }
     }
+
+
+
+
+
+
+
+
+
+
 }

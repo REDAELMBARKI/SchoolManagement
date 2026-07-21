@@ -36,7 +36,7 @@ public class GroupService : IGroupService
     {
         return await _query.GetAllResponsesAsync();
     }
-
+    
     public async Task<GroupResponseDto?> UpdateAsync(Guid id, GroupRequestDto dto)
     {
         var existing = await _repository.GetByIdAsync(id);

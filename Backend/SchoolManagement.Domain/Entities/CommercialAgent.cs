@@ -5,7 +5,7 @@ public class CommercialAgent : Employee
     // navigation
     public virtual ICollection<Intake> Intakes { get; private set; } = new List<Intake>();
 
-    private CommercialAgent() { } // For EF Core
+    private CommercialAgent() { } 
 
     public static CommercialAgent Register(string firstName, string lastName, string slug, Guid? genderId, string? email, string phone, DateOnly? dateOfBirth, DateTime hireDate, decimal salary, Guid branchId)
     {

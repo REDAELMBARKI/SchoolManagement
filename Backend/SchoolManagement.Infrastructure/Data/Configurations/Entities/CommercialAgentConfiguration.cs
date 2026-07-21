@@ -8,6 +8,17 @@ public class CommercialAgentConfiguration : IEntityTypeConfiguration<CommercialA
 {
     public void Configure(EntityTypeBuilder<CommercialAgent> entityTypeBuilder)
     {
+        // Email is optional for Employees
+        entityTypeBuilder
+            .OwnsOne(emp => emp.Email, email =>
+            {
+                email.Property(e => e.Value)
+                    .HasColumnName("Email")
+                    .HasMaxLength(100)
+                    .IsRequired(false);
+            });
+
+
         // Explicitly set auto-increment Id for TPC
         entityTypeBuilder.Property(c => c.Id)
             .ValueGeneratedOnAdd();

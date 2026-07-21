@@ -10,18 +10,16 @@ public static class StudentMapper
     {
         // Temporary slug, proper slug generation should happen in service layer with IsRecordExists check
         var initialSlug = $"{dto.FirstName}-{dto.LastName}".ToLowerInvariant();
-        var genderId = dto.GenderId.HasValue ? new Guid(dto.GenderId.Value.ToString()) : (Guid?)null;
-        var intakeId = dto.IntakeId.HasValue ? new Guid(dto.IntakeId.Value.ToString()) : (Guid?)null;
         
         return Student.Register(
             firstName: dto.FirstName,
             lastName: dto.LastName,
             slug: initialSlug,
-            genderId: genderId,
+            genderId: dto.GenderId,
             email: dto.Email,
             phone: dto.Phone,
             dateOfBirth: dto.DateOfBirth,
-            intakeId: intakeId
+            intakeId: dto.IntakeId
         );
     }
 
