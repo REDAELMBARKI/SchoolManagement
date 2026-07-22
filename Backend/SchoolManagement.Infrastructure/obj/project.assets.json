@@ -1632,6 +1632,19 @@
           "bin/placeholder/SchoolManagement.Application.dll": {}
         }
       },
+      "SchoolManagement.CrossCutting.Identity/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "dependencies": {
+          "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "10.0.9"
+        },
+        "compile": {
+          "bin/placeholder/SchoolManagement.CrossCutting.Identity.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/SchoolManagement.CrossCutting.Identity.dll": {}
+        }
+      },
       "SchoolManagement.Domain/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
@@ -4545,6 +4558,11 @@
       "path": "../SchoolManagement.Application/SchoolManagement.Application.csproj",
       "msbuildProject": "../SchoolManagement.Application/SchoolManagement.Application.csproj"
     },
+    "SchoolManagement.CrossCutting.Identity/1.0.0": {
+      "type": "project",
+      "path": "../SchoolManagement.CrossCutting.Identity/SchoolManagement.CrossCutting.Identity.csproj",
+      "msbuildProject": "../SchoolManagement.CrossCutting.Identity/SchoolManagement.CrossCutting.Identity.csproj"
+    },
     "SchoolManagement.Domain/1.0.0": {
       "type": "project",
       "path": "../SchoolManagement.Domain/SchoolManagement.Domain.csproj",
@@ -4563,6 +4581,7 @@
       "Microsoft.EntityFrameworkCore.SqlServer >= 10.0.9",
       "Microsoft.EntityFrameworkCore.Tools >= 10.0.9",
       "SchoolManagement.Application >= 1.0.0",
+      "SchoolManagement.CrossCutting.Identity >= 1.0.0",
       "SchoolManagement.Domain >= 1.0.0"
     ]
   },
@@ -4602,6 +4621,9 @@
           "projectReferences": {
             "C:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj": {
               "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj"
+            },
+            "C:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj": {
+              "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj"
             },
             "C:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj": {
               "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj"

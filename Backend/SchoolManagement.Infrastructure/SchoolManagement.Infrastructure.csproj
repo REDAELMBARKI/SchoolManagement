@@ -19,6 +19,7 @@
 	</ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SchoolManagement.Application\SchoolManagement.Application.csproj" />
+    <ProjectReference Include="..\SchoolManagement.CrossCutting.Identity\SchoolManagement.CrossCutting.Identity.csproj" />
     <ProjectReference Include="..\SchoolManagement.Domain\SchoolManagement.Domain.csproj" />
   </ItemGroup>
 </Project>

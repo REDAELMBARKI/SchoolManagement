@@ -2,6 +2,6 @@ namespace SchoolManagement.Application.Dtos.Responses;
 
 public class StudentRegistrationResponseDto
 {
-    public StudentResponseDto Student { get; set; } = null!;
-    public EnrollmentResponseDto Enrollment { get; set; } = null!;
+    public StudentResponseDto StudentRegRes { get; set; } = null!;
+    public EnrollmentResponseDto EnrollmentRegRes { get; set; } = null!;
 }

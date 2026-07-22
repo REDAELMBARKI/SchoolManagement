@@ -1,9 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Entities.EnrollmentAggregate;
@@ -11,7 +8,7 @@ using SchoolManagement.Infrastructure.Data.Configurations.Entities;
 using System.Linq;
 namespace SchoolManagement.Infrastructure.Data;
 
-public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
+public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string> 
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -102,9 +99,5 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
         modelBuilder.ApplyConfiguration(new LeadSourceConfiguration());
     }
 
-
-
-
-
-    
+ 
 }

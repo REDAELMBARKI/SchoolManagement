@@ -11,6 +11,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using SchoolManagement.Infrastructure.Data.Configurations.Extensions;
 using SchoolManagement.Infrastructure.Repositories;
+using SchoolManagement.Application.Interfaces;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Error()
@@ -47,7 +48,7 @@ builder.Services.AddJwtConfigExtension(builder.Configuration);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-// registre all classes 
+// Di registration 
 builder.Services.Scan(scan => scan
     .FromAssemblyOf<Program>()
     .AddClasses(c => 
@@ -64,6 +65,9 @@ builder.Services.Scan(scan => scan
     .AsMatchingInterface()     
     .WithScopedLifetime());
 
+builder.Services.AddScoped<ITransaction, EfTransaction>();
+
+// end Di registration
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 

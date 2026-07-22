@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Application.Services.Registrations;
 
 namespace SchoolManagement.Backend.Api.Controllers
 {
@@ -9,12 +10,18 @@ namespace SchoolManagement.Backend.Api.Controllers
     public class StudentRegistrationController : ControllerBase
     {
 
-        public StudentRegistrationController() { }
+        private readonly StudentRegistrationService _studentRegistrationService;
+
+        public StudentRegistrationController(StudentRegistrationService studentRegistrationService)
+        {
+            _studentRegistrationService = studentRegistrationService;
+        }
 
 
         [HttpPost]
-        public async Task<IActionResult> RegisterStudent([FromBody] StudentRequestDto request)
+        public async Task<IActionResult> RegisterStudent([FromBody] StudentRegistrationRequestDto request)
         {
-            awa
+            var StudentRegistrationResult = await _studentRegistrationService.RegisterStudentAsync(request);
+            return Ok(StudentRegistrationResult);
         }
 }
