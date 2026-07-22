@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Application.Mappers;
 using SchoolManagement.Domain.Entities;
+using SchoolManagement.Domain.Enums;
 using SchoolManagement.Domain.Interfaces.Queries;
 using SchoolManagement.Domain.Interfaces.Queries.Common;
 using SchoolManagement.Infrastructure.Data;
@@ -26,6 +27,7 @@ public class IntakeQueryService : IIntakeQueryService
             .Include(i => i.Subject)
             .Include(i => i.CommercialAgent)
             .Include(i => i.Branch)
+            .Include(i => i.Students)
             .ToListAsync();
     }
 
@@ -37,6 +39,7 @@ public class IntakeQueryService : IIntakeQueryService
             .Include(i => i.Subject)
             .Include(i => i.CommercialAgent)
             .Include(i => i.Branch)
+            .Include(i => i.Students)
             .FirstOrDefaultAsync(i => i.Id == id);
     }
 
@@ -66,7 +69,46 @@ public class IntakeQueryService : IIntakeQueryService
             .AnyAsync(i => i.Slug == slug);
     }
 
-  
+    // New query methods
+    public async Task<List<IntakeResponseDto>> GetIntakesByStatusAsync(IntakeStatus status)
+    {
+        var intakes = await _context.Intakes
+            .Where(i => i.Status == status)
+            .Include(i => i.Gender)
+            .Include(i => i.LeadSource)
+            .Include(i => i.Subject)
+            .Include(i => i.CommercialAgent)
+            .Include(i => i.Branch)
+            .Include(i => i.Students)
+            .ToListAsync();
+        return intakes.Select(IntakeMapper.ToResponse).ToList();
+    }
 
+    public async Task<List<IntakeResponseDto>> GetIntakesByBranchAsync(Guid branchId)
+    {
+        var intakes = await _context.Intakes
+            .Where(i => i.BranchId == branchId)
+            .Include(i => i.Gender)
+            .Include(i => i.LeadSource)
+            .Include(i => i.Subject)
+            .Include(i => i.CommercialAgent)
+            .Include(i => i.Branch)
+            .Include(i => i.Students)
+            .ToListAsync();
+        return intakes.Select(IntakeMapper.ToResponse).ToList();
+    }
 
+    public async Task<List<IntakeResponseDto>> GetIntakesByDateRangeAsync(DateTime startDate, DateTime endDate)
+    {
+        var intakes = await _context.Intakes
+            .Where(i => i.IntakeDate >= startDate && i.IntakeDate <= endDate)
+            .Include(i => i.Gender)
+            .Include(i => i.LeadSource)
+            .Include(i => i.Subject)
+            .Include(i => i.CommercialAgent)
+            .Include(i => i.Branch)
+            .Include(i => i.Students)
+            .ToListAsync();
+        return intakes.Select(IntakeMapper.ToResponse).ToList();
+    }
 }

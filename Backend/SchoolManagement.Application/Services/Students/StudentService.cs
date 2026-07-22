@@ -1,7 +1,7 @@
 using MediatR;
 using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
-using SchoolManagement.Application.Events.Students;
+using SchoolManagement.Domain.DomainEvents.Students;
 using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Application.Mappers;
 using SchoolManagement.Domain.Entities;
@@ -9,7 +9,7 @@ using SchoolManagement.Domain.Interfaces.Repositories;
 using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Domain.Interfaces.Queries;
 
-namespace SchoolManagement.Application.Services;
+namespace SchoolManagement.Application.Services.Students;
 
 public class StudentService : IStudentService
 {
@@ -41,17 +41,6 @@ public class StudentService : IStudentService
     {
         var student = StudentMapper.ToDomain(dto);
         var createdStudent = await _repository.AddAsync(student);
-        
-        // student creation events
-        if (createdStudent.IntakeId != null)
-        {
-            this.ConvertFromIntakeMailer(createdStudent, _mediator);
-        }
-        else
-        {
-            this.NewStudentMailer(createdStudent, _mediator);
-        }
-
         return StudentMapper.ToResponse(createdStudent);
     }
 
@@ -76,18 +65,4 @@ public class StudentService : IStudentService
     }
 
 
-
-    private void ConvertFromIntakeMailer(Student student ,  IMediator _mediator)
-    {
-        // update the intake status 
-
-        IntakeConvertedToStudentEvent args = new IntakeConvertedToStudentEvent(student);
-        _mediator.Publish<IntakeConvertedToStudentEvent>(args);
-    }
-
-    private void NewStudentMailer(Student student, IMediator _mediator)
-    {
-        NewStudentAsignedEvent args = new NewStudentAsignedEvent(student);
-        _mediator.Publish<NewStudentAsignedEvent>(args);
-    }
 }

@@ -83,7 +83,6 @@ public static class IntakeMapper
             } : null
         };
 
-        // Handle LeadSource mapping
         if (intake.LeadSource is OpcLeadSource opcLeadSource)
         {
             response.LeadSource = new OpcResponseDto
@@ -103,20 +102,20 @@ public static class IntakeMapper
             };
         }
 
-        // Handle ConvertedToStudent
-        if (intake.ConvertedToStudent != null)
+        foreach (var student in intake.Students)
         {
-            response.ConvertedToStudent = new StudentResponseDto
+            response.Students.Add(new StudentResponseDto
             {
-                Id = intake.ConvertedToStudent.Id,
-                FirstName = intake.ConvertedToStudent.FirstName,
-                LastName = intake.ConvertedToStudent.LastName,
-                Slug = intake.ConvertedToStudent.Slug,
-                Email = intake.ConvertedToStudent.Email?.Value ?? null,
-                Phone = intake.ConvertedToStudent.Phone,
-                DateOfBirth = intake.ConvertedToStudent.DateOfBirth,
-                IntakeId = intake.ConvertedToStudent.IntakeId
-            };
+                Id = student.Id,
+                FirstName = student.FirstName,
+                LastName = student.LastName,
+                Slug = student.Slug,
+                Email = student.Email?.Value ?? null,
+                Phone = student.Phone,
+                DateOfBirth = student.DateOfBirth,
+                IntakeId = student.IntakeId,
+                IsDirectRegistration = student.IsDirectRegistration
+            });
         }
 
         return response;

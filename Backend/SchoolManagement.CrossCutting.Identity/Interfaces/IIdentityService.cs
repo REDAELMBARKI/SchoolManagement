@@ -6,5 +6,6 @@ namespace SchoolManagement.CrossCutting.Identity.Interfaces
 {
     public  interface IIdentityService
     {
+
     }
 }

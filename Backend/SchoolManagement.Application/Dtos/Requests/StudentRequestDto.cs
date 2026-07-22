@@ -30,4 +30,5 @@ public class StudentRequestDto
     public Guid GroupId { get; set; }
 
     public Guid? IntakeId { get; set; }
+    public bool IsDirectRegistration { get; set; }
 }

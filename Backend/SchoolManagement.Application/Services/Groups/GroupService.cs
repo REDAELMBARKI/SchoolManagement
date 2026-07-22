@@ -7,7 +7,7 @@ using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Interfaces.Queries;
 
-namespace SchoolManagement.Application.Services;
+namespace SchoolManagement.Application.Services.Groups;
 
 public class GroupService : IGroupService
 {

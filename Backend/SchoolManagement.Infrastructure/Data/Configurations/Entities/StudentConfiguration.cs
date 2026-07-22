@@ -41,7 +41,7 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
         // relashioships 
         entityTypeBuilder
         .HasOne(s => s.Intake)
-        .WithOne(i => i.ConvertedToStudent)
-        .HasForeignKey<Student>(s => s.IntakeId);
+        .WithMany(i => i.Students)
+        .HasForeignKey(s => s.IntakeId);
     }
 }

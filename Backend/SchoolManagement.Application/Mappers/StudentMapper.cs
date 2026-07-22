@@ -19,7 +19,8 @@ public static class StudentMapper
             email: dto.Email,
             phone: dto.Phone,
             dateOfBirth: dto.DateOfBirth,
-            intakeId: dto.IntakeId
+            intakeId: dto.IntakeId,
+            isDirectRegistration: dto.IsDirectRegistration
         );
     }
 
@@ -35,6 +36,7 @@ public static class StudentMapper
             Phone = student.Phone,
             DateOfBirth = student.DateOfBirth,
             IntakeId = student.IntakeId,
+            IsDirectRegistration = student.IsDirectRegistration,
             Intake = student.Intake != null ? new IntakeResponseDto
             {
                 Id = student.Intake.Id,

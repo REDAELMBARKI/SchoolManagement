@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Interfaces.Repositories;
 using SchoolManagement.Infrastructure.Data;
@@ -8,5 +9,12 @@ public class IntakeRepository : Repository<Intake>, IIntakeRepository
 {
     public IntakeRepository(AppDbContext context) : base(context)
     {
+    }
+
+    public override async Task<Intake?> GetByIdAsync(Guid id)
+    {
+        return await Query()
+            .Include(i => i.Students)
+            .FirstOrDefaultAsync(i => i.Id == id);
     }
 }

@@ -8,7 +8,7 @@ using SchoolManagement.Domain.Interfaces.Repositories;
 using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Domain.Utils;
 
-namespace SchoolManagement.Application.Services;
+namespace SchoolManagement.Application.Services.Intakes;
 
 public class IntakeService : IIntakeService
 {
@@ -49,6 +49,12 @@ public class IntakeService : IIntakeService
         if (existingIntake is null)
         {
             throw new NotFoundException($"No intake found with id {id}");
+        }
+        
+        // Check if intake already has students
+        if (existingIntake.HasStudents)
+        {
+            throw new DomainException("Cannot update an intake that already has students.");
         }
         
         // Generate new slug if needed

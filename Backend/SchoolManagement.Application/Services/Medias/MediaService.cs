@@ -5,7 +5,7 @@ using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Interfaces.Repositories;
 using SchoolManagement.Application.Interfaces.Services;
 
-namespace SchoolManagement.Application.Services;
+namespace SchoolManagement.Application.Services.Medias;
 
 public class MediaService : IMediaService
 {

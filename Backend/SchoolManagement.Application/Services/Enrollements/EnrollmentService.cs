@@ -7,7 +7,7 @@ using SchoolManagement.Domain.Interfaces.Repositories;
 using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Domain.Entities.EnrollmentAggregate;
 
-namespace SchoolManagement.Application.Services;
+namespace SchoolManagement.Application.Services.Enrollements;
 
 public class EnrollmentService : IEnrollmentService
 {

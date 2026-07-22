@@ -20,6 +20,7 @@ public class StudentResponseDto
     
     // Foreign Keys
     public Guid? IntakeId { get; set; }
+    public bool IsDirectRegistration { get; set; }
 
     // Navigation Properties
     public IntakeResponseDto? Intake { get; set; }

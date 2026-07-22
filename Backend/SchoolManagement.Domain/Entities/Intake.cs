@@ -30,8 +30,10 @@ public class Intake : Person
     public virtual CommercialAgent? CommercialAgent { get; private set; }
     public virtual Subject Subject {get;private set;} = null!;
     public virtual Branch Branch {get;private set;} = null!;
-    public virtual Student? ConvertedToStudent { get; private set; }
-
+  
+    public virtual ICollection<Student> Students { get; private set; } = new List<Student>();
+    
+    public bool HasStudents => Students.Any();
 
     public static Intake Register(string firstName, string lastName, string slug  ,  Guid? genderId, string? email, string? phone, DateOnly? dateOfBirth, DateTime intakeDate, IntakeStatus status, DateTime? followUpDate, string? notes, Guid? commercialAgentId, Guid? leadSourceId, Guid subjectId, Guid branchId, bool isIndependent, decimal totalFees, decimal amountPaid)
     {
@@ -76,7 +78,7 @@ public class Intake : Person
 
     public void UpdateEmail(string? email)
     {
-        Email = new Email(email);
+        Email = email != null ? new Email(email) : null;
     }
 
     public void UpdatePhone(string? phone)

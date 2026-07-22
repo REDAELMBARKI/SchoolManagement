@@ -30,5 +30,5 @@ public class IntakeResponseDto {
     public SubjectResponseDto Subject { get; set; } = null!;
     public BranchResponseDto Branch { get; set; } = null!;
     public CommercialAgentResponseDto? CommercialAgent { get; set; }
-    public StudentResponseDto? ConvertedToStudent { get; set; }
+    public ICollection<StudentResponseDto> Students { get; set; } = new List<StudentResponseDto>();
 } 
