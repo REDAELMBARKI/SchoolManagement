@@ -8,6 +8,7 @@ using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Interfaces.Repositories;
 using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Domain.Interfaces.Queries;
+using SchoolManagement.Domain.Utils;
 
 namespace SchoolManagement.Application.Services.Students;
 
@@ -40,7 +41,20 @@ public class StudentService : IStudentService
     public async Task<StudentResponseDto> CreateAsync(StudentRequestDto dto)
     {
         var student = StudentMapper.ToDomain(dto);
+        
+        // Generate unique slug
+        var generatedSlug = await CustomSluger.Slug(
+            slug => _query.IsExistsBySlugAsync(slug), 
+            student.FirstName, 
+            student.LastName
+        );
+        student.UpdateSlug(generatedSlug);
+        
         var createdStudent = await _repository.AddAsync(student);
+        
+        // Publish StudentCreatedDomainEvent
+        await _mediator.Publish(new StudentCreatedDomainEvent(createdStudent.Id));
+        
         return StudentMapper.ToResponse(createdStudent);
     }
 

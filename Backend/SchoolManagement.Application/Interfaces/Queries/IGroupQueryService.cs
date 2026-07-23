@@ -7,5 +7,6 @@ namespace SchoolManagement.Domain.Interfaces.Queries;
 public interface IGroupQueryService : IEntityQuery<Group>
 {
     Task<List<GroupResponseDto>> GetAllResponsesAsync();
+    Task<List<Group>> GetAvailableGroupsByLevelId(Guid levelId);
     Task<GroupResponseDto?> GetResponseByIdAsync(Guid id);
 }

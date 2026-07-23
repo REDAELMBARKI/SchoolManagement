@@ -56,6 +56,9 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
     public DbSet<Grade> Grades { get; set; }
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Plan> Plans { get; set; }
+    public DbSet<Charge> Charges { get; set; }
+    public DbSet<Expense> Expenses { get; set; }
+    public DbSet<AuditLog> AuditLogs { get; set; }
 
     public DbSet<Media> Medias { get; set; }
 

@@ -8,6 +8,6 @@ public interface IEnrollmentService
     Task<List<EnrollmentResponseDto>> GetAllAsync();
     Task<EnrollmentResponseDto?> GetByIdAsync(Guid id);
     Task<EnrollmentResponseDto> CreateAsync(EnrollmentRequestDto dto);
-    Task<EnrollmentResponseDto> UpdateAsync(Guid id, EnrollmentRequestDto dto);
+    Task<EnrollmentResponseDto> UpdateAsync(Guid id, UpdateEnrollmentRequestDto dto);
     Task DeleteAsync(Guid id);
 }

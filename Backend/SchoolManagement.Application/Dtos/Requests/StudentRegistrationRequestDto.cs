@@ -9,5 +9,9 @@ public class StudentRegistrationRequestDto
     
     [Required]
     public EnrollmentRequestDto EnrollmentReqReg { get; set; } = null!;
+
+    public ChargeRequestDto? ChargeReq { get; set; }
+
+    public PaymentRequestDto? PaymentReq { get; set; }
 }
 

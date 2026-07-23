@@ -4,7 +4,7 @@ using SchoolManagement.Domain.Interfaces.Queries.Common;
 
 namespace SchoolManagement.Domain.Interfaces.Queries;
 
-public interface IStudentQueryService : IEntityQuery<Student>
+public interface IStudentQueryService : IEntityQuery<Student>, ISluged
 {
     Task<Student> FindByIdAsync(Guid id);
     Task<List<StudentResponseDto>> GetAllResponsesAsync();

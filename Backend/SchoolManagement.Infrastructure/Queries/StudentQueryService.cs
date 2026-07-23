@@ -46,6 +46,13 @@ public class StudentQueryService : IStudentQueryService
             .AnyAsync(s => s.Id == id);
     }
 
+    public async Task<bool> IsExistsBySlugAsync(string slug)
+    {
+        return await _context.Users.OfType<Student>()
+            .Where(s => EF.Property<DateTime?>(s, "DeletedAt") == null)
+            .AnyAsync(s => s.Slug == slug);
+    }
+
     public async Task<Student> FindByIdAsync(Guid id)
     {
         var student = await GetByIdAsync(id);

@@ -1,5 +1,4 @@
 using SchoolManagement.Domain.Common;
-using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Exceptions;
 using System.ComponentModel.DataAnnotations;
 namespace SchoolManagement.Domain.Entities.EnrollmentAggregate;

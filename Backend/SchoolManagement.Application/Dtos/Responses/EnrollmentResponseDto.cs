@@ -1,3 +1,5 @@
+using SchoolManagement.Domain.Enums;
+
 namespace SchoolManagement.Application.Dtos.Responses;
 
 public class EnrollmentResponseDto
@@ -6,11 +8,11 @@ public class EnrollmentResponseDto
     
     public DateTime EnrolledAt { get; set; }
     
-    public string Status { get; set; } = "Active"; // Active / Dropped / Completed
+    public EnrollmentStatus Status { get; set; } = EnrollmentStatus.Active; // Active / Dropped / Completed
     
     public string? Notes { get; set; }
     
-    // Foreign Keys
+    // Foreign Keys 
     public Guid StudentId { get; set; }
     public Guid SubjectId { get; set; }
     public Guid GroupId { get; set; }

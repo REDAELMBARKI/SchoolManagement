@@ -1,3 +1,5 @@
+
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Application.Mappers;
@@ -32,6 +34,7 @@ public class GroupQueryService : IGroupQueryService
             .Include(g => g.Level)
             .Include(g => g.Subject)
             .Include(g => g.Teachers)
+            .Include(g => g.Enrollments)
             .Where(g => EF.Property<DateTime?>(g, "DeletedAt") == null)
             .FirstOrDefaultAsync(g => g.Id == id);
     }
@@ -54,4 +57,16 @@ public class GroupQueryService : IGroupQueryService
         var group = await GetByIdAsync(id);
         return group == null ? null : GroupMapper.ToResponse(group);
     }
+
+    public async Task<List<Group>> GetAvailableGroupsByLevelId(Guid levelId)
+    {
+        return await _context.Groups
+                    .Include(g => g.Enrollments)
+                    .Include(g => g.Schedule)
+                    .Where(g => g.LevelId == levelId)
+                    .Where(g => EF.Property<DateTime?>(g, "DeletedAt") == null)
+                    .Where(g => g.Capacity > g.Enrollments.Select(e => e.Status == EnrollmentStatus.Active).Count) 
+                    .ToListAsync();
+    }
 }
+

@@ -1,3 +1,4 @@
+
 using FluentValidation;
 using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Domain.Interfaces.Queries;
@@ -6,7 +7,7 @@ namespace SchoolManagement.Application.Validators;
 
 public class StudentValidator : AbstractValidator<StudentRequestDto>
 {
-    public StudentValidator(IIntakeQueryService intakeQueryService)
+    public StudentValidator(IIntakeQueryService intakeQueryService, IGenderQueryService genderQueryService)
     {
         // Basic property validations
         RuleFor(s => s.FirstName).NotEmpty().MinimumLength(3).MaximumLength(50);
@@ -34,5 +35,16 @@ public class StudentValidator : AbstractValidator<StudentRequestDto>
             })
             .When(s => s.IntakeId.HasValue)
             .WithMessage("Selected intake does not exist.");
+
+        // Validate that GenderId exists if provided
+        RuleFor(s => s.GenderId)
+            .MustAsync(async (genderId, ct) => 
+            {
+                if (!genderId.HasValue) return true;
+                return await genderQueryService.IsExistsAsync(genderId.Value);
+            })
+            .When(s => s.GenderId.HasValue)
+            .WithMessage("Selected gender does not exist.");
     }
 }
+

@@ -17,4 +17,11 @@ public class IntakeRepository : Repository<Intake>, IIntakeRepository
             .Include(i => i.Students)
             .FirstOrDefaultAsync(i => i.Id == id);
     }
+
+    public async Task<Intake?> GetIntakeByStudentId(Guid studentId)
+    {
+        return await Query()
+                      .Where(i => i.Students.Any(s => s.Id == studentId))
+                      .FirstOrDefaultAsync();
+    }
 }

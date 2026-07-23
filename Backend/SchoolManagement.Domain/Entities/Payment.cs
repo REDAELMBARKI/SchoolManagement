@@ -1,7 +1,8 @@
 using SchoolManagement.Domain.Common;
+using SchoolManagement.Domain.Entities.EnrollmentAggregate;
 using SchoolManagement.Domain.Exceptions;
 using System.ComponentModel.DataAnnotations;
-namespace SchoolManagement.Domain.Entities.EnrollmentAggregate;
+namespace SchoolManagement.Domain.Entities;
 
 public class Payment : BaseEntity
 {

@@ -15,7 +15,7 @@ public abstract class Repository<T> : IRepository<T> where T : AggregateRoot
     {
         _context = context;
     }
-
+    protected AppDbContext Context => _context;
     protected virtual IQueryable<T> Query()
     {
         var query = _context.Set<T>().AsQueryable();
@@ -56,5 +56,10 @@ public abstract class Repository<T> : IRepository<T> where T : AggregateRoot
         return await Query().FirstOrDefaultAsync(e => e.Id == id);
     }
 
-    protected AppDbContext Context => _context;
+
+    public  Task SaveChangesAsync(CancellationToken ct = default )
+    {
+        return _context.SaveChangesAsync(ct);
+    }
+ 
 }
