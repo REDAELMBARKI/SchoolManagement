@@ -13,19 +13,26 @@ public class Student : Person
 
     // fks
     public Guid? IntakeId { get; private set; }
+    public Guid BranchId { get; private set; }
 
     // navigation
     public virtual ICollection<Parent> Parents { get; private set; } = new List<Parent>();
     public virtual ICollection<Enrollment> Enrollments { get; private set; } = new List<Enrollment>();
     public virtual Intake? Intake { get; private set; }
+    public virtual Branch Branch { get; private set; } = null!;
 
     private Student() { } 
 
-    public static Student Register(string firstName, string lastName, string slug, Guid? genderId, string? email, string phone, DateOnly dateOfBirth, Guid? intakeId, bool isDirectRegistration)
+    public static Student Register(string firstName, string lastName, string slug, Guid? genderId, string? email, string phone, DateOnly dateOfBirth, Guid? intakeId, bool isDirectRegistration, Guid branchId)
     {
         if (string.IsNullOrWhiteSpace(phone))
         {
             throw new DomainException("Phone cannot be empty.");
+        }
+
+        if (branchId == Guid.Empty)
+        {
+            throw new DomainException("Branch ID must not be empty.");
         }
 
         // Validate: either IntakeId is provided OR IsDirectRegistration is true
@@ -46,7 +53,8 @@ public class Student : Person
             Phone = phone,
             DateOfBirth = dateOfBirth,
             IntakeId = intakeId,
-            IsDirectRegistration = isDirectRegistration
+            IsDirectRegistration = isDirectRegistration,
+            BranchId = branchId
         };
 
         student.RegisterPerson(firstName, lastName, slug, genderId);
@@ -104,5 +112,12 @@ public class Student : Person
         }
 
         IsDirectRegistration = isDirectRegistration;
+    }
+
+    public void UpdateBranchId(Guid branchId)
+    {
+        if (branchId == Guid.Empty)
+            throw new DomainException("Branch ID must not be empty.");
+        BranchId = branchId;
     }
 }

@@ -72,6 +72,7 @@ public class StudentService : IStudentService
         existing.UpdateGender(dto.GenderId);
         existing.UpdateIntakeId(dto.IntakeId);
         existing.UpdateIsDirectRegistration(dto.IsDirectRegistration);
+        existing.UpdateBranchId(dto.BranchId);
         
         var updated = await _repository.UpdateAsync(existing);
         return StudentMapper.ToResponse(updated);

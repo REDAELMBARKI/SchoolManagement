@@ -11,6 +11,9 @@ public class AuditLog : BaseEntity
     public string? NewValues { get; private set; } // JSON
     public string? ChangedBy { get; private set; }
     public DateTime ChangedAt { get; private set; }
+    public Guid BranchId { get; private set; }
+
+    public virtual Branch Branch { get; private set; } = null!;
 
     private AuditLog() { }
 
@@ -20,7 +23,8 @@ public class AuditLog : BaseEntity
         string action,
         string? oldValues,
         string? newValues,
-        string? changedBy)
+        string? changedBy,
+        Guid branchId)
     {
         return new AuditLog
         {
@@ -30,7 +34,13 @@ public class AuditLog : BaseEntity
             OldValues = oldValues,
             NewValues = newValues,
             ChangedBy = changedBy,
-            ChangedAt = DateTime.UtcNow
+            ChangedAt = DateTime.UtcNow,
+            BranchId = branchId
         };
+    }
+
+    public void UpdateBranchId(Guid branchId)
+    {
+        BranchId = branchId;
     }
 }

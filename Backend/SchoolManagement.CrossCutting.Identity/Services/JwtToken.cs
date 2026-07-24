@@ -21,7 +21,7 @@ public class JwtService
           new Claim(ClaimTypes.NameIdentifier , user.Id.ToString()),
           new Claim(ClaimTypes.Email , user.Email!.ToString()),
           new Claim(ClaimTypes.Name , user.UserName!.ToString()),
-          new Claim("BranchId" , "12")
+          new Claim("BranchId" , "12") ,
       } ;
 
          

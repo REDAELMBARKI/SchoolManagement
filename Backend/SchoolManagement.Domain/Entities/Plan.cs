@@ -12,14 +12,16 @@ namespace SchoolManagement.Domain.Entities
         public decimal? DiscountPercent { get; private set; }
         public bool IsActive { get; private set; } = true;
         public int RemainingAmountDueDays { get; private set; }
+        public Guid BranchId { get; private set; }
 
         public virtual ICollection<Enrollment> Enrollments { get; private set; } = new List<Enrollment>();
+        public virtual Branch Branch { get; private set; } = null!;
 
         private Plan() { }
 
         public decimal Amount => BaseAmount - (DiscountPercent.HasValue ? (BaseAmount * (DiscountPercent.Value / 100) ) : BaseAmount); 
 
-        public static Plan Create(string name, int durationMonths, int remainingAmountDueDays , decimal baseAmount, decimal? discountPercent = null, bool isActive = true)
+        public static Plan Create(string name, int durationMonths, int remainingAmountDueDays , decimal baseAmount, Guid branchId, decimal? discountPercent = null, bool isActive = true)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new DomainException("Plan name cannot be empty.");
@@ -29,6 +31,8 @@ namespace SchoolManagement.Domain.Entities
                 throw new DomainException("Base amount cannot be negative.");
             if (discountPercent.HasValue && (discountPercent.Value < 0 || discountPercent.Value > 100))
                 throw new DomainException("Discount percent must be between 0 and 100.");
+            if (branchId == Guid.Empty)
+                throw new DomainException("Branch ID must not be empty.");
 
             return new Plan
             {
@@ -37,7 +41,8 @@ namespace SchoolManagement.Domain.Entities
                 BaseAmount = baseAmount,
                 DiscountPercent = discountPercent,
                 IsActive = isActive,
-                RemainingAmountDueDays = remainingAmountDueDays
+                RemainingAmountDueDays = remainingAmountDueDays,
+                BranchId = branchId
             };
         }
 
@@ -77,6 +82,13 @@ namespace SchoolManagement.Domain.Entities
         public void UpdateRemainingAmountDueDate(int remainingAmountDueDate)
         {
             RemainingAmountDueDays = remainingAmountDueDate;
+        }
+
+        public void UpdateBranchId(Guid branchId)
+        {
+            if (branchId == Guid.Empty)
+                throw new DomainException("Branch ID must not be empty.");
+            BranchId = branchId;
         }
     }
 }

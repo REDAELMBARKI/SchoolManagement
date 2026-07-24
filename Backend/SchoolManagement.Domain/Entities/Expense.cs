@@ -17,6 +17,9 @@ public class Expense : AggregateRoot
     public DateTime? PaidDate { get; private set; }
     public PaymentMethod? PaymentMethod { get; private set; }
     public string? Reference { get; private set; }
+    public Guid BranchId { get; private set; }
+
+    public virtual Branch Branch { get; private set; } = null!;
 
     private Expense() { }
 
@@ -25,6 +28,7 @@ public class Expense : AggregateRoot
         string payeeName,
         decimal amount,
         DateTime requestedDate,
+        Guid branchId,
         string? description = null,
         Guid? requestedBy = null)
     {
@@ -32,6 +36,8 @@ public class Expense : AggregateRoot
             throw new DomainException("Payee name cannot be empty.");
         if (amount <= 0)
             throw new DomainException("Amount must be greater than zero.");
+        if (branchId == Guid.Empty)
+            throw new DomainException("Branch ID must not be empty.");
 
         return new Expense
         {
@@ -41,7 +47,8 @@ public class Expense : AggregateRoot
             RequestedDate = requestedDate,
             Description = description,
             RequestedBy = requestedBy,
-            Status = ExpenseStatus.Pending
+            Status = ExpenseStatus.Pending,
+            BranchId = branchId
         };
     }
 
@@ -69,26 +76,45 @@ public class Expense : AggregateRoot
         Amount = amount;
     }
 
-    public void Approve(Guid approvedBy)
+    public void UpdateStatus(ExpenseStatus status)
     {
-        if (approvedBy == Guid.Empty)
-            throw new DomainException("Approved by ID must not be empty.");
-        Status = ExpenseStatus.Approved;
+        Status = status;
+    }
+
+    public void UpdateRequestedBy(Guid? requestedBy)
+    {
+        RequestedBy = requestedBy;
+    }
+
+    public void UpdateApprovedBy(Guid? approvedBy)
+    {
         ApprovedBy = approvedBy;
     }
 
-    public void MarkAsPaid(DateTime paidDate, PaymentMethod paymentMethod, string? reference = null)
+    public void UpdateRequestedDate(DateTime requestedDate)
     {
-        if (paymentMethod == 0)
-            throw new DomainException("Payment method must be selected.");
-        Status = ExpenseStatus.Paid;
+        RequestedDate = requestedDate;
+    }
+
+    public void UpdatePaidDate(DateTime? paidDate)
+    {
         PaidDate = paidDate;
+    }
+
+    public void UpdatePaymentMethod(PaymentMethod? paymentMethod)
+    {
         PaymentMethod = paymentMethod;
+    }
+
+    public void UpdateReference(string? reference)
+    {
         Reference = reference;
     }
 
-    public void Reject()
+    public void UpdateBranchId(Guid branchId)
     {
-        Status = ExpenseStatus.Rejected;
+        if (branchId == Guid.Empty)
+            throw new DomainException("Branch ID must not be empty.");
+        BranchId = branchId;
     }
 }

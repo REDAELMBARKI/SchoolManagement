@@ -74,7 +74,8 @@ public static class EnrollmentMapper
                 BaseAmount = e.Plan.BaseAmount,
                 DiscountPercent = e.Plan.DiscountPercent,
                 IsActive = e.Plan.IsActive,
-                RemainingAmountDueDate = e.Plan.RemainingAmountDueDate
+                RemainingAmountDueDate = e.Plan.RemainingAmountDueDays,
+                BranchId = e.Plan.BranchId
             } : null,
             Payments = e.Payments?.Select(p => new PaymentResponseDto
             {

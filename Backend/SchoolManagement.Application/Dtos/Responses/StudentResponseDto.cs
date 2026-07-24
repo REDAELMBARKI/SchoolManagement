@@ -21,6 +21,7 @@ public class StudentResponseDto
     // Foreign Keys
     public Guid? IntakeId { get; set; }
     public bool IsDirectRegistration { get; set; }
+    public Guid BranchId { get; set; }
 
     // Navigation Properties
     public IntakeResponseDto? Intake { get; set; }
@@ -32,4 +33,6 @@ public class StudentResponseDto
     public GenderResponseDto Gender { get; set; } = null!;
     
     public MediaResponseDto? Avatar { get; set; }
+
+    public BranchResponseDto? Branch { get; set; }
 }

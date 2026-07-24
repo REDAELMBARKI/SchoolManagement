@@ -47,7 +47,8 @@ public class PlanQueryService : IPlanQueryService
             BaseAmount = p.BaseAmount,
             DiscountPercent = p.DiscountPercent,
             IsActive = p.IsActive,
-            RemainingAmountDueDate = p.RemainingAmountDueDate
+            RemainingAmountDueDate = p.RemainingAmountDueDays,
+            BranchId = p.BranchId
         }).ToList();
     }
 
@@ -62,7 +63,8 @@ public class PlanQueryService : IPlanQueryService
             BaseAmount = plan.BaseAmount,
             DiscountPercent = plan.DiscountPercent,
             IsActive = plan.IsActive,
-            RemainingAmountDueDate = plan.RemainingAmountDueDate
+            RemainingAmountDueDate = plan.RemainingAmountDueDays,
+            BranchId = plan.BranchId
         };
     }
 }

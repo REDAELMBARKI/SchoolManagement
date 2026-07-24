@@ -21,14 +21,16 @@ public class Absence : AggregateRoot
     // FKs
     public Guid StudentId { get; private set; }
     public Guid ScheduleId { get; private set; }
+    public Guid BranchId { get; private set; }
 
     // navigations
     public virtual Student Student { get; private set; } = null!;
     public virtual Schedule Schedule { get; private set; } = null!;
+    public virtual Branch Branch { get; private set; } = null!;
 
     private Absence() { }
 
-    public static Absence Create(Guid studentId, Guid scheduleId, DateTime? date = null, string status = "Absent", bool isJustified = false, string? reason = null)
+    public static Absence Create(Guid studentId, Guid scheduleId, Guid branchId, DateTime? date = null, string status = "Absent", bool isJustified = false, string? reason = null)
     {
         if (studentId == Guid.Empty)
             throw new DomainException("Student ID must not be empty.");
@@ -36,11 +38,14 @@ public class Absence : AggregateRoot
             throw new DomainException("Schedule ID must not be empty.");
         if (string.IsNullOrWhiteSpace(status))
             throw new DomainException("Status cannot be empty.");
+        if (branchId == Guid.Empty)
+            throw new DomainException("Branch ID must not be empty.");
 
         return new Absence
         {
             StudentId = studentId,
             ScheduleId = scheduleId,
+            BranchId = branchId,
             Date = date ?? DateTime.UtcNow,
             Status = status,
             IsJustified = isJustified,
@@ -82,5 +87,12 @@ public class Absence : AggregateRoot
         if (scheduleId == Guid.Empty)
             throw new DomainException("Schedule ID must not be empty.");
         ScheduleId = scheduleId;
+    }
+
+    public void UpdateBranchId(Guid branchId)
+    {
+        if (branchId == Guid.Empty)
+            throw new DomainException("Branch ID must not be empty.");
+        BranchId = branchId;
     }
 }

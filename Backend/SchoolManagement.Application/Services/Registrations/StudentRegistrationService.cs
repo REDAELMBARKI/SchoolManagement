@@ -93,7 +93,8 @@ namespace SchoolManagement.Application.Services.Registrations;
                     GenderId = registrationRequestDto.StudentRegReq.GenderId,
                     LevelId = registrationRequestDto.StudentRegReq.LevelId,
                     IntakeId = registrationRequestDto.StudentRegReq.IntakeId,
-                    IsDirectRegistration = registrationRequestDto.StudentRegReq.IsDirectRegistration
+                    IsDirectRegistration = registrationRequestDto.StudentRegReq.IsDirectRegistration,
+                    BranchId = _currentUserContext.BranchId
                 };
               
                 var studentResponse = await _studentService.CreateAsync(studentCommand);
@@ -155,7 +156,7 @@ namespace SchoolManagement.Application.Services.Registrations;
                         ExternalReferenceCode = registrationRequestDto.PaymentRegReq.ExternalReferenceCode,
                         MethodDetailsJson = registrationRequestDto.PaymentRegReq.MethodDetailsJson ?? "{}",
                         BranchId = _currentUserContext.BranchId,
-                        ReceivedByStaffId = _currentUserContext.UserId
+                        ReceivedByStaffId = _currentUserContext.NameIdentifier
                     };
 
                     paymentResponse = await _paymentService.CreateAsync(paymentCommand);

@@ -17,7 +17,8 @@ public static class StudentMapper
             phone: command.Phone,
             dateOfBirth: command.DateOfBirth,
             intakeId: command.IntakeId,
-            isDirectRegistration: command.IsDirectRegistration
+            isDirectRegistration: command.IsDirectRegistration,
+            branchId: command.BranchId
         );
     }
 
@@ -34,6 +35,7 @@ public static class StudentMapper
             DateOfBirth = student.DateOfBirth,
             IntakeId = student.IntakeId,
             IsDirectRegistration = student.IsDirectRegistration,
+            BranchId = student.BranchId,
             Intake = student.Intake != null ? new IntakeResponseDto
             {
                 Id = student.Intake.Id,
@@ -46,7 +48,16 @@ public static class StudentMapper
                 AmountPaid = student.Intake.AmountPaid,
             } : null,
             Parents = student.Parents != null ? student.Parents.Select(p => ParentMapper.ToResponse(p)).ToList() : null,
-            Gender = MapGender(student.Gender)
+            Gender = MapGender(student.Gender),
+            Branch = student.Branch != null ? new BranchResponseDto
+            {
+                Id = student.Branch.Id,
+                Slug = student.Branch.Slug,
+                Name = student.Branch.Name,
+                City = student.Branch.City,
+                Address = student.Branch.Address,
+                Phone = student.Branch.Phone
+            } : null
         };
     }
 

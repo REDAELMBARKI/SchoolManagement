@@ -14,6 +14,9 @@ public class PlanResponseDto
     
     public bool IsActive { get; set; } = true;
     public int RemainingAmountDueDate { get; set; }
+    public Guid BranchId { get; set; }
     
     public ICollection<EnrollmentResponseDto> Enrollments { get; set; } = new List<EnrollmentResponseDto>();
+
+    public BranchResponseDto? Branch { get; set; }
 }

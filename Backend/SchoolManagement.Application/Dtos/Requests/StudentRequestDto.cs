@@ -28,4 +28,5 @@ public class StudentRequestDto
 
     public Guid? IntakeId { get; set; }
     public bool IsDirectRegistration { get; set; }
+
 }

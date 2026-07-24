@@ -21,5 +21,7 @@ public class StudentCommand
     public Guid? IntakeId { get; set; }
     public bool IsDirectRegistration { get; set; }
 
+    public Guid BranchId { get; set; }
+
     public string Slug { get; set; } = string.Empty;
 }

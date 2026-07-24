@@ -61,7 +61,7 @@ public class StudentController : ControllerBase
                 GenderId = dto.GenderId,
                 LevelId = dto.LevelId,
                 IntakeId = dto.IntakeId,
-                IsDirectRegistration = dto.IsDirectRegistration
+                IsDirectRegistration = dto.IsDirectRegistration,
             };
             var student = await _studentService.CreateAsync(command);
             return CreatedAtAction(nameof(GetById), new { id = student.Id }, student);

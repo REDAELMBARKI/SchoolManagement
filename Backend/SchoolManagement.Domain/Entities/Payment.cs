@@ -14,12 +14,13 @@ public class Payment : BaseEntity
     public PaymentStatus Status { get; private set; }
     public DateTime PaidAt { get; private set; }
     public Guid BranchId { get; private set; }
+    public Guid ChargeId { get; private set; }
     public Guid ReceivedByStaffId { get; private set; }
     public string? ExternalReferenceCode { get; private set; }
     public string MethodDetailsJson { get; private set; } = "{}";
 
     public virtual Enrollment Enrollment { get; private set; } = null!;
-
+   // add nagivation for those fks 
     private Payment() { }
 
     public static Payment Create(
