@@ -1,5 +1,7 @@
+using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
+using SchoolManagement.Application.Interfaces;
 using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Application.Mappers;
 using SchoolManagement.Domain.Exceptions;
@@ -11,9 +13,10 @@ public class ChargeService : IChargeService
 {
     private readonly IChargeRepository _repository;
 
-    public ChargeService(IChargeRepository repository)
+    public ChargeService(IChargeRepository repository )
     {
         _repository = repository;
+
     }
 
     public async Task<List<ChargeResponseDto>> GetAllAsync()
@@ -28,9 +31,9 @@ public class ChargeService : IChargeService
         return ChargeMapper.ToResponse(charge);
     }
 
-    public async Task<ChargeResponseDto> CreateAsync(ChargeRequestDto dto)
+    public async Task<ChargeResponseDto> CreateAsync(ChargeCommand chargeCommand)
     {
-        var charge = ChargeMapper.ToDomain(dto);
+        var charge = ChargeMapper.ToDomain(chargeCommand);
         var createdCharge = await _repository.AddAsync(charge);
         return ChargeMapper.ToResponse(createdCharge);
     }

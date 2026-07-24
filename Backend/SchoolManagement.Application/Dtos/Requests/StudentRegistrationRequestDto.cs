@@ -1,3 +1,5 @@
+using SchoolManagement.Application.Dtos.Commands;
+using SchoolManagement.Application.Dtos.Responses;
 using System.ComponentModel.DataAnnotations;
 
 namespace SchoolManagement.Application.Dtos.Requests;
@@ -5,13 +7,14 @@ namespace SchoolManagement.Application.Dtos.Requests;
 public class StudentRegistrationRequestDto
 {
     [Required]
-    public StudentRequestDto StudentReqReg { get; set; } = null!;
+    public StudentRequestDto StudentRegReq { get; set; } = null!;
     
     [Required]
-    public EnrollmentRequestDto EnrollmentReqReg { get; set; } = null!;
+    public EnrollmentRequestDto EnrollmentRegReq { get; set; } = null!;
 
-    public ChargeRequestDto? ChargeReq { get; set; }
 
-    public PaymentRequestDto? PaymentReq { get; set; }
+
+    public PaymentRequestDto PaymentRegReq { get; set; } = null!;
+    public ChargeCommand? ChargeRegReq { get; set; }
 }
 

@@ -1,24 +1,27 @@
 using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Entities.EnrollmentAggregate;
+using SchoolManagement.Domain.Enums;
 using SchoolManagement.Domain.Exceptions;
 using System.ComponentModel.DataAnnotations;
-namespace SchoolManagement.Domain.Entities;
+namespace SchoolManagement.Domain.Entities.Payment;
 
 public class Payment : BaseEntity
 {
-    public DateTime? PaidAt { get; private set; }
-    public Guid EnrollmentId { get; private set; }
-    public decimal AmountPaid { get; private set; }
-    public decimal FeeAmount { get; private set; }
-    public DateTime PeriodStart { get; private set; }
-    public DateTime PeriodEnd { get; private set; }
-    public string Status { get; private set; } = "Pending";
+    public decimal Amount { get; set; }         
+    public decimal? TransferFees { get; set; }   
+    public PaymentMethod Method { get; set; }
+    public PaymentStatus Status { get; set; }
+    public DateTime PaidAt { get; set; }
+    public Guid BranchId { get; set; }
+    public Guid ReceivedByStaffId { get; set; }
+    public string? ExternalReferenceCode { get; set; }
+    public string MethodDetailsJson { get; set; } = "{}"; // stores method-specific fields as JSON
 
-    public virtual Enrollment Enrollment { get; private set; } = null!;
+    public virtual IEnumerable<PaymentAllocation> Allocations { get; private set; } = null!;
 
     private Payment() { }
 
-    public static Payment Create(Guid enrollmentId, decimal feeAmount, DateTime periodStart, DateTime periodEnd, decimal amountPaid = 0, DateTime? paidAt = null, string status = "Pending")
+    public static Payment Create(Guid enrollmentId, decimal feeAmount, DateTime periodStart, DateTime periodEnd, decimal amountPaid = 0, DateTime? paidAt = null, PaymentStatus status = PaymentStatus.Pending)
     {
         if (enrollmentId == Guid.Empty)
             throw new DomainException("Enrollment ID must not be empty.");
@@ -26,8 +29,6 @@ public class Payment : BaseEntity
             throw new DomainException("Fee amount cannot be negative.");
         if (amountPaid < 0)
             throw new DomainException("Amount paid cannot be negative.");
-        if (string.IsNullOrWhiteSpace(status))
-            throw new DomainException("Status cannot be empty.");
 
         return new Payment
         {
@@ -77,10 +78,8 @@ public class Payment : BaseEntity
         PeriodEnd = periodEnd;
     }
 
-    public void UpdateStatus(string status)
+    public void UpdateStatus(PaymentStatus status)
     {
-        if (string.IsNullOrWhiteSpace(status))
-            throw new DomainException("Status cannot be empty.");
         Status = status;
     }
 }

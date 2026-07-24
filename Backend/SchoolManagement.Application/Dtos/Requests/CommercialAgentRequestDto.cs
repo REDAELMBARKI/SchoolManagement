@@ -11,6 +11,5 @@ public class CommercialAgentRequestDto
     public DateOnly? DateOfBirth { get; set; }
     public DateTime HireDate { get; set; }
     public decimal Salary { get; set; }
-    public Guid BranchId { get; set; }
 }
 

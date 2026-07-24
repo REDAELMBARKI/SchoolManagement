@@ -8,11 +8,11 @@ namespace SchoolManagement.Domain.Entities;
 public class Charge : AggregateRoot
 {
     public Guid StudentId { get; private set; }
-    public ChargeType ChargeType { get; private set; }
+    public ChargeType ChargeType { get; private set; } = ChargeType.Enrollment;
     public string? Description { get; private set; }
     public decimal Amount { get; private set; }
     public decimal AmountPaid { get; private set; }
-    public ChargeStatus Status { get; private set; }
+    public ChargeStatus Status { get; private set; } = ChargeStatus.Unpaid;
     public DateTime IssuedDate { get; private set; }
     public DateTime DueDate { get; private set; }
     public Guid? SourceId { get; private set; }
@@ -29,9 +29,9 @@ public class Charge : AggregateRoot
         Guid studentId,
         ChargeType type,
         decimal amount,
-        DateTime issuedDate,
         DateTime dueDate,
         Guid branchId ,
+        DateTime issuedDate ,
         string? description = null,
         decimal amountPaid = 0,
         Guid? sourceId = null

@@ -33,9 +33,6 @@ public class IntakeRequestDto
     [Required]
     public Guid SubjectId { get; set; }
 
-    [Required]
-    public Guid BranchId { get; set; }
-
     public Guid? ConvertedToStudentId { get; set; }
 
     public Guid? CommercialAgentId { get; set; }

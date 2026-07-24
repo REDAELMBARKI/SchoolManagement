@@ -1,6 +1,6 @@
 using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
-using SchoolManagement.Domain.Entities;
+using SchoolManagement.Domain.Entities.Payment;
 
 namespace SchoolManagement.Application.Mappers;
 

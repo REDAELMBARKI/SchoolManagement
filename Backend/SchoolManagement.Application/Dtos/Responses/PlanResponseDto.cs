@@ -8,7 +8,12 @@ public class PlanResponseDto
     
     public int DurationMonths { get; set; }            // 1, 3, 6, 12
     
+    public decimal BaseAmount { get; set; }            // the actual fee before discount
+    
     public decimal? DiscountPercent { get; set; }
+    
+    public bool IsActive { get; set; } = true;
+    public int RemainingAmountDueDate { get; set; }
     
     public ICollection<EnrollmentResponseDto> Enrollments { get; set; } = new List<EnrollmentResponseDto>();
 }

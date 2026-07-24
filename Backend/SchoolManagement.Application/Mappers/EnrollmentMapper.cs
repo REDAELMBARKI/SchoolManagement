@@ -13,7 +13,6 @@ public static class EnrollmentMapper
             studentId: dto.StudentId,
             subjectId: dto.SubjectId,
             groupId: dto.GroupId,
-            branchId: dto.BranchId,
             planId: dto.PlanId,
             notes: dto.Notes
         );
@@ -69,7 +68,10 @@ public static class EnrollmentMapper
                 Id = e.Plan.Id,
                 Name = e.Plan.Name,
                 DurationMonths = e.Plan.DurationMonths,
-                DiscountPercent = e.Plan.DiscountPercent
+                BaseAmount = e.Plan.BaseAmount,
+                DiscountPercent = e.Plan.DiscountPercent,
+                IsActive = e.Plan.IsActive,
+                RemainingAmountDueDate = e.Plan.RemainingAmountDueDate
             } : null,
             Payments = e.Payments?.Select(p => new PaymentResponseDto
             {

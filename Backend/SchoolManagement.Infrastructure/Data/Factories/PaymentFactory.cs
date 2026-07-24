@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Domain.Entities;
+using SchoolManagement.Domain.Entities.Payment;
 using SchoolManagement.Infrastructure.Data;
 
 namespace SchoolManagement.Infrastructure.Data.Factories;

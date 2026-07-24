@@ -1,4 +1,6 @@
 using SchoolManagement.Domain.Common;
+using SchoolManagement.Domain.Entities.Payment;
+using SchoolManagement.Domain.Enums;
 using SchoolManagement.Domain.Exceptions;
 using System.ComponentModel.DataAnnotations;
 namespace SchoolManagement.Domain.Entities.EnrollmentAggregate;
@@ -6,7 +8,7 @@ namespace SchoolManagement.Domain.Entities.EnrollmentAggregate;
 public class Enrollment : AggregateRoot
 {
     public DateTime EnrolledAt { get; private set; } = DateTime.UtcNow;
-    public string Status { get; private set; } = "Active";// Active / Dropped / Completed
+    public EnrollmentStatus Status { get; private set; } = EnrollmentStatus.Active ;  // Active / Dropped / Completed
     public string? Notes { get; private set; }
     // FKs
     public Guid StudentId { get; private set; }
@@ -15,7 +17,8 @@ public class Enrollment : AggregateRoot
     public Guid BranchId { get; private set; }
     public Guid PlanId { get; private set; }
     // navigations
-    public virtual ICollection<Payment> Payments { get; private set; } = new List<Payment>();
+    public virtual IEnumerable<PaymentAllocation> Allocations { get; private set; } =  new List<PaymentAllocation>();
+
     public virtual Subject Subject { get; private set; } = null!;
     public virtual Branch Branch { get; private set; } = null!;
     public virtual Plan Plan { get; private set; } = null!;

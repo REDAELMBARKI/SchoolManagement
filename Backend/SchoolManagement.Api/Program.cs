@@ -40,8 +40,7 @@ builder.Services.AddFluentValidationClientsideAdapters();
 
 // Add controllers
 builder.Services.AddControllers();
-
-
+builder.Services.AddHttpContextAccessor();
 // add jwt barear 
 builder.Services.AddJwtConfigExtension(builder.Configuration);
 // Add services to the container.
@@ -96,7 +95,7 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception error)
     {
-         Console.WriteLine($"❌ Database connection failed: {error.Message}");
+         Console.WriteLine($"Database connection failed: {error.Message}");
         
     }
 }

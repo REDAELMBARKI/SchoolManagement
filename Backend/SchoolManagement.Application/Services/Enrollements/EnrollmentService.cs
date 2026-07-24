@@ -45,12 +45,11 @@ public class EnrollmentService : IEnrollmentService
     public async Task<EnrollmentResponseDto> UpdateAsync(Guid id, UpdateEnrollmentRequestDto dto)
     {
         var existing = await _repository.GetByIdAsync(id);
-        if (existing is null) throw new NotFoundException($"Enrollment with id {id} not found");
+        if (existing is null) throw new NotFoundException($"Enrollment with id {id} not found.");
 
         existing.UpdateStudentId(dto.StudentId);
         existing.UpdateSubjectId(dto.SubjectId);
         existing.UpdateGroupId(dto.GroupId);
-        existing.UpdateBranchId(dto.BranchId);
         existing.UpdatePlanId(dto.PlanId);
         existing.UpdateNotes(dto.Notes);
         

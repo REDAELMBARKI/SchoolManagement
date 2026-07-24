@@ -1,4 +1,4 @@
-using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Entities;
 
@@ -6,18 +6,17 @@ namespace SchoolManagement.Application.Mappers;
 
 public static class ChargeMapper
 {
-    public static Charge ToDomain(ChargeRequestDto dto)
+    public static Charge ToDomain(ChargeCommand command)
     {
         return Charge.Create(
-            studentId: dto.StudentId,
-            type: dto.ChargeType,
-            amount: dto.Amount,
-            issuedDate: dto.IssuedDate,
-            dueDate: dto.DueDate,
-            description: dto.Description,
-            amountPaid: dto.AmountPaid,
-            sourceId: dto.SourceId,
-            branchId: dto.BranchId
+            studentId: command.StudentId,
+            type: command.ChargeType,
+            amount: command.Amount,
+            issuedDate: command.IssuedDate,
+            dueDate: command.DueDate,
+            amountPaid: command.AmountPaid,
+            sourceId: command.SourceId,
+            branchId: command.BranchId
         );
     }
 

@@ -5,9 +5,6 @@ namespace SchoolManagement.Application.Dtos.Requests;
 public class ScheduleRequestDto
 {
     [Required]
-    public Guid BranchId { get; set; }
-    
-    [Required]
     public Guid TeacherId { get; set; }
     
     [Required]

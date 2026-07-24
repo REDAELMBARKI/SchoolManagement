@@ -9,7 +9,6 @@ public class EnrollmentValidator : AbstractValidator<EnrollmentRequestDto>
 {
     public EnrollmentValidator(
         ISubjectQueryService subjectQueryService,
-        IBranchQueryService branchQueryService,
         IScheduleQueryService scheduleQueryService,
         IStudentQueryService studentQueryService)
     {
@@ -18,17 +17,12 @@ public class EnrollmentValidator : AbstractValidator<EnrollmentRequestDto>
         RuleFor(e => e.LevelId).NotEmpty();
         RuleFor(e => e.StudentId).NotEmpty();
         RuleFor(e => e.SubjectId).NotEmpty();
-        RuleFor(e => e.BranchId).NotEmpty();
         RuleFor(e => e.PlanId).NotEmpty();
 
         // Validate FKs exist
         RuleFor(e => e.SubjectId)
             .MustAsync(async (subjectId, ct) => await subjectQueryService.IsExistsAsync(subjectId))
             .WithMessage("Selected subject does not exist.");
-
-        RuleFor(e => e.BranchId)
-            .MustAsync(async (branchId, ct) => await branchQueryService.IsExistsAsync(branchId))
-            .WithMessage("Selected branch does not exist.");
 
         RuleFor(e => e.PreferedScheduleId)
             .MustAsync(async (scheduleId, ct) => await scheduleQueryService.IsExistsAsync(scheduleId))

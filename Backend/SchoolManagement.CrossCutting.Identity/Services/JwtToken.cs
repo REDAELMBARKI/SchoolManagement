@@ -14,15 +14,17 @@ public class JwtService
     {
         _config = config ;
     }
-    public string generateToken(User user)
+    public string generateToken(ApplicationUser user)
     { 
       var claims = new[]
       {
           new Claim(ClaimTypes.NameIdentifier , user.Id.ToString()),
-          new Claim(ClaimTypes.Email , user.Email.Value),
-          new Claim(ClaimTypes.Name , user.FirstName + " " + user.LastName),
+          new Claim(ClaimTypes.Email , user.Email!.ToString()),
+          new Claim(ClaimTypes.Name , user.UserName!.ToString()),
+          new Claim("BranchId" , "12")
       } ;
 
+         
       var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:secret"])) ; 
       var creds  = new SigningCredentials(key , SecurityAlgorithms.HmacSha256) ;
       

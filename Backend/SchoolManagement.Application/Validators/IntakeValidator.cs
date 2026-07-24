@@ -13,7 +13,6 @@ public class IntakeValidator : AbstractValidator<IntakeRequestDto>
 {
     public IntakeValidator(
         IGenderQueryService gender_query,
-        IBranchQueryService branch_query,
         ICommercialAgentQueryService commercialAgent_query,
         IOpcQueryService opc_query,
         IAdQueryService ad_query ,
@@ -64,15 +63,6 @@ public class IntakeValidator : AbstractValidator<IntakeRequestDto>
         })
         .When(i => i.GenderId.HasValue)
         .WithMessage("Selected gender does not exist");
-
-        // Branch validation
-        RuleFor(i => i.BranchId)
-        .NotEmpty()
-        .MustAsync(async (branchId, ct) =>
-        {
-            return await branch_query.IsExistsAsync(branchId);
-        })
-        .WithMessage("Selected branch does not exist");
 
         // CommercialAgent validation
         RuleFor(i => i.CommercialAgentId)

@@ -24,5 +24,5 @@ public class UpdatePaymentRequestDto
 
     public DateTime? PaidAt { get; set; }
 
-    public string Status { get; set; } = "Pending";
+    public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
 }

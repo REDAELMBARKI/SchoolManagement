@@ -1,4 +1,4 @@
-﻿using SchoolManagement.Domain.Entities;
+﻿using SchoolManagement.Domain.Entities.Payment;
 using SchoolManagement.Domain.Interfaces.Queries.Common;
 using System;
 using System.Collections.Generic;
