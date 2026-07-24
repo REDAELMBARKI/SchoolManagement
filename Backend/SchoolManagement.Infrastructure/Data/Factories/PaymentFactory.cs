@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Domain.Entities.Payment;
+using SchoolManagement.Domain.Entities;
+using SchoolManagement.Domain.Enums;
 using SchoolManagement.Infrastructure.Data;
 
 namespace SchoolManagement.Infrastructure.Data.Factories;
@@ -13,7 +14,7 @@ public class PaymentFactory : Factory<Payment>
     protected override async Task<Payment> Make()
     {
         var enrollments = await Context.Enrollments.Select(e => e.Id).ToListAsync();
-        var statuses = new[] { "Pending", "Paid", "Overdue" };
+        var statuses = new[] { PaymentStatus.Pending, PaymentStatus.Completed, PaymentStatus.Failed };
 
         var periodStart = faker.Date.Past();
         var periodEnd = periodStart.AddMonths(1);
@@ -21,7 +22,7 @@ public class PaymentFactory : Factory<Payment>
         var isPaid = faker.Random.Bool();
         var amountPaid = isPaid ? feeAmount : faker.Finance.Amount(0, feeAmount);
         var paidAt = isPaid ? faker.Date.Past() : (DateTime?)null;
-        var status = isPaid ? "Paid" : faker.PickRandom(statuses.Where(s => s != "Paid"));
+        var status = isPaid ? PaymentStatus.Completed : faker.PickRandom(statuses.Where(s => s != PaymentStatus.Completed));
 
         return Payment.Create(
             enrollmentId: enrollments.Any() ? faker.PickRandom(enrollments) : Guid.Empty,

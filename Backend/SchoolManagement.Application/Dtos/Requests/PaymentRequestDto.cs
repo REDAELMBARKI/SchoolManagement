@@ -5,21 +5,9 @@ namespace SchoolManagement.Application.Dtos.Requests;
 
 public class PaymentRequestDto
 {
-    [Required]
-    public Guid EnrollmentId { get; set; }
-
-    [Required]
-    public decimal FeeAmount { get; set; }
-
-    [Required]
-    public DateTime PeriodStart { get; set; }
-
-    [Required]
-    public DateTime PeriodEnd { get; set; }
-
-    public decimal AmountPaid { get; set; } = 0;
-
-    public DateTime? PaidAt { get; set; }
-
-    public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
+    public decimal Amount { get; set; }
+    public decimal? TransferFees { get; set; }
+    public PaymentMethod Method { get; set; }
+    public string? ExternalReferenceCode { get; set; }
+    public string? MethodDetailsJson { get; set; }
 }

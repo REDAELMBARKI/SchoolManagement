@@ -1,12 +1,12 @@
+using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
+using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Application.Mappers;
+using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Domain.Interfaces.Queries;
 using SchoolManagement.Domain.Interfaces.Repositories;
-using SchoolManagement.Application.Interfaces.Services;
-using SchoolManagement.Domain.Entities.EnrollmentAggregate;
-using SchoolManagement.Domain.Entities;
 
 namespace SchoolManagement.Application.Services.Enrollements;
 
@@ -33,11 +33,11 @@ public class EnrollmentService : IEnrollmentService
         return await _queryService.GetResponseByIdAsync(id);
     }
 
-    public async Task<EnrollmentResponseDto> CreateAsync(EnrollmentRequestDto dto)
+    public async Task<EnrollmentResponseDto> CreateAsync(EnrollmentCommand command)
     {
-        var availableGroupsWithSameLevel = await _groupQueryService.GetAvailableGroupsByLevelId(dto.LevelId);
-        dto.GroupId = EvaluateStudentGroup(availableGroupsWithSameLevel, dto.PreferedScheduleId ,  dto.GroupId);
-        var enrollment = EnrollmentMapper.ToDomain(dto);
+        var availableGroupsWithSameLevel = await _groupQueryService.GetAvailableGroupsByLevelId(command.LevelId);
+        command.GroupId = EvaluateStudentGroup(availableGroupsWithSameLevel, command.PreferedScheduleId, command.GroupId);
+        var enrollment = EnrollmentMapper.ToDomain(command);
         var created = await _repository.AddAsync(enrollment);
         return EnrollmentMapper.ToResponse(created);
     }
@@ -50,9 +50,10 @@ public class EnrollmentService : IEnrollmentService
         existing.UpdateStudentId(dto.StudentId);
         existing.UpdateSubjectId(dto.SubjectId);
         existing.UpdateGroupId(dto.GroupId);
+        existing.UpdateBranchId(dto.BranchId);
         existing.UpdatePlanId(dto.PlanId);
         existing.UpdateNotes(dto.Notes);
-        
+
         var updated = await _repository.UpdateAsync(existing);
         return EnrollmentMapper.ToResponse(updated);
     }
@@ -63,33 +64,34 @@ public class EnrollmentService : IEnrollmentService
     }
 
 
- 
-    private Guid EvaluateStudentGroup(List<Group> availableGroupsWithSameLevel,Guid? PreferedScheduleId,  Guid? groupId)
+
+    private Guid EvaluateStudentGroup(List<Group> availableGroupsWithSameLevel, Guid? PreferedScheduleId, Guid? groupId)
     {
         Guid? GroupId = groupId;
         if (groupId != null)
         {
-            CheckGroupAvailability(availableGroupsWithSameLevel , groupId!.Value);
+            CheckGroupAvailability(availableGroupsWithSameLevel, groupId!.Value);
         }
         else
         {
-            GroupId = AssignNewGroup(availableGroupsWithSameLevel , PreferedScheduleId);
+            GroupId = AssignNewGroup(availableGroupsWithSameLevel, PreferedScheduleId);
         }
 
         return GroupId!.Value;
     }
 
-    private Guid AssignNewGroup(List<Group> availableGroupsWithSameLevel , Guid? PreferedScheduleId)
+    private Guid AssignNewGroup(List<Group> availableGroupsWithSameLevel, Guid? PreferedScheduleId)
     {
-        Group? groupPrefered =  availableGroupsWithSameLevel.FirstOrDefault(g => g.Schedule.Id == PreferedScheduleId);
-        if (groupPrefered == null) {
+        Group? groupPrefered = availableGroupsWithSameLevel.FirstOrDefault(g => g.Schedule.Id == PreferedScheduleId);
+        if (groupPrefered == null)
+        {
             return availableGroupsWithSameLevel.First().Id;
         }
         return groupPrefered.Id;
     }
 
-    private void CheckGroupAvailability(List<Group> availableGroupsWithSameLevel , Guid groupId)
-    { 
+    private void CheckGroupAvailability(List<Group> availableGroupsWithSameLevel, Guid groupId)
+    {
 
         if (!availableGroupsWithSameLevel.Any() || !availableGroupsWithSameLevel.Select(g => g.Id).Contains(groupId))
             throw new UnAvailableResourceException("No Empty Place  Available group with same level ");

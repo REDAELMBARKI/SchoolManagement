@@ -1,4 +1,3 @@
-using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Responses;
 using System.ComponentModel.DataAnnotations;
 
@@ -12,9 +11,7 @@ public class StudentRegistrationRequestDto
     [Required]
     public EnrollmentRequestDto EnrollmentRegReq { get; set; } = null!;
 
-
-
+    [Required]
     public PaymentRequestDto PaymentRegReq { get; set; } = null!;
-    public ChargeCommand? ChargeRegReq { get; set; }
 }
 

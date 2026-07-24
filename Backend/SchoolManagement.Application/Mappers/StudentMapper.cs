@@ -1,4 +1,4 @@
-using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Entities;
 
@@ -6,21 +6,18 @@ namespace SchoolManagement.Application.Mappers;
 
 public static class StudentMapper
 {
-    public static Student ToDomain(StudentRequestDto dto)
+    public static Student ToDomain(StudentCommand command)
     {
-        // Temporary slug, proper slug generation should happen in service layer with IsRecordExists check
-        var initialSlug = $"{dto.FirstName}-{dto.LastName}".ToLowerInvariant();
-        
         return Student.Register(
-            firstName: dto.FirstName,
-            lastName: dto.LastName,
-            slug: initialSlug,
-            genderId: dto.GenderId,
-            email: dto.Email,
-            phone: dto.Phone,
-            dateOfBirth: dto.DateOfBirth,
-            intakeId: dto.IntakeId,
-            isDirectRegistration: dto.IsDirectRegistration
+            firstName: command.FirstName,
+            lastName: command.LastName,
+            slug: command.Slug,
+            genderId: command.GenderId,
+            email: command.Email,
+            phone: command.Phone,
+            dateOfBirth: command.DateOfBirth,
+            intakeId: command.IntakeId,
+            isDirectRegistration: command.IsDirectRegistration
         );
     }
 

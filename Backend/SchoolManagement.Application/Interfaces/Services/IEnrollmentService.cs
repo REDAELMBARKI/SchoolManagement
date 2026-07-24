@@ -1,3 +1,4 @@
+using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
 
@@ -7,7 +8,7 @@ public interface IEnrollmentService
 {
     Task<List<EnrollmentResponseDto>> GetAllAsync();
     Task<EnrollmentResponseDto?> GetByIdAsync(Guid id);
-    Task<EnrollmentResponseDto> CreateAsync(EnrollmentRequestDto dto);
+    Task<EnrollmentResponseDto> CreateAsync(EnrollmentCommand command);
     Task<EnrollmentResponseDto> UpdateAsync(Guid id, UpdateEnrollmentRequestDto dto);
     Task DeleteAsync(Guid id);
 }

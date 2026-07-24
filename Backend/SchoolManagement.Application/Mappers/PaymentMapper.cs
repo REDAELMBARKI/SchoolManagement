@@ -1,21 +1,24 @@
-using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Responses;
-using SchoolManagement.Domain.Entities.Payment;
+using SchoolManagement.Domain.Entities;
 
 namespace SchoolManagement.Application.Mappers;
 
 public static class PaymentMapper
 {
-    public static Payment ToDomain(PaymentRequestDto dto)
+    public static Payment ToDomain(PaymentCommand command)
     {
         return Payment.Create(
-            enrollmentId: dto.EnrollmentId,
-            feeAmount: dto.FeeAmount,
-            periodStart: dto.PeriodStart,
-            periodEnd: dto.PeriodEnd,
-            amountPaid: dto.AmountPaid,
-            paidAt: dto.PaidAt,
-            status: dto.Status
+            enrollmentId: command.EnrollmentId,
+            amount: command.Amount,
+            status: command.Status,
+            paidAt: command.PaidAt,
+            branchId: command.BranchId,
+            receivedByStaffId: command.ReceivedByStaffId,
+            transferFees: command.TransferFees,
+            method: command.Method,
+            externalReferenceCode: command.ExternalReferenceCode,
+            methodDetailsJson: command.MethodDetailsJson
         );
     }
 
@@ -25,12 +28,15 @@ public static class PaymentMapper
         {
             Id = payment.Id,
             EnrollmentId = payment.EnrollmentId,
-            FeeAmount = payment.FeeAmount,
-            AmountPaid = payment.AmountPaid,
-            PeriodStart = payment.PeriodStart,
-            PeriodEnd = payment.PeriodEnd,
+            Amount = payment.Amount,
+            TransferFees = payment.TransferFees,
+            Method = payment.Method,
             Status = payment.Status,
-            PaidAt = payment.PaidAt
+            PaidAt = payment.PaidAt,
+            BranchId = payment.BranchId,
+            ReceivedByStaffId = payment.ReceivedByStaffId,
+            ExternalReferenceCode = payment.ExternalReferenceCode,
+            MethodDetailsJson = payment.MethodDetailsJson
         };
     }
 }

@@ -1,3 +1,4 @@
+using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
 
@@ -7,7 +8,7 @@ public interface IPaymentService
 {
     Task<List<PaymentResponseDto>> GetAllAsync();
     Task<PaymentResponseDto?> GetByIdAsync(Guid id);
-    Task<PaymentResponseDto> CreateAsync(PaymentRequestDto dto);
+    Task<PaymentResponseDto> CreateAsync(PaymentCommand command);
     Task<PaymentResponseDto> UpdateAsync(Guid id, UpdatePaymentRequestDto dto);
     Task DeleteAsync(Guid id);
 }

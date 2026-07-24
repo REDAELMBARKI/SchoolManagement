@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Domain.Exceptions;
@@ -50,7 +51,17 @@ public class EnrollmentController : ControllerBase
     {
         try
         {
-            var enrollment = await _enrollmentService.CreateAsync(dto);
+            var command = new EnrollmentCommand
+            {
+                LevelId = dto.LevelId,
+                SubjectId = dto.SubjectId,
+                PlanId = dto.PlanId,
+                Notes = dto.Notes,
+                BranchId = dto.BranchId,
+                PreferedScheduleId = dto.PreferedScheduleId,
+                GroupId = dto.GroupId ?? Guid.Empty
+            };
+            var enrollment = await _enrollmentService.CreateAsync(command);
             return CreatedAtAction(nameof(GetById), new { id = enrollment.Id }, enrollment);
         }
         catch (NotFoundException ex)
@@ -68,7 +79,7 @@ public class EnrollmentController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] EnrollmentRequestDto dto)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateEnrollmentRequestDto dto)
     {
         try
         {

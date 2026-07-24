@@ -1,5 +1,4 @@
 using SchoolManagement.Domain.Common;
-using SchoolManagement.Domain.Entities.Payment;
 using SchoolManagement.Domain.Enums;
 using SchoolManagement.Domain.Exceptions;
 using System.ComponentModel.DataAnnotations;
@@ -17,7 +16,7 @@ public class Enrollment : AggregateRoot
     public Guid BranchId { get; private set; }
     public Guid PlanId { get; private set; }
     // navigations
-    public virtual IEnumerable<PaymentAllocation> Allocations { get; private set; } =  new List<PaymentAllocation>();
+    public virtual IEnumerable<Payment> Payments { get; private set; } =  new List<Payment>();
 
     public virtual Subject Subject { get; private set; } = null!;
     public virtual Branch Branch { get; private set; } = null!;
@@ -27,7 +26,7 @@ public class Enrollment : AggregateRoot
 
     private Enrollment() { }
 
-    public static Enrollment Create(Guid studentId, Guid subjectId, Guid groupId, Guid branchId, Guid planId, DateTime? enrolledAt = null, string status = "Active", string? notes = null)
+    public static Enrollment Create(Guid studentId, Guid subjectId, Guid groupId, Guid branchId, Guid planId, DateTime? enrolledAt = null, EnrollmentStatus status = EnrollmentStatus.Active, string? notes = null)
     {
         if (studentId == Guid.Empty)
             throw new DomainException("Student ID must not be empty.");
@@ -58,9 +57,9 @@ public class Enrollment : AggregateRoot
         EnrolledAt = enrolledAt;
     }
 
-    public void UpdateStatus(string status)
+    public void UpdateStatus(EnrollmentStatus status)
     {
-        if (string.IsNullOrWhiteSpace(status))
+        if (string.IsNullOrWhiteSpace(status.ToString()))
             throw new DomainException("Status cannot be empty.");
         Status = status;
     }

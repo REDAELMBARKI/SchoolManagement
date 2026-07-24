@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Entities.EnrollmentAggregate;
-using SchoolManagement.Domain.Entities.Payment;
 using SchoolManagement.Infrastructure.Data.Configurations.Entities;
 using System.Linq;
 namespace SchoolManagement.Infrastructure.Data;

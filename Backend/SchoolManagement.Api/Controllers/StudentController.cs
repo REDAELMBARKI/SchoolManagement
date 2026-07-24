@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Requests;
  using SchoolManagement.Domain.Exceptions; 
  using SchoolManagement.Application.Services;
@@ -50,7 +51,19 @@ public class StudentController : ControllerBase
     {
         try
         {
-            var student = await _studentService.CreateAsync(dto);
+            var command = new StudentCommand
+            {
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                Email = dto.Email,
+                Phone = dto.Phone,
+                DateOfBirth = dto.DateOfBirth,
+                GenderId = dto.GenderId,
+                LevelId = dto.LevelId,
+                IntakeId = dto.IntakeId,
+                IsDirectRegistration = dto.IsDirectRegistration
+            };
+            var student = await _studentService.CreateAsync(command);
             return CreatedAtAction(nameof(GetById), new { id = student.Id }, student);
         }
         catch (Exception ex)

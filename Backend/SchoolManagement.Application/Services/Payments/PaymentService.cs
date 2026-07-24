@@ -1,3 +1,4 @@
+using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Application.Interfaces.Queries;
@@ -32,9 +33,9 @@ public class PaymentService : IPaymentService
         return PaymentMapper.ToResponse(payment);
     }
 
-    public async Task<PaymentResponseDto> CreateAsync(PaymentRequestDto dto)
+    public async Task<PaymentResponseDto> CreateAsync(PaymentCommand command)
     {
-        var payment = PaymentMapper.ToDomain(dto);
+        var payment = PaymentMapper.ToDomain(command);
         var createdPayment = await _repository.AddAsync(payment);
         return PaymentMapper.ToResponse(createdPayment);
     }
@@ -48,12 +49,15 @@ public class PaymentService : IPaymentService
         }
 
         existing.UpdateEnrollmentId(dto.EnrollmentId);
-        existing.UpdateFeeAmount(dto.FeeAmount);
-        existing.UpdatePeriodStart(dto.PeriodStart);
-        existing.UpdatePeriodEnd(dto.PeriodEnd);
-        existing.UpdateAmountPaid(dto.AmountPaid);
+        existing.UpdateAmount(dto.Amount);
+        existing.UpdateTransferFees(dto.TransferFees);
+        existing.UpdateMethod(dto.Method);
         existing.UpdatePaidAt(dto.PaidAt);
         existing.UpdateStatus(dto.Status);
+        existing.UpdateBranchId(dto.BranchId);
+        existing.UpdateReceivedByStaffId(dto.ReceivedByStaffId);
+        existing.UpdateExternalReferenceCode(dto.ExternalReferenceCode);
+        existing.UpdateMethodDetailsJson(dto.MethodDetailsJson ?? "{}");
 
         var updated = await _repository.UpdateAsync(existing);
         return PaymentMapper.ToResponse(updated);

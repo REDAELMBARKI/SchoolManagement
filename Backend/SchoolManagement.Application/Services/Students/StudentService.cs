@@ -1,4 +1,5 @@
 using MediatR;
+using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.DomainEvents.Students;
@@ -38,21 +39,18 @@ public class StudentService : IStudentService
         return student;
     }
 
-    public async Task<StudentResponseDto> CreateAsync(StudentRequestDto dto)
+    public async Task<StudentResponseDto> CreateAsync(StudentCommand command)
     {
-        var student = StudentMapper.ToDomain(dto);
-        
-        // Generate unique slug
         var generatedSlug = await CustomSluger.Slug(
             slug => _query.IsExistsBySlugAsync(slug), 
-            student.FirstName, 
-            student.LastName
+            command.FirstName, 
+            command.LastName
         );
-        student.UpdateSlug(generatedSlug);
-        
+        command.Slug = generatedSlug;
+
+        var student = StudentMapper.ToDomain(command);
         var createdStudent = await _repository.AddAsync(student);
         
-        // Publish StudentCreatedDomainEvent
         await _mediator.Publish(new StudentCreatedDomainEvent(createdStudent.Id));
         
         return StudentMapper.ToResponse(createdStudent);
@@ -66,10 +64,16 @@ public class StudentService : IStudentService
             throw new NotFoundException($"No student found with id {id}");
         }
         
-        var student = StudentMapper.ToDomain(dto);
-        student.Id = id;
+        existing.UpdateFirstName(dto.FirstName);
+        existing.UpdateLastName(dto.LastName);
+        existing.UpdateEmail(dto.Email);
+        existing.UpdatePhone(dto.Phone);
+        existing.UpdateDateOfBirth(dto.DateOfBirth);
+        existing.UpdateGender(dto.GenderId);
+        existing.UpdateIntakeId(dto.IntakeId);
+        existing.UpdateIsDirectRegistration(dto.IsDirectRegistration);
         
-        var updated = await _repository.UpdateAsync(student);
+        var updated = await _repository.UpdateAsync(existing);
         return StudentMapper.ToResponse(updated);
     }
 

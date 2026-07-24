@@ -13,7 +13,6 @@ using SchoolManagement.Domain.Interfaces.Queries;
 using SchoolManagement.Domain.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
-using System.Net.NetworkInformation;
 using System.Text;
 
 namespace SchoolManagement.Application.Services.Registrations;
@@ -55,11 +54,11 @@ namespace SchoolManagement.Application.Services.Registrations;
 
         
         
-        private async Task<EvaluatePaymentPlanResult> EvaluatePaymentPlanAsync(Guid PlanId , PaymentRequestDto paymentRequestDto)
+        private async Task<EvaluatePaymentPlanResult> EvaluatePaymentPlanAsync(Guid PlanId , decimal amountPaid)
         {
             var evaluatePaymentPlanResult = new EvaluatePaymentPlanResult();
             Plan plan = (await _planQueryService.GetByIdAsync(PlanId))!;
-            bool isFullyPaid = paymentRequestDto.AmountPaid >= plan.Amount ;
+            bool isFullyPaid = amountPaid >= plan.Amount ;
             if (isFullyPaid) { 
                evaluatePaymentPlanResult.IsFullyPaid = true;
             }
@@ -67,7 +66,7 @@ namespace SchoolManagement.Application.Services.Registrations;
             {
                evaluatePaymentPlanResult.Amount = plan.Amount;
                evaluatePaymentPlanResult.AmountRemainingDueDays = plan.RemainingAmountDueDays;
-               evaluatePaymentPlanResult.PaidAmount = paymentRequestDto.AmountPaid ;
+               evaluatePaymentPlanResult.PaidAmount = amountPaid ;
                
             } 
             
@@ -83,16 +82,41 @@ namespace SchoolManagement.Application.Services.Registrations;
                 Plan? plan = null;
 
                 await _transaction.BeginTransactionAsync();
+
+                var studentCommand = new StudentCommand
+                {
+                    FirstName = registrationRequestDto.StudentRegReq.FirstName,
+                    LastName = registrationRequestDto.StudentRegReq.LastName,
+                    Email = registrationRequestDto.StudentRegReq.Email,
+                    Phone = registrationRequestDto.StudentRegReq.Phone,
+                    DateOfBirth = registrationRequestDto.StudentRegReq.DateOfBirth,
+                    GenderId = registrationRequestDto.StudentRegReq.GenderId,
+                    LevelId = registrationRequestDto.StudentRegReq.LevelId,
+                    IntakeId = registrationRequestDto.StudentRegReq.IntakeId,
+                    IsDirectRegistration = registrationRequestDto.StudentRegReq.IsDirectRegistration
+                };
               
-                var studentResponse = await _studentService.CreateAsync(registrationRequestDto.StudentRegReq);
-                registrationRequestDto.EnrollmentRegReq.StudentId = studentResponse.Id; 
-                var enrollmentResponse = await _enrollmentService.CreateAsync(registrationRequestDto.EnrollmentRegReq);
+                var studentResponse = await _studentService.CreateAsync(studentCommand);
+
+                var enrollmentCommand = new EnrollmentCommand
+                {
+                    StudentId = studentResponse.Id,
+                    LevelId = registrationRequestDto.EnrollmentRegReq.LevelId,
+                    SubjectId = registrationRequestDto.EnrollmentRegReq.SubjectId,
+                    PlanId = registrationRequestDto.EnrollmentRegReq.PlanId,
+                    Notes = registrationRequestDto.EnrollmentRegReq.Notes,
+                    BranchId = registrationRequestDto.EnrollmentRegReq.BranchId,
+                    PreferedScheduleId = registrationRequestDto.EnrollmentRegReq.PreferedScheduleId,
+                    GroupId = registrationRequestDto.EnrollmentRegReq.GroupId ?? Guid.Empty
+                };
+
+                var enrollmentResponse = await _enrollmentService.CreateAsync(enrollmentCommand);
                 plan = (await _planQueryService.GetByIdAsync(enrollmentResponse.PlanId))!;
-                var evaluatePaymentPlan = await EvaluatePaymentPlanAsync(enrollmentResponse.PlanId , registrationRequestDto.PaymentRegReq);
+                var evaluatePaymentPlan = await EvaluatePaymentPlanAsync(enrollmentResponse.PlanId , registrationRequestDto.PaymentRegReq.Amount);
 
                 if (!evaluatePaymentPlan.IsFullyPaid)
                 {
-                    registrationRequestDto.ChargeRegReq = new ChargeCommand
+                    var chargeCommand = new ChargeCommand
                     {
                         Amount = evaluatePaymentPlan.Amount,
                         AmountPaid = evaluatePaymentPlan.PaidAmount,
@@ -107,23 +131,34 @@ namespace SchoolManagement.Application.Services.Registrations;
    
                     if (evaluatePaymentPlan.PaidAmount > 0)
                     {
-                        registrationRequestDto.ChargeRegReq.Status = ChargeStatus.PartiallyPaid;
+                        chargeCommand.Status = ChargeStatus.PartiallyPaid;
                     }
                     else
                     {
-                        registrationRequestDto.ChargeRegReq.Status = ChargeStatus.Unpaid;
+                        chargeCommand.Status = ChargeStatus.Unpaid;
                     }
 
 
-                     chargeResponse = await _chargeService.CreateAsync(registrationRequestDto.ChargeRegReq);
+                     chargeResponse = await _chargeService.CreateAsync(chargeCommand);
                 }
 
 
                 PaymentResponseDto? paymentResponse = null;
                 if (registrationRequestDto.PaymentRegReq != null)
                 {
-                    registrationRequestDto.PaymentRegReq.EnrollmentId = enrollmentResponse.Id;
-                    paymentResponse = await _paymentService.CreateAsync(registrationRequestDto.PaymentRegReq);
+                    var paymentCommand = new PaymentCommand
+                    {
+                        EnrollmentId = enrollmentResponse.Id,
+                        Amount = registrationRequestDto.PaymentRegReq.Amount,
+                        TransferFees = registrationRequestDto.PaymentRegReq.TransferFees,
+                        Method = registrationRequestDto.PaymentRegReq.Method,
+                        ExternalReferenceCode = registrationRequestDto.PaymentRegReq.ExternalReferenceCode,
+                        MethodDetailsJson = registrationRequestDto.PaymentRegReq.MethodDetailsJson ?? "{}",
+                        BranchId = _currentUserContext.BranchId,
+                        ReceivedByStaffId = _currentUserContext.UserId
+                    };
+
+                    paymentResponse = await _paymentService.CreateAsync(paymentCommand);
                 }
                
                 await _transaction.CommitTransactionAsync();

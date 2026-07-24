@@ -1,4 +1,4 @@
-using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Entities.EnrollmentAggregate;
 using System.Linq;
@@ -7,14 +7,17 @@ namespace SchoolManagement.Application.Mappers;
 
 public static class EnrollmentMapper  
 {
-    public static Enrollment ToDomain(EnrollmentRequestDto dto)
+    public static Enrollment ToDomain(EnrollmentCommand command)
     {
         return Enrollment.Create(
-            studentId: dto.StudentId,
-            subjectId: dto.SubjectId,
-            groupId: dto.GroupId,
-            planId: dto.PlanId,
-            notes: dto.Notes
+            branchId : command.BranchId, 
+            studentId: command.StudentId,
+            subjectId: command.SubjectId,
+            groupId: command.GroupId,
+            planId: command.PlanId,
+            enrolledAt: command.EnrolledAt,
+            status: command.Status,
+            notes: command.Notes
         );
     }
 
@@ -76,12 +79,16 @@ public static class EnrollmentMapper
             Payments = e.Payments?.Select(p => new PaymentResponseDto
             {
                 Id = p.Id,
-                AmountPaid = p.AmountPaid,
-                FeeAmount = p.FeeAmount,
+                EnrollmentId = p.EnrollmentId,
+                Amount = p.Amount,
+                TransferFees = p.TransferFees,
+                Method = p.Method,
                 Status = p.Status,
                 PaidAt = p.PaidAt,
-                PeriodStart = p.PeriodStart,
-                PeriodEnd = p.PeriodEnd
+                BranchId = p.BranchId,
+                ReceivedByStaffId = p.ReceivedByStaffId,
+                ExternalReferenceCode = p.ExternalReferenceCode,
+                MethodDetailsJson = p.MethodDetailsJson
             }).ToList() ?? new List<PaymentResponseDto>()
         };
     }
