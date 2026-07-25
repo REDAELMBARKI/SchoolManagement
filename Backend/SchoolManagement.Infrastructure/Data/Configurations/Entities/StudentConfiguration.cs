@@ -13,10 +13,16 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
             .ValueGeneratedOnAdd();
                 
   
-        // Email is optional for Students
-        entityTypeBuilder.Property(s => s.Email)
-            .IsRequired(false)
-            .HasMaxLength(255);
+        // Email is optional for Students (Value Object owned)
+        entityTypeBuilder.OwnsOne(s => s.Email, email =>
+        {
+            email.Property(e => e.Value)
+                .HasColumnName("Email")
+                .HasMaxLength(255)
+                .IsRequired(false);
+
+            email.HasIndex(e => e.Value);
+        });
             
         // Phone is required for Students
         entityTypeBuilder.Property(s => s.Phone)
@@ -32,7 +38,6 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
             .IsRequired(false);
             
         // Indexes
-        entityTypeBuilder.HasIndex(s => s.Email);
         entityTypeBuilder.HasIndex(s => s.Phone);
         entityTypeBuilder.HasIndex(s => s.DateOfBirth);
         

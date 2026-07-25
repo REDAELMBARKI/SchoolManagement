@@ -21,10 +21,14 @@ public class IntakeConfiguration : IEntityTypeConfiguration<Intake>
 
         // Email Value object is optional for Intakes
         entityTypeBuilder.OwnsOne(i => i.Email, email =>
+        {
            email.Property(e => e.Value)
            .HasColumnName("Email")
-           .IsRequired(false)
-        );
+           .HasMaxLength(255)
+           .IsRequired(false);
+
+           email.HasIndex(e => e.Value).IsUnique();
+        });
 
 
         // Phone is optional for Intakes
@@ -71,7 +75,6 @@ public class IntakeConfiguration : IEntityTypeConfiguration<Intake>
             .IsRequired();
 
         // Indexes for performance
-        entityTypeBuilder.HasIndex(i => i.Email).IsUnique();
         entityTypeBuilder.HasIndex(i => i.Phone);
         entityTypeBuilder.HasIndex(i => i.DateOfBirth);
         entityTypeBuilder.HasIndex(i => i.IntakeDate);
