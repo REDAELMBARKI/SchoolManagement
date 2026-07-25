@@ -17,7 +17,7 @@ public class StudentService : IStudentService
 {
     private readonly IStudentRepository _repository;
     private readonly IStudentQueryService _query;
-    private readonly IMediator _mediator; 
+    private readonly IMediator _mediator;
     public StudentService(IStudentRepository repository, IStudentQueryService query, IMediator mediator)
     {
         _repository = repository;
@@ -41,6 +41,8 @@ public class StudentService : IStudentService
 
     public async Task<StudentResponseDto> CreateAsync(StudentCommand command)
     {
+        await EnsureNoDuplicateStudentAsync(command);
+
         var generatedSlug = await CustomSluger.Slug(
             slug => _query.IsExistsBySlugAsync(slug), 
             command.FirstName, 
@@ -56,6 +58,18 @@ public class StudentService : IStudentService
         return StudentMapper.ToResponse(createdStudent);
     }
 
+    public async Task EnsureNoDuplicateStudentAsync(StudentCommand command)
+    {
+        if (await _query.HasDuplicateByPhoneAsync(command.Phone))
+            throw new DomainException("A student with this phone number already exists.");
+
+        if (!string.IsNullOrWhiteSpace(command.Email) && await _query.HasDuplicateByEmailAsync(command.Email))
+            throw new DomainException("A student with this email already exists.");
+
+        if (await _query.HasDuplicateByNameDobAsync(command.FirstName, command.LastName, command.DateOfBirth))
+            throw new DomainException("A student with the same name and date of birth already exists.");
+    }
+
     public async Task<StudentResponseDto> UpdateAsync(Guid id, StudentRequestDto dto)
     {
         var existing = await _repository.GetByIdAsync(id);
@@ -69,10 +83,10 @@ public class StudentService : IStudentService
         existing.UpdateEmail(dto.Email);
         existing.UpdatePhone(dto.Phone);
         existing.UpdateDateOfBirth(dto.DateOfBirth);
-        existing.UpdateGender(dto.GenderId);
+        existing.UpdateGenderId(dto.GenderId);
         existing.UpdateIntakeId(dto.IntakeId);
         existing.UpdateIsDirectRegistration(dto.IsDirectRegistration);
-        existing.UpdateBranchId(dto.BranchId);
+        //existing.UpdateBranchId(dto.BranchId);
         
         var updated = await _repository.UpdateAsync(existing);
         return StudentMapper.ToResponse(updated);

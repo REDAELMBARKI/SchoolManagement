@@ -1,4 +1,4 @@
-using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Entities;
 
@@ -36,17 +36,15 @@ public static class GroupMapper
         }).ToList()
     };
 
-    public static Group ToDomain(GroupRequestDto dto)
+    public static Group ToDomain(GroupCommand command)
     {
-        // Wait, Group.Create requires BranchId! Oh wait, Group has BranchId! Oh right! Group.Create has branchId! Oh wait, GroupRequestDto doesn't have BranchId!
-        // Hmm, let's just use Guid.Empty for now, but we should update DTO later
         return Group.Create(
-            name: dto.Name,
-            capacity: dto.Capacity,
-            period: dto.Period,
-            branchId: Guid.Empty, // Temporary, should be from DTO
-            levelId: dto.LevelId,
-            subjectId: dto.SubjectId
+            name: command.Name,
+            capacity: command.Capacity,
+            period: command.Period,
+            branchId: command.BranchId,
+            levelId: command.LevelId,
+            subjectId: command.SubjectId
         );
     }
 }

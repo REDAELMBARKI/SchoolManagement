@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolManagement.Infrastruc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolManagement.CrossCutting.Identity", "SchoolManagement.CrossCutting.Identity\SchoolManagement.CrossCutting.Identity.csproj", "{7862BD57-658E-469F-A005-8C98E33D94E5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolManagement.Tests", "SchoolManagement.Tests\SchoolManagement.Tests.csproj", "{26B5B18E-D012-4229-812A-2C7048DE1584}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{7862BD57-658E-469F-A005-8C98E33D94E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7862BD57-658E-469F-A005-8C98E33D94E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7862BD57-658E-469F-A005-8C98E33D94E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26B5B18E-D012-4229-812A-2C7048DE1584}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26B5B18E-D012-4229-812A-2C7048DE1584}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26B5B18E-D012-4229-812A-2C7048DE1584}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26B5B18E-D012-4229-812A-2C7048DE1584}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

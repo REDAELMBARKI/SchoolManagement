@@ -17,6 +17,7 @@ public class Charge : AggregateRoot
     public DateTime DueDate { get; private set; }
     public Guid? SourceId { get; private set; }
     public Guid BranchId { get; private set; }
+    public string CurrencyCode { get; private set; } = "MAD";
 
     // Navigation properties
     public virtual Student Student { get; private set; } = null!;
@@ -43,6 +44,7 @@ public class Charge : AggregateRoot
             throw new DomainException("Amount must be greater than zero.");
         if (amountPaid < 0)
             throw new DomainException("Amount paid cannot be negative.");
+       
 
         var charge = new Charge
         {
@@ -54,7 +56,7 @@ public class Charge : AggregateRoot
             DueDate = dueDate,
             Description = description,
             SourceId = sourceId,
-            BranchId = branchId
+            BranchId = branchId,
         };
 
         charge.UpdateStatus();

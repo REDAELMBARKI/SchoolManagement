@@ -1,4 +1,4 @@
-using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
@@ -7,28 +7,27 @@ namespace SchoolManagement.Application.Mappers;
 
 public static class IntakeMapper
 {
-    public static Intake ToDomain(IntakeRequestDto dto)
+    public static Intake ToDomain(IntakeCommand command)
     {  
-        string initialSlug  =  $"{dto.FirstName}-{dto.LastName}".ToLower();
         return Intake.Register(
-            firstName: dto.FirstName,
-            lastName: dto.LastName,
-            slug: initialSlug,
-            genderId: dto.GenderId,
-            email: dto.Email,
-            phone: dto.Phone,
-            dateOfBirth: dto.DateOfBirth,
-            intakeDate: dto.IntakeDate,
-            status: dto.Status,
-            followUpDate: dto.FollowUpDate,
-            notes: dto.Notes,
-            commercialAgentId: dto.CommercialAgentId,
-            leadSourceId: dto.LeadSource.SourceId,
-            subjectId: dto.SubjectId,
-            branchId: dto.BranchId,
-            isIndependent: dto.IsIndependent,
-            totalFees: dto.TotalFees,
-            amountPaid: dto.AmountPaid
+            firstName: command.FirstName,
+            lastName: command.LastName,
+            slug: command.Slug,
+            genderId: command.GenderId,
+            email: command.Email,
+            phone: command.Phone,
+            dateOfBirth: command.DateOfBirth,
+            intakeDate: command.IntakeDate,
+            status: command.Status,
+            followUpDate: command.FollowUpDate,
+            notes: command.Notes,
+            commercialAgentId: command.CommercialAgentId,
+            leadSourceId: command.LeadSourceId,
+            subjectId: command.SubjectId,
+            branchId: command.BranchId,
+            isIndependent: command.IsIndependent,
+            totalFees: command.TotalFees,
+            amountPaid: command.AmountPaid
         );
     }
 

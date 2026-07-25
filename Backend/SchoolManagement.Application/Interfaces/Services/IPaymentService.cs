@@ -9,6 +9,6 @@ public interface IPaymentService
     Task<List<PaymentResponseDto>> GetAllAsync();
     Task<PaymentResponseDto?> GetByIdAsync(Guid id);
     Task<PaymentResponseDto> CreateAsync(PaymentCommand command);
-    Task<PaymentResponseDto> UpdateAsync(Guid id, UpdatePaymentRequestDto dto);
+    Task<PaymentResponseDto> UpdateAsync(Guid id, UpdatePaymentCommand command);
     Task DeleteAsync(Guid id);
 }

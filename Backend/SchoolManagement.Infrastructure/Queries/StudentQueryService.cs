@@ -19,7 +19,7 @@ public class StudentQueryService : IStudentQueryService
 
     public async Task<List<Student>> GetAllAsync()
     {
-        return await _context.Users.OfType<Student>()
+        return await _context.Students
             .Include(s => s.Gender)
             .Include(s => s.Parents)
             .Include(s => s.Intake)
@@ -30,7 +30,7 @@ public class StudentQueryService : IStudentQueryService
 
     public async Task<Student?> GetByIdAsync(Guid id)
     {
-        return await _context.Users.OfType<Student>()
+        return await _context.Students
             .Include(s => s.Gender)
             .Include(s => s.Parents)
             .Include(s => s.Intake)
@@ -41,14 +41,14 @@ public class StudentQueryService : IStudentQueryService
 
     public async Task<bool> IsExistsAsync(Guid id)
     {
-        return await _context.Users.OfType<Student>()
+        return await _context.Students
             .Where(s => EF.Property<DateTime?>(s, "DeletedAt") == null)
             .AnyAsync(s => s.Id == id);
     }
 
     public async Task<bool> IsExistsBySlugAsync(string slug)
     {
-        return await _context.Users.OfType<Student>()
+        return await _context.Students
             .Where(s => EF.Property<DateTime?>(s, "DeletedAt") == null)
             .AnyAsync(s => s.Slug == slug);
     }
@@ -91,5 +91,35 @@ public class StudentQueryService : IStudentQueryService
             DateOfBirth = student.DateOfBirth,
             IntakeId = student.IntakeId
         };
+    }
+
+    public async Task<bool> HasDuplicateByPhoneAsync(string phone, Guid? excludeId = null)
+    {
+        if (string.IsNullOrWhiteSpace(phone)) return false;
+        var query = _context.Students
+            .Where(s => EF.Property<DateTime?>(s, "DeletedAt") == null)
+            .Where(s => s.Phone == phone);
+        if (excludeId.HasValue) query = query.Where(s => s.Id != excludeId.Value);
+        return await query.AnyAsync();
+    }
+
+    public async Task<bool> HasDuplicateByEmailAsync(string? email, Guid? excludeId = null)
+    {
+        if (string.IsNullOrWhiteSpace(email)) return false;
+        var query = _context.Students
+            .Where(s => EF.Property<DateTime?>(s, "DeletedAt") == null)
+            .Where(s => s.Email != null && s.Email.Value == email);
+        if (excludeId.HasValue) query = query.Where(s => s.Id != excludeId.Value);
+        return await query.AnyAsync();
+    }
+
+    public async Task<bool> HasDuplicateByNameDobAsync(string firstName, string lastName, DateOnly dateOfBirth, Guid? excludeId = null)
+    {
+        if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName)) return false;
+        var query = _context.Students
+            .Where(s => EF.Property<DateTime?>(s, "DeletedAt") == null)
+            .Where(s => s.FirstName == firstName && s.LastName == lastName && s.DateOfBirth == dateOfBirth);
+        if (excludeId.HasValue) query = query.Where(s => s.Id != excludeId.Value);
+        return await query.AnyAsync();
     }
 }

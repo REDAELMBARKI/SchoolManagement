@@ -19,4 +19,5 @@ public class ChargeCommand
     public decimal AmountPaid { get; set; } = 0;
 
     public Guid? SourceId { get; set; }
+
 }

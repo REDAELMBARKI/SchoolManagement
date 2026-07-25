@@ -49,7 +49,6 @@ public class ChargeService : IChargeService
         existing.UpdateAmount(dto.Amount);
         existing.UpdateDescription(dto.Description);
         existing.UpdateDueDate(dto.DueDate);
-
         var updated = await _repository.UpdateAsync(existing);
         return ChargeMapper.ToResponse(updated);
     }

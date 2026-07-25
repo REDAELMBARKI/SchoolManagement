@@ -89,7 +89,8 @@ public static class EnrollmentMapper
                 BranchId = p.BranchId,
                 ReceivedByStaffId = p.ReceivedByStaffId,
                 ExternalReferenceCode = p.ExternalReferenceCode,
-                MethodDetailsJson = p.MethodDetailsJson
+                MethodDetailsJson = p.MethodDetailsJson,
+                CurrencyCode = p.CurrencyCode
             }).ToList() ?? new List<PaymentResponseDto>()
         };
     }

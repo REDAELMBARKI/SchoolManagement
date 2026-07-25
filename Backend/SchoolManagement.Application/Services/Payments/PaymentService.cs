@@ -6,6 +6,7 @@ using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Application.Mappers;
 using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Domain.Interfaces.Repositories;
+using SchoolManagement.Application.Interfaces;
 
 namespace SchoolManagement.Application.Services.Payments;
 
@@ -13,11 +14,13 @@ public class PaymentService : IPaymentService
 {
     private readonly IPaymentRepository _repository;
     private readonly IPaymentQueryService _query;
+    private readonly ICurrentUserContext _currentUserContext;
 
-    public PaymentService(IPaymentRepository repository , IPaymentQueryService paymentQueryService)
+    public PaymentService(IPaymentRepository repository , IPaymentQueryService paymentQueryService, ICurrentUserContext currentUserContext)
     {
         _repository = repository;
         _query = paymentQueryService;
+        _currentUserContext = currentUserContext;
     }
 
     public async Task<List<PaymentResponseDto>> GetAllAsync()
@@ -35,29 +38,39 @@ public class PaymentService : IPaymentService
 
     public async Task<PaymentResponseDto> CreateAsync(PaymentCommand command)
     {
+        var branchId = _currentUserContext.BranchId;
+        if (branchId == Guid.Empty)
+            throw new DomainException("Branch context is missing.");
+        command.BranchId = branchId;
+
         var payment = PaymentMapper.ToDomain(command);
         var createdPayment = await _repository.AddAsync(payment);
         return PaymentMapper.ToResponse(createdPayment);
     }
 
-    public async Task<PaymentResponseDto> UpdateAsync(Guid id, UpdatePaymentRequestDto dto)
+    public async Task<PaymentResponseDto> UpdateAsync(Guid id, UpdatePaymentCommand command)
     {
+        var branchId = _currentUserContext.BranchId;
+        if (branchId == Guid.Empty)
+            throw new DomainException("Branch context is missing.");
+        command.BranchId = branchId;
+
         var existing = await _repository.GetByIdAsync(id);
         if (existing == null)
         {
             throw new NotFoundException($"No payment found with id {id}");
         }
 
-        existing.UpdateEnrollmentId(dto.EnrollmentId);
-        existing.UpdateAmount(dto.Amount);
-        existing.UpdateTransferFees(dto.TransferFees);
-        existing.UpdateMethod(dto.Method);
-        existing.UpdatePaidAt(dto.PaidAt);
-        existing.UpdateStatus(dto.Status);
-        existing.UpdateBranchId(dto.BranchId);
-        existing.UpdateReceivedByStaffId(dto.ReceivedByStaffId);
-        existing.UpdateExternalReferenceCode(dto.ExternalReferenceCode);
-        existing.UpdateMethodDetailsJson(dto.MethodDetailsJson ?? "{}");
+        existing.UpdateEnrollmentId(command.EnrollmentId);
+        existing.UpdateAmount(command.Amount);
+        existing.UpdateTransferFees(command.TransferFees);
+        existing.UpdateMethod(command.Method);
+        existing.UpdatePaidAt(command.PaidAt);
+        existing.UpdateStatus(command.Status);
+        existing.UpdateBranchId(command.BranchId);
+        existing.UpdateReceivedByStaffId(command.ReceivedByStaffId);
+        existing.UpdateExternalReferenceCode(command.ExternalReferenceCode);
+        existing.UpdateMethodDetailsJson(command.MethodDetailsJson ?? "{}");
 
         var updated = await _repository.UpdateAsync(existing);
         return PaymentMapper.ToResponse(updated);

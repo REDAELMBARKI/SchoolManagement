@@ -26,4 +26,5 @@ public class UpdatePaymentRequestDto
     public Guid ReceivedByStaffId { get; set; }
     public string? ExternalReferenceCode { get; set; }
     public string? MethodDetailsJson { get; set; }
+    public string CurrencyCode { get; set; } = "USD";
 }

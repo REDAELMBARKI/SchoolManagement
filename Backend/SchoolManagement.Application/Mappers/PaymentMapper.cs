@@ -18,7 +18,7 @@ public static class PaymentMapper
             transferFees: command.TransferFees,
             method: command.Method,
             externalReferenceCode: command.ExternalReferenceCode,
-            methodDetailsJson: command.MethodDetailsJson
+            methodDetailsJson: command.MethodDetailsJson ?? "{}"
         );
     }
 
@@ -36,7 +36,8 @@ public static class PaymentMapper
             BranchId = payment.BranchId,
             ReceivedByStaffId = payment.ReceivedByStaffId,
             ExternalReferenceCode = payment.ExternalReferenceCode,
-            MethodDetailsJson = payment.MethodDetailsJson
+            MethodDetailsJson = payment.MethodDetailsJson,
+            CurrencyCode = payment.CurrencyCode
         };
     }
 }

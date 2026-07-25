@@ -18,3 +18,5 @@ C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\obj\Debug\net10.0\re
 C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\obj\Debug\net10.0\SchoolManagement.Infrastructure.pdb
 C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\obj\Debug\net10.0\SchoolManagement.Infrastructure.genruntimeconfig.cache
 C:\SchoolManagement\Backend\SchoolManagement.Infrastructure\obj\Debug\net10.0\ref\SchoolManagement.Infrastructure.dll
+c:\SchoolManagement\Backend\SchoolManagement.Infrastructure\bin\Debug\net10.0\SchoolManagement.CrossCutting.Identity.dll
+c:\SchoolManagement\Backend\SchoolManagement.Infrastructure\bin\Debug\net10.0\SchoolManagement.CrossCutting.Identity.pdb

@@ -15,6 +15,7 @@ public class ChargeResponseDto
     public DateTime DueDate { get; set; }
     public Guid? SourceId { get; set; }
     public Guid BranchId { get; set; }
+    public string CurrencyCode { get; set; } = "USD";
     public StudentResponseDto? Student { get; set; }
     public ICollection<PaymentResponseDto> Payments { get; set; } = new List<PaymentResponseDto>();
 }

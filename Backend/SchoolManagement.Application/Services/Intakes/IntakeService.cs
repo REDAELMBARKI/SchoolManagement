@@ -1,4 +1,4 @@
-using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Application.Mappers;
 using SchoolManagement.Domain.Entities;
@@ -7,6 +7,7 @@ using SchoolManagement.Domain.Interfaces.Queries;
 using SchoolManagement.Domain.Interfaces.Repositories;
 using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Domain.Utils;
+using SchoolManagement.Application.Interfaces;
 
 namespace SchoolManagement.Application.Services.Intakes;
 
@@ -14,10 +15,12 @@ public class IntakeService : IIntakeService
 {
     private readonly IIntakeRepository _repository;
     private readonly IIntakeQueryService _query;
-    public IntakeService(IIntakeRepository repository, IIntakeQueryService query)
+    private readonly ICurrentUserContext _currentUserContext;
+    public IntakeService(IIntakeRepository repository, IIntakeQueryService query, ICurrentUserContext currentUserContext)
     {
         _repository = repository;
         _query = query;
+        _currentUserContext = currentUserContext;
     }
 
     public async Task<IEnumerable<IntakeResponseDto>> GetAllIntakesAsync()
@@ -30,11 +33,17 @@ public class IntakeService : IIntakeService
         return await _query.GetResponseByIdAsync(id);
     }
 
-    public async Task<IntakeResponseDto> AddIntakeAsync(IntakeRequestDto intakeDto)
+    public async Task<IntakeResponseDto> AddIntakeAsync(IntakeCommand command)
     {
-        Intake intake = IntakeMapper.ToDomain(intakeDto);
-        var generatedSlug = await CustomSluger.Slug(slug => _query.IsExistsBySlugAsync(slug), intake.FirstName, intake.LastName);
-        intake.UpdateSlug(generatedSlug);
+        var branchId = _currentUserContext.BranchId;
+        if (branchId == Guid.Empty)
+            throw new DomainException("Branch context is missing.");
+        command.BranchId = branchId;
+
+        var generatedSlug = await CustomSluger.Slug(slug => _query.IsExistsBySlugAsync(slug), command.FirstName, command.LastName);
+        command.Slug = generatedSlug;
+
+        Intake intake = IntakeMapper.ToDomain(command);
         var newEntity = await _repository.AddAsync(intake);
         return IntakeMapper.ToResponse(newEntity);
     }
@@ -42,46 +51,46 @@ public class IntakeService : IIntakeService
 
    
     
-    public async Task<IntakeResponseDto?> UpdateAsync(Guid id, IntakeRequestDto intakeDto)
+    public async Task<IntakeResponseDto?> UpdateAsync(Guid id, IntakeCommand command)
     {
-        // First get the existing entity from the repository
+        var branchId = _currentUserContext.BranchId;
+        if (branchId == Guid.Empty)
+            throw new DomainException("Branch context is missing.");
+        command.BranchId = branchId;
+
         var existingIntake = await _repository.GetByIdAsync(id);
         if (existingIntake is null)
         {
             throw new NotFoundException($"No intake found with id {id}");
         }
         
-        // Check if intake already has students
         if (existingIntake.HasStudents)
         {
             throw new DomainException("Cannot update an intake that already has students.");
         }
         
-        // Generate new slug if needed
-        var generatedSlug = await CustomSluger.Slug(slug => _query.IsExistsBySlugAsync(slug), intakeDto.FirstName, intakeDto.LastName);
+        var generatedSlug = await CustomSluger.Slug(slug => _query.IsExistsBySlugAsync(slug), command.FirstName, command.LastName);
         
-        // Now call all the update methods on the existing entity directly from the DTO
-        existingIntake.UpdateFirstName(intakeDto.FirstName);
-        existingIntake.UpdateLastName(intakeDto.LastName);
+        existingIntake.UpdateFirstName(command.FirstName);
+        existingIntake.UpdateLastName(command.LastName);
         existingIntake.UpdateSlug(generatedSlug);
-        existingIntake.UpdateGenderId(intakeDto.GenderId);
-        existingIntake.UpdatePhone(intakeDto.Phone);
-        existingIntake.UpdateEmail(intakeDto.Email);
-        existingIntake.UpdateDateOfBirth(intakeDto.DateOfBirth);
-        existingIntake.UpdateIntakeDate(intakeDto.IntakeDate);
-        existingIntake.UpdateStatus(intakeDto.Status);
-        existingIntake.UpdateFollowUpDate(intakeDto.FollowUpDate);
-        existingIntake.UpdateNotes(intakeDto.Notes);
-        existingIntake.UpdateCommercialAgentId(intakeDto.CommercialAgentId);
-        existingIntake.UpdateLeadSourceId(intakeDto.LeadSource.SourceId);
-        existingIntake.UpdateSubjectId(intakeDto.SubjectId);
-        existingIntake.UpdateBranchId(intakeDto.BranchId);
-        existingIntake.UpdateIsIndependent(intakeDto.IsIndependent);
-        existingIntake.UpdateTotalFees(intakeDto.TotalFees);
-        existingIntake.UpdateAmountPaid(intakeDto.AmountPaid);
+        existingIntake.UpdateGenderId(command.GenderId);
+        existingIntake.UpdatePhone(command.Phone);
+        existingIntake.UpdateEmail(command.Email);
+        existingIntake.UpdateDateOfBirth(command.DateOfBirth);
+        existingIntake.UpdateIntakeDate(command.IntakeDate);
+        existingIntake.UpdateStatus(command.Status);
+        existingIntake.UpdateFollowUpDate(command.FollowUpDate);
+        existingIntake.UpdateNotes(command.Notes);
+        existingIntake.UpdateCommercialAgentId(command.CommercialAgentId);
+        existingIntake.UpdateLeadSourceId(command.LeadSourceId);
+        existingIntake.UpdateSubjectId(command.SubjectId);
+        existingIntake.UpdateBranchId(command.BranchId);
+        existingIntake.UpdateIsIndependent(command.IsIndependent);
+        existingIntake.UpdateTotalFees(command.TotalFees);
+        existingIntake.UpdateAmountPaid(command.AmountPaid);
         
         existingIntake.UpdatedAt = DateTime.UtcNow;
-        // Now save the updated entity via repository
         Intake  updatedIntake = await _repository.UpdateAsync(existingIntake);
         return IntakeMapper.ToResponse(updatedIntake); 
     }

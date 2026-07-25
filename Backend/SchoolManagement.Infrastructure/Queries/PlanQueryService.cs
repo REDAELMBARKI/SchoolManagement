@@ -18,21 +18,18 @@ public class PlanQueryService : IPlanQueryService
     public async Task<List<Plan>> GetAllAsync()
     {
         return await _context.Plans
-            .Where(p => EF.Property<DateTime?>(p, "DeletedAt") == null)
-            .ToListAsync();
+             .ToListAsync();
     }
 
     public async Task<Plan?> GetByIdAsync(Guid id)
     {
         return await _context.Plans
-            .Where(p => EF.Property<DateTime?>(p, "DeletedAt") == null)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task<bool> IsExistsAsync(Guid id)
     {
         return await _context.Plans
-            .Where(p => EF.Property<DateTime?>(p, "DeletedAt") == null)
             .AnyAsync(p => p.Id == id);
     }
 

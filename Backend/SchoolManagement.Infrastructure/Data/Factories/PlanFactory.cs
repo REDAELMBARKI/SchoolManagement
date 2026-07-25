@@ -19,7 +19,12 @@ public class PlanFactory : Factory<Plan>
             ("Full Year", 12, 20m)
         };
 
+        var branches = Context.Branches.Select(b => b.Id).ToList();
+        var branchId = branches.Any() ? faker.PickRandom(branches) : Guid.Empty;
+
         var selected = faker.PickRandom(plans);
-        return Task.FromResult(Plan.Create(selected.Name, selected.Duration, selected.Discount));
+        decimal baseAmount = selected.Duration * 500m;
+        int remainingAmountDueDays = selected.Duration * 30;
+        return Task.FromResult(Plan.Create(selected.Name, selected.Duration, remainingAmountDueDays, baseAmount, branchId, selected.Discount));
     }
 }

@@ -43,14 +43,14 @@ public class UserQueryService : IUserQueryService
         return await _context.Users
             .Include(u => u.Roles)
             .Where(u => EF.Property<DateTime?>(u, "DeletedAt") == null)
-            .FirstOrDefaultAsync(u => u.Email.Value == email);
+            .FirstOrDefaultAsync(u => u.UserName == email);
     }
 
     public async Task<bool> IsExistsByEmailAsync(string email)
     {
         return await _context.Users
             .Where(u => EF.Property<DateTime?>(u, "DeletedAt") == null)
-            .AnyAsync(u => u.Email.Value == email);
+            .AnyAsync(u => u.UserName == email);
     }
 
 

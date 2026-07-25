@@ -34,7 +34,8 @@ public static class ChargeMapper
             IssuedDate = charge.IssuedDate,
             DueDate = charge.DueDate,
             SourceId = charge.SourceId,
-            BranchId = charge.BranchId
+            BranchId = charge.BranchId,
+            CurrencyCode = charge.CurrencyCode
         };
     }
 }

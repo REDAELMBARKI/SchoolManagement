@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Application.Mappers;
 using SchoolManagement.Domain.Entities.EnrollmentAggregate;
+using SchoolManagement.Domain.Enums;
 using SchoolManagement.Domain.Interfaces.Queries;
 using SchoolManagement.Infrastructure.Data;
 
@@ -56,5 +57,14 @@ public class EnrollmentQueryService : IEnrollmentQueryService
     {
         var enrollment = await GetByIdAsync(id);
         return enrollment == null ? null : EnrollmentMapper.ToResponse(enrollment);
+    }
+
+    public async Task<bool> HasActiveEnrollmentForStudentSubjectAsync(Guid studentId, Guid subjectId)
+    {
+        if (studentId == Guid.Empty) return false;
+        return await _context.Enrollments
+            .AnyAsync(e => e.StudentId == studentId
+                        && e.SubjectId == subjectId
+                        && e.Status == EnrollmentStatus.Active);
     }
 }

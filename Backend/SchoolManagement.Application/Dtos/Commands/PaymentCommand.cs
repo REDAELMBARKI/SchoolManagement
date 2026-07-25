@@ -10,6 +10,7 @@ public class PaymentCommand
     public decimal Amount { get; set; }
 
     public decimal? TransferFees { get; set; }
+    public Guid? ChargeId { get; set; }
 
     public PaymentMethod Method { get; set; }
 
@@ -24,4 +25,6 @@ public class PaymentCommand
     public string? ExternalReferenceCode { get; set; }
 
     public string MethodDetailsJson { get; set; } = "{}";
+
+    public string CurrencyCode { get; set; } = "USD";
 }

@@ -28,6 +28,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
 
     // ── People ──
  
+    public DbSet<User> Users { get; set; }
+    public DbSet<UserRole> UserRoles { get; set; }
     public DbSet<Teacher> Teachers { get; set; }
     public DbSet<Parent> Parents { get; set; }
     public DbSet<CommercialAgent> CommercialAgents { get; set; }

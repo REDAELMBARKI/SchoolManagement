@@ -21,14 +21,12 @@ public class UserFactory : Factory<User>
         var email = faker.Internet.Email(firstName, lastName);
        
         return User.Register(
+            userName: email,
             firstName: firstName,
             lastName: lastName,
             slug: new SlugHelper().GenerateSlug($"{firstName} {lastName}"),
             genderId: faker.PickRandom(genders),
-            email: email,
-            password: BCrypt.Net.BCrypt.HashPassword("password"),
-            dateOfBirth: dateOfBirth,
-            isActivated: true
+            passwordHash: BCrypt.Net.BCrypt.HashPassword("password")
         );
     }
 

@@ -59,7 +59,7 @@ public class IntakeValidator : AbstractValidator<IntakeRequestDto>
         RuleFor(i => i.GenderId)
         .MustAsync(async (genderId, ct) =>
         {
-            return await gender_query.IsExistsAsync(genderId.Value);
+            return await gender_query.IsExistsAsync(genderId!.Value);
         })
         .When(i => i.GenderId.HasValue)
         .WithMessage("Selected gender does not exist");

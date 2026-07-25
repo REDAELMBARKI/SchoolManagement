@@ -5,7 +5,7 @@ using SchoolManagement.Domain.Exceptions;
 using System.ComponentModel.DataAnnotations;
 namespace SchoolManagement.Domain.Entities;
 
-public class Payment : BaseEntity
+public class Payment : AggregateRoot
 {
     public Guid EnrollmentId { get; private set; }
     public decimal Amount { get; private set; }
@@ -14,10 +14,11 @@ public class Payment : BaseEntity
     public PaymentStatus Status { get; private set; }
     public DateTime PaidAt { get; private set; }
     public Guid BranchId { get; private set; }
-    public Guid ChargeId { get; private set; }
+    public Guid? ChargeId { get; private set; }
     public Guid ReceivedByStaffId { get; private set; }
     public string? ExternalReferenceCode { get; private set; }
     public string MethodDetailsJson { get; private set; } = "{}";
+    public string CurrencyCode { get; private set; } = "MAD";
 
     public virtual Enrollment Enrollment { get; private set; } = null!;
    // add nagivation for those fks 
@@ -33,7 +34,8 @@ public class Payment : BaseEntity
         decimal? transferFees = null,
         PaymentMethod method = PaymentMethod.Cash,
         string? externalReferenceCode = null,
-        string methodDetailsJson = "{}")
+        string methodDetailsJson = "{}"
+     )
     {
         if (enrollmentId == Guid.Empty)
             throw new DomainException("Enrollment ID must not be empty.");
@@ -55,7 +57,7 @@ public class Payment : BaseEntity
             BranchId = branchId,
             ReceivedByStaffId = receivedByStaffId,
             ExternalReferenceCode = externalReferenceCode,
-            MethodDetailsJson = methodDetailsJson
+            MethodDetailsJson = methodDetailsJson,
         };
     }
 
@@ -116,4 +118,5 @@ public class Payment : BaseEntity
             throw new DomainException("Method details JSON cannot be empty.");
         MethodDetailsJson = methodDetailsJson;
     }
+
 }

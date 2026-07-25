@@ -10,6 +10,7 @@ namespace SchoolManagement.Application.Results
         public bool IsFullyPaid = false;
         public decimal Amount ;
         public decimal PaidAmount ;
-        public decimal AmountRemainingDueDays;
+        public int RemainingAmountDueDays;
+
     }
 }

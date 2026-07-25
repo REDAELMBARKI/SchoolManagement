@@ -4,9 +4,11 @@ using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Application.Mappers;
 using SchoolManagement.Domain.Entities;
+using SchoolManagement.Domain.Enums;
 using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Domain.Interfaces.Queries;
 using SchoolManagement.Domain.Interfaces.Repositories;
+using SchoolManagement.Application.Interfaces;
 
 namespace SchoolManagement.Application.Services.Enrollements;
 
@@ -15,12 +17,14 @@ public class EnrollmentService : IEnrollmentService
     private readonly IEnrollmentRepository _repository;
     private readonly IEnrollmentQueryService _queryService;
     private readonly IGroupQueryService _groupQueryService;
+    private readonly ICurrentUserContext _currentUserContext;
 
-    public EnrollmentService(IEnrollmentRepository repository, IEnrollmentQueryService queryService, IGroupQueryService groupQueryService)
+    public EnrollmentService(IEnrollmentRepository repository, IEnrollmentQueryService queryService, IGroupQueryService groupQueryService, ICurrentUserContext currentUserContext)
     {
         _repository = repository;
         _queryService = queryService;
         _groupQueryService = groupQueryService;
+        _currentUserContext = currentUserContext;
     }
 
     public async Task<List<EnrollmentResponseDto>> GetAllAsync()
@@ -35,24 +39,40 @@ public class EnrollmentService : IEnrollmentService
 
     public async Task<EnrollmentResponseDto> CreateAsync(EnrollmentCommand command)
     {
-        var availableGroupsWithSameLevel = await _groupQueryService.GetAvailableGroupsByLevelId(command.LevelId);
-        command.GroupId = EvaluateStudentGroup(availableGroupsWithSameLevel, command.PreferedScheduleId, command.GroupId);
+        var branchId = _currentUserContext.BranchId;
+        if (branchId == Guid.Empty)
+            throw new DomainException("Branch context is missing.");
+        command.BranchId = branchId;
+
+        await EnsureNoDuplicateActiveEnrollmentAsync(command.StudentId, command.SubjectId);
+
+        var availableGroups = await _groupQueryService.GetAvailableGroupsByLevelSubjectBranch(
+            levelId: command.LevelId,
+            subjectId: command.SubjectId,
+            branchId: command.BranchId);
+
+        command.GroupId = EvaluateStudentGroup(availableGroups, command.PreferedScheduleId, command.GroupId);
         var enrollment = EnrollmentMapper.ToDomain(command);
         var created = await _repository.AddAsync(enrollment);
         return EnrollmentMapper.ToResponse(created);
     }
 
-    public async Task<EnrollmentResponseDto> UpdateAsync(Guid id, UpdateEnrollmentRequestDto dto)
+    public async Task<EnrollmentResponseDto> UpdateAsync(Guid id, UpdateEnrollmentCommand command)
     {
+        var branchId = _currentUserContext.BranchId;
+        if (branchId == Guid.Empty)
+            throw new DomainException("Branch context is missing.");
+        command.BranchId = branchId;
+
         var existing = await _repository.GetByIdAsync(id);
         if (existing is null) throw new NotFoundException($"Enrollment with id {id} not found.");
 
-        existing.UpdateStudentId(dto.StudentId);
-        existing.UpdateSubjectId(dto.SubjectId);
-        existing.UpdateGroupId(dto.GroupId);
-        existing.UpdateBranchId(dto.BranchId);
-        existing.UpdatePlanId(dto.PlanId);
-        existing.UpdateNotes(dto.Notes);
+        existing.UpdateStudentId(command.StudentId);
+        existing.UpdateSubjectId(command.SubjectId);
+        existing.UpdateGroupId(command.GroupId);
+        existing.UpdateBranchId(command.BranchId);
+        existing.UpdatePlanId(command.PlanId);
+        existing.UpdateNotes(command.Notes);
 
         var updated = await _repository.UpdateAsync(existing);
         return EnrollmentMapper.ToResponse(updated);
@@ -63,39 +83,43 @@ public class EnrollmentService : IEnrollmentService
         await _repository.DeleteAsync(id);
     }
 
-
-
-    private Guid EvaluateStudentGroup(List<Group> availableGroupsWithSameLevel, Guid? PreferedScheduleId, Guid? groupId)
+    private async Task EnsureNoDuplicateActiveEnrollmentAsync(Guid studentId, Guid subjectId)
     {
-        Guid? GroupId = groupId;
-        if (groupId != null)
-        {
-            CheckGroupAvailability(availableGroupsWithSameLevel, groupId!.Value);
-        }
-        else
-        {
-            GroupId = AssignNewGroup(availableGroupsWithSameLevel, PreferedScheduleId);
-        }
-
-        return GroupId!.Value;
+        var duplicateExists = await _queryService.HasActiveEnrollmentForStudentSubjectAsync(studentId, subjectId);
+        if (duplicateExists)
+            throw new DomainException("Student already has an active enrollment for this subject.");
     }
 
-    private Guid AssignNewGroup(List<Group> availableGroupsWithSameLevel, Guid? PreferedScheduleId)
+    private Guid EvaluateStudentGroup(List<Group> availableGroups, Guid? PreferedScheduleId, Guid? groupId)
     {
-        Group? groupPrefered = availableGroupsWithSameLevel.FirstOrDefault(g => g.Schedule.Id == PreferedScheduleId);
+        if (!availableGroups.Any())
+            throw new UnAvailableResourceException("No available groups with free capacity for the selected level, subject, and branch.");
+
+        if (groupId.HasValue && groupId.Value != Guid.Empty)
+        {
+            CheckGroupAvailability(availableGroups, groupId.Value);
+            return groupId.Value;
+        }
+
+        return AssignNewGroup(availableGroups, PreferedScheduleId);
+    }
+
+    private Guid AssignNewGroup(List<Group> availableGroups, Guid? PreferedScheduleId)
+    {
+        var groupPrefered = availableGroups.FirstOrDefault(g => g.Schedule.Id == PreferedScheduleId);
         if (groupPrefered == null)
         {
-            return availableGroupsWithSameLevel.First().Id;
+            var first = availableGroups.FirstOrDefault();
+            if (first == null)
+                throw new UnAvailableResourceException("No available groups with free capacity for the selected level, subject, and branch.");
+            return first.Id;
         }
         return groupPrefered.Id;
     }
 
-    private void CheckGroupAvailability(List<Group> availableGroupsWithSameLevel, Guid groupId)
+    private void CheckGroupAvailability(List<Group> availableGroups, Guid groupId)
     {
-
-        if (!availableGroupsWithSameLevel.Any() || !availableGroupsWithSameLevel.Select(g => g.Id).Contains(groupId))
-            throw new UnAvailableResourceException("No Empty Place  Available group with same level ");
+        if (!availableGroups.Select(g => g.Id).Contains(groupId))
+            throw new UnAvailableResourceException("The selected group is either full, belongs to a different subject/branch, or does not exist.");
     }
-
-
 }

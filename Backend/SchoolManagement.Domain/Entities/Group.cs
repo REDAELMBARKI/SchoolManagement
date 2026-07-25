@@ -1,6 +1,7 @@
 using System.Linq;
 using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Entities.EnrollmentAggregate;
+using SchoolManagement.Domain.Enums;
 using SchoolManagement.Domain.Exceptions;
 
 namespace SchoolManagement.Domain.Entities;
@@ -136,11 +137,11 @@ public class Group : AggregateRoot
     // Check if group has space for more enrollments
     public bool HasAvailableSpace()
     {
-        return Enrollments.Select(e => e.Status == EnrollmentStatus.Active).Count < Capacity;
+        return Enrollments.Count(e => e.Status == EnrollmentStatus.Active) < Capacity;
     }
 
     public int GetRemainingCapacity()
     {
-        return Capacity - Enrollments.Select(e => e.Status == EnrollmentStatus.Active).Count;   
+        return Capacity - Enrollments.Count(e => e.Status == EnrollmentStatus.Active);
     }
 }

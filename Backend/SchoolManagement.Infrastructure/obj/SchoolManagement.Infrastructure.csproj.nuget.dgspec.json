@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj": {}
+    "c:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj": {}
   },
   "projects": {
-    "C:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj": {
+    "c:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj",
+        "projectUniqueName": "c:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj",
         "projectName": "SchoolManagement.Application",
-        "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj",
+        "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj",
         "packagesPath": "C:\\Users\\OBLIVION\\.nuget\\packages\\",
-        "outputPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Application\\obj\\",
+        "outputPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -34,8 +34,8 @@
             "framework": "net10.0",
             "targetAlias": "net10.0",
             "projectReferences": {
-              "C:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj": {
-                "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj"
+              "c:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj": {
+                "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj"
               }
             }
           }
@@ -50,7 +50,7 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.300"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net10.0": {
@@ -102,7 +102,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400-preview.0.26322.102/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -380,14 +380,14 @@
         }
       }
     },
-    "C:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj": {
+    "c:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj",
+        "projectUniqueName": "c:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj",
         "projectName": "SchoolManagement.CrossCutting.Identity",
-        "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj",
+        "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj",
         "packagesPath": "C:\\Users\\OBLIVION\\.nuget\\packages\\",
-        "outputPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\obj\\",
+        "outputPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -422,7 +422,7 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.300"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net10.0": {
@@ -454,7 +454,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400-preview.0.26322.102/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -732,14 +732,14 @@
         }
       }
     },
-    "C:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj": {
+    "c:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj",
+        "projectUniqueName": "c:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj",
         "projectName": "SchoolManagement.Domain",
-        "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj",
+        "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj",
         "packagesPath": "C:\\Users\\OBLIVION\\.nuget\\packages\\",
-        "outputPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\obj\\",
+        "outputPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -774,7 +774,7 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.300"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net10.0": {
@@ -814,7 +814,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400-preview.0.26322.102/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -1092,14 +1092,14 @@
         }
       }
     },
-    "C:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj": {
+    "c:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj",
+        "projectUniqueName": "c:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj",
         "projectName": "SchoolManagement.Infrastructure",
-        "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj",
+        "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj",
         "packagesPath": "C:\\Users\\OBLIVION\\.nuget\\packages\\",
-        "outputPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\obj\\",
+        "outputPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -1122,14 +1122,14 @@
             "framework": "net10.0",
             "targetAlias": "net10.0",
             "projectReferences": {
-              "C:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj": {
-                "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj"
+              "c:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj": {
+                "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj"
               },
-              "C:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj": {
-                "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj"
+              "c:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj": {
+                "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj"
               },
-              "C:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj": {
-                "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj"
+              "c:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj": {
+                "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj"
               }
             }
           }
@@ -1144,7 +1144,7 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.300"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net10.0": {
@@ -1204,7 +1204,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400-preview.0.26322.102/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",

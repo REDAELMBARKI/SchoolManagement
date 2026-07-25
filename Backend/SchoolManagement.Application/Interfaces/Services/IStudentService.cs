@@ -10,5 +10,7 @@ public interface IStudentService
     Task<StudentResponseDto> GetByIdAsync(Guid id);
     Task<StudentResponseDto> CreateAsync(StudentCommand command);
     Task<StudentResponseDto> UpdateAsync(Guid id, StudentRequestDto dto);
+    Task EnsureNoDuplicateStudentAsync(StudentCommand command);
     Task DeleteAsync(Guid id);
+
 }

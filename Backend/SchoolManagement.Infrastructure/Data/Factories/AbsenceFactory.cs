@@ -14,6 +14,7 @@ public class AbsenceFactory : Factory<Absence>
     {
         var students = await Context.Students.Select(s => s.Id).ToListAsync();
         var schedules = await Context.Schedules.Select(s => s.Id).ToListAsync();
+        var branches = await Context.Branches.Select(b => b.Id).ToListAsync();
         var statuses = new[] { "Absent", "Late" };
 
         var isJustified = faker.Random.Bool();
@@ -22,6 +23,7 @@ public class AbsenceFactory : Factory<Absence>
         return Absence.Create(
             studentId: students.Any() ? faker.PickRandom(students) : Guid.Empty,
             scheduleId: schedules.Any() ? faker.PickRandom(schedules) : Guid.Empty,
+            branchId: branches.Any() ? faker.PickRandom(branches) : Guid.Empty,
             date: faker.Date.Past(),
             status: faker.PickRandom(statuses),
             isJustified: isJustified,

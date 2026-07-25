@@ -13,9 +13,12 @@ public class PlatformFactory : Factory<Platform>
     {
         var platforms = new[] { "Facebook", "Google Ads", "TikTok", "Instagram", "YouTube" };
         var name = faker.PickRandom(platforms);
+        var branchIds = Context.Branches.Select(b => b.Id).ToList();
+        var branchId = branchIds.Any() ? faker.PickRandom(branchIds) : Guid.Empty;
         return Task.FromResult(Platform.Create(
             name: name,
-            slug: this.GenerateSlug(name)
+            slug: this.GenerateSlug(name),
+            branchId: branchId
         ));
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
+using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Services;
 using SchoolManagement.Domain.Exceptions;
@@ -18,6 +19,7 @@ namespace SchoolManagement.Api.Controllers;
 [Route("api/intakes")]
 public class IntakeController : ControllerBase
 {
+
 
 
     private readonly IIntakeService _intakeService;
@@ -66,20 +68,69 @@ public class IntakeController : ControllerBase
 
 
     [HttpPost]
-    public async Task<IActionResult> Add(IntakeRequestDto intakeDto)
+    public async Task<IActionResult> Add(IntakeRequestDto dto)
     {
-        var newIntake = await _intakeService.AddIntakeAsync(intakeDto);
-        return CreatedAtAction(nameof(GetById), new { id = newIntake.Id }, newIntake);
+        try
+        {
+            var command = new IntakeCommand
+            {
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                Email = dto.Email,
+                Phone = dto.Phone,
+                DateOfBirth = dto.DateOfBirth,
+                GenderId = dto.GenderId,
+                IntakeDate = dto.IntakeDate,
+                Status = dto.Status,
+                FollowUpDate = dto.FollowUpDate,
+                Notes = dto.Notes,
+                CommercialAgentId = dto.CommercialAgentId,
+                LeadSourceId = dto.IsIndependent ? null : dto.LeadSource?.SourceId,
+                SubjectId = dto.SubjectId,
+                IsIndependent = dto.IsIndependent,
+                TotalFees = dto.TotalFees,
+                AmountPaid = dto.AmountPaid
+            };
+            var newIntake = await _intakeService.AddIntakeAsync(command);
+            return CreatedAtAction(nameof(GetById), new { id = newIntake.Id }, newIntake);
+        }
+        catch (Exception ex)
+        {
+            return Problem(
+                statusCode: 500,
+                title: "Create error",
+                detail: ex.Message
+            );
+        }
     }
 
 
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, IntakeRequestDto intake)
+    public async Task<IActionResult> Update(Guid id, IntakeRequestDto dto)
     {
         try
         {
-            await _intakeService.UpdateAsync(id , intake);
+            var command = new IntakeCommand
+            {
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                Email = dto.Email,
+                Phone = dto.Phone,
+                DateOfBirth = dto.DateOfBirth,
+                GenderId = dto.GenderId,
+                IntakeDate = dto.IntakeDate,
+                Status = dto.Status,
+                FollowUpDate = dto.FollowUpDate,
+                Notes = dto.Notes,
+                CommercialAgentId = dto.CommercialAgentId,
+                LeadSourceId = dto.IsIndependent ? null : dto.LeadSource?.SourceId,
+                SubjectId = dto.SubjectId,
+                IsIndependent = dto.IsIndependent,
+                TotalFees = dto.TotalFees,
+                AmountPaid = dto.AmountPaid
+            };
+            await _intakeService.UpdateAsync(id, command);
             return NoContent();
         }catch(NotFoundException)
         {
@@ -121,6 +172,7 @@ public class IntakeController : ControllerBase
             );
         }
     }
+
 
 
 

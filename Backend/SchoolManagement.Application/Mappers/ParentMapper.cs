@@ -1,4 +1,4 @@
-using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Entities;
 
@@ -6,20 +6,17 @@ namespace SchoolManagement.Application.Mappers;
 
 public static class ParentMapper
 {
-    public static Parent ToDomain(ParentRequestDto dto)
+    public static Parent ToDomain(ParentCommand command)
     {
-        var relationship = Enum.TryParse<RelationshipType>(dto.Relationship, true, out var rel)
-            ? rel
-            : RelationshipType.Other;
-
         return Parent.Register(
-            firstName: dto.FirstName,
-            lastName: dto.LastName,
-            slug: dto.Slug,
-            genderId: dto.GenderId,
-            email: dto.Email,
-            phone: dto.Phone,
-            relationship: relationship
+            firstName: command.FirstName,
+            lastName: command.LastName,
+            slug: command.Slug,
+            genderId: command.GenderId,
+            email: command.Email,
+            phone: command.Phone,
+            relationship: command.Relationship,
+            branchId: command.BranchId
         );
     }
 

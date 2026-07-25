@@ -1,4 +1,4 @@
-using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Entities;
 
@@ -6,16 +6,16 @@ namespace SchoolManagement.Application.Mappers;
 
 public static class ScheduleMapper
 {
-    public static Schedule ToDomain(ScheduleRequestDto dto)
+    public static Schedule ToDomain(ScheduleCommand command)
     {
         return Schedule.Create(
-            branchId: dto.BranchId,
-            teacherId: dto.TeacherId,
-            roomId: dto.RoomId,
-            dayId: dto.DayId,
-            timeSlotId: dto.TimeSlotId,
-            groupId: dto.GroupId,
-            subjectId: dto.SubjectId
+            branchId: command.BranchId,
+            teacherId: command.TeacherId,
+            roomId: command.RoomId,
+            dayId: command.DayId,
+            timeSlotId: command.TimeSlotId,
+            groupId: command.GroupId,
+            subjectId: command.SubjectId
         );
     }
 

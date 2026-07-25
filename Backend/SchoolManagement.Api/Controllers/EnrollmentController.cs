@@ -57,8 +57,8 @@ public class EnrollmentController : ControllerBase
                 SubjectId = dto.SubjectId,
                 PlanId = dto.PlanId,
                 Notes = dto.Notes,
-                BranchId = dto.BranchId,
                 PreferedScheduleId = dto.PreferedScheduleId,
+                StudentId = dto.StudentId,
                 GroupId = dto.GroupId ?? Guid.Empty
             };
             var enrollment = await _enrollmentService.CreateAsync(command);
@@ -83,7 +83,17 @@ public class EnrollmentController : ControllerBase
     {
         try
         {
-            await _enrollmentService.UpdateAsync(id, dto);
+            var command = new UpdateEnrollmentCommand
+            {
+                PreferedScheduleId = dto.PreferedScheduleId,
+                LevelId = dto.LevelId,
+                StudentId = dto.StudentId,
+                SubjectId = dto.SubjectId,
+                PlanId = dto.PlanId,
+                Notes = dto.Notes,
+                GroupId = dto.GroupId
+            };
+            await _enrollmentService.UpdateAsync(id, command);
             return NoContent();
         }
         catch (NotFoundException)
@@ -122,9 +132,4 @@ public class EnrollmentController : ControllerBase
         }
     }
 
-    // TODO: Additional endpoints for you to implement:
-    // - GET api/enrollments/student/{studentId} - Get student's enrollments
-    // - GET api/enrollments/group/{groupId} - Get group enrollments
-    // - POST api/enrollments/{id}/drop - Drop enrollment (change status)
-    // - POST api/enrollments/{id}/payment - Process payment
 }

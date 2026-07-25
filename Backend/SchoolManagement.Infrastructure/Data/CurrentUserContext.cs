@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using SchoolManagement.Application.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -58,4 +58,5 @@ namespace SchoolManagement.Infrastructure.Data
 
             return branchId;
         }
+    }
 }

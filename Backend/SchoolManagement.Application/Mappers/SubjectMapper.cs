@@ -1,4 +1,4 @@
-using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Entities;
 
@@ -6,13 +6,13 @@ namespace SchoolManagement.Application.Mappers;
 
 public static class SubjectMapper
 {
-    public static Subject ToDomain(SubjectRequestDto dto)
+    public static Subject ToDomain(SubjectCommand command)
     {
         return Subject.Create(
-            name: dto.Name,
-            slug: dto.Slug,
-            description: dto.Description,
-            branchId: dto.BranchId
+            name: command.Name,
+            slug: command.Slug,
+            description: command.Description,
+            branchId: command.BranchId
         );
     }
 
