@@ -41,6 +41,8 @@ namespace SchoolManagement.Tests.UnitTests.Students
             _studentQueryMock.Setup(q =>  q.HasDuplicateByPhoneAsync(command.Phone)).ReturnsAsync(true);
         
             _sut.EnsureNoDuplicateStudentAsync(command);
+
+
         }
 
 

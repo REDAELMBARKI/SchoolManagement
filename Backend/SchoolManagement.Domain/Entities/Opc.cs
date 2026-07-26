@@ -4,7 +4,7 @@ namespace SchoolManagement.Domain.Entities;
 
 public class Opc : Employee
 {
-    public virtual ICollection<LeadSource> LeadSources { get; private set; } = new List<LeadSource>();
+    public virtual ICollection<OpcLeadSource> LeadSources { get; private set; } = new List<OpcLeadSource>();
 
     [NotMapped]
     public IEnumerable<Intake> Intakes => LeadSources.SelectMany(ls => ls.Intakes).ToList();

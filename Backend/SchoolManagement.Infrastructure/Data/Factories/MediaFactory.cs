@@ -15,7 +15,7 @@ public class MediaFactory : Factory<Media>
         var branches = await Context.Branches.Select(b => b.Id).ToListAsync();
         var students = await Context.Students.Select(s => s.Id).ToListAsync();
         var teachers = await Context.Teachers.Select(t => t.Id).ToListAsync();
-        var users = await Context.Users.Select(u => u.Id).ToListAsync();
+        var users = await Context.DomainUsers.Select(u => u.Id).ToListAsync();
 
         var mediaTypes = Enum.GetValues<MediaType>();
         var collections = Enum.GetValues<MediaCollection>();

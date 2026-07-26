@@ -6,7 +6,7 @@ namespace SchoolManagement.Infrastructure.Data.Configurations.Entities
 {
     public class AdLeadSourceConfiguration : IEntityTypeConfiguration<AdLeadSource>
     {
-        void IEntityTypeConfiguration<AdLeadSource>.Configure(EntityTypeBuilder<AdLeadSource> builder)
+        public void Configure(EntityTypeBuilder<AdLeadSource> builder)
         {
             builder.HasOne(AdL => AdL.Ad)
                  .WithMany()

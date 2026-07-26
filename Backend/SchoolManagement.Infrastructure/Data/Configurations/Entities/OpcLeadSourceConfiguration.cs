@@ -6,12 +6,11 @@ namespace SchoolManagement.Infrastructure.Data.Configurations.Entities
 {
     public class OpcLeadSourceConfiguration : IEntityTypeConfiguration<OpcLeadSource>
     {
-        void IEntityTypeConfiguration<OpcLeadSource>.Configure(EntityTypeBuilder<OpcLeadSource> builder)
+        public void Configure(EntityTypeBuilder<OpcLeadSource> builder)
         {
             builder.HasOne(OpcL => OpcL.Opc)
-                 .WithMany()
+                 .WithMany(o => o.LeadSources)
                  .HasForeignKey(OpcL => OpcL.OpcId);
         }
-    
     }
 }

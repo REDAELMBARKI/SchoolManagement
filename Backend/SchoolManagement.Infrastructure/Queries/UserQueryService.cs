@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Interfaces.Queries;
 using SchoolManagement.Infrastructure.Data;
@@ -15,44 +14,24 @@ public class UserQueryService : IUserQueryService
         _context = context;
     }
 
-    public async Task<List<User>> GetAllAsync()
+    public async Task<List<DomainUser>> GetAllAsync()
     {
-        return await _context.Users
-            .Include(u => u.Roles)
+        return await _context.DomainUsers
             .Where(u => EF.Property<DateTime?>(u, "DeletedAt") == null)
             .ToListAsync();
     }
 
-    public async Task<User?> GetByIdAsync(Guid id)
+    public async Task<DomainUser?> GetByIdAsync(Guid id)
     {
-        return await _context.Users
-            .Include(u => u.Roles)
+        return await _context.DomainUsers
             .Where(u => EF.Property<DateTime?>(u, "DeletedAt") == null)
             .FirstOrDefaultAsync(u => u.Id == id);
     }
 
     public async Task<bool> IsExistsAsync(Guid id)
     {
-        return await _context.Users
+        return await _context.DomainUsers
             .Where(u => EF.Property<DateTime?>(u, "DeletedAt") == null)
             .AnyAsync(u => u.Id == id);
     }
-
-    public async Task<User?> GetByEmailAsync(string email)
-    {
-        return await _context.Users
-            .Include(u => u.Roles)
-            .Where(u => EF.Property<DateTime?>(u, "DeletedAt") == null)
-            .FirstOrDefaultAsync(u => u.UserName == email);
-    }
-
-    public async Task<bool> IsExistsByEmailAsync(string email)
-    {
-        return await _context.Users
-            .Where(u => EF.Property<DateTime?>(u, "DeletedAt") == null)
-            .AnyAsync(u => u.UserName == email);
-    }
-
-
-  
 }

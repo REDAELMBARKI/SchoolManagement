@@ -24,6 +24,5 @@ public class OpcConfiguration : IEntityTypeConfiguration<Opc>
                 
         // Table mapping for Opc entity (TPC inherited from Employee)
         entityTypeBuilder.ToTable("Opcs");
-
     }
 }

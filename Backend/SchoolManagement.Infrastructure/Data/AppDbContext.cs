@@ -28,8 +28,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
 
     // ── People ──
  
-    public DbSet<User> Users { get; set; }
-    public DbSet<UserRole> UserRoles { get; set; }
+    public DbSet<DomainUser> DomainUsers { get; set; }
     public DbSet<Teacher> Teachers { get; set; }
     public DbSet<Parent> Parents { get; set; }
     public DbSet<CommercialAgent> CommercialAgents { get; set; }
@@ -78,7 +77,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
 
     private void ApplySoftDeleteFilter(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Employee>().HasQueryFilter(e => e.DeletedAt == null);
+        modelBuilder.Entity<Person>().HasQueryFilter(e => e.DeletedAt == null);
     }
 
 
@@ -90,6 +89,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
     private void ApplyEntityConfigurations(ModelBuilder modelBuilder){
         modelBuilder.ApplyConfiguration(new PersonConfiguration());
         modelBuilder.ApplyConfiguration(new EmployeeConfigurations());
+        modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new IntakeConfiguration());
         modelBuilder.ApplyConfiguration(new StudentConfiguration());
         modelBuilder.ApplyConfiguration(new ParentConfiguration());
@@ -102,6 +102,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
         modelBuilder.ApplyConfiguration(new GradeConfiguration());
         modelBuilder.ApplyConfiguration(new MediaConfiguration());
         modelBuilder.ApplyConfiguration(new LeadSourceConfiguration());
+        modelBuilder.ApplyConfiguration(new OpcLeadSourceConfiguration());
+        modelBuilder.ApplyConfiguration(new AdLeadSourceConfiguration());
     }
 
  
