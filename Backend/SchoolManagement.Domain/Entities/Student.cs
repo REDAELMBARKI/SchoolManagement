@@ -16,7 +16,7 @@ public class Student : Person
     public Guid BranchId { get; private set; }
 
     // navigation
-    public virtual ICollection<Parent> Parents { get; private set; } = new List<Parent>();
+    public virtual ICollection<StudentResponsable> StudentResponsables { get; private set; } = new List<StudentResponsable>();
     public virtual ICollection<Enrollment> Enrollments { get; private set; } = new List<Enrollment>();
     public virtual Intake? Intake { get; private set; }
     public virtual Branch Branch { get; private set; } = null!;

@@ -48,6 +48,7 @@ public class StudentService : IStudentService
             command.FirstName, 
             command.LastName
         );
+
         command.Slug = generatedSlug;
 
         var student = StudentMapper.ToDomain(command);

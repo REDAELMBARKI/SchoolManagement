@@ -26,7 +26,7 @@ public class StudentResponseDto
     // Navigation Properties
     public IntakeResponseDto? Intake { get; set; }
 
-    public IEnumerable<ParentResponseDto> Parents {get;set;} =  new List<ParentResponseDto>();
+    public IEnumerable<StudentResponsableResponseDto> StudentResponsables {get;set;} =  new List<StudentResponsableResponseDto>();
     
     public IEnumerable<EnrollmentResponseDto> Enrollments { get; set; } = new List<EnrollmentResponseDto>();
     

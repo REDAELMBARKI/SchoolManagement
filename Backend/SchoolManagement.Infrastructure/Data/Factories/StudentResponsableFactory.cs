@@ -5,13 +5,13 @@ using Slugify;
 
 namespace SchoolManagement.Infrastructure.Data.Factories;
 
-public class ParentFactory : Factory<Parent>
+public class StudentResponsableFactory : Factory<StudentResponsable>
 {
-    public ParentFactory(AppDbContext context) : base(context)
+    public StudentResponsableFactory(AppDbContext context) : base(context)
     {
     }
 
-    protected override async Task<Parent> Make()
+    protected override async Task<StudentResponsable> Make()
     {
         var genders = await Context.Genders.Select(g => g.Id).ToListAsync();
         var branches = await Context.Branches.Select(b => b.Id).ToListAsync();
@@ -24,7 +24,7 @@ public class ParentFactory : Factory<Parent>
         var relationship = faker.PickRandom<RelationshipType>();
         var branchId = branches.Any() ? faker.PickRandom(branches) : Guid.Empty;
 
-        return Parent.Register(
+        return StudentResponsable.Register(
             firstName: firstName,
             lastName: lastName,
             slug: new SlugHelper().GenerateSlug($"{firstName} {lastName}"),

@@ -21,7 +21,7 @@ public class StudentQueryService : IStudentQueryService
     {
         return await _context.Students
             .Include(s => s.Gender)
-            .Include(s => s.Parents)
+            .Include(s => s.StudentResponsables)
             .Include(s => s.Intake)
             .Include(s => s.Enrollments)
             .Where(s => EF.Property<DateTime?>(s, "DeletedAt") == null)
@@ -32,7 +32,7 @@ public class StudentQueryService : IStudentQueryService
     {
         return await _context.Students
             .Include(s => s.Gender)
-            .Include(s => s.Parents)
+            .Include(s => s.StudentResponsables)
             .Include(s => s.Intake)
             .Include(s => s.Enrollments)
             .Where(s => EF.Property<DateTime?>(s, "DeletedAt") == null)

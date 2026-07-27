@@ -47,7 +47,7 @@ public static class StudentMapper
                 TotalFees = student.Intake.TotalFees,
                 AmountPaid = student.Intake.AmountPaid,
             } : null,
-            Parents = student.Parents != null ? student.Parents.Select(p => ParentMapper.ToResponse(p)).ToList() : null,
+            StudentResponsables = student.StudentResponsables != null ? student.StudentResponsables.Select(p => StudentResponsableMapper.ToResponse(p)).ToList() : null,
             Gender = MapGender(student.Gender),
             Branch = student.Branch != null ? new BranchResponseDto
             {

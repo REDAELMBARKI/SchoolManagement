@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace SchoolManagement.Domain.Entities;
 
-public class Parent : Person
+public class StudentResponsable : Person
 {
     public string? Email { get; private set; } = string.Empty;
     public string Phone { get; private set; } = string.Empty;
@@ -13,9 +13,9 @@ public class Parent : Person
     public virtual ICollection<Student> Students { get; private set; } = new List<Student>();
     public virtual Branch Branch { get; private set; } = null!;
 
-    private Parent() { } 
+    private StudentResponsable() { }
 
-    public static Parent Register(string firstName, string lastName, string slug, Guid? genderId, string? email, string phone, RelationshipType relationship, Guid branchId)
+    public static StudentResponsable Register(string firstName, string lastName, string slug, Guid? genderId, string? email, string phone, RelationshipType relationship, Guid branchId)
     {
         if (string.IsNullOrWhiteSpace(phone))
         {
@@ -26,7 +26,7 @@ public class Parent : Person
             throw new DomainException("Branch ID must not be empty.");
         }
 
-        var parent = new Parent
+        var responsable = new StudentResponsable
         {
             Email = email,
             Phone = phone,
@@ -34,8 +34,8 @@ public class Parent : Person
             BranchId = branchId
         };
 
-        parent.RegisterPerson(firstName, lastName, slug, genderId);
-        return parent;
+        responsable.RegisterPerson(firstName, lastName, slug, genderId);
+        return responsable;
     }
 
     public void UpdateEmail(string? email)

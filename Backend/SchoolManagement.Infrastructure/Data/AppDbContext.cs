@@ -30,7 +30,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
  
     public DbSet<DomainUser> DomainUsers { get; set; }
     public DbSet<Teacher> Teachers { get; set; }
-    public DbSet<Parent> Parents { get; set; }
+    public DbSet<StudentResponsable> StudentResponsables { get; set; }
     public DbSet<CommercialAgent> CommercialAgents { get; set; }
     public DbSet<Opc> Opcs { get; set; }
 
@@ -92,7 +92,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
         modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new IntakeConfiguration());
         modelBuilder.ApplyConfiguration(new StudentConfiguration());
-        modelBuilder.ApplyConfiguration(new ParentConfiguration());
+        modelBuilder.ApplyConfiguration(new StudentResponsableConfiguration());
         modelBuilder.ApplyConfiguration(new TeacherConfiguration());
         modelBuilder.ApplyConfiguration(new CommercialAgentConfiguration());
         modelBuilder.ApplyConfiguration(new OpcConfiguration());
