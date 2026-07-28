@@ -1,15 +1,15 @@
 using MediatR;
 using SchoolManagement.Application.Dtos.Commands;
-using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
+using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Domain.DomainEvents.Students;
 using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Application.Mappers;
 using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Interfaces.Repositories;
-using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Domain.Interfaces.Queries;
 using SchoolManagement.Domain.Utils;
+using Slugify;
 
 namespace SchoolManagement.Application.Services.Students;
 
@@ -18,11 +18,14 @@ public class StudentService : IStudentService
     private readonly IStudentRepository _repository;
     private readonly IStudentQueryService _query;
     private readonly IMediator _mediator;
-    public StudentService(IStudentRepository repository, IStudentQueryService query, IMediator mediator)
+    private readonly IAuditLogService _auditLogService;
+
+    public StudentService(IStudentRepository repository, IStudentQueryService query, IMediator mediator, IAuditLogService auditLogService)
     {
         _repository = repository;
         _query = query;
         _mediator = mediator;
+        _auditLogService = auditLogService;
     }
 
     public async Task<List<StudentResponseDto>> GetAllAsync()
@@ -44,15 +47,21 @@ public class StudentService : IStudentService
         await EnsureNoDuplicateStudentAsync(command);
 
         var generatedSlug = await CustomSluger.Slug(
-            slug => _query.IsExistsBySlugAsync(slug), 
-            command.FirstName, 
-            command.LastName
+            slug => _query.IsExistsBySlugAsync(slug),
+            $"{command.FirstName}-{command.LastName}"
         );
 
         command.Slug = generatedSlug;
-
+        
         var student = StudentMapper.ToDomain(command);
         var createdStudent = await _repository.AddAsync(student);
+
+        await _auditLogService.StoreAsync(
+            action: AuditLog.CreateAction(),
+            entityName: nameof(Student),
+            entityId: createdStudent.Id,
+            branchId: createdStudent.BranchId,
+            newValues: CreateAuditSnapshot(createdStudent));
         
         await _mediator.Publish(new StudentCreatedDomainEvent(createdStudent.Id));
         
@@ -71,7 +80,7 @@ public class StudentService : IStudentService
             throw new DomainException("A student with the same name and date of birth already exists.");
     }
 
-    public async Task<StudentResponseDto> UpdateAsync(Guid id, StudentRequestDto dto)
+    public async Task<StudentResponseDto> UpdateAsync(Guid id, UpdateStudentCommand command)
     {
         var existing = await _repository.GetByIdAsync(id);
         if (existing == null)
@@ -79,24 +88,69 @@ public class StudentService : IStudentService
             throw new NotFoundException($"No student found with id {id}");
         }
         
-        existing.UpdateFirstName(dto.FirstName);
-        existing.UpdateLastName(dto.LastName);
-        existing.UpdateEmail(dto.Email);
-        existing.UpdatePhone(dto.Phone);
-        existing.UpdateDateOfBirth(dto.DateOfBirth);
-        existing.UpdateGenderId(dto.GenderId);
-        existing.UpdateIntakeId(dto.IntakeId);
-        existing.UpdateIsDirectRegistration(dto.IsDirectRegistration);
-        //existing.UpdateBranchId(dto.BranchId);
-        
+        var oldValues = CreateAuditSnapshot(existing);
+
+        existing.UpdateFirstName(command.FirstName);
+        existing.UpdateLastName(command.LastName);
+        existing.UpdateEmail(command.Email);
+        existing.UpdatePhone(command.Phone);
+        existing.UpdateDateOfBirth(command.DateOfBirth);
+        existing.UpdateGenderId(command.GenderId);
+        if (existing.IntakeId != command.IntakeId && existing.IsDirectRegistration != command.IsDirectRegistration)
+        {
+            existing.UpdateRegistrationSource(command.IntakeId, command.IsDirectRegistration);
+        }
+        else
+        {
+            existing.UpdateIntakeId(command.IntakeId);
+            existing.UpdateIsDirectRegistration(command.IsDirectRegistration);
+        }
+
         var updated = await _repository.UpdateAsync(existing);
+
+        await _auditLogService.StoreAsync(
+            action: AuditLog.UpdateAction(),
+            entityName: nameof(Student),
+            entityId: updated.Id,
+            branchId: updated.BranchId,
+            oldValues: oldValues,
+            newValues: CreateAuditSnapshot(updated));
+
         return StudentMapper.ToResponse(updated);
     }
 
     public async Task DeleteAsync(Guid id)
     {
+        var existing = await _repository.GetByIdAsync(id);
         await _repository.DeleteAsync(id);
+
+        if (existing != null)
+        {
+            await _auditLogService.StoreAsync(
+                action: AuditLog.DeleteAction(),
+                entityName: nameof(Student),
+                entityId: existing.Id,
+                branchId: existing.BranchId,
+                oldValues: CreateAuditSnapshot(existing));
+        }
     }
 
+    private static object CreateAuditSnapshot(Student student)
+    {
+        return new
+        {
+            student.Id,
+            student.FirstName,
+            student.LastName,
+            Email = student.Email?.Value,
+            student.Phone,
+            student.DateOfBirth,
+            student.GenderId,
+            student.IntakeId,
+            student.IsDirectRegistration,
+            student.BranchId,
+            student.Slug
+        };
+    }
 
 }

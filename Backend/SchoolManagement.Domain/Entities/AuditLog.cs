@@ -43,4 +43,21 @@ public class AuditLog : BaseEntity
     {
         BranchId = branchId;
     }
+
+
+    public static string CreateAction(){
+        return "Create";
+    }
+
+
+    public static string UpdateAction(){
+       return  "Update";
+    }
+
+
+    public static string DeleteAction(){
+        return "Delete";
+    }
+
+
 }

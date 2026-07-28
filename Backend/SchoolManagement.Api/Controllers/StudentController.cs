@@ -81,7 +81,18 @@ public class StudentController : ControllerBase
     {
         try
         {
-            await _studentService.UpdateAsync(id, dto);
+            var command = new UpdateStudentCommand
+            {
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                Email = dto.Email,
+                Phone = dto.Phone,
+                DateOfBirth = dto.DateOfBirth,
+                GenderId = dto.GenderId,
+                IntakeId = dto.IntakeId,
+                IsDirectRegistration = dto.IsDirectRegistration
+            };
+            await _studentService.UpdateAsync(id, command);
             return NoContent();
         }
         catch (NotFoundException)

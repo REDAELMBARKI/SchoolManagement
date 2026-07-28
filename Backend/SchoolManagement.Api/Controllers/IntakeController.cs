@@ -111,7 +111,7 @@ public class IntakeController : ControllerBase
     {
         try
         {
-            var command = new IntakeCommand
+            var command = new UpdateIntakeCommand
             {
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,

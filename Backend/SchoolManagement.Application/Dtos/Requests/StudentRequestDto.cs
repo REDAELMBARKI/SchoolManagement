@@ -26,7 +26,10 @@ public class StudentRequestDto
     [Required]
     public Guid LevelId { get; set; }
 
-    public Guid? IntakeId { get; set; }
+
+    [Required]
+
     public bool IsDirectRegistration { get; set; }
 
+    public Guid? IntakeId { get; set; }
 }

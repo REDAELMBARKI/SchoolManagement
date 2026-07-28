@@ -10,8 +10,11 @@ using AutoMapper;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using SchoolManagement.Infrastructure.Data.Configurations.Extensions;
+using SchoolManagement.Application.Services.Students;
 using SchoolManagement.Infrastructure.Repositories;
 using SchoolManagement.Application.Interfaces;
+using SchoolManagement.Application.Interfaces.Services;
+using SchoolManagement.Infrastructure.Services.AuditLogs;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Error()
@@ -49,11 +52,12 @@ builder.Services.AddOpenApi();
 
 // Di registration 
 builder.Services.Scan(scan => scan
-    .FromAssemblyOf<Program>()
+    .FromAssemblies(typeof(Program).Assembly, typeof(StudentService).Assembly, typeof(CurrentUserContext).Assembly)
     .AddClasses(c => 
           c.InNamespaces("SchoolManagement.Infrastructure.Repositories",
                          "SchoolManagement.Application.Services" ,
                          "SchoolManagement.Application.Mappers" ,
+                         "SchoolManagement.Infrastructure.Services",
                          "SchoolManagement.Infrastructure.Data.Factories" ,
                          "SchoolManagement.Infrastructure.Data.Seeders",
                          "SchoolManagement.Domain.Interfaces" ,
@@ -65,6 +69,8 @@ builder.Services.Scan(scan => scan
     .WithScopedLifetime());
 
 builder.Services.AddScoped<ITransaction, EfTransaction>();
+builder.Services.AddScoped<ICurrentUserContext, CurrentUserContext>();
+builder.Services.AddScoped<IAuditLogService, AuditLogService>();
 
 // end Di registration
 builder.Services.AddMediatR(cfg =>

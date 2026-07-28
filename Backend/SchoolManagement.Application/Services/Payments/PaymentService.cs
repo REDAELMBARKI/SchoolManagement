@@ -4,6 +4,7 @@ using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Application.Interfaces.Queries;
 using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Application.Mappers;
+using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Domain.Interfaces.Repositories;
 using SchoolManagement.Application.Interfaces;
@@ -15,12 +16,18 @@ public class PaymentService : IPaymentService
     private readonly IPaymentRepository _repository;
     private readonly IPaymentQueryService _query;
     private readonly ICurrentUserContext _currentUserContext;
+    private readonly IAuditLogService _auditLogService;
 
-    public PaymentService(IPaymentRepository repository , IPaymentQueryService paymentQueryService, ICurrentUserContext currentUserContext)
+    public PaymentService(
+        IPaymentRepository repository,
+        IPaymentQueryService paymentQueryService,
+        ICurrentUserContext currentUserContext,
+        IAuditLogService auditLogService)
     {
         _repository = repository;
         _query = paymentQueryService;
         _currentUserContext = currentUserContext;
+        _auditLogService = auditLogService;
     }
 
     public async Task<List<PaymentResponseDto>> GetAllAsync()
@@ -45,6 +52,14 @@ public class PaymentService : IPaymentService
 
         var payment = PaymentMapper.ToDomain(command);
         var createdPayment = await _repository.AddAsync(payment);
+
+        await _auditLogService.StoreAsync(
+            action: AuditLog.CreateAction(),
+            entityName: nameof(Payment),
+            entityId: createdPayment.Id,
+            branchId: createdPayment.BranchId,
+            newValues: CreateAuditSnapshot(createdPayment));
+
         return PaymentMapper.ToResponse(createdPayment);
     }
 
@@ -61,6 +76,8 @@ public class PaymentService : IPaymentService
             throw new NotFoundException($"No payment found with id {id}");
         }
 
+        var oldValues = CreateAuditSnapshot(existing);
+
         existing.UpdateEnrollmentId(command.EnrollmentId);
         existing.UpdateAmount(command.Amount);
         existing.UpdateTransferFees(command.TransferFees);
@@ -73,11 +90,50 @@ public class PaymentService : IPaymentService
         existing.UpdateMethodDetailsJson(command.MethodDetailsJson ?? "{}");
 
         var updated = await _repository.UpdateAsync(existing);
+
+        await _auditLogService.StoreAsync(
+            action: AuditLog.UpdateAction(),
+            entityName: nameof(Payment),
+            entityId: updated.Id,
+            branchId: updated.BranchId,
+            oldValues: oldValues,
+            newValues: CreateAuditSnapshot(updated));
+
         return PaymentMapper.ToResponse(updated);
     }
 
     public async Task DeleteAsync(Guid id)
     {
+        var existing = await _repository.GetByIdAsync(id);
         await _repository.DeleteAsync(id);
+
+        if (existing != null)
+        {
+            await _auditLogService.StoreAsync(
+                action: AuditLog.DeleteAction(),
+                entityName: nameof(Payment),
+                entityId: existing.Id,
+                branchId: existing.BranchId,
+                oldValues: CreateAuditSnapshot(existing));
+        }
+    }
+
+    private static object CreateAuditSnapshot(Payment payment)
+    {
+        return new
+        {
+            payment.Id,
+            payment.EnrollmentId,
+            payment.Amount,
+            payment.TransferFees,
+            payment.Method,
+            payment.Status,
+            payment.PaidAt,
+            payment.BranchId,
+            payment.ReceivedByStaffId,
+            payment.ExternalReferenceCode,
+            payment.MethodDetailsJson,
+            payment.CurrencyCode
+        };
     }
 }

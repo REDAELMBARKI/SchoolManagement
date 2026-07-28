@@ -78,7 +78,7 @@ public class GroupController : ControllerBase
     {
         try
         {
-            var command = new GroupCommand
+            var command = new UpdateGroupCommand
             {
                 Name = dto.Name,
                 Capacity = dto.Capacity,

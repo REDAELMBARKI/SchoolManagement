@@ -1,9 +1,9 @@
 using SchoolManagement.Application.Dtos.Commands;
-using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Application.Mappers;
 using SchoolManagement.Domain.Entities;
+using SchoolManagement.Domain.Entities.EnrollmentAggregate;
 using SchoolManagement.Domain.Enums;
 using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Domain.Interfaces.Queries;
@@ -18,13 +18,20 @@ public class EnrollmentService : IEnrollmentService
     private readonly IEnrollmentQueryService _queryService;
     private readonly IGroupQueryService _groupQueryService;
     private readonly ICurrentUserContext _currentUserContext;
+    private readonly IAuditLogService _auditLogService;
 
-    public EnrollmentService(IEnrollmentRepository repository, IEnrollmentQueryService queryService, IGroupQueryService groupQueryService, ICurrentUserContext currentUserContext)
+    public EnrollmentService(
+        IEnrollmentRepository repository,
+        IEnrollmentQueryService queryService,
+        IGroupQueryService groupQueryService,
+        ICurrentUserContext currentUserContext,
+        IAuditLogService auditLogService)
     {
         _repository = repository;
         _queryService = queryService;
         _groupQueryService = groupQueryService;
         _currentUserContext = currentUserContext;
+        _auditLogService = auditLogService;
     }
 
     public async Task<List<EnrollmentResponseDto>> GetAllAsync()
@@ -54,6 +61,14 @@ public class EnrollmentService : IEnrollmentService
         command.GroupId = EvaluateStudentGroup(availableGroups, command.PreferedScheduleId, command.GroupId);
         var enrollment = EnrollmentMapper.ToDomain(command);
         var created = await _repository.AddAsync(enrollment);
+
+        await _auditLogService.StoreAsync(
+            action: AuditLog.CreateAction(),
+            entityName: "Enrollment",
+            entityId: created.Id,
+            branchId: created.BranchId,
+            newValues: CreateAuditSnapshot(created));
+
         return EnrollmentMapper.ToResponse(created);
     }
 
@@ -67,6 +82,8 @@ public class EnrollmentService : IEnrollmentService
         var existing = await _repository.GetByIdAsync(id);
         if (existing is null) throw new NotFoundException($"Enrollment with id {id} not found.");
 
+        var oldValues = CreateAuditSnapshot(existing);
+
         existing.UpdateStudentId(command.StudentId);
         existing.UpdateSubjectId(command.SubjectId);
         existing.UpdateGroupId(command.GroupId);
@@ -75,12 +92,32 @@ public class EnrollmentService : IEnrollmentService
         existing.UpdateNotes(command.Notes);
 
         var updated = await _repository.UpdateAsync(existing);
+
+        await _auditLogService.StoreAsync(
+            action: AuditLog.UpdateAction(),
+            entityName: "Enrollment",
+            entityId: updated.Id,
+            branchId: updated.BranchId,
+            oldValues: oldValues,
+            newValues: CreateAuditSnapshot(updated));
+
         return EnrollmentMapper.ToResponse(updated);
     }
 
     public async Task DeleteAsync(Guid id)
     {
+        var existing = await _repository.GetByIdAsync(id);
         await _repository.DeleteAsync(id);
+
+        if (existing != null)
+        {
+            await _auditLogService.StoreAsync(
+                action: AuditLog.DeleteAction(),
+                entityName: "Enrollment",
+                entityId: existing.Id,
+                branchId: existing.BranchId,
+                oldValues: CreateAuditSnapshot(existing));
+        }
     }
 
     private async Task EnsureNoDuplicateActiveEnrollmentAsync(Guid studentId, Guid subjectId)
@@ -121,5 +158,21 @@ public class EnrollmentService : IEnrollmentService
     {
         if (!availableGroups.Select(g => g.Id).Contains(groupId))
             throw new UnAvailableResourceException("The selected group is either full, belongs to a different subject/branch, or does not exist.");
+    }
+
+    private static object CreateAuditSnapshot(Enrollment enrollment)
+    {
+        return new
+        {
+            enrollment.Id,
+            enrollment.EnrolledAt,
+            enrollment.Status,
+            enrollment.Notes,
+            enrollment.StudentId,
+            enrollment.SubjectId,
+            enrollment.GroupId,
+            enrollment.BranchId,
+            enrollment.PlanId
+        };
     }
 }

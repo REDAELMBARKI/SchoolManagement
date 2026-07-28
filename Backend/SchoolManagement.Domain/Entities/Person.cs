@@ -29,6 +29,7 @@ public abstract class Person : AggregateRoot
 
         FirstName = firstName;
         LastName = lastName;
+        Slug = slug;
         GenderId = genderId;
     }
 

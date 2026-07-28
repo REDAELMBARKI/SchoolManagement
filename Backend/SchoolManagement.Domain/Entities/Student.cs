@@ -49,7 +49,7 @@ public class Student : Person
 
         var student = new Student
         {
-            Email = email != null ? new Email(email) : null,
+            Email = string.IsNullOrWhiteSpace(email) ? null : new Email(email),
             Phone = phone,
             DateOfBirth = dateOfBirth,
             IntakeId = intakeId,
@@ -63,7 +63,7 @@ public class Student : Person
 
     public void UpdateEmail(string? email)
     {
-        Email = email != null ? new Email(email) : null;
+        Email = string.IsNullOrWhiteSpace(email) ? null : new Email(email);
     }
 
     public void UpdatePhone(string phone)
@@ -95,6 +95,22 @@ public class Student : Person
         }
 
         IntakeId = intakeId;
+    }
+
+    public void UpdateRegistrationSource(Guid? intakeId, bool isDirectRegistration)
+    {
+        if (!intakeId.HasValue && !isDirectRegistration)
+        {
+            throw new DomainException("Either IntakeId must be provided or IsDirectRegistration must be true.");
+        }
+
+        if (intakeId.HasValue && isDirectRegistration)
+        {
+            throw new DomainException("Cannot set IntakeId when IsDirectRegistration is true.");
+        }
+
+        IntakeId = intakeId;
+        IsDirectRegistration = isDirectRegistration;
     }
 
     public void UpdateIsDirectRegistration(bool isDirectRegistration)

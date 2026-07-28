@@ -4,27 +4,26 @@ using Slugify;
 namespace SchoolManagement.Domain.Utils;
 
 public class CustomSluger
-{ 
-  
-    public static async Task<string> Slug(IsRecordExists isRecordExistsDelegate ,  params string[] strs  )
+{
+    public static async Task<string> Slug(IsRecordExists isRecordExistsDelegate, string slug)
     {
-         int max_attempts = 5; 
-         var helper = new SlugHelper();
-         string slug = helper.GenerateSlug(string.Join(" " ,strs));
-         bool exists = await isRecordExistsDelegate(slug);
-         while(exists && max_attempts-- > 0){
-             string suffix = Guid.NewGuid().ToString("N").Substring(0, 6);
-             slug = $"{slug}-{suffix}" ;
-             exists = await isRecordExistsDelegate(slug);
-        } 
+        int max_attempts = 5;
+        var initSlug = slug;
+        bool exists = await isRecordExistsDelegate(initSlug);
+        while (exists && max_attempts-- > 0)
+        {
+            string suffix = Guid.NewGuid().ToString("N").Substring(0, 6);
+            initSlug = $"{slug}-{suffix}";
+            exists = await isRecordExistsDelegate(initSlug);
+        }
         if (exists)
         {
-            string fullGuid = Guid.NewGuid().ToString("N"); 
-            slug = $"{slug}-{fullGuid}";
+            string fullGuid = Guid.NewGuid().ToString("N");
+            initSlug = $"{slug}-{fullGuid}";
         }
-        return slug;
+        return initSlug;
     }
 }
 
 
-public delegate Task<bool> IsRecordExists(string slug) ; 
+public delegate Task<bool> IsRecordExists(string slug);
