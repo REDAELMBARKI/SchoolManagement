@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Application.Interfaces.Queries;
 using SchoolManagement.Domain.Entities;
+using SchoolManagement.Domain.Enums;
 using SchoolManagement.Infrastructure.Data;
 
 namespace SchoolManagement.Infrastructure.Queries;
@@ -38,5 +39,23 @@ public class InvoiceQueryService : IInvoiceQueryService
     {
         return await _context.Invoices
             .AnyAsync(i => i.Id == id);
+    }
+
+    public async Task<List<Invoice>> GetPastDueInvoicesAsync(DateTime? asOfDate = null)
+    {
+        var targetDate = asOfDate ?? DateTime.UtcNow;
+
+        return await _context.Invoices
+            .Include(i => i.Charges)
+            .Where(i => i.DueDate < targetDate
+                     && i.Status != InvoiceStatus.Paid
+                     && i.Status != InvoiceStatus.PastDue
+                     && i.Status != InvoiceStatus.Waived
+                     && i.Status != InvoiceStatus.Cancelled
+                     && i.Charges.Any(c => c.Status == ChargeStatus.Active)
+                     && i.PaidAmount < i.Charges
+                         .Where(c => c.Status == ChargeStatus.Active)
+                         .Sum(c => c.Amount))
+            .ToListAsync();
     }
 }

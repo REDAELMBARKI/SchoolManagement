@@ -15,6 +15,7 @@ using SchoolManagement.Infrastructure.Repositories;
 using SchoolManagement.Application.Interfaces;
 using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Infrastructure.Services.AuditLogs;
+using Hangfire;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Error()
@@ -23,6 +24,7 @@ Log.Logger = new LoggerConfiguration()
 
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 // auto mapper 
 builder.Services.AddAutoMapper(cfg => { }  , 
@@ -41,14 +43,20 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 
+
+// add hangfire 
+builder.Services.AddHangfire(config => 
+  config.UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
+
+builder.Services.AddHangfireServer();
+
 // Add controllers
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 // add jwt barear 
 builder.Services.AddJwtConfigExtension(builder.Configuration);
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+
 
 // Di registration 
 builder.Services.Scan(scan => scan
@@ -73,6 +81,8 @@ builder.Services.AddScoped<ICurrentUserContext, CurrentUserContext>();
 builder.Services.AddScoped<IAuditLogService, AuditLogService>();
 
 // end Di registration
+
+// add media tr event publisher 
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
@@ -120,6 +130,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseHangfireDashboard("/hangfire");
+app.RegisterHangfireJobs();
+
 // app.UseAuthentication();
 app.MapControllers();
 app.Run();

@@ -80,6 +80,15 @@ public class Invoice : AggregateRoot
 
     public void RecalculateStatus()
     {
+        if (Status == InvoiceStatus.Cancelled)
+            return;
+
+        if (_charges.Count > 0 && _charges.All(c => c.Status == ChargeStatus.Waived))
+        {
+            Status = InvoiceStatus.Waived;
+            return;
+        }
+
         if (PaidAmount >= TotalAmount && TotalAmount > 0)
         {
             Status = InvoiceStatus.Paid;
@@ -90,7 +99,7 @@ public class Invoice : AggregateRoot
         }
         else if (DateTime.UtcNow > DueDate && PaidAmount < TotalAmount)
         {
-            Status = InvoiceStatus.Overdue;
+            Status = InvoiceStatus.PastDue;
         }
         else
         {

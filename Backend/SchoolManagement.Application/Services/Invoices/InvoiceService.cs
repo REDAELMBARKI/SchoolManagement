@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Application.Interfaces;
@@ -5,6 +6,7 @@ using SchoolManagement.Application.Interfaces.Queries;
 using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Application.Mappers;
 using SchoolManagement.Domain.Entities;
+using SchoolManagement.Domain.Enums;
 using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Domain.Interfaces.Repositories;
 
@@ -16,17 +18,20 @@ public class InvoiceService : IInvoiceService
     private readonly IInvoiceQueryService _query;
     private readonly IAuditLogService _auditLogService;
     private readonly ICurrentUserContext _currentUserContext;
+    private readonly ILogger<InvoiceService> _logger;
 
     public InvoiceService(
         IInvoiceRepository repository,
         IInvoiceQueryService query,
         IAuditLogService auditLogService,
-        ICurrentUserContext currentUserContext)
+        ICurrentUserContext currentUserContext,
+        ILogger<InvoiceService> logger)
     {
         _repository = repository;
         _query = query;
         _auditLogService = auditLogService;
         _currentUserContext = currentUserContext;
+        _logger = logger;
     }
 
     public async Task<List<InvoiceResponseDto>> GetAllAsync()
@@ -96,6 +101,33 @@ public class InvoiceService : IInvoiceService
                 branchId: _currentUserContext.BranchId,
                 oldValues: CreateAuditSnapshot(existing));
         }
+    }
+
+    public async Task<int> ProcessPastDueInvoicesAsync()
+    {
+        var pastDueInvoices = await _query.GetPastDueInvoicesAsync();
+        if (pastDueInvoices.Count == 0)
+        {
+            _logger.LogInformation("[Hangfire] No past due invoices found to process.");
+            return 0;
+        }
+
+        int processedCount = 0;
+        foreach (var invoice in pastDueInvoices)
+        {
+            var oldStatus = invoice.Status;
+            invoice.RecalculateStatus();
+
+            if (invoice.Status == InvoiceStatus.PastDue)
+            {
+                await _repository.UpdateAsync(invoice);
+                processedCount++;
+                _logger.LogInformation("[Hangfire] Invoice {InvoiceId} status updated from {OldStatus} to PastDue.", invoice.Id, oldStatus);
+            }
+        }
+
+        _logger.LogInformation("[Hangfire] ProcessPastDueInvoices completed. Total updated: {Count}.", processedCount);
+        return processedCount;
     }
 
     private static object CreateAuditSnapshot(Invoice invoice)

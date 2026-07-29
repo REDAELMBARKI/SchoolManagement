@@ -19,6 +19,7 @@
     <Import Project="$(NuGetPackageRoot)microsoft.entityframeworkcore.design\10.0.9\build\net10.0\Microsoft.EntityFrameworkCore.Design.props" Condition="Exists('$(NuGetPackageRoot)microsoft.entityframeworkcore.design\10.0.9\build\net10.0\Microsoft.EntityFrameworkCore.Design.props')" />
   </ImportGroup>
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <PkgHangfire_SqlServer Condition=" '$(PkgHangfire_SqlServer)' == '' ">C:\Users\OBLIVION\.nuget\packages\hangfire.sqlserver\1.8.24</PkgHangfire_SqlServer>
     <PkgMicrosoft_CodeAnalysis_Analyzers Condition=" '$(PkgMicrosoft_CodeAnalysis_Analyzers)' == '' ">C:\Users\OBLIVION\.nuget\packages\microsoft.codeanalysis.analyzers\3.11.0</PkgMicrosoft_CodeAnalysis_Analyzers>
     <PkgMicrosoft_EntityFrameworkCore_Tools Condition=" '$(PkgMicrosoft_EntityFrameworkCore_Tools)' == '' ">C:\Users\OBLIVION\.nuget\packages\microsoft.entityframeworkcore.tools\10.0.9</PkgMicrosoft_EntityFrameworkCore_Tools>
   </PropertyGroup>

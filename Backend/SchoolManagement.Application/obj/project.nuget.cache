@@ -1,17 +1,23 @@
 {
   "version": 2,
-  "dgSpecHash": "LzrhUMa7+s8=",
+  "dgSpecHash": "oK5AMGlG/9Q=",
   "success": true,
-  "projectFilePath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj",
+  "projectFilePath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\OBLIVION\\.nuget\\packages\\automapper\\16.2.0\\automapper.16.2.0.nupkg.sha512",
     "C:\\Users\\OBLIVION\\.nuget\\packages\\fluentvalidation\\12.1.1\\fluentvalidation.12.1.1.nupkg.sha512",
+    "C:\\Users\\OBLIVION\\.nuget\\packages\\hangfire.aspnetcore\\1.8.24\\hangfire.aspnetcore.1.8.24.nupkg.sha512",
+    "C:\\Users\\OBLIVION\\.nuget\\packages\\hangfire.core\\1.8.24\\hangfire.core.1.8.24.nupkg.sha512",
+    "C:\\Users\\OBLIVION\\.nuget\\packages\\hangfire.netcore\\1.8.24\\hangfire.netcore.1.8.24.nupkg.sha512",
+    "C:\\Users\\OBLIVION\\.nuget\\packages\\hangfire.sqlserver\\1.8.24\\hangfire.sqlserver.1.8.24.nupkg.sha512",
     "C:\\Users\\OBLIVION\\.nuget\\packages\\mediatr\\14.2.0\\mediatr.14.2.0.nupkg.sha512",
     "C:\\Users\\OBLIVION\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
     "C:\\Users\\OBLIVION\\.nuget\\packages\\microsoft.aspnetcore.http.features\\5.0.17\\microsoft.aspnetcore.http.features.5.0.17.nupkg.sha512",
     "C:\\Users\\OBLIVION\\.nuget\\packages\\microsoft.bcl.cryptography\\10.0.2\\microsoft.bcl.cryptography.10.0.2.nupkg.sha512",
     "C:\\Users\\OBLIVION\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\10.0.10\\microsoft.extensions.configuration.abstractions.10.0.10.nupkg.sha512",
     "C:\\Users\\OBLIVION\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\10.0.0\\microsoft.extensions.dependencyinjection.abstractions.10.0.0.nupkg.sha512",
+    "C:\\Users\\OBLIVION\\.nuget\\packages\\microsoft.extensions.fileproviders.abstractions\\3.0.0\\microsoft.extensions.fileproviders.abstractions.3.0.0.nupkg.sha512",
+    "C:\\Users\\OBLIVION\\.nuget\\packages\\microsoft.extensions.hosting.abstractions\\3.0.0\\microsoft.extensions.hosting.abstractions.3.0.0.nupkg.sha512",
     "C:\\Users\\OBLIVION\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\10.0.0\\microsoft.extensions.logging.abstractions.10.0.0.nupkg.sha512",
     "C:\\Users\\OBLIVION\\.nuget\\packages\\microsoft.extensions.options\\10.0.0\\microsoft.extensions.options.10.0.0.nupkg.sha512",
     "C:\\Users\\OBLIVION\\.nuget\\packages\\microsoft.extensions.primitives\\10.0.10\\microsoft.extensions.primitives.10.0.10.nupkg.sha512",
@@ -19,8 +25,22 @@
     "C:\\Users\\OBLIVION\\.nuget\\packages\\microsoft.identitymodel.jsonwebtokens\\8.19.2\\microsoft.identitymodel.jsonwebtokens.8.19.2.nupkg.sha512",
     "C:\\Users\\OBLIVION\\.nuget\\packages\\microsoft.identitymodel.logging\\8.19.2\\microsoft.identitymodel.logging.8.19.2.nupkg.sha512",
     "C:\\Users\\OBLIVION\\.nuget\\packages\\microsoft.identitymodel.tokens\\8.19.2\\microsoft.identitymodel.tokens.8.19.2.nupkg.sha512",
+    "C:\\Users\\OBLIVION\\.nuget\\packages\\newtonsoft.json\\11.0.1\\newtonsoft.json.11.0.1.nupkg.sha512",
     "C:\\Users\\OBLIVION\\.nuget\\packages\\slugify.core\\5.1.1\\slugify.core.5.1.1.nupkg.sha512",
     "C:\\Users\\OBLIVION\\.nuget\\packages\\system.identitymodel.tokens.jwt\\8.19.2\\system.identitymodel.tokens.jwt.8.19.2.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'Newtonsoft.Json' 11.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-5crp-9r3c-p9vr",
+      "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj",
+      "warningLevel": 1,
+      "filePath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj",
+      "libraryId": "Newtonsoft.Json",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
 }
