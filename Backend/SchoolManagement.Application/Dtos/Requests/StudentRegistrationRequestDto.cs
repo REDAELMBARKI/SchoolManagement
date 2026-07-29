@@ -1,4 +1,3 @@
-using SchoolManagement.Application.Dtos.Responses;
 using System.ComponentModel.DataAnnotations;
 
 namespace SchoolManagement.Application.Dtos.Requests;
@@ -12,6 +11,10 @@ public class StudentRegistrationRequestDto
     public EnrollmentRequestDto EnrollmentRegReq { get; set; } = null!;
 
     [Required]
-    public PaymentRequestDto PaymentRegReq { get; set; } = null!;
-}
+    public RegistrationPaymentRequestDto PaymentRegReq { get; set; } = null!;
 
+    public DateTime? PeriodStart { get; set; }
+    public DateTime? PeriodEnd { get; set; }
+    public DateTime? InvoiceDueDate { get; set; }
+    public DateTime? ChargeDueDate { get; set; }
+}

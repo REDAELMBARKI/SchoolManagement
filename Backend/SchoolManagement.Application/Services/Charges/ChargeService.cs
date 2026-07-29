@@ -1,6 +1,7 @@
 using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Application.Interfaces;
+using SchoolManagement.Application.Interfaces.Queries;
 using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Application.Mappers;
 using SchoolManagement.Domain.Entities;
@@ -12,22 +13,31 @@ namespace SchoolManagement.Application.Services.Charges;
 public class ChargeService : IChargeService
 {
     private readonly IChargeRepository _repository;
+    private readonly IChargeQueryService _queryService;
     private readonly IAuditLogService _auditLogService;
+    private readonly ICurrentUserContext _currentUserContext;
 
-    public ChargeService(IChargeRepository repository, IAuditLogService auditLogService)
+    public ChargeService(
+        IChargeRepository repository,
+        IChargeQueryService queryService,
+        IAuditLogService auditLogService,
+        ICurrentUserContext currentUserContext)
     {
         _repository = repository;
+        _queryService = queryService;
         _auditLogService = auditLogService;
+        _currentUserContext = currentUserContext;
     }
 
     public async Task<List<ChargeResponseDto>> GetAllAsync()
     {
-         throw new NotImplementedException();
+        var charges = await _queryService.GetAllAsync();
+        return charges.Select(ChargeMapper.ToResponse).ToList();
     }
 
     public async Task<ChargeResponseDto?> GetByIdAsync(Guid id)
     {
-        var charge = await _repository.GetByIdAsync(id);
+        var charge = await _queryService.GetByIdAsync(id);
         if (charge == null) return null;
         return ChargeMapper.ToResponse(charge);
     }
@@ -41,7 +51,7 @@ public class ChargeService : IChargeService
             action: AuditLog.CreateAction(),
             entityName: nameof(Charge),
             entityId: createdCharge.Id,
-            branchId: createdCharge.BranchId,
+            branchId: _currentUserContext.BranchId,
             newValues: CreateAuditSnapshot(createdCharge));
 
         return ChargeMapper.ToResponse(createdCharge);
@@ -58,15 +68,13 @@ public class ChargeService : IChargeService
         var oldValues = CreateAuditSnapshot(existing);
 
         existing.UpdateAmount(command.Amount);
-        existing.UpdateDescription(command.Description);
-        existing.UpdateDueDate(command.DueDate);
         var updated = await _repository.UpdateAsync(existing);
 
         await _auditLogService.StoreAsync(
             action: AuditLog.UpdateAction(),
             entityName: nameof(Charge),
             entityId: updated.Id,
-            branchId: updated.BranchId,
+            branchId: _currentUserContext.BranchId,
             oldValues: oldValues,
             newValues: CreateAuditSnapshot(updated));
 
@@ -84,7 +92,7 @@ public class ChargeService : IChargeService
                 action: AuditLog.DeleteAction(),
                 entityName: nameof(Charge),
                 entityId: existing.Id,
-                branchId: existing.BranchId,
+                branchId: _currentUserContext.BranchId,
                 oldValues: CreateAuditSnapshot(existing));
         }
     }
@@ -94,17 +102,9 @@ public class ChargeService : IChargeService
         return new
         {
             charge.Id,
-            charge.StudentId,
-            charge.ChargeType,
-            charge.Description,
+            charge.InvoiceId,
             charge.Amount,
-            charge.AmountPaid,
-            charge.Status,
-            charge.IssuedDate,
-            charge.DueDate,
-            charge.SourceId,
-            charge.BranchId,
-            charge.CurrencyCode
+            charge.DueDate
         };
     }
 }

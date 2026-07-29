@@ -23,8 +23,8 @@ public class StudentRegistrationValidator : AbstractValidator<StudentRegistratio
 
         When(x => x.PaymentRegReq != null, () =>
         {
-            RuleFor(x => x.PaymentRegReq!.Amount)
-                .GreaterThan(0).WithMessage("Payment amount must be greater than zero.");
+            RuleFor(x => x.PaymentRegReq!.AmountPaid)
+                .GreaterThan(0).WithMessage("Paid amount must be greater than zero.");
 
             RuleFor(x => x.PaymentRegReq!.TransferFees)
                 .GreaterThanOrEqualTo(0).When(x => x.PaymentRegReq!.TransferFees.HasValue)

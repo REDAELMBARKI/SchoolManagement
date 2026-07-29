@@ -6,7 +6,7 @@ namespace SchoolManagement.Application.Mappers;
 
 public static class PaymentMapper
 {
-    public static Payment ToDomain(PaymentCommand command)
+    public static Payment ToDomain(RegistrationPaymentCommand command)
     {
         return Payment.Create(
             enrollmentId: command.EnrollmentId,
@@ -15,6 +15,24 @@ public static class PaymentMapper
             paidAt: command.PaidAt,
             branchId: command.BranchId,
             receivedByStaffId: command.ReceivedByStaffId,
+            invoiceId: command.InvoiceId,
+            transferFees: command.TransferFees,
+            method: command.Method,
+            externalReferenceCode: command.ExternalReferenceCode,
+            methodDetailsJson: command.MethodDetailsJson ?? "{}"
+        );
+    }
+
+    public static Payment ToDomain(ChargeSettlementPaymentCommand command)
+    {
+        return Payment.Create(
+            enrollmentId: command.EnrollmentId,
+            amount: command.Amount,
+            status: command.Status,
+            paidAt: command.PaidAt,
+            branchId: command.BranchId,
+            receivedByStaffId: command.ReceivedByStaffId,
+            invoiceId: command.InvoiceId,
             transferFees: command.TransferFees,
             method: command.Method,
             externalReferenceCode: command.ExternalReferenceCode,
@@ -28,6 +46,7 @@ public static class PaymentMapper
         {
             Id = payment.Id,
             EnrollmentId = payment.EnrollmentId,
+            InvoiceId = payment.InvoiceId,
             Amount = payment.Amount,
             TransferFees = payment.TransferFees,
             Method = payment.Method,

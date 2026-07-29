@@ -2,26 +2,27 @@ using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Entities.EnrollmentAggregate;
 using SchoolManagement.Domain.Enums;
 using SchoolManagement.Domain.Exceptions;
-using System.ComponentModel.DataAnnotations;
+
 namespace SchoolManagement.Domain.Entities;
 
 public class Payment : AggregateRoot
 {
     public Guid EnrollmentId { get; private set; }
+    public Guid? InvoiceId { get; private set; }
     public decimal Amount { get; private set; }
     public decimal? TransferFees { get; private set; }
     public PaymentMethod Method { get; private set; }
     public PaymentStatus Status { get; private set; }
     public DateTime PaidAt { get; private set; }
     public Guid BranchId { get; private set; }
-    public Guid? ChargeId { get; private set; }
     public Guid ReceivedByStaffId { get; private set; }
     public string? ExternalReferenceCode { get; private set; }
     public string MethodDetailsJson { get; private set; } = "{}";
     public string CurrencyCode { get; private set; } = "MAD";
 
     public virtual Enrollment Enrollment { get; private set; } = null!;
-   // add nagivation for those fks 
+    public virtual Invoice? Invoice { get; private set; }
+
     private Payment() { }
 
     public static Payment Create(
@@ -31,6 +32,7 @@ public class Payment : AggregateRoot
         DateTime paidAt,
         Guid branchId,
         Guid receivedByStaffId,
+        Guid? invoiceId = null,
         decimal? transferFees = null,
         PaymentMethod method = PaymentMethod.Cash,
         string? externalReferenceCode = null,
@@ -49,6 +51,7 @@ public class Payment : AggregateRoot
         return new Payment
         {
             EnrollmentId = enrollmentId,
+            InvoiceId = invoiceId,
             Amount = amount,
             TransferFees = transferFees,
             Method = method,
@@ -59,6 +62,11 @@ public class Payment : AggregateRoot
             ExternalReferenceCode = externalReferenceCode,
             MethodDetailsJson = methodDetailsJson,
         };
+    }
+
+    public void UpdateInvoiceId(Guid? invoiceId)
+    {
+        InvoiceId = invoiceId;
     }
 
     public void UpdateEnrollmentId(Guid enrollmentId)
@@ -118,5 +126,4 @@ public class Payment : AggregateRoot
             throw new DomainException("Method details JSON cannot be empty.");
         MethodDetailsJson = methodDetailsJson;
     }
-
 }

@@ -4,14 +4,10 @@ using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Application.Interfaces;
 using SchoolManagement.Application.Interfaces.Services;
-using SchoolManagement.Application.Mappers;
 using SchoolManagement.Application.Results;
 using SchoolManagement.Domain.DomainEvents.Students;
-using SchoolManagement.Domain.Entities;
-using SchoolManagement.Domain.Enums;
 using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Domain.Interfaces.Queries;
-using SchoolManagement.Domain.Interfaces.Repositories;
 
 namespace SchoolManagement.Application.Services.Registrations;
 
@@ -19,34 +15,31 @@ public class StudentRegistrationService
 {
     private readonly IEnrollmentService _enrollmentService;
     private readonly IStudentService _studentService;
-    private readonly IChargeService _chargeService;
+    private readonly IInvoiceService _invoiceService;
     private readonly IPaymentService _paymentService;
     private readonly ITransaction _transaction;
     private readonly IMediator _mediator;
     private readonly IPlanQueryService _planQueryService;
     private readonly ICurrentUserContext _currentUserContext;
-    private readonly IChargeRepository _chargeRepository;
 
     public StudentRegistrationService(
-            IStudentService studentService,
-            IEnrollmentService enrollmentService,
-            IChargeService chargeService,
-            IPaymentService paymentService,
-            ITransaction transaction,
-            IMediator mediator,
-            IPlanQueryService planQueryService,
-            ICurrentUserContext currentUserContext,
-            IChargeRepository chargeRepository)
+        IStudentService studentService,
+        IEnrollmentService enrollmentService,
+        IInvoiceService invoiceService,
+        IPaymentService paymentService,
+        ITransaction transaction,
+        IMediator mediator,
+        IPlanQueryService planQueryService,
+        ICurrentUserContext currentUserContext)
     {
         _studentService = studentService;
         _enrollmentService = enrollmentService;
-        _chargeService = chargeService;
+        _invoiceService = invoiceService;
         _paymentService = paymentService;
         _transaction = transaction;
         _mediator = mediator;
         _planQueryService = planQueryService;
         _currentUserContext = currentUserContext;
-        _chargeRepository = chargeRepository;
     }
 
     private async Task<EvaluatePaymentPlanResult> EvaluatePaymentPlanAsync(Guid planId, decimal amountPaid)
@@ -60,11 +53,13 @@ public class StudentRegistrationService
         if (isFullyPaid)
         {
             result.IsFullyPaid = true;
+            result.CreditBalance = amountPaid - plan.Amount;
         }
         else
         {
             result.RemainingAmountDueDays = plan.RemainingAmountDueDays;
-            result.Amount = plan.Amount;
+            result.TotalAmount = plan.Amount;
+            result.RemainingAmount = plan.Amount - amountPaid;
             result.PaidAmount = amountPaid;
         }
 
@@ -75,7 +70,8 @@ public class StudentRegistrationService
     {
         try
         {
-            ChargeResponseDto? chargeResponse = null;
+            InvoiceResponseDto? invoiceResponse = null;
+            EnrollmentResponseDto enrollmentResponse;
 
             await _transaction.BeginTransactionAsync();
 
@@ -104,47 +100,52 @@ public class StudentRegistrationService
                 StudentId = studentResponse.Id,
                 LevelId = registrationRequestDto.EnrollmentRegReq.LevelId,
                 SubjectId = registrationRequestDto.EnrollmentRegReq.SubjectId,
-                PlanId = registrationRequestDto.EnrollmentRegReq.PlanId,
                 Notes = registrationRequestDto.EnrollmentRegReq.Notes,
                 BranchId = branchId,
                 PreferedScheduleId = registrationRequestDto.EnrollmentRegReq.PreferedScheduleId,
                 GroupId = registrationRequestDto.EnrollmentRegReq.GroupId ?? Guid.Empty
             };
 
-            var enrollmentResponse = await _enrollmentService.CreateAsync(enrollmentCommand);
-            var evaluatePaymentPlan = await EvaluatePaymentPlanAsync(enrollmentResponse.PlanId, registrationRequestDto.PaymentRegReq.Amount);
+            enrollmentResponse = await _enrollmentService.CreateAsync(enrollmentCommand);
 
+            var paymentAmount = registrationRequestDto.PaymentRegReq?.AmountPaid ?? 0;
+            var evaluatePaymentPlan = await EvaluatePaymentPlanAsync(
+                registrationRequestDto.EnrollmentRegReq.PlanId,
+                paymentAmount);
+
+            var now = DateTime.UtcNow;
+            var periodStart = registrationRequestDto.PeriodStart ?? now;
+            var periodEnd = registrationRequestDto.PeriodEnd ?? now.AddMonths(1);
+
+            // Create an invoice with Charge when payment is not fully paid upfront
             if (!evaluatePaymentPlan.IsFullyPaid)
             {
-                var chargeCommand = new ChargeCommand
+                var dueDate = registrationRequestDto.InvoiceDueDate
+                    ?? now.AddDays(evaluatePaymentPlan.RemainingAmountDueDays);
+
+                var invoiceCommand = new InvoiceCommand
                 {
-                    Amount = evaluatePaymentPlan.Amount,
-                    AmountPaid = evaluatePaymentPlan.PaidAmount,
-                    DueDate = DateTime.UtcNow.AddDays(evaluatePaymentPlan.RemainingAmountDueDays),
-                    StudentId = studentResponse.Id,
-                    SourceId = enrollmentResponse.Id,
-                    ChargeType = ChargeType.Enrollment,
-                    IssuedDate = DateTime.UtcNow,
-                    BranchId = branchId
+                    EnrollmentId = enrollmentResponse.Id,
+                    PeriodStart = periodStart,
+                    PeriodEnd = periodEnd,
+                    DueDate = dueDate,
+                    BranchId = branchId,
+                    Charges = new List<ChargeCommand>
+                    {
+                        new ChargeCommand
+                        {
+                            Amount = evaluatePaymentPlan.TotalAmount
+                        }
+                    }
                 };
 
-                if (evaluatePaymentPlan.PaidAmount > 0)
-                {
-                    chargeCommand.Status = ChargeStatus.PartiallyPaid;
-                }
-                else
-                {
-                    chargeCommand.Status = ChargeStatus.Unpaid;
-                }
-
-                chargeResponse = await _chargeService.CreateAsync(chargeCommand);
+                invoiceResponse = await _invoiceService.CreateAsync(invoiceCommand);
             }
 
             PaymentResponseDto? paymentResponse = null;
-            var paymentAmount = registrationRequestDto.PaymentRegReq?.Amount ?? 0;
             if (paymentAmount > 0)
             {
-                var paymentCommand = new PaymentCommand
+                var paymentCommand = new RegistrationPaymentCommand
                 {
                     EnrollmentId = enrollmentResponse.Id,
                     Amount = paymentAmount,
@@ -153,24 +154,19 @@ public class StudentRegistrationService
                     ExternalReferenceCode = registrationRequestDto.PaymentRegReq.ExternalReferenceCode,
                     MethodDetailsJson = registrationRequestDto.PaymentRegReq.MethodDetailsJson ?? "{}",
                     BranchId = branchId,
-                    ChargeId = chargeResponse?.Id ?? null,
+                    InvoiceId = invoiceResponse?.Id,
                     ReceivedByStaffId = _currentUserContext.NameIdentifier,
                     CurrencyCode = registrationRequestDto.PaymentRegReq.CurrencyCode ?? "USD"
                 };
 
                 paymentResponse = await _paymentService.CreateAsync(paymentCommand);
+            }
 
-                if (chargeResponse != null && chargeResponse.Id != Guid.Empty)
-                {
-                    var chargeEntity = await _chargeRepository.GetByIdAsync(chargeResponse.Id);
-                    if (chargeEntity != null)
-                    {
-                        chargeEntity.AddPayment(paymentAmount);
-                        await _chargeRepository.UpdateAsync(chargeEntity);
-                        chargeResponse.AmountPaid = chargeEntity.AmountPaid;
-                        chargeResponse.Status = chargeEntity.Status;
-                    }
-                }
+            if (evaluatePaymentPlan.CreditBalance > 0)
+            {
+                enrollmentResponse = await _enrollmentService.AddCreditAsync(
+                    enrollmentResponse.Id,
+                    evaluatePaymentPlan.CreditBalance);
             }
 
             await _mediator.Publish(new NewStudentAssignedDomainEvent(studentResponse.Id, enrollmentResponse.Id));
@@ -180,7 +176,7 @@ public class StudentRegistrationService
             {
                 StudentRegRes = studentResponse,
                 EnrollmentRegRes = enrollmentResponse,
-                ChargeRegRes = chargeResponse,
+                InvoiceRegRes = invoiceResponse,
                 PaymentRegRes = paymentResponse
             };
         }

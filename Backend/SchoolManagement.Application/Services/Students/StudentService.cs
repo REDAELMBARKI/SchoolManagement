@@ -1,6 +1,7 @@
 using MediatR;
 using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Responses;
+using SchoolManagement.Application.Interfaces;
 using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Domain.DomainEvents.Students;
 using SchoolManagement.Domain.Exceptions;
@@ -19,13 +20,20 @@ public class StudentService : IStudentService
     private readonly IStudentQueryService _query;
     private readonly IMediator _mediator;
     private readonly IAuditLogService _auditLogService;
+    private readonly ICurrentUserContext _currentUserContext;
 
-    public StudentService(IStudentRepository repository, IStudentQueryService query, IMediator mediator, IAuditLogService auditLogService)
+    public StudentService(
+        IStudentRepository repository,
+        IStudentQueryService query,
+        IMediator mediator,
+        IAuditLogService auditLogService,
+        ICurrentUserContext currentUserContext)
     {
         _repository = repository;
         _query = query;
         _mediator = mediator;
         _auditLogService = auditLogService;
+        _currentUserContext = currentUserContext;
     }
 
     public async Task<List<StudentResponseDto>> GetAllAsync()
@@ -60,7 +68,7 @@ public class StudentService : IStudentService
             action: AuditLog.CreateAction(),
             entityName: nameof(Student),
             entityId: createdStudent.Id,
-            branchId: createdStudent.BranchId,
+            branchId: _currentUserContext.BranchId,
             newValues: CreateAuditSnapshot(createdStudent));
         
         await _mediator.Publish(new StudentCreatedDomainEvent(createdStudent.Id));
@@ -112,7 +120,7 @@ public class StudentService : IStudentService
             action: AuditLog.UpdateAction(),
             entityName: nameof(Student),
             entityId: updated.Id,
-            branchId: updated.BranchId,
+            branchId: _currentUserContext.BranchId,
             oldValues: oldValues,
             newValues: CreateAuditSnapshot(updated));
 
@@ -130,7 +138,7 @@ public class StudentService : IStudentService
                 action: AuditLog.DeleteAction(),
                 entityName: nameof(Student),
                 entityId: existing.Id,
-                branchId: existing.BranchId,
+                branchId: _currentUserContext.BranchId,
                 oldValues: CreateAuditSnapshot(existing));
         }
     }
@@ -152,5 +160,4 @@ public class StudentService : IStudentService
             student.Slug
         };
     }
-
 }

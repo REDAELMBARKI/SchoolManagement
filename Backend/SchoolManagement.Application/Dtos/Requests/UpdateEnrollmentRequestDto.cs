@@ -20,9 +20,6 @@ public class UpdateEnrollmentRequestDto
     [Required]
     public Guid SubjectId { get; set; }
 
-    [Required]
-    public Guid PlanId { get; set; }
-
     public string? Notes { get; set; }
 
     public Guid GroupId { get; set; }

@@ -9,14 +9,9 @@ public static class ChargeMapper
     public static Charge ToDomain(ChargeCommand command)
     {
         return Charge.Create(
-            studentId: command.StudentId,
-            type: command.ChargeType,
+            invoiceId: command.InvoiceId,
             amount: command.Amount,
-            issuedDate: command.IssuedDate,
-            dueDate: command.DueDate,
-            amountPaid: command.AmountPaid,
-            sourceId: command.SourceId,
-            branchId: command.BranchId
+            dueDate: command.DueDate
         );
     }
 
@@ -25,17 +20,9 @@ public static class ChargeMapper
         return new ChargeResponseDto
         {
             Id = charge.Id,
-            StudentId = charge.StudentId,
-            ChargeType = charge.ChargeType,
-            Description = charge.Description,
+            InvoiceId = charge.InvoiceId,
             Amount = charge.Amount,
-            AmountPaid = charge.AmountPaid,
-            Status = charge.Status,
-            IssuedDate = charge.IssuedDate,
-            DueDate = charge.DueDate,
-            SourceId = charge.SourceId,
-            BranchId = charge.BranchId,
-            CurrencyCode = charge.CurrencyCode
+            DueDate = charge.DueDate
         };
     }
 }

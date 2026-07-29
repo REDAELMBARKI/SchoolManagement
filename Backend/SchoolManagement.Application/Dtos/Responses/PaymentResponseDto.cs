@@ -6,6 +6,7 @@ public class PaymentResponseDto
 {
     public Guid Id { get; set; }
     public Guid EnrollmentId { get; set; }
+    public Guid? InvoiceId { get; set; }
     public decimal Amount { get; set; }
     public decimal? TransferFees { get; set; }
     public PaymentMethod Method { get; set; }

@@ -66,7 +66,7 @@ public class EnrollmentService : IEnrollmentService
             action: AuditLog.CreateAction(),
             entityName: "Enrollment",
             entityId: created.Id,
-            branchId: created.BranchId,
+            branchId: _currentUserContext.BranchId,
             newValues: CreateAuditSnapshot(created));
 
         return EnrollmentMapper.ToResponse(created);
@@ -88,7 +88,6 @@ public class EnrollmentService : IEnrollmentService
         existing.UpdateSubjectId(command.SubjectId);
         existing.UpdateGroupId(command.GroupId);
         existing.UpdateBranchId(command.BranchId);
-        existing.UpdatePlanId(command.PlanId);
         existing.UpdateNotes(command.Notes);
 
         var updated = await _repository.UpdateAsync(existing);
@@ -97,7 +96,29 @@ public class EnrollmentService : IEnrollmentService
             action: AuditLog.UpdateAction(),
             entityName: "Enrollment",
             entityId: updated.Id,
-            branchId: updated.BranchId,
+            branchId: _currentUserContext.BranchId,
+            oldValues: oldValues,
+            newValues: CreateAuditSnapshot(updated));
+
+        return EnrollmentMapper.ToResponse(updated);
+    }
+
+    public async Task<EnrollmentResponseDto> AddCreditAsync(Guid id, decimal amount)
+    {
+        var existing = await _repository.GetByIdAsync(id);
+        if (existing is null)
+            throw new NotFoundException($"Enrollment with id {id} not found.");
+
+        var oldValues = CreateAuditSnapshot(existing);
+
+        existing.AddCredit(amount);
+        var updated = await _repository.UpdateAsync(existing);
+
+        await _auditLogService.StoreAsync(
+            action: AuditLog.UpdateAction(),
+            entityName: "Enrollment",
+            entityId: updated.Id,
+            branchId: _currentUserContext.BranchId,
             oldValues: oldValues,
             newValues: CreateAuditSnapshot(updated));
 
@@ -115,7 +136,7 @@ public class EnrollmentService : IEnrollmentService
                 action: AuditLog.DeleteAction(),
                 entityName: "Enrollment",
                 entityId: existing.Id,
-                branchId: existing.BranchId,
+                branchId: _currentUserContext.BranchId,
                 oldValues: CreateAuditSnapshot(existing));
         }
     }
@@ -172,7 +193,7 @@ public class EnrollmentService : IEnrollmentService
             enrollment.SubjectId,
             enrollment.GroupId,
             enrollment.BranchId,
-            enrollment.PlanId
+            enrollment.CreditBalance
         };
     }
 }

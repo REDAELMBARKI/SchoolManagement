@@ -17,8 +17,6 @@ public class EnrollmentCommand
 
     public Guid BranchId { get; set; }
 
-    public Guid PlanId { get; set; }
-
     public Guid LevelId { get; set; }
 
     public Guid? PreferedScheduleId { get; set; }

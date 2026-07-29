@@ -21,16 +21,14 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
         entityTypeBuilder.Property(e => e.BranchId)
             .IsRequired();
 
-        entityTypeBuilder.Property(e => e.PlanId)
-            .IsRequired();
+        entityTypeBuilder.Property(e => e.CreditBalance)
+            .IsRequired()
+            .HasPrecision(18, 2);
 
         // Indexes for performance
         entityTypeBuilder.HasIndex(e => e.StudentId);
         entityTypeBuilder.HasIndex(e => e.GroupId);
         entityTypeBuilder.HasIndex(e => e.BranchId);
-        entityTypeBuilder.HasIndex(e => e.PlanId);
-
-
 
         // relationships
       
@@ -48,12 +46,6 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
         .HasOne(e => e.Branch)
         .WithMany(b =>  b.Enrollments)
         .HasForeignKey(e => e.BranchId)
-         .OnDelete(DeleteBehavior.Restrict);
-
-        entityTypeBuilder
-        .HasOne(e => e.Plan)
-        .WithMany(p =>  p.Enrollments)
-        .HasForeignKey(e => e.PlanId)
          .OnDelete(DeleteBehavior.Restrict);
 
         entityTypeBuilder

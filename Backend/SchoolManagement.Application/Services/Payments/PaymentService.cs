@@ -14,17 +14,20 @@ namespace SchoolManagement.Application.Services.Payments;
 public class PaymentService : IPaymentService
 {
     private readonly IPaymentRepository _repository;
+    private readonly IInvoiceRepository _invoiceRepository;
     private readonly IPaymentQueryService _query;
     private readonly ICurrentUserContext _currentUserContext;
     private readonly IAuditLogService _auditLogService;
 
     public PaymentService(
         IPaymentRepository repository,
+        IInvoiceRepository invoiceRepository,
         IPaymentQueryService paymentQueryService,
         ICurrentUserContext currentUserContext,
         IAuditLogService auditLogService)
     {
         _repository = repository;
+        _invoiceRepository = invoiceRepository;
         _query = paymentQueryService;
         _currentUserContext = currentUserContext;
         _auditLogService = auditLogService;
@@ -43,24 +46,63 @@ public class PaymentService : IPaymentService
         return PaymentMapper.ToResponse(payment);
     }
 
-    public async Task<PaymentResponseDto> CreateAsync(PaymentCommand command)
+    public async Task<PaymentResponseDto> CreateAsync(RegistrationPaymentCommand command)
     {
         var branchId = _currentUserContext.BranchId;
         if (branchId == Guid.Empty)
             throw new DomainException("Branch context is missing.");
+
         command.BranchId = branchId;
+        command.ReceivedByStaffId = _currentUserContext.NameIdentifier;
 
-        var payment = PaymentMapper.ToDomain(command);
+        var createdPayment = await CreatePaymentAsync(PaymentMapper.ToDomain(command));
+
+        if (command.InvoiceId.HasValue && command.InvoiceId.Value != Guid.Empty)
+        {
+            var invoice = await _invoiceRepository.GetByIdAsync(command.InvoiceId.Value);
+            if (invoice != null)
+            {
+                invoice.AddPayment(createdPayment.Amount);
+                await _invoiceRepository.UpdateAsync(invoice);
+            }
+        }
+
+        return PaymentMapper.ToResponse(createdPayment);
+    }
+
+    public async Task<PaymentResponseDto> SettleChargeAsync(ChargeSettlementPaymentCommand command)
+    {
+        var branchId = _currentUserContext.BranchId;
+        if (branchId == Guid.Empty)
+            throw new DomainException("Branch context is missing.");
+
+        command.BranchId = branchId;
+        command.ReceivedByStaffId = _currentUserContext.NameIdentifier;
+
+        var invoice = await _invoiceRepository.GetByIdAsync(command.InvoiceId);
+        if (invoice == null)
+            throw new NotFoundException($"No invoice found with id {command.InvoiceId}");
+
+        if (invoice.BranchId != branchId)
+            throw new DomainException("The invoice does not belong to the current branch.");
+
+        var createdPayment = await CreatePaymentAsync(PaymentMapper.ToDomain(command));
+        invoice.AddPayment(createdPayment.Amount);
+        await _invoiceRepository.UpdateAsync(invoice);
+
+        return PaymentMapper.ToResponse(createdPayment);
+    }
+
+    private async Task<Payment> CreatePaymentAsync(Payment payment)
+    {
         var createdPayment = await _repository.AddAsync(payment);
-
         await _auditLogService.StoreAsync(
             action: AuditLog.CreateAction(),
             entityName: nameof(Payment),
             entityId: createdPayment.Id,
-            branchId: createdPayment.BranchId,
+            branchId: _currentUserContext.BranchId,
             newValues: CreateAuditSnapshot(createdPayment));
-
-        return PaymentMapper.ToResponse(createdPayment);
+        return createdPayment;
     }
 
     public async Task<PaymentResponseDto> UpdateAsync(Guid id, UpdatePaymentCommand command)
@@ -95,7 +137,7 @@ public class PaymentService : IPaymentService
             action: AuditLog.UpdateAction(),
             entityName: nameof(Payment),
             entityId: updated.Id,
-            branchId: updated.BranchId,
+            branchId: _currentUserContext.BranchId,
             oldValues: oldValues,
             newValues: CreateAuditSnapshot(updated));
 
@@ -113,7 +155,7 @@ public class PaymentService : IPaymentService
                 action: AuditLog.DeleteAction(),
                 entityName: nameof(Payment),
                 entityId: existing.Id,
-                branchId: existing.BranchId,
+                branchId: _currentUserContext.BranchId,
                 oldValues: CreateAuditSnapshot(existing));
         }
     }
@@ -124,6 +166,7 @@ public class PaymentService : IPaymentService
         {
             payment.Id,
             payment.EnrollmentId,
+            payment.InvoiceId,
             payment.Amount,
             payment.TransferFees,
             payment.Method,

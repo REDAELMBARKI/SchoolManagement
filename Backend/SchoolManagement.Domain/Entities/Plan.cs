@@ -1,6 +1,5 @@
 using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Exceptions;
-using SchoolManagement.Domain.Entities.EnrollmentAggregate;
 
 namespace SchoolManagement.Domain.Entities
 {
@@ -14,7 +13,6 @@ namespace SchoolManagement.Domain.Entities
         public int RemainingAmountDueDays { get; private set; }
         public Guid BranchId { get; private set; }
 
-        public virtual ICollection<Enrollment> Enrollments { get; private set; } = new List<Enrollment>();
         public virtual Branch Branch { get; private set; } = null!;
 
         private Plan() { }

@@ -14,7 +14,6 @@ public static class EnrollmentMapper
             studentId: command.StudentId,
             subjectId: command.SubjectId,
             groupId: command.GroupId,
-            planId: command.PlanId,
             enrolledAt: command.EnrolledAt,
             status: command.Status,
             notes: command.Notes
@@ -29,11 +28,11 @@ public static class EnrollmentMapper
             EnrolledAt = e.EnrolledAt,
             Status = e.Status,
             Notes = e.Notes,
+            CreditBalance = e.CreditBalance,
             StudentId = e.StudentId,
             SubjectId = e.SubjectId,
             GroupId = e.GroupId,
             BranchId = e.BranchId,
-            PlanId = e.PlanId,
             Student = e.Student != null ? new StudentResponseDto
             {
                 Id = e.Student.Id,
@@ -66,21 +65,11 @@ public static class EnrollmentMapper
                 Address = e.Branch.Address,
                 Phone = e.Branch.Phone
             } : null,
-            Plan = e.Plan != null ? new PlanResponseDto
-            {
-                Id = e.Plan.Id,
-                Name = e.Plan.Name,
-                DurationMonths = e.Plan.DurationMonths,
-                BaseAmount = e.Plan.BaseAmount,
-                DiscountPercent = e.Plan.DiscountPercent,
-                IsActive = e.Plan.IsActive,
-                RemainingAmountDueDate = e.Plan.RemainingAmountDueDays,
-                BranchId = e.Plan.BranchId
-            } : null,
             Payments = e.Payments?.Select(p => new PaymentResponseDto
             {
                 Id = p.Id,
                 EnrollmentId = p.EnrollmentId,
+                InvoiceId = p.InvoiceId,
                 Amount = p.Amount,
                 TransferFees = p.TransferFees,
                 Method = p.Method,

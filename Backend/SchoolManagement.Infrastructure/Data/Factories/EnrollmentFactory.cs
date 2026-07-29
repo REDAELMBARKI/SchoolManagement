@@ -17,7 +17,6 @@ public class EnrollmentFactory : Factory<Enrollment>
         var subjects = await Context.Subjects.Select(s => s.Id).ToListAsync();
         var groups = await Context.Groups.Select(g => g.Id).ToListAsync();
         var branches = await Context.Branches.Select(b => b.Id).ToListAsync();
-        var plans = await Context.Plans.Select(p => p.Id).ToListAsync();
 
         var statuses = new[] { EnrollmentStatus.Active, EnrollmentStatus.Dropped, EnrollmentStatus.Completed };
 
@@ -26,7 +25,6 @@ public class EnrollmentFactory : Factory<Enrollment>
             subjectId: subjects.Any() ? faker.PickRandom(subjects) : Guid.Empty,
             groupId: groups.Any() ? faker.PickRandom(groups) : Guid.Empty,
             branchId: branches.Any() ? faker.PickRandom(branches) : Guid.Empty,
-            planId: plans.Any() ? faker.PickRandom(plans) : Guid.Empty,
             enrolledAt: faker.Date.Past(),
             status: faker.PickRandom(statuses),
             notes: faker.Random.Bool() ? faker.Lorem.Sentence() : null

@@ -43,7 +43,7 @@ public class GroupService : IGroupService
             action: AuditLog.CreateAction(),
             entityName: nameof(Group),
             entityId: newEntity.Id,
-            branchId: newEntity.BranchId,
+            branchId: _currentUserContext.BranchId,
             newValues: CreateAuditSnapshot(newEntity));
 
         return GroupMapper.ToResponse(newEntity);
@@ -84,7 +84,7 @@ public class GroupService : IGroupService
             action: AuditLog.UpdateAction(),
             entityName: nameof(Group),
             entityId: updated.Id,
-            branchId: updated.BranchId,
+            branchId: _currentUserContext.BranchId,
             oldValues: oldValues,
             newValues: CreateAuditSnapshot(updated));
 
@@ -102,7 +102,7 @@ public class GroupService : IGroupService
                 action: AuditLog.DeleteAction(),
                 entityName: nameof(Group),
                 entityId: existing.Id,
-                branchId: existing.BranchId,
+                branchId: _currentUserContext.BranchId,
                 oldValues: CreateAuditSnapshot(existing));
         }
 

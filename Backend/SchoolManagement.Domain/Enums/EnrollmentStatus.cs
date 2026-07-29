@@ -6,8 +6,8 @@ namespace SchoolManagement.Domain.Enums
 {
     public enum EnrollmentStatus
     {
-        Active,
-        Dropped,
-        Completed
+        Active,      // currently enrolled, attending / in progress
+        Dropped,     // student left before finishing (cancelled)
+        Completed    // course/term finished (regardless of payment)
     }
 }

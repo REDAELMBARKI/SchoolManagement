@@ -57,15 +57,12 @@ public class IntakeService : IIntakeService
             action: AuditLog.CreateAction(),
             entityName: nameof(Intake),
             entityId: newEntity.Id,
-            branchId: newEntity.BranchId,
+            branchId: _currentUserContext.BranchId,
             newValues: CreateAuditSnapshot(newEntity));
 
         return IntakeMapper.ToResponse(newEntity);
     }
 
-
-   
-    
     public async Task<IntakeResponseDto?> UpdateAsync(Guid id, UpdateIntakeCommand command)
     {
         var branchId = _currentUserContext.BranchId;
@@ -87,7 +84,6 @@ public class IntakeService : IIntakeService
         var generatedSlug = await CustomSluger.Slug(slug => _query.IsExistsBySlugAsync(slug), $"{command.FirstName}-{command.LastName}");
         var oldValues = CreateAuditSnapshot(existingIntake);
 
-
         existingIntake.UpdateFirstName(command.FirstName);
         existingIntake.UpdateLastName(command.LastName);
         existingIntake.UpdateSlug(generatedSlug);
@@ -108,19 +104,18 @@ public class IntakeService : IIntakeService
         existingIntake.UpdateAmountPaid(command.AmountPaid);
         
         existingIntake.UpdatedAt = DateTime.UtcNow;
-        Intake  updatedIntake = await _repository.UpdateAsync(existingIntake);
+        Intake updatedIntake = await _repository.UpdateAsync(existingIntake);
 
         await _auditLogService.StoreAsync(
             action: AuditLog.UpdateAction(),
             entityName: nameof(Intake),
             entityId: updatedIntake.Id,
-            branchId: updatedIntake.BranchId,
+            branchId: _currentUserContext.BranchId,
             oldValues: oldValues,
             newValues: CreateAuditSnapshot(updatedIntake));
 
         return IntakeMapper.ToResponse(updatedIntake); 
     }
-
 
     public async Task DeleteIntakeAsync(Guid id)
     {
@@ -133,7 +128,7 @@ public class IntakeService : IIntakeService
                 action: AuditLog.DeleteAction(),
                 entityName: nameof(Intake),
                 entityId: existingIntake.Id,
-                branchId: existingIntake.BranchId,
+                branchId: _currentUserContext.BranchId,
                 oldValues: CreateAuditSnapshot(existingIntake));
         }
     }
@@ -163,5 +158,4 @@ public class IntakeService : IIntakeService
             intake.AmountPaid
         };
     }
-
 }

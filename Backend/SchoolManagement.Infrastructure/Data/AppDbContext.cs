@@ -57,6 +57,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
     public DbSet<Grade> Grades { get; set; }
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Plan> Plans { get; set; }
+    public DbSet<Invoice> Invoices { get; set; }
     public DbSet<Charge> Charges { get; set; }
     public DbSet<Expense> Expenses { get; set; }
     public DbSet<AuditLog> AuditLogs { get; set; }
@@ -99,6 +100,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
         modelBuilder.ApplyConfiguration(new GroupConfiguration());
         modelBuilder.ApplyConfiguration(new ScheduleConfiguration());
         modelBuilder.ApplyConfiguration(new EnrollmentConfiguration());
+        modelBuilder.ApplyConfiguration(new InvoiceConfiguration());
+        modelBuilder.ApplyConfiguration(new ChargeConfiguration());
         modelBuilder.ApplyConfiguration(new GradeConfiguration());
         modelBuilder.ApplyConfiguration(new MediaConfiguration());
         modelBuilder.ApplyConfiguration(new LeadSourceConfiguration());

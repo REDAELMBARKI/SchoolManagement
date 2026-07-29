@@ -14,5 +14,9 @@
         "strings": "on"
     },
     "editor.suggestSelection": "first",
-    "editor.acceptSuggestionOnEnter": "on"
+    "editor.acceptSuggestionOnEnter": "on",
+    "csharp-dev-tools.solutionViewer.selectedWorkspaceSolutions": [
+        "Backend/SchoolManagement.sln",
+        "Backend/SchoolManagement.Api/SchoolManagement.sln"
+    ]
 }

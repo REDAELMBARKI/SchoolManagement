@@ -55,7 +55,6 @@ public class EnrollmentController : ControllerBase
             {
                 LevelId = dto.LevelId,
                 SubjectId = dto.SubjectId,
-                PlanId = dto.PlanId,
                 Notes = dto.Notes,
                 PreferedScheduleId = dto.PreferedScheduleId,
                 StudentId = dto.StudentId,
@@ -89,7 +88,6 @@ public class EnrollmentController : ControllerBase
                 LevelId = dto.LevelId,
                 StudentId = dto.StudentId,
                 SubjectId = dto.SubjectId,
-                PlanId = dto.PlanId,
                 Notes = dto.Notes,
                 GroupId = dto.GroupId
             };
