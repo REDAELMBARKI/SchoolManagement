@@ -25,8 +25,8 @@ public class Invoice : AggregateRoot
     public virtual Enrollment Enrollment { get; private set; } = null!;
     public virtual Branch Branch { get; private set; } = null!;
 
-    // TotalAmount sum of its charges
-    public decimal TotalAmount => _charges.Sum(c => c.Amount);
+    // TotalAmount sum of its active charges
+    public decimal TotalAmount => _charges.Where(c => c.Status == ChargeStatus.Active).Sum(c => c.Amount);
 
     private Invoice() { }
 

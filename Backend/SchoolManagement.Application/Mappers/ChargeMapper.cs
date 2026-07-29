@@ -22,7 +22,11 @@ public static class ChargeMapper
             Id = charge.Id,
             InvoiceId = charge.InvoiceId,
             Amount = charge.Amount,
-            DueDate = charge.DueDate
+            PaidAmount = charge.PaidAmount,
+            WaivedAmount = charge.WaivedAmount,
+            WaivedReason = charge.WaivedReason,
+            DueDate = charge.DueDate,
+            Status = charge.Status.ToString()
         };
     }
 }

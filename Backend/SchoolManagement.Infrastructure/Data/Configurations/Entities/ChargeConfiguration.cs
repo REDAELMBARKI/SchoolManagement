@@ -14,6 +14,19 @@ public class ChargeConfiguration : IEntityTypeConfiguration<Charge>
             .IsRequired()
             .HasPrecision(18, 2);
 
+        builder.Property(c => c.PaidAmount)
+            .HasPrecision(18, 2);
+
+        builder.Property(c => c.WaivedAmount)
+            .HasPrecision(18, 2);
+
+        builder.Property(c => c.WaivedReason)
+            .HasMaxLength(500);
+
+        builder.Property(c => c.Status)
+            .IsRequired()
+            .HasConversion<string>();
+
         builder.HasOne(c => c.Invoice)
             .WithMany(i => i.Charges)
             .HasForeignKey(c => c.InvoiceId)

@@ -2,9 +2,7 @@ namespace SchoolManagement.Domain.Enums;
 
 public enum ChargeStatus
 {
-    Unpaid,
-    PartiallyPaid,
-    Paid,
-    Cancelled,
-    
+    Active = 1,
+    Waived = 2,
+    Cancelled = 3
 }
