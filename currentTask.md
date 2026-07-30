@@ -2,6 +2,8 @@
 
 **Epic**: Implement Invoice Lifecycle & Settlement Engine + Enrollment Lifecycle Workflows
 
+**Last updated**: Story 3 complete. Story 4 partially started (config + renewal/cancel credit; payment overpayment still pending).
+
 ---
 
 ## Invoice Lifecycle & Settlement Engine
@@ -27,6 +29,8 @@
 
 - [ ] **API-4**: Register background service in `Program.cs`
   - Add `builder.Services.AddHostedService<OverdueInvoiceProcessor>()`
+
+> **Partial (Hangfire)**: `InvoiceService.ProcessPastDueInvoicesAsync()` + Hangfire recurring job exist. Still missing domain event, audit per transition, and dedicated hosted service from spec.
 
 ---
 
@@ -54,61 +58,92 @@
 - [x] **APP-9**: Create `WaiveInvoiceValidator` using FluentValidation
 - [x] **API-10**: Add `POST /api/invoices/{id}/waive` endpoint in `InvoiceController`
 
+- [x] **INF-5**: `InvoiceRepository.GetByIdAsync` includes `Charges` (required for waive/cancel charge handling)
+
 ---
 
 ### Story 3: Invoice Cancellation Workflow
 **Priority**: P0 - Critical  
-**Story Points**: 3
+**Story Points**: 3  
+**Status**: ✅ Done
 
 **Tasks**:
-- [ ] **DOM-11**: Add `CancelInvoice(string reason)` method to `Invoice` entity
+- [x] **DOM-11**: Add `CancelInvoice(string reason)` method to `Invoice` entity
   - Validate: Invoice must be in Pending or PartiallyPaid status
   - Transition status to `InvoiceStatus.Cancelled`
+  - Cancel all active linked charges
   - Add domain event `InvoiceCancelledDomainEvent`
 
-- [ ] **APP-12**: Create `CancelInvoiceCommand` DTO
+- [x] **APP-12**: Create `CancelInvoiceCommand` DTO
   - Properties: InvoiceId, Reason, CancelledByUserId
 
-- [ ] **APP-13**: Add `CancelInvoiceAsync` method to `IInvoiceService`
-- [ ] **APP-14**: Implement `CancelInvoiceAsync` in `InvoiceService`
-  - Retrieve invoice
+- [x] **APP-13**: Add `CancelInvoiceAsync` method to `IInvoiceService`
+- [x] **APP-14**: Implement `CancelInvoiceAsync` in `InvoiceService`
+  - Retrieve invoice (with charges)
   - Call `invoice.CancelInvoice(command.Reason)`
   - Handle linked charges (mark as cancelled)
   - Save via repository
-  - Log audit trail
+  - Log audit trail (`AuditLog.CancelAction`)
 
-- [ ] **APP-15**: Create `CancelInvoiceValidator`
-- [ ] **API-16**: Add `POST /api/invoices/{id}/cancel` endpoint
+- [x] **APP-15**: Create `CancelInvoiceValidator` (validates `CancelInvoiceCommand`)
+- [x] **API-16**: Add `POST /api/invoices/{id}/cancel` endpoint
+
+> **Also wired (Story 4 overlap)**: On cancel, restore enrollment credit per `BillingOptions` (`CreditRestorePercentage`, grace period rules). See Story 4 tasks APP-24 / APP-25.
 
 ---
 
 ### Story 4: Overpayment & Credit Balance Handling
 **Priority**: P0 - Critical  
-**Story Points**: 4
+**Story Points**: 4  
+**Status**: 🟡 In progress (~40%)
+
+**Decisions locked in**:
+- Allow overpayment → spill to `Enrollment.CreditBalance` (prepay for future invoices)
+- Auto-apply credit **on renewal invoices only** — not on manual payments
+- Use `AddCredit()` + `UseCredit()` on enrollment (no separate `ApplyOverpaymentToCredit` / `UseCreditBalance` names)
+- One active charge per billing invoice (convention; config `MaxActiveChargesPerInvoice`)
+- On cancel: restore credit using configurable **percentage** + time rules (not cash refunds)
 
 **Tasks**:
-- [ ] **DOM-17**: Add `ApplyOverpaymentToCredit(decimal overpaymentAmount)` method to `Enrollment` entity
-  - Validate: overpaymentAmount must be positive
-  - Add to `CreditBalance`
-  - Add domain event `CreditBalanceUpdatedDomainEvent`
+- [x] **DOM-17**: Enrollment credit increase — use existing `AddCredit(decimal amount)` (supersedes `ApplyOverpaymentToCredit`)
+  - Used in registration overpayment + cancel restore
+
 
 - [ ] **DOM-18**: Modify `Invoice.AddPayment()` to detect overpayment
-  - If payment > remaining balance, calculate overpayment
-  - Return overpayment amount to caller
+  - Cap payment at remaining balance; return overpayment to caller
+  - Allocate payment to active charges (charge `PaidAmount` sync)
   - Emit `InvoiceOverpaymentDomainEvent`
 
 - [ ] **APP-19**: Update `PaymentService` to handle overpayment
-  - After adding payment to invoice, check for overpayment
-  - If overpayment exists, call `enrollment.ApplyOverpaymentToCredit(overpayment)`
+  - After applying payment to invoice, route overpayment to `enrollment.AddCredit()` when `BillingOptions.AllowOverpaymentToCredit` is true
 
-- [ ] **DOM-20**: Add `UseCreditBalance(decimal amount)` method to `Enrollment` entity
-  - Validate: amount <= CreditBalance
-  - Deduct from CreditBalance
-  - Add domain event
+- [x] **DOM-20**: Add `UseCredit(decimal amount)` to `Enrollment` entity
+  - Validates amount > 0 and <= `CreditBalance`
+  - [ ] Add domain event (deferred to Story 10)
 
-- [ ] **APP-21**: Update invoice payment logic to check for available credit balance first
-  - Before processing payment, check enrollment credit balance
-  - Apply credit balance to invoice if available
+- [x] **APP-21**: Apply credit on renewal invoice generation only
+  - `GenerateDailyInvoicesAsync`: `UseCredit` + `Invoice.RecordCreditApplied`
+  - Controlled by `BillingOptions.ApplyCreditOnRenewalOnly`
+  - Manual invoice payments do **not** auto-consume credit (by design)
+
+- [x] **DOM-21**: Add `Invoice.CreditAppliedAmount` + `RecordCreditApplied(decimal)`
+  - Tracks enrollment credit consumed on this invoice (for cancel restore)
+
+- [x] **APP-22**: Create `BillingOptions` + `appsettings.json` `"Billing"` section
+  - `AllowOverpaymentToCredit`, `ApplyCreditOnRenewalOnly`, `CreditRestorePercentage`
+  - `RestoreCreditBeforePeriodStartOnly`, `GracePeriodDaysAfterPeriodStart`
+  - `MaxActiveChargesPerInvoice`
+  - Registered in `Program.cs` via `IOptions<BillingOptions>`
+
+- [x] **APP-23**: Restore credit on invoice cancel (`CancelInvoiceAsync`)
+  - `restore = CreditAppliedAmount × CreditRestorePercentage / 100`
+  - Gated by period start + grace period from config
+
+- [x] **APP-24**: Registration prepayment — `StudentRegistrationService` stores overpayment via `AddCreditAsync` when `amountPaid > plan.Amount`
+
+- [ ] **DOM-25**: `Charge.AddPayment(decimal)` + single `Invoice.ApplyPayment` entry point (charge/invoice paid amount sync)
+
+> **Not in scope (explicit)**: Auto-apply credit when staff records a manual payment — renewals only.
 
 ---
 
@@ -309,17 +344,20 @@
 ## Summary
 
 **Total Stories**: 12  
-**Total Tasks**: 53  
+**Total Tasks**: 60 (+7 from Story 4 config/credit tracking additions)  
 **Estimated Effort**: ~48 story points
 
+**Completed stories**: Story 2 ✅, Story 3 ✅  
+**In progress**: Story 4 🟡 (~40% — config, renewal credit, cancel restore, registration prepay done; payment overpayment + charge sync pending)
+
 **Implementation Order Recommendation**:
-1. Start with Story 5 (Drop Enrollment) - foundational for enrollment lifecycle
-2. Story 6 (Complete Enrollment) - simpler, builds on drop pattern
-3. Story 1 (Overdue Processor) - independent background service
-4. Story 2 (Invoice Waiver) - foundational for invoice lifecycle
-5. Story 3 (Invoice Cancellation) - builds on waiver pattern
-6. Story 4 (Overpayment Handling) - integrates with payment flow
-7. Story 7 (Group Transfer) - most complex, requires capacity + clash detection
-8. Story 8 (Atomic Capacity) - infrastructure improvement for transfer
-9. Story 9-10 (Cross-cutting) - can be done in parallel with domain stories
-10. Story 11-12 (Testing) - ongoing throughout implementation
+1. ~~Story 2 (Invoice Waiver)~~ ✅
+2. ~~Story 3 (Invoice Cancellation)~~ ✅
+3. **Story 4 (Overpayment Handling)** — finish `PaymentService` + `Invoice.ApplyPayment` + EF migration
+4. Story 5 (Drop Enrollment) — uses cancel invoice logic
+5. Story 6 (Complete Enrollment)
+6. Story 1 (Overdue Processor) — align Hangfire job with full spec (events, audit)
+7. Story 7 (Group Transfer)
+8. Story 8 (Atomic Capacity)
+9. Story 9-10 (Cross-cutting)
+10. Story 11-12 (Testing)

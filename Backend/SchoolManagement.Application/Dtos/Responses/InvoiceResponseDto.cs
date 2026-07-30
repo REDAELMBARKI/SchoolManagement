@@ -11,6 +11,7 @@ public class InvoiceResponseDto
     public DateTime DueDate { get; set; }
     public decimal TotalAmount { get; set; }
     public decimal PaidAmount { get; set; }
+    public decimal CreditAppliedAmount { get; set; }
     public InvoiceStatus Status { get; set; }
     public Guid BranchId { get; set; }
     public List<ChargeResponseDto> Charges { get; set; } = new();

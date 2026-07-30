@@ -1,10 +1,12 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Application.Interfaces;
 using SchoolManagement.Application.Interfaces.Queries;
 using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Application.Mappers;
+using SchoolManagement.Application.Options;
 using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Entities.EnrollmentAggregate;
 using SchoolManagement.Domain.Enums;
@@ -23,6 +25,7 @@ public class InvoiceService : IInvoiceService
     private readonly IAuditLogService _auditLogService;
     private readonly ICurrentUserContext _currentUserContext;
     private readonly ILogger<InvoiceService> _logger;
+    private readonly BillingOptions _billingOptions;
 
     public InvoiceService(
         IInvoiceRepository repository,
@@ -31,7 +34,8 @@ public class InvoiceService : IInvoiceService
         IEnrollmentRepository enrollmentRepository,
         IAuditLogService auditLogService,
         ICurrentUserContext currentUserContext,
-        ILogger<InvoiceService> logger)
+        ILogger<InvoiceService> logger,
+        IOptions<BillingOptions> billingOptions)
     {
         _repository = repository;
         _query = query;
@@ -40,6 +44,7 @@ public class InvoiceService : IInvoiceService
         _currentUserContext = currentUserContext;
         _enrollmentRepository = enrollmentRepository;
         _logger = logger;
+        _billingOptions = billingOptions.Value;
     }
 
     public async Task<List<InvoiceResponseDto>> GetAllAsync()
@@ -119,6 +124,62 @@ public class InvoiceService : IInvoiceService
         return InvoiceMapper.ToResponse(updated);
     }
 
+    public async Task<InvoiceResponseDto> CancelInvoiceAsync(Guid id, CancelInvoiceCommand command)
+    {
+        var invoice = await _repository.GetByIdAsync(id);
+        if (invoice == null)
+            throw new NotFoundException($"No invoice found with id {id}");
+
+        var oldValues = CreateAuditSnapshot(invoice);
+
+        invoice.CancelInvoice(command.Reason);
+
+        var updated = await _repository.UpdateAsync(invoice);
+
+        if (updated.CreditAppliedAmount > 0)
+        {
+            var restoreAmount = _billingOptions.CalculateCreditRestoreAmount(
+                updated.CreditAppliedAmount,
+                updated.PeriodStart,
+                DateTime.UtcNow);
+
+            if (restoreAmount > 0)
+            {
+                var enrollment = await _enrollmentRepository.GetByIdAsync(updated.EnrollmentId);
+                if (enrollment != null)
+                {
+                    enrollment.AddCredit(restoreAmount);
+                    await _enrollmentRepository.UpdateAsync(enrollment);
+
+                    _logger.LogInformation(
+                        "Restored {RestoreAmount} credit ({Percentage}%) to enrollment {EnrollmentId} after cancelling invoice {InvoiceId}.",
+                        restoreAmount,
+                        _billingOptions.CreditRestorePercentage,
+                        enrollment.Id,
+                        updated.Id);
+                }
+            }
+            else
+            {
+                _logger.LogInformation(
+                    "No credit restored for cancelled invoice {InvoiceId} (CreditApplied={CreditApplied}, restore rules not met).",
+                    updated.Id,
+                    updated.CreditAppliedAmount);
+            }
+        }
+
+        await _auditLogService.StoreAsync(
+            action: AuditLog.CancelAction(),
+            entityName: nameof(Invoice),
+            entityId: updated.Id,
+            branchId: _currentUserContext.BranchId,
+            oldValues: oldValues,
+            newValues: CreateAuditSnapshot(updated),
+            message: $"Cancelled invoice {updated.Id} for reason: {command.Reason}");
+
+        return InvoiceMapper.ToResponse(updated);
+    }
+
     public async Task DeleteAsync(Guid id)
     {
         var existing = await _repository.GetByIdAsync(id);
@@ -188,10 +249,11 @@ public class InvoiceService : IInvoiceService
             }
 
             decimal chargeAmount = plan.Amount;
+            decimal creditApplied = 0;
 
-            if (enrollment.CreditBalance > 0)
+            if (_billingOptions.ApplyCreditOnRenewalOnly && enrollment.CreditBalance > 0)
             {
-                var creditApplied = Math.Min(enrollment.CreditBalance, plan.Amount);
+                creditApplied = Math.Min(enrollment.CreditBalance, plan.Amount);
                 chargeAmount = plan.Amount - creditApplied;
                 enrollment.UpdateCreditBalance(enrollment.CreditBalance - creditApplied);
                 await _enrollmentRepository.UpdateAsync(enrollment);
@@ -211,6 +273,9 @@ public class InvoiceService : IInvoiceService
                 dueDate: dueDate,
                 branchId: expiringInvoice.BranchId
             );
+
+            if (creditApplied > 0)
+                newInvoice.RecordCreditApplied(creditApplied);
 
             if (chargeAmount > 0)
             {
@@ -246,6 +311,7 @@ public class InvoiceService : IInvoiceService
             invoice.DueDate,
             invoice.TotalAmount,
             invoice.PaidAmount,
+            invoice.CreditAppliedAmount,
             invoice.Status,
             invoice.BranchId,
             Charges = invoice.Charges.Select(c => new

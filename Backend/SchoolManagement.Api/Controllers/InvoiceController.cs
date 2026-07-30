@@ -60,4 +60,12 @@ public class InvoiceController : ControllerBase
         var result = await _invoiceService.WaiveInvoiceAsync(id, command);
         return Ok(result);
     }
+
+    [HttpPost("{id:guid}/cancel")]
+    public async Task<IActionResult> Cancel(Guid id, [FromBody] CancelInvoiceCommand command)
+    {
+        command.InvoiceId = id;
+        var result = await _invoiceService.CancelInvoiceAsync(id, command);
+        return Ok(result);
+    }
 }

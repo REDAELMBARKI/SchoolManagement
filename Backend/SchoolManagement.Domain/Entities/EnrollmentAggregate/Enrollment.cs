@@ -137,6 +137,14 @@ public class Enrollment : AggregateRoot
         CreditBalance += amount;
     }
 
+    public void UseCredit(decimal amount)
+    {
+        if (amount <= 0)
+            throw new DomainException("Credit amount must be greater than zero.");
+        if (amount > CreditBalance)
+            throw new DomainException("Insufficient credit balance.");
+        CreditBalance -= amount;
+    }
 
     public void UpdateCreditBalance(decimal amount)
     {

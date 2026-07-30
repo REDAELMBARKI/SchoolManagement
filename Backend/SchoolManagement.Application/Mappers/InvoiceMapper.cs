@@ -40,6 +40,7 @@ public static class InvoiceMapper
             DueDate = invoice.DueDate,
             TotalAmount = invoice.TotalAmount,
             PaidAmount = invoice.PaidAmount,
+            CreditAppliedAmount = invoice.CreditAppliedAmount,
             Status = invoice.Status,
             BranchId = invoice.BranchId,
             Charges = invoice.Charges.Select(ChargeMapper.ToResponse).ToList()

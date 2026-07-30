@@ -4,5 +4,5 @@ public class CancelInvoiceCommand
 {
     public Guid InvoiceId { get; set; }
     public string Reason { get; set; } = string.Empty;
-    public Guid? CancelledByUserId { get; set; }
+    public Guid CancelledByUserId { get; set; }
 }

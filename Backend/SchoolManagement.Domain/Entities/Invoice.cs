@@ -13,6 +13,7 @@ public class Invoice : AggregateRoot
     public DateTime PeriodEnd { get; private set; }
     public DateTime DueDate { get; private set; }
     public decimal PaidAmount { get; private set; }
+    public decimal CreditAppliedAmount { get; private set; }
     public InvoiceStatus Status { get; private set; } = InvoiceStatus.Pending;
     public Guid BranchId { get; private set; }
 
@@ -79,6 +80,13 @@ public class Invoice : AggregateRoot
         RecalculateStatus();
     }
 
+    public void RecordCreditApplied(decimal amount)
+    {
+        if (amount < 0)
+            throw new DomainException("Credit applied amount cannot be negative.");
+        CreditAppliedAmount += amount;
+    }
+
     public void WaiveInvoice(decimal waivedAmount, string reason)
     {
         if (waivedAmount <= 0)
@@ -121,6 +129,26 @@ public class Invoice : AggregateRoot
         }
 
         AddDomainEvent(new InvoiceWaivedDomainEvent(Id, EnrollmentId, waivedAmount, reason));
+    }
+
+    public void CancelInvoice(string reason)
+    {
+        if (string.IsNullOrWhiteSpace(reason))
+            throw new DomainException("Cancellation reason is required.");
+
+        if (Status == InvoiceStatus.Cancelled)
+            throw new DomainException("Invoice is already cancelled.");
+
+        if (Status != InvoiceStatus.Pending && Status != InvoiceStatus.PartiallyPaid)
+            throw new DomainException("Only pending or partially paid invoices can be cancelled.");
+
+        foreach (var charge in _charges.Where(c => c.Status == ChargeStatus.Active))
+        {
+            charge.Cancel();
+        }
+
+        Status = InvoiceStatus.Cancelled;
+        AddDomainEvent(new InvoiceCancelledDomainEvent(Id, EnrollmentId, reason));
     }
 
     public void RecalculateStatus()

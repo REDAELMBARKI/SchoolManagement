@@ -11,6 +11,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using SchoolManagement.Infrastructure.Data.Configurations.Extensions;
 using SchoolManagement.Application.Services.Students;
+using SchoolManagement.Application.Options;
 using SchoolManagement.Infrastructure.Repositories;
 using SchoolManagement.Application.Interfaces;
 using SchoolManagement.Application.Interfaces.Services;
@@ -57,6 +58,8 @@ builder.Services.AddHttpContextAccessor();
 // add jwt barear 
 builder.Services.AddJwtConfigExtension(builder.Configuration);
 
+builder.Services.Configure<BillingOptions>(
+    builder.Configuration.GetSection(BillingOptions.SectionName));
 
 // Di registration 
 builder.Services.Scan(scan => scan

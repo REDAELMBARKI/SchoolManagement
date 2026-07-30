@@ -13,6 +13,9 @@ public class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
         builder.Property(i => i.PaidAmount)
             .HasPrecision(18, 2);
 
+        builder.Property(i => i.CreditAppliedAmount)
+            .HasPrecision(18, 2);
+
         builder.Property(i => i.Status)
             .IsRequired()
             .HasConversion<string>()

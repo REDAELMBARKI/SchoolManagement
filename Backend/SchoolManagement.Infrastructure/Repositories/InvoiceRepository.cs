@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Interfaces.Repositories;
 using SchoolManagement.Infrastructure.Data;
@@ -8,5 +9,12 @@ public class InvoiceRepository : Repository<Invoice>, IInvoiceRepository
 {
     public InvoiceRepository(AppDbContext context) : base(context)
     {
+    }
+
+    public override async Task<Invoice?> GetByIdAsync(Guid id)
+    {
+        return await Query()
+            .Include(i => i.Charges)
+            .FirstOrDefaultAsync(i => i.Id == id);
     }
 }
