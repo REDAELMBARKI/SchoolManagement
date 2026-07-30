@@ -9,5 +9,6 @@ public interface IAuditLogService
         Guid branchId,
         object? oldValues = null,
         object? newValues = null,
+        string? message = null,
         CancellationToken cancellationToken = default);
 }

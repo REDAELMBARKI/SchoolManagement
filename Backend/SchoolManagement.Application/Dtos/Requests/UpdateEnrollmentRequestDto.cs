@@ -23,4 +23,6 @@ public class UpdateEnrollmentRequestDto
     public string? Notes { get; set; }
 
     public Guid GroupId { get; set; }
+
+    public Guid? PlanId { get; set; }
 }

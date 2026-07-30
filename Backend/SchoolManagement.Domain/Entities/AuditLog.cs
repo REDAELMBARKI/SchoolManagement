@@ -6,7 +6,8 @@ public class AuditLog : BaseEntity
 {
     public string EntityName { get; private set; } = string.Empty;
     public Guid EntityId { get; private set; }
-    public string Action { get; private set; } = string.Empty; // Create, Update, Delete
+    public string Action { get; private set; } = string.Empty; // Create, Update, Delete, Waive, etc.
+    public string? Message { get; private set; }
     public string? OldValues { get; private set; } // JSON
     public string? NewValues { get; private set; } // JSON
     public string? ChangedBy { get; private set; }
@@ -24,13 +25,15 @@ public class AuditLog : BaseEntity
         string? oldValues,
         string? newValues,
         string? changedBy,
-        Guid branchId)
+        Guid branchId,
+        string? message = null)
     {
         return new AuditLog
         {
             EntityName = entityName,
             EntityId = entityId,
             Action = action,
+            Message = message,
             OldValues = oldValues,
             NewValues = newValues,
             ChangedBy = changedBy,
@@ -44,20 +47,28 @@ public class AuditLog : BaseEntity
         BranchId = branchId;
     }
 
-
-    public static string CreateAction(){
+    public static string CreateAction()
+    {
         return "Create";
     }
 
-
-    public static string UpdateAction(){
-       return  "Update";
+    public static string UpdateAction()
+    {
+        return "Update";
     }
 
-
-    public static string DeleteAction(){
+    public static string DeleteAction()
+    {
         return "Delete";
     }
 
+    public static string WaiveAction()
+    {
+        return "Waive";
+    }
 
+    public static string CancelAction()
+    {
+        return "Cancel";
+    }
 }

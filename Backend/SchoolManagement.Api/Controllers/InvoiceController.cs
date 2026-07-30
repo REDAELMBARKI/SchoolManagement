@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Dtos.Commands;
+using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Application.Interfaces;
 using SchoolManagement.Application.Interfaces.Services;
 
 namespace SchoolManagement.Api.Controllers;
@@ -49,5 +51,13 @@ public class InvoiceController : ControllerBase
     {
         await _invoiceService.DeleteAsync(id);
         return NoContent();
+    }
+
+    [HttpPost("{id:guid}/waive")]
+    public async Task<IActionResult> Waive(Guid id, [FromBody] WaiveInvoiceCommand command)
+    {
+        command.InvoiceId = id;
+        var result = await _invoiceService.WaiveInvoiceAsync(id, command);
+        return Ok(result);
     }
 }

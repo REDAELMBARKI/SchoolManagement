@@ -100,6 +100,7 @@ public class StudentRegistrationService
                 StudentId = studentResponse.Id,
                 LevelId = registrationRequestDto.EnrollmentRegReq.LevelId,
                 SubjectId = registrationRequestDto.EnrollmentRegReq.SubjectId,
+                PlanId = registrationRequestDto.EnrollmentRegReq.PlanId,
                 Notes = registrationRequestDto.EnrollmentRegReq.Notes,
                 BranchId = branchId,
                 PreferedScheduleId = registrationRequestDto.EnrollmentRegReq.PreferedScheduleId,

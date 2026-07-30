@@ -6,8 +6,10 @@ using SchoolManagement.Application.Interfaces.Queries;
 using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Application.Mappers;
 using SchoolManagement.Domain.Entities;
+using SchoolManagement.Domain.Entities.EnrollmentAggregate;
 using SchoolManagement.Domain.Enums;
 using SchoolManagement.Domain.Exceptions;
+using SchoolManagement.Domain.Interfaces.Queries;
 using SchoolManagement.Domain.Interfaces.Repositories;
 
 namespace SchoolManagement.Application.Services.Invoices;
@@ -16,6 +18,8 @@ public class InvoiceService : IInvoiceService
 {
     private readonly IInvoiceRepository _repository;
     private readonly IInvoiceQueryService _query;
+    private readonly IEnrollmentQueryService _enrollmentQuery;
+    private readonly IEnrollmentRepository _enrollmentRepository;
     private readonly IAuditLogService _auditLogService;
     private readonly ICurrentUserContext _currentUserContext;
     private readonly ILogger<InvoiceService> _logger;
@@ -23,14 +27,18 @@ public class InvoiceService : IInvoiceService
     public InvoiceService(
         IInvoiceRepository repository,
         IInvoiceQueryService query,
+        IEnrollmentQueryService enrollmentQuery,
+        IEnrollmentRepository enrollmentRepository,
         IAuditLogService auditLogService,
         ICurrentUserContext currentUserContext,
         ILogger<InvoiceService> logger)
     {
         _repository = repository;
         _query = query;
+        _enrollmentQuery = enrollmentQuery;
         _auditLogService = auditLogService;
         _currentUserContext = currentUserContext;
+        _enrollmentRepository = enrollmentRepository;
         _logger = logger;
     }
 
@@ -87,6 +95,30 @@ public class InvoiceService : IInvoiceService
         return InvoiceMapper.ToResponse(updated);
     }
 
+    public async Task<InvoiceResponseDto> WaiveInvoiceAsync(Guid id, WaiveInvoiceCommand command)
+    {
+        var invoice = await _repository.GetByIdAsync(id);
+        if (invoice == null)
+            throw new NotFoundException($"No invoice found with id {id}");
+
+        var oldValues = CreateAuditSnapshot(invoice);
+
+        invoice.WaiveInvoice(command.WaivedAmount, command.Reason);
+
+        var updated = await _repository.UpdateAsync(invoice);
+
+        await _auditLogService.StoreAsync(
+            action: AuditLog.WaiveAction(),
+            entityName: nameof(Invoice),
+            entityId: updated.Id,
+            branchId: _currentUserContext.BranchId,
+            oldValues: oldValues,
+            newValues: CreateAuditSnapshot(updated),
+            message: $"Waived amount {command.WaivedAmount} on invoice {updated.Id} for reason: {command.Reason}");
+
+        return InvoiceMapper.ToResponse(updated);
+    }
+
     public async Task DeleteAsync(Guid id)
     {
         var existing = await _repository.GetByIdAsync(id);
@@ -103,13 +135,13 @@ public class InvoiceService : IInvoiceService
         }
     }
 
-    public async Task<int> ProcessPastDueInvoicesAsync()
+    public async Task ProcessPastDueInvoicesAsync()
     {
         var pastDueInvoices = await _query.GetPastDueInvoicesAsync();
         if (pastDueInvoices.Count == 0)
         {
             _logger.LogInformation("[Hangfire] No past due invoices found to process.");
-            return 0;
+            return;
         }
 
         int processedCount = 0;
@@ -127,7 +159,80 @@ public class InvoiceService : IInvoiceService
         }
 
         _logger.LogInformation("[Hangfire] ProcessPastDueInvoices completed. Total updated: {Count}.", processedCount);
-        return processedCount;
+    }
+
+    public async Task GenerateDailyInvoicesAsync()
+    {
+        var expiringInvoices = await _query.GetInvoicesEndingWithinDaysAsync(days: 3);
+        int generatedCount = 0;
+
+        foreach (var expiringInvoice in expiringInvoices)
+        {
+            var enrollment = expiringInvoice.Enrollment;
+            if (enrollment == null)
+            {
+                _logger.LogWarning(
+                    "[Hangfire] Skipping invoice {InvoiceId}: enrollment not found.",
+                    expiringInvoice.Id);
+                continue;
+            }
+
+            var plan = enrollment.GetLatestPlan();
+            if (plan == null)
+            {
+                _logger.LogWarning(
+                    "[Hangfire] Skipping renewal for invoice {InvoiceId}, enrollment {EnrollmentId}: no plan assigned.",
+                    expiringInvoice.Id,
+                    enrollment.Id);
+                continue;
+            }
+
+            decimal chargeAmount = plan.Amount;
+
+            if (enrollment.CreditBalance > 0)
+            {
+                var creditApplied = Math.Min(enrollment.CreditBalance, plan.Amount);
+                chargeAmount = plan.Amount - creditApplied;
+                enrollment.UpdateCreditBalance(enrollment.CreditBalance - creditApplied);
+                await _enrollmentRepository.UpdateAsync(enrollment);
+            }
+
+            var nextPeriodStart = expiringInvoice.PeriodEnd.AddDays(1);
+            var nextPeriodEnd = nextPeriodStart.AddMonths(plan.DurationMonths);
+            var dueDate = nextPeriodStart.AddDays(plan.RemainingAmountDueDays);
+
+            if (await _query.HasRenewalInvoiceAsync(expiringInvoice.EnrollmentId, expiringInvoice.PeriodEnd))
+                continue;
+
+            var newInvoice = Invoice.Create(
+                enrollmentId: expiringInvoice.EnrollmentId,
+                periodStart: nextPeriodStart,
+                periodEnd: nextPeriodEnd,
+                dueDate: dueDate,
+                branchId: expiringInvoice.BranchId
+            );
+
+            if (chargeAmount > 0)
+            {
+                var charge = Charge.Create(
+                    invoiceId: newInvoice.Id,
+                    amount: chargeAmount,
+                    dueDate: dueDate
+                );
+                newInvoice.AddCharge(charge);
+            }
+
+            var created = await _repository.AddAsync(newInvoice);
+            generatedCount++;
+
+            _logger.LogInformation(
+                "[Hangfire] Next-period invoice created: InvoiceId {InvoiceId} for EnrollmentId {EnrollmentId} (previous period ending {PeriodEnd}).",
+                created.Id,
+                expiringInvoice.EnrollmentId,
+                expiringInvoice.PeriodEnd);
+        }
+
+        _logger.LogInformation("[Hangfire] GenerateDailyInvoices completed. Total new invoices created: {Count}.", generatedCount);
     }
 
     private static object CreateAuditSnapshot(Invoice invoice)
@@ -142,7 +247,16 @@ public class InvoiceService : IInvoiceService
             invoice.TotalAmount,
             invoice.PaidAmount,
             invoice.Status,
-            invoice.BranchId
+            invoice.BranchId,
+            Charges = invoice.Charges.Select(c => new
+            {
+                c.Id,
+                c.Amount,
+                c.PaidAmount,
+                c.WaivedAmount,
+                c.WaivedReason,
+                c.Status
+            }).ToList()
         };
     }
 }

@@ -14,6 +14,7 @@ public static class EnrollmentMapper
             studentId: command.StudentId,
             subjectId: command.SubjectId,
             groupId: command.GroupId,
+            planId: command.PlanId,
             enrolledAt: command.EnrolledAt,
             status: command.Status,
             notes: command.Notes
@@ -80,7 +81,25 @@ public static class EnrollmentMapper
                 ExternalReferenceCode = p.ExternalReferenceCode,
                 MethodDetailsJson = p.MethodDetailsJson,
                 CurrencyCode = p.CurrencyCode
-            }).ToList() ?? new List<PaymentResponseDto>()
+            }).ToList() ?? new List<PaymentResponseDto>(),
+            EnrollmentPlans = e.EnrollmentPlans?.Select(ep => new EnrollmentPlanResponseDto
+            {
+                Id = ep.Id,
+                EnrollmentId = ep.EnrollmentId,
+                PlanId = ep.PlanId,
+                CreatedAt = ep.CreatedAt,
+                Plan = ep.Plan != null ? new PlanResponseDto
+                {
+                    Id = ep.Plan.Id,
+                    Name = ep.Plan.Name,
+                    DurationMonths = ep.Plan.DurationMonths,
+                    BaseAmount = ep.Plan.BaseAmount,
+                    DiscountPercent = ep.Plan.DiscountPercent,
+                    IsActive = ep.Plan.IsActive,
+                    RemainingAmountDueDate = ep.Plan.RemainingAmountDueDays,
+                    BranchId = ep.Plan.BranchId
+                } : null
+            }).ToList() ?? new List<EnrollmentPlanResponseDto>()
         };
     }
 }

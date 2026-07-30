@@ -1,4 +1,5 @@
 using SchoolManagement.Domain.Common;
+using SchoolManagement.Domain.DomainEvents.Invoices;
 using SchoolManagement.Domain.Entities.EnrollmentAggregate;
 using SchoolManagement.Domain.Enums;
 using SchoolManagement.Domain.Exceptions;
@@ -25,8 +26,8 @@ public class Invoice : AggregateRoot
     public virtual Enrollment Enrollment { get; private set; } = null!;
     public virtual Branch Branch { get; private set; } = null!;
 
-    // TotalAmount sum of its active charges
-    public decimal TotalAmount => _charges.Where(c => c.Status == ChargeStatus.Active).Sum(c => c.Amount);
+    // TotalAmount sum of its active charges minus waived amount
+    public decimal TotalAmount => _charges.Where(c => c.Status == ChargeStatus.Active).Sum(c => c.Amount - c.WaivedAmount);
 
     private Invoice() { }
 
@@ -76,6 +77,50 @@ public class Invoice : AggregateRoot
 
         PaidAmount += amount;
         RecalculateStatus();
+    }
+
+    public void WaiveInvoice(decimal waivedAmount, string reason)
+    {
+        if (waivedAmount <= 0)
+            throw new DomainException("Waived amount must be greater than zero.");
+
+        if (Status == InvoiceStatus.Cancelled)
+            throw new DomainException("Cannot waive a cancelled invoice.");
+
+        if (Status == InvoiceStatus.Waived)
+            throw new DomainException("Invoice is already waived.");
+
+        var remainingBalance = TotalAmount - PaidAmount;
+        if (waivedAmount > remainingBalance)
+            throw new DomainException("Waived amount cannot exceed the remaining balance.");
+
+        decimal remainingToWaive = waivedAmount;
+        var activeCharges = _charges.Where(c => c.Status == ChargeStatus.Active).ToList();
+
+        foreach (var charge in activeCharges)
+        {
+            if (remainingToWaive <= 0) break;
+
+            var chargeRemaining = charge.Amount - charge.WaivedAmount - charge.PaidAmount;
+            if (chargeRemaining <= 0) continue;
+
+            var amountToWaive = Math.Min(remainingToWaive, chargeRemaining);
+            charge.Waive(reason, amountToWaive);
+            remainingToWaive -= amountToWaive;
+        }
+
+        RecalculateStatus();
+
+        if (_charges.Count > 0 && _charges.All(c => c.Status == ChargeStatus.Waived))
+        {
+            Status = InvoiceStatus.Waived;
+        }
+        else if (waivedAmount >= remainingBalance)
+        {
+            Status = InvoiceStatus.Waived;
+        }
+
+        AddDomainEvent(new InvoiceWaivedDomainEvent(Id, EnrollmentId, waivedAmount, reason));
     }
 
     public void RecalculateStatus()

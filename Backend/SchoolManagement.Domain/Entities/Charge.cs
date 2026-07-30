@@ -64,7 +64,10 @@ public class Charge : AggregateRoot
 
         WaivedAmount += amountToWaive;
         WaivedReason = reason;
-        Status = ChargeStatus.Waived;
+        if (WaivedAmount + PaidAmount >= Amount)
+        {
+            Status = ChargeStatus.Waived;
+        }
     }
 
     public void Cancel()

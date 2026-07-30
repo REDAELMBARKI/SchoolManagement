@@ -19,7 +19,7 @@
 
 - [ ] **DOM-2**: Add domain event `InvoiceOverdueDomainEvent` in `SchoolManagement.Domain/DomainEvents/`
   - Include properties: InvoiceId, EnrollmentId, OverdueDate, AmountDue
-  - Emit event when status transitions to Overdue
+  - Emit event when status transitions to Overdue ;
 
 - [ ] **APP-3**: Create event handler `InvoiceOverdueNotificationHandler` in `SchoolManagement.Application/EventsHandlers/`
   - Handle `InvoiceOverdueDomainEvent`
@@ -35,24 +35,24 @@
 **Story Points**: 3
 
 **Tasks**:
-- [ ] **DOM-5**: Add `WaiveInvoice(decimal waivedAmount, string reason)` method to `Invoice` entity
+- [x] **DOM-5**: Add `WaiveInvoice(decimal waivedAmount, string reason)` method to `Invoice` entity
   - Validate: waivedAmount must be positive and <= remaining balance (TotalAmount - PaidAmount)
   - Reduce TotalAmount by waivedAmount (or add negative charge)
   - Recalculate status after waiver
   - Add domain event `InvoiceWaivedDomainEvent`
 
-- [ ] **APP-6**: Create `WaiveInvoiceCommand` DTO in `SchoolManagement.Application/Dtos/`
+- [x] **APP-6**: Create `WaiveInvoiceCommand` DTO in `SchoolManagement.Application/Dtos/`
   - Properties: InvoiceId, WaivedAmount, Reason, WaivedByUserId
 
-- [ ] **APP-7**: Add `WaiveInvoiceAsync` method to `IInvoiceService` interface
-- [ ] **APP-8**: Implement `WaiveInvoiceAsync` in `InvoiceService`
+- [x] **APP-7**: Add `WaiveInvoiceAsync` method to `IInvoiceService` interface
+- [x] **APP-8**: Implement `WaiveInvoiceAsync` in `InvoiceService`
   - Retrieve invoice by ID
   - Call `invoice.WaiveInvoice(command.WaivedAmount, command.Reason)`
   - Save via repository
   - Log audit trail
 
-- [ ] **APP-9**: Create `WaiveInvoiceValidator` using FluentValidation
-- [ ] **API-10**: Add `POST /api/invoices/{id}/waive` endpoint in `InvoiceController`
+- [x] **APP-9**: Create `WaiveInvoiceValidator` using FluentValidation
+- [x] **API-10**: Add `POST /api/invoices/{id}/waive` endpoint in `InvoiceController`
 
 ---
 

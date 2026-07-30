@@ -53,6 +53,5 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
         .WithMany(g =>  g.Enrollments)
         .HasForeignKey(e => e.GroupId)
          .OnDelete(DeleteBehavior.Restrict);
-
     }
 }

@@ -9,4 +9,5 @@ public class UpdateEnrollmentCommand
     public string? Notes { get; set; }
     public Guid GroupId { get; set; }
     public Guid BranchId { get; set; }
+    public Guid? PlanId { get; set; }
 }

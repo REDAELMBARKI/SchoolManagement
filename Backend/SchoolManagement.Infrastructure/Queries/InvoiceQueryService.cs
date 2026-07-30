@@ -58,4 +58,30 @@ public class InvoiceQueryService : IInvoiceQueryService
                          .Sum(c => c.Amount))
             .ToListAsync();
     }
+
+    public async Task<List<Invoice>> GetInvoicesEndingWithinDaysAsync(int days = 3)
+    {
+        var now = DateTime.UtcNow;
+        var subscriptionEndDate = now.AddDays(days);
+
+        return await _context.Invoices
+            .Include(i => i.Charges)
+            .Include(i => i.Enrollment)
+                .ThenInclude(e => e.EnrollmentPlans)
+                    .ThenInclude(ep => ep.Plan)
+            .Where(i => i.PeriodEnd >= now
+                     && i.PeriodEnd <= subscriptionEndDate
+                     && i.Status != InvoiceStatus.Pending
+                     && i.Status != InvoiceStatus.Cancelled
+                     && i.Enrollment.Status == EnrollmentStatus.Active)
+            .ToListAsync();
+    }
+
+    public async Task<bool> HasRenewalInvoiceAsync(Guid enrollmentId, DateTime periodEnd)
+    {
+        return await _context.Invoices
+                    .AnyAsync(i => i.EnrollmentId == enrollmentId
+                                && i.PeriodStart >= periodEnd
+                                && i.Status != InvoiceStatus.Cancelled);
+    }
 }

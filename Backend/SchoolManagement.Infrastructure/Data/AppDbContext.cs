@@ -53,6 +53,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
 
     // ── Operations ──
     public DbSet<Enrollment> Enrollments { get; set; }
+    public DbSet<EnrollmentPlan> EnrollmentPlans { get; set; }
     public DbSet<Absence> Absences { get; set; }
     public DbSet<Grade> Grades { get; set; }
     public DbSet<Payment> Payments { get; set; }
@@ -100,6 +101,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
         modelBuilder.ApplyConfiguration(new GroupConfiguration());
         modelBuilder.ApplyConfiguration(new ScheduleConfiguration());
         modelBuilder.ApplyConfiguration(new EnrollmentConfiguration());
+        modelBuilder.ApplyConfiguration(new EnrollmentPlanConfiguration());
         modelBuilder.ApplyConfiguration(new InvoiceConfiguration());
         modelBuilder.ApplyConfiguration(new ChargeConfiguration());
         modelBuilder.ApplyConfiguration(new GradeConfiguration());

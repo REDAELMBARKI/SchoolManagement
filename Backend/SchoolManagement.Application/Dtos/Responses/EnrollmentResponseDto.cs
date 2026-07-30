@@ -27,4 +27,5 @@ public class EnrollmentResponseDto
     public BranchResponseDto? Branch { get; set; }
     
     public ICollection<PaymentResponseDto> Payments { get; set; } = new List<PaymentResponseDto>();
+    public ICollection<EnrollmentPlanResponseDto> EnrollmentPlans { get; set; } = new List<EnrollmentPlanResponseDto>();
 }

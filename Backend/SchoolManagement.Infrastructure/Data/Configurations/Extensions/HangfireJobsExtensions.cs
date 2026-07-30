@@ -16,17 +16,19 @@ public static class HangfireJobsExtensions
         {
             var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
 
-            // 1. Daily Overdue Invoice Check (Runs daily at midnight)
-            // Note: Once ProcessOverdueInvoicesAsync is implemented in IInvoiceService, this job will execute it.
-            /*
+
             recurringJobManager.AddOrUpdate<IInvoiceService>(
                 "daily-overdue-invoice-check",
-                service => service.ProcessOverdueInvoicesAsync(),
+                service => service.ProcessPastDueInvoicesAsync(),
                 Cron.Daily
             );
-            */
 
-            // Example placeholder job to verify Hangfire registration on startup
+            recurringJobManager.AddOrUpdate<IInvoiceService>(
+                "daily-invoice-generation",
+                service => service.GenerateDailyInvoicesAsync(),
+                Cron.Daily
+            );
+
             recurringJobManager.AddOrUpdate(
                 "system-health-check",
                 () => Console.WriteLine($"[Hangfire] Health check executed at: {DateTime.UtcNow}"),

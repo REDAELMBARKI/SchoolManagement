@@ -25,6 +25,8 @@ public class EnrollmentQueryService : IEnrollmentQueryService
             .Include(e => e.Group)
             .Include(e => e.Branch)
             .Include(e => e.Payments)
+            .Include(e => e.EnrollmentPlans)
+                .ThenInclude(ep => ep.Plan)
             .ToListAsync();
     }
 
@@ -36,6 +38,8 @@ public class EnrollmentQueryService : IEnrollmentQueryService
             .Include(e => e.Group)
             .Include(e => e.Branch)
             .Include(e => e.Payments)
+            .Include(e => e.EnrollmentPlans)
+                .ThenInclude(ep => ep.Plan)
             .FirstOrDefaultAsync(e => e.Id == id);
     }
 

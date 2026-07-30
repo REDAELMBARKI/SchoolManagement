@@ -90,6 +90,15 @@ public class EnrollmentService : IEnrollmentService
         existing.UpdateBranchId(command.BranchId);
         existing.UpdateNotes(command.Notes);
 
+        if (command.PlanId.HasValue && command.PlanId.Value != Guid.Empty)
+        {
+            var latestPlan = existing.GetLatestPlan();
+            if (latestPlan == null || latestPlan.Id != command.PlanId.Value)
+            {
+                existing.AddPlan(command.PlanId.Value);
+            }
+        }
+
         var updated = await _repository.UpdateAsync(existing);
 
         await _auditLogService.StoreAsync(

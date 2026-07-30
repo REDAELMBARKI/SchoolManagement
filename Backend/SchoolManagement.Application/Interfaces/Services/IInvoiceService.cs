@@ -10,5 +10,8 @@ public interface IInvoiceService
     Task<InvoiceResponseDto> CreateAsync(InvoiceCommand command);
     Task<InvoiceResponseDto> UpdateAsync(Guid id, UpdateInvoiceCommand command);
     Task DeleteAsync(Guid id);
-    Task<int> ProcessPastDueInvoicesAsync();
+    Task<InvoiceResponseDto> WaiveInvoiceAsync(Guid id, WaiveInvoiceCommand command);
+    Task<InvoiceResponseDto> CancelInvoiceAsync(Guid id, CancelInvoiceCommand command);
+    Task ProcessPastDueInvoicesAsync();
+    Task GenerateDailyInvoicesAsync();
 }
