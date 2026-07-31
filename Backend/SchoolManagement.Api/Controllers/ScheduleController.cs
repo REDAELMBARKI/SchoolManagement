@@ -1,12 +1,17 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.FileProviders;
-using SchoolManagement.Application.Dtos.Requests;
+using SchoolManagement.Application.Academic.Dtos.Requests;
+using SchoolManagement.Application.Core.Dtos.Requests;
+using SchoolManagement.Application.Common.Dtos.Requests;
 using SchoolManagement.Infrastructure.Data;
-using SchoolManagement.Application.Services;
-using SchoolManagement.Domain.Exceptions;
-using SchoolManagement.Application.Interfaces.Services;
+using SchoolManagement.Application.Academic.Services;
+using SchoolManagement.Application.Core.Services;
+using SchoolManagement.Domain.Common.Exceptions;
+using SchoolManagement.Application.Academic.Interfaces.Services;
+using SchoolManagement.Application.Core.Interfaces.Services;
+using SchoolManagement.Application.Common.Interfaces.Services;
 
 namespace SchoolManagement.Api.Controllers;
 

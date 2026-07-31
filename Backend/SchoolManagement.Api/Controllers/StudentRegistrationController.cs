@@ -1,5 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
-using SchoolManagement.Application.Dtos.Requests;
+﻿using Microsoft.AspNetCore.Mvc;
+using SchoolManagement.Application.Academic.Dtos.Requests;
+using SchoolManagement.Application.Core.Dtos.Requests;
+using SchoolManagement.Application.Common.Dtos.Requests;
 using SchoolManagement.Application.Services.Registrations;
 
 namespace SchoolManagement.Api.Controllers;

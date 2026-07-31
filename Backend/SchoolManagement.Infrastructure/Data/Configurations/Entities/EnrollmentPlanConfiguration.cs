@@ -1,6 +1,6 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SchoolManagement.Domain.Entities.EnrollmentAggregate;
+using SchoolManagement.Domain.Core.Entities;
 
 namespace SchoolManagement.Infrastructure.Data.Configurations.Entities;
 

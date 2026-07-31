@@ -1,0 +1,19 @@
+﻿using SchoolManagement.Application.Academic.Dtos.Commands;
+using SchoolManagement.Application.Core.Dtos.Commands;
+using SchoolManagement.Application.Common.Dtos.Commands;
+using SchoolManagement.Application.Academic.Dtos.Responses;
+using SchoolManagement.Application.Core.Dtos.Responses;
+using SchoolManagement.Application.Common.Dtos.Responses;
+
+namespace SchoolManagement.Application.Core.Interfaces.Services;
+
+public interface IStudentService
+{
+    Task<List<StudentResponseDto>> GetAllAsync();
+    Task<StudentResponseDto> GetByIdAsync(Guid id);
+    Task<StudentResponseDto> CreateAsync(StudentCommand command);
+    Task<StudentResponseDto> UpdateAsync(Guid id, UpdateStudentCommand command);
+    Task EnsureNoDuplicateStudentAsync(StudentCommand command);
+    Task DeleteAsync(Guid id);
+
+}

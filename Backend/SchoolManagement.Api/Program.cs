@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -10,13 +10,17 @@ using AutoMapper;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using SchoolManagement.Infrastructure.Data.Configurations.Extensions;
-using SchoolManagement.Application.Services.Students;
+using SchoolManagement.Application.Core.Services;
 using SchoolManagement.Application.Options;
-using SchoolManagement.Application.Validators;
-using SchoolManagement.Infrastructure.Repositories;
-using SchoolManagement.Application.Interfaces;
-using SchoolManagement.Application.Interfaces.Services;
-using SchoolManagement.Infrastructure.Services.AuditLogs;
+using SchoolManagement.Application.Core.Validators;
+using SchoolManagement.Infrastructure.Academic.Repositories;
+using SchoolManagement.Infrastructure.Core.Repositories;
+using SchoolManagement.Infrastructure.Common.Repositories;
+using SchoolManagement.Application.Common.Interfaces;
+using SchoolManagement.Application.Academic.Interfaces.Services;
+using SchoolManagement.Application.Core.Interfaces.Services;
+using SchoolManagement.Application.Common.Interfaces.Services;
+using SchoolManagement.Infrastructure.Common.Services;
 using Hangfire;
 
 Log.Logger = new LoggerConfiguration()

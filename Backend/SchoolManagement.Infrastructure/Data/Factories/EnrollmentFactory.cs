@@ -1,5 +1,5 @@
-using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Domain.Entities.EnrollmentAggregate;
+﻿using Microsoft.EntityFrameworkCore;
+using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Enums;
 using SchoolManagement.Infrastructure.Data;
 
