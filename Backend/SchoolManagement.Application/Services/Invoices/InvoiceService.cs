@@ -314,15 +314,15 @@ public class InvoiceService : IInvoiceService
             invoice.CreditAppliedAmount,
             invoice.Status,
             invoice.BranchId,
-            Charges = invoice.Charges.Select(c => new
+            Charge = invoice.Charge == null ? null : new
             {
-                c.Id,
-                c.Amount,
-                c.PaidAmount,
-                c.WaivedAmount,
-                c.WaivedReason,
-                c.Status
-            }).ToList()
+                invoice.Charge.Id,
+                invoice.Charge.Amount,
+                invoice.Charge.PaidAmount,
+                invoice.Charge.WaivedAmount,
+                invoice.Charge.WaivedReason,
+                invoice.Charge.Status
+            }
         };
     }
 }

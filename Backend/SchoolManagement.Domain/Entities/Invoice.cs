@@ -3,6 +3,7 @@ using SchoolManagement.Domain.DomainEvents.Invoices;
 using SchoolManagement.Domain.Entities.EnrollmentAggregate;
 using SchoolManagement.Domain.Enums;
 using SchoolManagement.Domain.Exceptions;
+using SchoolManagement.Domain.Results;
 
 namespace SchoolManagement.Domain.Entities;
 
@@ -17,9 +18,8 @@ public class Invoice : AggregateRoot
     public InvoiceStatus Status { get; private set; } = InvoiceStatus.Pending;
     public Guid BranchId { get; private set; }
 
-    // Navigation & Collection of Charges
-    private readonly List<Charge> _charges = new();
-    public virtual IReadOnlyCollection<Charge> Charges => _charges.AsReadOnly();
+    // Navigation
+    public virtual Charge? Charge { get; private set; }
 
     public virtual ICollection<Payment> Payments { get; private set; } = new List<Payment>();
 
@@ -27,8 +27,11 @@ public class Invoice : AggregateRoot
     public virtual Enrollment Enrollment { get; private set; } = null!;
     public virtual Branch Branch { get; private set; } = null!;
 
-    // TotalAmount sum of its active charges minus waived amount
-    public decimal TotalAmount => _charges.Where(c => c.Status == ChargeStatus.Active).Sum(c => c.Amount - c.WaivedAmount);
+    // TotalAmount is the net liability for the invoice's single charge, if present.
+    public decimal TotalAmount =>
+        Charge == null || Charge.Status == ChargeStatus.Cancelled
+            ? 0
+            : Charge.Amount - Charge.WaivedAmount;
 
     private Invoice() { }
 
@@ -66,18 +69,42 @@ public class Invoice : AggregateRoot
     {
         if (charge == null)
             throw new DomainException("Charge cannot be null.");
+        if (Charge != null)
+            throw new DomainException("Only one charge is allowed per invoice.");
 
-        _charges.Add(charge);
+        Charge = charge;
         RecalculateStatus();
     }
 
-    public void AddPayment(decimal amount)
+    public InvoicePaymentResult AddPayment(decimal amount)
     {
         if (amount <= 0)
             throw new DomainException("Payment amount must be greater than zero.");
+        if (Status == InvoiceStatus.Cancelled)
+            throw new DomainException("Cannot add payment to a cancelled invoice.");
 
-        PaidAmount += amount;
+        var remainingBalance = Math.Max(0, TotalAmount - PaidAmount);
+        var appliedAmount = Math.Min(amount, remainingBalance);
+        if (Charge != null &&
+            (Charge.Status == ChargeStatus.Active || Charge.Status == ChargeStatus.PartiallyPaid))
+        {
+            Charge.AddPayment(appliedAmount);
+        }
+
+        PaidAmount += appliedAmount;
         RecalculateStatus();
+
+        var overpaymentAmount = amount - appliedAmount;
+        if (overpaymentAmount > 0)
+        {
+            AddDomainEvent(new InvoiceOverpaymentDomainEvent(
+                Id,
+                EnrollmentId,
+                appliedAmount,
+                overpaymentAmount));
+        }
+
+        return new InvoicePaymentResult(appliedAmount, overpaymentAmount);
     }
 
     public void RecordCreditApplied(decimal amount)
@@ -102,24 +129,17 @@ public class Invoice : AggregateRoot
         if (waivedAmount > remainingBalance)
             throw new DomainException("Waived amount cannot exceed the remaining balance.");
 
-        decimal remainingToWaive = waivedAmount;
-        var activeCharges = _charges.Where(c => c.Status == ChargeStatus.Active).ToList();
+        if (Charge == null)
+            throw new DomainException("Cannot waive an invoice without a charge.");
 
-        foreach (var charge in activeCharges)
-        {
-            if (remainingToWaive <= 0) break;
+        if (Charge.Status == ChargeStatus.Cancelled || Charge.Status == ChargeStatus.Waived)
+            throw new DomainException("Only an active invoice charge can be waived.");
 
-            var chargeRemaining = charge.Amount - charge.WaivedAmount - charge.PaidAmount;
-            if (chargeRemaining <= 0) continue;
-
-            var amountToWaive = Math.Min(remainingToWaive, chargeRemaining);
-            charge.Waive(reason, amountToWaive);
-            remainingToWaive -= amountToWaive;
-        }
+        Charge.Waive(reason, waivedAmount);
 
         RecalculateStatus();
 
-        if (_charges.Count > 0 && _charges.All(c => c.Status == ChargeStatus.Waived))
+        if (Charge?.Status == ChargeStatus.Waived)
         {
             Status = InvoiceStatus.Waived;
         }
@@ -142,9 +162,11 @@ public class Invoice : AggregateRoot
         if (Status != InvoiceStatus.Pending && Status != InvoiceStatus.PartiallyPaid)
             throw new DomainException("Only pending or partially paid invoices can be cancelled.");
 
-        foreach (var charge in _charges.Where(c => c.Status == ChargeStatus.Active))
+        if (Charge != null &&
+            Charge.Status != ChargeStatus.Cancelled &&
+            Charge.Status != ChargeStatus.Waived)
         {
-            charge.Cancel();
+            Charge.Cancel();
         }
 
         Status = InvoiceStatus.Cancelled;
@@ -156,7 +178,7 @@ public class Invoice : AggregateRoot
         if (Status == InvoiceStatus.Cancelled)
             return;
 
-        if (_charges.Count > 0 && _charges.All(c => c.Status == ChargeStatus.Waived))
+        if (Charge?.Status == ChargeStatus.Waived)
         {
             Status = InvoiceStatus.Waived;
             return;

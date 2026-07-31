@@ -14,7 +14,7 @@ public class InvoiceRepository : Repository<Invoice>, IInvoiceRepository
     public override async Task<Invoice?> GetByIdAsync(Guid id)
     {
         return await Query()
-            .Include(i => i.Charges)
+            .Include(i => i.Charge)
             .FirstOrDefaultAsync(i => i.Id == id);
     }
 }

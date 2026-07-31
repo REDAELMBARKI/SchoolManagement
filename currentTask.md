@@ -88,9 +88,7 @@
 - [x] **APP-15**: Create `CancelInvoiceValidator` (validates `CancelInvoiceCommand`)
 - [x] **API-16**: Add `POST /api/invoices/{id}/cancel` endpoint
 
-> **Also wired (Story 4 overlap)**: On cancel, restore enrollment credit per `BillingOptions` (`CreditRestorePercentage`, grace period rules). See Story 4 tasks APP-24 / APP-25.
 
----
 
 ### Story 4: Overpayment & Credit Balance Handling
 **Priority**: P0 - Critical  
@@ -323,41 +321,3 @@
   - `HasAvailableSpace` - test with various enrollment states
   - `GetRemainingCapacity` - test calculation accuracy
 
----
-
-### Story 12: Integration Tests for API Endpoints
-**Priority**: P2 - Medium  
-**Story Points**: 4
-
-**Tasks**:
-- [ ] **TEST-52**: Add integration tests for Invoice API endpoints
-  - POST /api/invoices/{id}/waive
-  - POST /api/invoices/{id}/cancel
-
-- [ ] **TEST-53**: Add integration tests for Enrollment API endpoints
-  - POST /api/enrollments/{id}/drop
-  - POST /api/enrollments/{id}/complete
-  - POST /api/enrollments/{id}/transfer
-
----
-
-## Summary
-
-**Total Stories**: 12  
-**Total Tasks**: 60 (+7 from Story 4 config/credit tracking additions)  
-**Estimated Effort**: ~48 story points
-
-**Completed stories**: Story 2 ✅, Story 3 ✅  
-**In progress**: Story 4 🟡 (~40% — config, renewal credit, cancel restore, registration prepay done; payment overpayment + charge sync pending)
-
-**Implementation Order Recommendation**:
-1. ~~Story 2 (Invoice Waiver)~~ ✅
-2. ~~Story 3 (Invoice Cancellation)~~ ✅
-3. **Story 4 (Overpayment Handling)** — finish `PaymentService` + `Invoice.ApplyPayment` + EF migration
-4. Story 5 (Drop Enrollment) — uses cancel invoice logic
-5. Story 6 (Complete Enrollment)
-6. Story 1 (Overdue Processor) — align Hangfire job with full spec (events, audit)
-7. Story 7 (Group Transfer)
-8. Story 8 (Atomic Capacity)
-9. Story 9-10 (Cross-cutting)
-10. Story 11-12 (Testing)

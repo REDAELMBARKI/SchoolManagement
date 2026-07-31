@@ -18,7 +18,7 @@ public class InvoiceQueryService : IInvoiceQueryService
     public async Task<List<Invoice>> GetAllAsync()
     {
         return await _context.Invoices
-            .Include(i => i.Charges)
+            .Include(i => i.Charge)
             .Include(i => i.Payments)
             .Include(i => i.Enrollment)
             .Include(i => i.Branch)
@@ -28,7 +28,7 @@ public class InvoiceQueryService : IInvoiceQueryService
     public async Task<Invoice?> GetByIdAsync(Guid id)
     {
         return await _context.Invoices
-            .Include(i => i.Charges)
+            .Include(i => i.Charge)
             .Include(i => i.Payments)
             .Include(i => i.Enrollment)
             .Include(i => i.Branch)
@@ -46,16 +46,15 @@ public class InvoiceQueryService : IInvoiceQueryService
         var targetDate = asOfDate ?? DateTime.UtcNow;
 
         return await _context.Invoices
-            .Include(i => i.Charges)
+            .Include(i => i.Charge)
             .Where(i => i.DueDate < targetDate
                      && i.Status != InvoiceStatus.Paid
                      && i.Status != InvoiceStatus.PastDue
                      && i.Status != InvoiceStatus.Waived
                      && i.Status != InvoiceStatus.Cancelled
-                     && i.Charges.Any(c => c.Status == ChargeStatus.Active)
-                     && i.PaidAmount < i.Charges
-                         .Where(c => c.Status == ChargeStatus.Active)
-                         .Sum(c => c.Amount))
+                     && i.Charge != null
+                     && i.Charge.Status != ChargeStatus.Cancelled
+                     && i.PaidAmount < (i.Charge.Amount - i.Charge.WaivedAmount))
             .ToListAsync();
     }
 
@@ -65,7 +64,7 @@ public class InvoiceQueryService : IInvoiceQueryService
         var subscriptionEndDate = now.AddDays(days);
 
         return await _context.Invoices
-            .Include(i => i.Charges)
+            .Include(i => i.Charge)
             .Include(i => i.Enrollment)
                 .ThenInclude(e => e.EnrollmentPlans)
                     .ThenInclude(ep => ep.Plan)

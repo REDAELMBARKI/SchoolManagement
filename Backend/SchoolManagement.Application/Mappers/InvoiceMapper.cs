@@ -16,12 +16,12 @@ public static class InvoiceMapper
             branchId: command.BranchId
         );
 
-        foreach (var chargeCmd in command.Charges)
+        if (command.Charge != null)
         {
             var charge = Charge.Create(
                 invoiceId: invoice.Id,
-                amount: chargeCmd.Amount,
-                dueDate: chargeCmd.DueDate != default ? chargeCmd.DueDate : invoice.DueDate
+                amount: command.Charge.Amount,
+                dueDate: command.Charge.DueDate != default ? command.Charge.DueDate : invoice.DueDate
             );
             invoice.AddCharge(charge);
         }
@@ -43,7 +43,7 @@ public static class InvoiceMapper
             CreditAppliedAmount = invoice.CreditAppliedAmount,
             Status = invoice.Status,
             BranchId = invoice.BranchId,
-            Charges = invoice.Charges.Select(ChargeMapper.ToResponse).ToList()
+            Charge = invoice.Charge == null ? null : ChargeMapper.ToResponse(invoice.Charge)
         };
     }
 }

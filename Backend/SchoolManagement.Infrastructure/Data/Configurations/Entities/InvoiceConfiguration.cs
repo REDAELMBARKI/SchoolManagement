@@ -31,9 +31,9 @@ public class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
             .HasForeignKey(i => i.BranchId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany(i => i.Charges)
+        builder.HasOne(i => i.Charge)
             .WithOne(c => c.Invoice)
-            .HasForeignKey(c => c.InvoiceId)
+            .HasForeignKey<Charge>(c => c.InvoiceId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(i => i.Payments)

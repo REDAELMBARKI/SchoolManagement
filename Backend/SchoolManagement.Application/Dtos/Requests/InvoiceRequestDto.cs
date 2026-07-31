@@ -6,7 +6,7 @@ public class InvoiceRequestDto
     public DateTime PeriodStart { get; set; }
     public DateTime PeriodEnd { get; set; }
     public DateTime DueDate { get; set; }
-    public List<ChargeRequestDto> Charges { get; set; } = new();
+    public ChargeRequestDto? Charge { get; set; }
 }
 
 public class ChargeRequestDto

@@ -131,12 +131,9 @@ public class StudentRegistrationService
                     PeriodEnd = periodEnd,
                     DueDate = dueDate,
                     BranchId = branchId,
-                    Charges = new List<ChargeCommand>
+                    Charge = new ChargeCommand
                     {
-                        new ChargeCommand
-                        {
-                            Amount = evaluatePaymentPlan.TotalAmount
-                        }
+                        Amount = evaluatePaymentPlan.TotalAmount
                     }
                 };
 

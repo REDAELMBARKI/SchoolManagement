@@ -13,17 +13,20 @@ namespace SchoolManagement.Application.Services.Charges;
 public class ChargeService : IChargeService
 {
     private readonly IChargeRepository _repository;
+    private readonly IInvoiceRepository _invoiceRepository;
     private readonly IChargeQueryService _queryService;
     private readonly IAuditLogService _auditLogService;
     private readonly ICurrentUserContext _currentUserContext;
 
     public ChargeService(
         IChargeRepository repository,
+        IInvoiceRepository invoiceRepository,
         IChargeQueryService queryService,
         IAuditLogService auditLogService,
         ICurrentUserContext currentUserContext)
     {
         _repository = repository;
+        _invoiceRepository = invoiceRepository;
         _queryService = queryService;
         _auditLogService = auditLogService;
         _currentUserContext = currentUserContext;
@@ -44,6 +47,12 @@ public class ChargeService : IChargeService
 
     public async Task<ChargeResponseDto> CreateAsync(ChargeCommand chargeCommand)
     {
+        var invoice = await _invoiceRepository.GetByIdAsync(chargeCommand.InvoiceId);
+        if (invoice == null)
+            throw new NotFoundException($"No invoice found with id {chargeCommand.InvoiceId}");
+        if (invoice.Charge != null)
+            throw new DomainException("Only one charge is allowed per invoice.");
+
         var charge = ChargeMapper.ToDomain(chargeCommand);
         var createdCharge = await _repository.AddAsync(charge);
 

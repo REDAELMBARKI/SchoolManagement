@@ -14,5 +14,5 @@ public class InvoiceResponseDto
     public decimal CreditAppliedAmount { get; set; }
     public InvoiceStatus Status { get; set; }
     public Guid BranchId { get; set; }
-    public List<ChargeResponseDto> Charges { get; set; } = new();
+    public ChargeResponseDto? Charge { get; set; }
 }

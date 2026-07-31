@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "bWHwIglUYo0=",
+  "dgSpecHash": "Dcm6V/u5hr0=",
   "success": true,
-  "projectFilePath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj",
+  "projectFilePath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\OBLIVION\\.nuget\\packages\\automapper\\16.2.0\\automapper.16.2.0.nupkg.sha512",
     "C:\\Users\\OBLIVION\\.nuget\\packages\\azure.core\\1.47.1\\azure.core.1.47.1.nupkg.sha512",

@@ -44,11 +44,32 @@ public class Charge : AggregateRoot
         if (amount <= 0)
             throw new DomainException("Amount must be greater than zero.");
         Amount = amount;
+        UpdateStatus();
     }
 
     public void UpdateDueDate(DateTime dueDate)
     {
         DueDate = dueDate;
+    }
+
+    internal decimal AddPayment(decimal amount)
+    {
+        if (amount <= 0)
+            throw new DomainException("Payment amount must be greater than zero.");
+        if (Status == ChargeStatus.Cancelled)
+            throw new DomainException("Cannot add payment to a cancelled charge.");
+        if (Status == ChargeStatus.Waived)
+            throw new DomainException("Cannot add payment to a waived charge.");
+
+        var remainingAmount = Amount - WaivedAmount - PaidAmount;
+        if (remainingAmount <= 0)
+            return amount;
+
+        var appliedAmount = Math.Min(amount, remainingAmount);
+        PaidAmount += appliedAmount;
+        UpdateStatus();
+
+        return amount - appliedAmount;
     }
 
     public void Waive(string? reason = null, decimal? waivedAmount = null)
@@ -64,10 +85,7 @@ public class Charge : AggregateRoot
 
         WaivedAmount += amountToWaive;
         WaivedReason = reason;
-        if (WaivedAmount + PaidAmount >= Amount)
-        {
-            Status = ChargeStatus.Waived;
-        }
+        UpdateStatus();
     }
 
     public void Cancel()
@@ -77,9 +95,37 @@ public class Charge : AggregateRoot
 
     public void Reactivate()
     {
-        Status = ChargeStatus.Active;
         WaivedAmount = 0;
         WaivedReason = null;
+        UpdateStatus();
+    }
+
+    private void UpdateStatus()
+    {
+        if (Status == ChargeStatus.Cancelled)
+            return;
+
+        var netAmount = Math.Max(0, Amount - WaivedAmount);
+        var paidAmount = Math.Min(PaidAmount, netAmount);
+
+        if (netAmount == 0)
+        {
+            Status = ChargeStatus.Waived;
+            return;
+        }
+
+        if (paidAmount >= netAmount)
+        {
+            Status = ChargeStatus.Paid;
+            return;
+        }
+
+        if (paidAmount > 0)
+        {
+            Status = ChargeStatus.PartiallyPaid;
+            return;
+        }
+
+        Status = ChargeStatus.Active;
     }
 }
-

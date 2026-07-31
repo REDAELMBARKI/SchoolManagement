@@ -27,9 +27,12 @@ public class ChargeConfiguration : IEntityTypeConfiguration<Charge>
             .IsRequired()
             .HasConversion<string>();
 
+        builder.HasIndex(c => c.InvoiceId)
+            .IsUnique();
+
         builder.HasOne(c => c.Invoice)
-            .WithMany(i => i.Charges)
-            .HasForeignKey(c => c.InvoiceId)
+            .WithOne(i => i.Charge)
+            .HasForeignKey<Charge>(c => c.InvoiceId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

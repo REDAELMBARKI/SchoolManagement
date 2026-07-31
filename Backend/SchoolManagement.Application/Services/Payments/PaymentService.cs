@@ -1,13 +1,15 @@
+using Microsoft.Extensions.Options;
+using SchoolManagement.Application.Interfaces;
 using SchoolManagement.Application.Dtos.Commands;
 using SchoolManagement.Application.Dtos.Requests;
 using SchoolManagement.Application.Dtos.Responses;
+using SchoolManagement.Application.Options;
 using SchoolManagement.Application.Interfaces.Queries;
 using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Application.Mappers;
-using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Exceptions;
+using SchoolManagement.Domain.Entities;
 using SchoolManagement.Domain.Interfaces.Repositories;
-using SchoolManagement.Application.Interfaces;
 
 namespace SchoolManagement.Application.Services.Payments;
 
@@ -15,22 +17,28 @@ public class PaymentService : IPaymentService
 {
     private readonly IPaymentRepository _repository;
     private readonly IInvoiceRepository _invoiceRepository;
+    private readonly IEnrollmentRepository _enrollmentRepository;
     private readonly IPaymentQueryService _query;
     private readonly ICurrentUserContext _currentUserContext;
     private readonly IAuditLogService _auditLogService;
+    private readonly BillingOptions _billingOptions;
 
     public PaymentService(
         IPaymentRepository repository,
         IInvoiceRepository invoiceRepository,
+        IEnrollmentRepository enrollmentRepository,
         IPaymentQueryService paymentQueryService,
         ICurrentUserContext currentUserContext,
-        IAuditLogService auditLogService)
+        IAuditLogService auditLogService,
+        IOptions<BillingOptions> billingOptions)
     {
         _repository = repository;
         _invoiceRepository = invoiceRepository;
+        _enrollmentRepository = enrollmentRepository;
         _query = paymentQueryService;
         _currentUserContext = currentUserContext;
         _auditLogService = auditLogService;
+        _billingOptions = billingOptions.Value;
     }
 
     public async Task<List<PaymentResponseDto>> GetAllAsync()
@@ -62,8 +70,10 @@ public class PaymentService : IPaymentService
             var invoice = await _invoiceRepository.GetByIdAsync(command.InvoiceId.Value);
             if (invoice != null)
             {
-                invoice.AddPayment(createdPayment.Amount);
+                var paymentResult = invoice.AddPayment(createdPayment.Amount);
                 await _invoiceRepository.UpdateAsync(invoice);
+
+                await StoreOverpaymentAsCreditAsync(invoice.EnrollmentId, paymentResult.OverpaymentAmount);
             }
         }
 
@@ -87,8 +97,10 @@ public class PaymentService : IPaymentService
             throw new DomainException("The invoice does not belong to the current branch.");
 
         var createdPayment = await CreatePaymentAsync(PaymentMapper.ToDomain(command));
-        invoice.AddPayment(createdPayment.Amount);
+        var paymentResult = invoice.AddPayment(createdPayment.Amount);
         await _invoiceRepository.UpdateAsync(invoice);
+
+        await StoreOverpaymentAsCreditAsync(invoice.EnrollmentId, paymentResult.OverpaymentAmount);
 
         return PaymentMapper.ToResponse(createdPayment);
     }
@@ -103,6 +115,19 @@ public class PaymentService : IPaymentService
             branchId: _currentUserContext.BranchId,
             newValues: CreateAuditSnapshot(createdPayment));
         return createdPayment;
+    }
+
+    private async Task StoreOverpaymentAsCreditAsync(Guid enrollmentId, decimal overpaymentAmount)
+    {
+        if (overpaymentAmount <= 0 || !_billingOptions.AllowOverpaymentToCredit)
+            return;
+
+        var enrollment = await _enrollmentRepository.GetByIdAsync(enrollmentId);
+        if (enrollment == null)
+            throw new NotFoundException($"No enrollment found with id {enrollmentId}");
+
+        enrollment.AddCredit(overpaymentAmount);
+        await _enrollmentRepository.UpdateAsync(enrollment);
     }
 
     public async Task<PaymentResponseDto> UpdateAsync(Guid id, UpdatePaymentCommand command)

@@ -7,5 +7,5 @@ public class InvoiceCommand
     public DateTime PeriodEnd { get; set; }
     public DateTime DueDate { get; set; }
     public Guid BranchId { get; set; }
-    public List<ChargeCommand> Charges { get; set; } = new();
+    public ChargeCommand? Charge { get; set; }
 }
