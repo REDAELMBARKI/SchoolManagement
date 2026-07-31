@@ -1,4 +1,5 @@
 using SchoolManagement.Domain.Common;
+using SchoolManagement.Domain.DomainEvents.Enrollments;
 using SchoolManagement.Domain.Enums;
 using SchoolManagement.Domain.Exceptions;
 
@@ -7,6 +8,7 @@ namespace SchoolManagement.Domain.Entities.EnrollmentAggregate;
 public class Enrollment : AggregateRoot
 {
     public DateTime EnrolledAt { get; private set; } = DateTime.UtcNow;
+    public DateTime? DroppedAt { get; private set; }
     public EnrollmentStatus Status { get; private set; } = EnrollmentStatus.Active;  // Active / Dropped / Completed
     public string? Notes { get; private set; }
     public decimal CreditBalance { get; private set; }
@@ -88,6 +90,21 @@ public class Enrollment : AggregateRoot
     public void UpdateEnrolledAt(DateTime enrolledAt)
     {
         EnrolledAt = enrolledAt;
+    }
+
+    public void DropEnrollment(string reason, DateTime? droppedAt = null)
+    {
+        if (string.IsNullOrWhiteSpace(reason))
+            throw new DomainException("Drop reason is required.");
+        if (Status == EnrollmentStatus.Dropped)
+            throw new DomainException("Enrollment is already dropped.");
+        if (Status != EnrollmentStatus.Active)
+            throw new DomainException("Only active enrollments can be dropped.");
+
+        Status = EnrollmentStatus.Dropped;
+        DroppedAt = droppedAt ?? DateTime.UtcNow;
+
+        AddDomainEvent(new EnrollmentDroppedDomainEvent(Id, GroupId, reason, DroppedAt.Value));
     }
 
     public void UpdateStatus(EnrollmentStatus status)

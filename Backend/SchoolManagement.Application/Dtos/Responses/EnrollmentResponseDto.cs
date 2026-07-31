@@ -7,6 +7,7 @@ public class EnrollmentResponseDto
     public Guid Id { get; set; }
     
     public DateTime EnrolledAt { get; set; }
+    public DateTime? DroppedAt { get; set; }
     
     public EnrollmentStatus Status { get; set; } = EnrollmentStatus.Active; // Active / Dropped / Completed
     

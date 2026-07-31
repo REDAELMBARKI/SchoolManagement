@@ -2,7 +2,7 @@
 
 **Epic**: Implement Invoice Lifecycle & Settlement Engine + Enrollment Lifecycle Workflows
 
-**Last updated**: Story 3 complete. Story 4 partially started (config + renewal/cancel credit; payment overpayment still pending).
+**Last updated**: Story 3 complete. Story 4 complete. Story 5 complete.
 
 ---
 
@@ -93,7 +93,7 @@
 ### Story 4: Overpayment & Credit Balance Handling
 **Priority**: P0 - Critical  
 **Story Points**: 4  
-**Status**: 🟡 In progress (~40%)
+**Status**: ✅ Done
 
 **Decisions locked in**:
 - Allow overpayment → spill to `Enrollment.CreditBalance` (prepay for future invoices)
@@ -107,12 +107,12 @@
   - Used in registration overpayment + cancel restore
 
 
-- [ ] **DOM-18**: Modify `Invoice.AddPayment()` to detect overpayment
+- [x] **DOM-18**: Modify `Invoice.AddPayment()` to detect overpayment
   - Cap payment at remaining balance; return overpayment to caller
   - Allocate payment to active charges (charge `PaidAmount` sync)
   - Emit `InvoiceOverpaymentDomainEvent`
 
-- [ ] **APP-19**: Update `PaymentService` to handle overpayment
+- [x] **APP-19**: Update `PaymentService` to handle overpayment
   - After applying payment to invoice, route overpayment to `enrollment.AddCredit()` when `BillingOptions.AllowOverpaymentToCredit` is true
 
 - [x] **DOM-20**: Add `UseCredit(decimal amount)` to `Enrollment` entity
@@ -139,7 +139,7 @@
 
 - [x] **APP-24**: Registration prepayment — `StudentRegistrationService` stores overpayment via `AddCreditAsync` when `amountPaid > plan.Amount`
 
-- [ ] **DOM-25**: `Charge.AddPayment(decimal)` + single `Invoice.ApplyPayment` entry point (charge/invoice paid amount sync)
+- [x] **DOM-25**: `Charge.AddPayment(decimal)` + single `Invoice.ApplyPayment` entry point (charge/invoice paid amount sync)
 
 > **Not in scope (explicit)**: Auto-apply credit when staff records a manual payment — renewals only.
 
@@ -152,21 +152,21 @@
 **Story Points**: 5
 
 **Tasks**:
-- [ ] **DOM-22**: Add `DropEnrollment(string reason, DateTime? droppedAt = null)` method to `Enrollment` entity
+- [x] **DOM-22**: Add `DropEnrollment(string reason, DateTime? droppedAt = null)` method to `Enrollment` entity
   - Validate: Current status must be Active
   - Transition status to `EnrollmentStatus.Dropped`
   - Set dropped date
   - Add domain event `EnrollmentDroppedDomainEvent`
 
-- [ ] **DOM-23**: Add `ReleaseGroupCapacity()` method to `Group` entity
+- [x] **DOM-23**: Add `ReleaseGroupCapacity()` method to `Group` entity
   - Decrement effective capacity or recalculate available space
   - This should be called when enrollment is dropped
 
-- [ ] **APP-24**: Create `DropEnrollmentCommand` DTO
+- [x] **APP-24**: Create `DropEnrollmentCommand` DTO
   - Properties: EnrollmentId, Reason, DroppedByUserId
 
-- [ ] **APP-25**: Add `DropEnrollmentAsync` method to `IEnrollmentService`
-- [ ] **APP-26**: Implement `DropEnrollmentAsync` in `EnrollmentService`
+- [x] **APP-25**: Add `DropEnrollmentAsync` method to `IEnrollmentService`
+- [x] **APP-26**: Implement `DropEnrollmentAsync` in `EnrollmentService`
   - Retrieve enrollment with Group
   - Call `enrollment.DropEnrollment(command.Reason)`
   - Call `group.ReleaseGroupCapacity()` (or handle via Group's capacity recalculation)
@@ -175,8 +175,8 @@
   - Save via repository
   - Log audit trail
 
-- [ ] **APP-27**: Create `DropEnrollmentValidator`
-- [ ] **API-28**: Add `POST /api/enrollments/{id}/drop` endpoint
+- [x] **APP-27**: Create `DropEnrollmentValidator`
+- [x] **API-28**: Add `POST /api/enrollments/{id}/drop` endpoint
 
 ---
 
@@ -320,4 +320,3 @@
 - [ ] **TEST-51**: Add unit tests for Group capacity logic
   - `HasAvailableSpace` - test with various enrollment states
   - `GetRemainingCapacity` - test calculation accuracy
-

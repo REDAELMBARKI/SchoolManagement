@@ -25,6 +25,8 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
             .IsRequired()
             .HasPrecision(18, 2);
 
+        entityTypeBuilder.Property(e => e.DroppedAt);
+
         // Indexes for performance
         entityTypeBuilder.HasIndex(e => e.StudentId);
         entityTypeBuilder.HasIndex(e => e.GroupId);

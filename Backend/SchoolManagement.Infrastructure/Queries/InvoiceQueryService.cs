@@ -83,4 +83,17 @@ public class InvoiceQueryService : IInvoiceQueryService
                                 && i.PeriodStart >= periodEnd
                                 && i.Status != InvoiceStatus.Cancelled);
     }
+
+    public async Task<Invoice?> GetLatestCancelableInvoiceByEnrollmentIdAsync(Guid enrollmentId)
+    {
+        return await _context.Invoices
+            .Include(i => i.Charge)
+            .Include(i => i.Payments)
+            .Include(i => i.Enrollment)
+            .Include(i => i.Branch)
+            .Where(i => i.EnrollmentId == enrollmentId
+                     && (i.Status == InvoiceStatus.Pending || i.Status == InvoiceStatus.PartiallyPaid))
+            .OrderByDescending(i => i.DueDate)
+            .FirstOrDefaultAsync();
+    }
 }

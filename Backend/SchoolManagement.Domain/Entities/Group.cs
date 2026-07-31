@@ -144,4 +144,10 @@ public class Group : AggregateRoot
     {
         return Capacity - Enrollments.Count(e => e.Status == EnrollmentStatus.Active);
     }
+
+    public void ReleaseGroupCapacity()
+    {
+        // Group capacity is derived from active enrollments, so dropping an
+        // enrollment frees the seat by changing its status.
+    }
 }

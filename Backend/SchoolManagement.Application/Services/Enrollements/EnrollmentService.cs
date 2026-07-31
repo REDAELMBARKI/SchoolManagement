@@ -1,4 +1,6 @@
 using SchoolManagement.Application.Dtos.Commands;
+using SchoolManagement.Application.Interfaces;
+using SchoolManagement.Application.Interfaces.Queries;
 using SchoolManagement.Application.Dtos.Responses;
 using SchoolManagement.Application.Interfaces.Services;
 using SchoolManagement.Application.Mappers;
@@ -8,7 +10,6 @@ using SchoolManagement.Domain.Enums;
 using SchoolManagement.Domain.Exceptions;
 using SchoolManagement.Domain.Interfaces.Queries;
 using SchoolManagement.Domain.Interfaces.Repositories;
-using SchoolManagement.Application.Interfaces;
 
 namespace SchoolManagement.Application.Services.Enrollements;
 
@@ -19,19 +20,28 @@ public class EnrollmentService : IEnrollmentService
     private readonly IGroupQueryService _groupQueryService;
     private readonly ICurrentUserContext _currentUserContext;
     private readonly IAuditLogService _auditLogService;
+    private readonly IInvoiceQueryService _invoiceQueryService;
+    private readonly IInvoiceService _invoiceService;
+    private readonly ITransaction _transaction;
 
     public EnrollmentService(
         IEnrollmentRepository repository,
         IEnrollmentQueryService queryService,
         IGroupQueryService groupQueryService,
         ICurrentUserContext currentUserContext,
-        IAuditLogService auditLogService)
+        IAuditLogService auditLogService,
+        IInvoiceQueryService invoiceQueryService,
+        IInvoiceService invoiceService,
+        ITransaction transaction)
     {
         _repository = repository;
         _queryService = queryService;
         _groupQueryService = groupQueryService;
         _currentUserContext = currentUserContext;
         _auditLogService = auditLogService;
+        _invoiceQueryService = invoiceQueryService;
+        _invoiceService = invoiceService;
+        _transaction = transaction;
     }
 
     public async Task<List<EnrollmentResponseDto>> GetAllAsync()
@@ -134,6 +144,61 @@ public class EnrollmentService : IEnrollmentService
         return EnrollmentMapper.ToResponse(updated);
     }
 
+    public async Task<EnrollmentResponseDto> DropEnrollmentAsync(DropEnrollmentCommand command)
+    {
+        var branchId = _currentUserContext.BranchId;
+        if (branchId == Guid.Empty)
+            throw new DomainException("Branch context is missing.");
+
+        command.DroppedByUserId = _currentUserContext.NameIdentifier;
+
+        await _transaction.BeginTransactionAsync();
+        try
+        {
+            var existing = await _repository.GetByIdAsync(command.EnrollmentId);
+            if (existing is null)
+                throw new NotFoundException($"Enrollment with id {command.EnrollmentId} not found.");
+            if (existing.BranchId != branchId)
+                throw new DomainException("The enrollment does not belong to the current branch.");
+
+            var oldValues = CreateAuditSnapshot(existing);
+
+            existing.DropEnrollment(command.Reason);
+            existing.Group.ReleaseGroupCapacity();
+
+            var cancelableInvoice = await _invoiceQueryService.GetLatestCancelableInvoiceByEnrollmentIdAsync(existing.Id);
+            if (cancelableInvoice != null)
+            {
+                await _invoiceService.CancelInvoiceAsync(cancelableInvoice.Id, new CancelInvoiceCommand
+                {
+                    InvoiceId = cancelableInvoice.Id,
+                    Reason = $"Enrollment dropped: {command.Reason}",
+                    CancelledByUserId = command.DroppedByUserId
+                });
+            }
+
+            var updated = await _repository.UpdateAsync(existing);
+
+            await _auditLogService.StoreAsync(
+                action: AuditLog.UpdateAction(),
+                entityName: "Enrollment",
+                entityId: updated.Id,
+                branchId: branchId,
+                oldValues: oldValues,
+                newValues: CreateAuditSnapshot(updated),
+                message: $"Dropped enrollment {updated.Id} for reason: {command.Reason}");
+
+            await _transaction.CommitTransactionAsync();
+
+            return EnrollmentMapper.ToResponse(updated);
+        }
+        catch
+        {
+            await _transaction.RollbackTransactionAsync();
+            throw;
+        }
+    }
+
     public async Task DeleteAsync(Guid id)
     {
         var existing = await _repository.GetByIdAsync(id);
@@ -196,6 +261,7 @@ public class EnrollmentService : IEnrollmentService
         {
             enrollment.Id,
             enrollment.EnrolledAt,
+            enrollment.DroppedAt,
             enrollment.Status,
             enrollment.Notes,
             enrollment.StudentId,

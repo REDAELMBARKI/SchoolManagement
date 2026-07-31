@@ -130,4 +130,32 @@ public class EnrollmentController : ControllerBase
         }
     }
 
+    [HttpPost("{id}/drop")]
+    public async Task<IActionResult> Drop(Guid id, [FromBody] DropEnrollmentRequestDto dto)
+    {
+        try
+        {
+            var command = new DropEnrollmentCommand
+            {
+                EnrollmentId = id,
+                Reason = dto.Reason
+            };
+
+            var enrollment = await _enrollmentService.DropEnrollmentAsync(command);
+            return Ok(enrollment);
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
+        catch (Exception ex)
+        {
+            return Problem(
+                statusCode: 500,
+                title: "Drop error",
+                detail: ex.Message
+            );
+        }
+    }
+
 }

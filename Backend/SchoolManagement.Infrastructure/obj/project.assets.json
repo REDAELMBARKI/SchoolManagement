@@ -4946,11 +4946,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj",
+      "projectUniqueName": "c:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj",
       "projectName": "SchoolManagement.Infrastructure",
-      "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj",
+      "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj",
       "packagesPath": "C:\\Users\\OBLIVION\\.nuget\\packages\\",
-      "outputPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\obj\\",
+      "outputPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -4973,14 +4973,14 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {
-            "C:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj": {
-              "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj"
+            "c:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj": {
+              "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj"
             },
-            "C:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj": {
-              "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj"
+            "c:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj": {
+              "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj"
             },
-            "C:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj": {
-              "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj"
+            "c:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj": {
+              "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj"
             }
           }
         }
