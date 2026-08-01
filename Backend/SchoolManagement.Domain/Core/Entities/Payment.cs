@@ -21,6 +21,7 @@ public class Payment : AggregateRoot
 
     public virtual Enrollment Enrollment { get; private set; } = null!;
     public virtual Invoice? Invoice { get; private set; }
+    public virtual ICollection<Refund> Refunds { get; private set; } = new List<Refund>();
 
     private Payment() { }
 

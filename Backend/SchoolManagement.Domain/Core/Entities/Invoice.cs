@@ -174,8 +174,7 @@ public class Invoice : AggregateRoot
     }
 
     public void RecalculateStatus()
-    {
-        if (Status == InvoiceStatus.Cancelled)
+    {        if (Status == InvoiceStatus.Cancelled)
             return;
 
         var oldStatus = Status;
