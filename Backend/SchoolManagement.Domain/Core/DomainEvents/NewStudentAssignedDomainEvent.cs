@@ -1,5 +1,7 @@
-﻿using MediatR;
-using SchoolManagement.Domain.Entities;
+using MediatR;
+using SchoolManagement.Domain.Academic.Entities;
+using SchoolManagement.Domain.Core.Entities;
+using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Core.Entities;
 
 namespace SchoolManagement.Domain.Core.DomainEvents;

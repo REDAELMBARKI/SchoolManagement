@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Http;
-using SchoolManagement.Application.Interfaces;
+using SchoolManagement.Application.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;

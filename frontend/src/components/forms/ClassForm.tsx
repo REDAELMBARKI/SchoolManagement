@@ -6,14 +6,10 @@ import InputField from "../InputField";
 import {
   classSchema,
   ClassSchema,
-  subjectSchema,
-  SubjectSchema,
 } from "@/lib/formValidationSchemas";
 import {
   createClass,
-  createSubject,
   updateClass,
-  updateSubject,
 } from "@/lib/actions";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "react-toastify";

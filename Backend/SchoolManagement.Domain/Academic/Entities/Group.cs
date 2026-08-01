@@ -11,6 +11,7 @@ public class Group : AggregateRoot
 {
     public string Name { get; private set; } = string.Empty;
     public int Capacity { get; private set; } = 15;
+    public byte[] RowVersion { get; private set; } = Array.Empty<byte>();
     // Morning / Afternoon / Evening / Weekend
     public string Period { get; private set; } = string.Empty;
 
@@ -150,5 +151,10 @@ public class Group : AggregateRoot
     {
         // Group capacity is derived from active enrollments, so dropping an
         // enrollment frees the seat by changing its status.
+    }
+
+    public void TouchCapacityGuard()
+    {
+        UpdatedAt = DateTime.UtcNow;
     }
 }

@@ -17,8 +17,26 @@ function Set-NamespaceFromPath {
     $content = [System.IO.File]::ReadAllText($FilePath)
     $updated = [regex]::Replace($content, 'namespace\s+[\w\.]+(\s*;|\s*\{)', "namespace $namespace`$1", 1)
     if ($updated -ne $content) {
-        [System.IO.File]::WriteAllText($FilePath, $updated)
+        Write-FileWithRetry -Path $FilePath -Content $updated | Out-Null
     }
+}
+
+function Write-FileWithRetry {
+    param([string]$Path, [string]$Content, [int]$MaxRetries = 5)
+    for ($i = 0; $i -lt $MaxRetries; $i++) {
+        try {
+            [System.IO.File]::WriteAllText($Path, $Content)
+            return $true
+        }
+        catch [System.IO.IOException] {
+            if ($i -eq $MaxRetries - 1) {
+                Write-Warning "Skipped locked file: $Path"
+                return $false
+            }
+            Start-Sleep -Milliseconds 300
+        }
+    }
+    return $false
 }
 
 function Replace-InFile {
@@ -27,8 +45,7 @@ function Replace-InFile {
     $content = [System.IO.File]::ReadAllText($Path)
     if ($content.IndexOf($Old, [StringComparison]::Ordinal) -lt 0) { return $false }
     $content = $content.Replace($Old, $New)
-    [System.IO.File]::WriteAllText($Path, $content)
-    return $true
+    return (Write-FileWithRetry -Path $Path -Content $content)
 }
 
 # 1. Align namespace declarations with folder structure

@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore.Storage;
-using SchoolManagement.Application.Interfaces;
+using SchoolManagement.Application.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -19,24 +19,42 @@ namespace SchoolManagement.Infrastructure.Data
 
         public Task BeginTransactionAsync()
         {
-            _transaction = _appDbContext.Database.BeginTransaction();
-            return Task.CompletedTask;
+            return BeginAsync();
         }
 
         public Task CommitTransactionAsync()
         {
-            if (_transaction is null)
-                throw new InvalidOperationException("No active transaction to roll back.");
-            _transaction.CommitAsync();
-            return Task.CompletedTask;
+            return CommitAsync();
         }
 
         public Task RollbackTransactionAsync()
         {
+            return RollbackAsync();
+        }
+
+        private async Task BeginAsync()
+        {
+            _transaction = await _appDbContext.Database.BeginTransactionAsync();
+        }
+
+        private async Task CommitAsync()
+        {
+            if (_transaction is null)
+                throw new InvalidOperationException("No active transaction to commit.");
+
+            await _transaction.CommitAsync();
+            await _transaction.DisposeAsync();
+            _transaction = null;
+        }
+
+        private async Task RollbackAsync()
+        {
             if (_transaction is null)
                 throw new InvalidOperationException("No active transaction to roll back.");
-            _transaction.RollbackAsync();
-            return Task.CompletedTask;
+
+            await _transaction.RollbackAsync();
+            await _transaction.DisposeAsync();
+            _transaction = null;
         }
     }
 }

@@ -1,8 +1,6 @@
 import { eventsData } from "@/lib/data";
 
-const EventList = ({
-  dateParam: _dateParam,
-}: {
+const EventList = (_props: {
   dateParam: string | undefined;
 }) => {
   const data = eventsData;

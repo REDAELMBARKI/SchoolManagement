@@ -8,6 +8,7 @@ public class EnrollmentResponseDto
     
     public DateTime EnrolledAt { get; set; }
     public DateTime? DroppedAt { get; set; }
+    public DateTime? CompletedAt { get; set; }
     
     public EnrollmentStatus Status { get; set; } = EnrollmentStatus.Active; // Active / Dropped / Completed
     

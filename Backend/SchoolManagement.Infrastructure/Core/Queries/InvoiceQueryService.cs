@@ -1,6 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Application.Interfaces.Queries;
-using SchoolManagement.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using SchoolManagement.Application.Academic.Interfaces.Queries;
+using SchoolManagement.Application.Core.Interfaces.Queries;
+using SchoolManagement.Application.Common.Interfaces.Queries;
+using SchoolManagement.Domain.Academic.Entities;
+using SchoolManagement.Domain.Core.Entities;
+using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Enums;
 using SchoolManagement.Infrastructure.Data;
 

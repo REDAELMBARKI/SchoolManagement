@@ -2,10 +2,8 @@
 
 import { useForm } from "react-hook-form";
 import InputField from "../InputField";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { effect, promise } from "zod";
-import axios from "axios";
 
 const IntakeForm = ({
   type,
@@ -24,34 +22,6 @@ const IntakeForm = ({
   } = useForm();
 
   const [state, setState] = useState({ success: false, error: false });
-  const [initLookup , setInitLookup]  = useState({
-    isLoading : true ,
-    leadSources : [] as Array<{ id: number; name: string }>, 
-    genders : [] as Array<{ id: number; name: string }>
-  });
-
-  
-  useEffect(() => {
-      const fetchInit = async  () => {
-          const [res , res2]  = await Promise.allSettled([
-               await axios.get('api/leadSources'),
-               await axios.get('api/genders')
-          ]);
-
-
-          if(res.status == "fulfilled" && res2.status == "fulfilled")
-          {
-            setInitLookup({
-              isLoading : false , 
-              leadSources : res.status == "fulfilled" ?  res.value.data : [] ,
-              genders : res2.status == 'fulfilled' ? res2.value.data : []
-
-            })
-          }
-
-      }
-      fetchInit()
-  }, []);
 
   const onSubmit = handleSubmit(async (formData) => {
     // Mock submission - in real app, this would call an API

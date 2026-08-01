@@ -1,8 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Application.Dtos.Responses;
-using SchoolManagement.Application.Mappers;
-using SchoolManagement.Domain.Entities;
-using SchoolManagement.Domain.Interfaces.Queries;
+using Microsoft.EntityFrameworkCore;
+using SchoolManagement.Application.Academic.Dtos.Responses;
+using SchoolManagement.Application.Core.Dtos.Responses;
+using SchoolManagement.Application.Common.Dtos.Responses;
+using SchoolManagement.Application.Academic.Mappers;
+using SchoolManagement.Application.Core.Mappers;
+using SchoolManagement.Application.Common.Mappers;
+using SchoolManagement.Domain.Academic.Entities;
+using SchoolManagement.Domain.Core.Entities;
+using SchoolManagement.Domain.Common.Entities;
+using SchoolManagement.Application.Academic.Interfaces.Queries;
+using SchoolManagement.Application.Core.Interfaces.Queries;
+using SchoolManagement.Application.Common.Interfaces.Queries;
 using SchoolManagement.Infrastructure.Data;
 
 namespace SchoolManagement.Infrastructure.Core.Queries;

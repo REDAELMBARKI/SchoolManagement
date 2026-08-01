@@ -1,4 +1,4 @@
-const StudentAttendanceCard = ({ id: _id }: { id: string }) => {
+const StudentAttendanceCard = (_props: { id: string }) => {
   const percentage = 90;
   return (
     <div className="">

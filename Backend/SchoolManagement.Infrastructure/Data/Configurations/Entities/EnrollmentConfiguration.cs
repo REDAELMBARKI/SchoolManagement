@@ -27,6 +27,8 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
 
         entityTypeBuilder.Property(e => e.DroppedAt);
 
+        entityTypeBuilder.Property(e => e.CompletedAt);
+
         // Indexes for performance
         entityTypeBuilder.HasIndex(e => e.StudentId);
         entityTypeBuilder.HasIndex(e => e.GroupId);

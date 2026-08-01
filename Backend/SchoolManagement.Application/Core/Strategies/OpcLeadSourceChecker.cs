@@ -1,5 +1,9 @@
-﻿using SchoolManagement.Application.Dtos.Requests;
-using SchoolManagement.Domain.Interfaces.Queries;
+using SchoolManagement.Application.Academic.Dtos.Requests;
+using SchoolManagement.Application.Core.Dtos.Requests;
+using SchoolManagement.Application.Common.Dtos.Requests;
+using SchoolManagement.Application.Academic.Interfaces.Queries;
+using SchoolManagement.Application.Core.Interfaces.Queries;
+using SchoolManagement.Application.Common.Interfaces.Queries;
 using System;
 using System.Collections.Generic;
 using System.Text;

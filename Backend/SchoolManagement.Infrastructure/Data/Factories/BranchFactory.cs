@@ -1,5 +1,9 @@
-using SchoolManagement.Domain.Entities;
- using SchoolManagement.Infrastructure.Repositories;
+using SchoolManagement.Domain.Academic.Entities;
+using SchoolManagement.Domain.Core.Entities;
+using SchoolManagement.Domain.Common.Entities;
+ using SchoolManagement.Infrastructure.Academic.Repositories;
+using SchoolManagement.Infrastructure.Core.Repositories;
+using SchoolManagement.Infrastructure.Common.Repositories;
 using SchoolManagement.Infrastructure.Data ;
 using System.ComponentModel.DataAnnotations;
 namespace SchoolManagement.Infrastructure.Data.Factories;

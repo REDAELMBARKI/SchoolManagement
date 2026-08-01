@@ -1,31 +1,15 @@
-﻿using SchoolManagement.Application.Academic.Dtos.Commands;
-using SchoolManagement.Application.Core.Dtos.Commands;
-using SchoolManagement.Application.Common.Dtos.Commands;
+using SchoolManagement.Application.Academic.Interfaces.Queries;
 using SchoolManagement.Application.Common.Interfaces;
-using SchoolManagement.Application.Academic.Interfaces.Queries;
-using SchoolManagement.Application.Core.Interfaces.Queries;
-using SchoolManagement.Application.Common.Interfaces.Queries;
-using SchoolManagement.Application.Academic.Dtos.Responses;
-using SchoolManagement.Application.Core.Dtos.Responses;
-using SchoolManagement.Application.Common.Dtos.Responses;
-using SchoolManagement.Application.Academic.Interfaces.Services;
-using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Application.Common.Interfaces.Services;
-using SchoolManagement.Application.Academic.Mappers;
-using SchoolManagement.Application.Core.Mappers;
-using SchoolManagement.Application.Common.Mappers;
-using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Entities;
-using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Enums;
-using SchoolManagement.Domain.Common.Exceptions;
-using SchoolManagement.Application.Academic.Interfaces.Queries;
+using SchoolManagement.Application.Core.Dtos.Commands;
+using SchoolManagement.Application.Core.Dtos.Responses;
 using SchoolManagement.Application.Core.Interfaces.Queries;
-using SchoolManagement.Application.Common.Interfaces.Queries;
-using SchoolManagement.Domain.Academic.Interfaces;
+using SchoolManagement.Application.Core.Interfaces.Services;
+using SchoolManagement.Application.Core.Mappers;
+using SchoolManagement.Domain.Academic.Entities;
+using SchoolManagement.Domain.Common.Entities;
+using SchoolManagement.Domain.Common.Exceptions;
 using SchoolManagement.Domain.Core.Interfaces;
-using SchoolManagement.Domain.Common.Interfaces;
 
 namespace SchoolManagement.Application.Core.Services;
 
@@ -77,25 +61,50 @@ public class EnrollmentService : IEnrollmentService
             throw new DomainException("Branch context is missing.");
         command.BranchId = branchId;
 
-        await EnsureNoDuplicateActiveEnrollmentAsync(command.StudentId, command.SubjectId);
+        await _transaction.BeginTransactionAsync();
+        try
+        {
+            await EnsureNoDuplicateActiveEnrollmentAsync(command.StudentId, command.SubjectId);
 
-        var availableGroups = await _groupQueryService.GetAvailableGroupsByLevelSubjectBranch(
-            levelId: command.LevelId,
-            subjectId: command.SubjectId,
-            branchId: command.BranchId);
+            var availableGroups = await _groupQueryService.GetAvailableGroupsByLevelSubjectBranch(
+                levelId: command.LevelId,
+                subjectId: command.SubjectId,
+                branchId: command.BranchId);
 
-        command.GroupId = EvaluateStudentGroup(availableGroups, command.PreferedScheduleId, command.GroupId);
-        var enrollment = EnrollmentMapper.ToDomain(command);
-        var created = await _repository.AddAsync(enrollment);
+            var selectedGroup = EvaluateStudentGroup(availableGroups, command.PreferedScheduleId, command.GroupId);
+            if (!selectedGroup.HasAvailableSpace())
+                throw new UnAvailableResourceException("The selected group has just reached capacity. Please refresh and try again.");
 
-        await _auditLogService.StoreAsync(
-            action: AuditLog.CreateAction(),
-            entityName: "Enrollment",
-            entityId: created.Id,
-            branchId: _currentUserContext.BranchId,
-            newValues: CreateAuditSnapshot(created));
+            // Touch the group row so EF can enforce optimistic concurrency on
+            // the seat allocation save.
+            selectedGroup.TouchCapacityGuard();
 
-        return EnrollmentMapper.ToResponse(created);
+            command.GroupId = selectedGroup.Id;
+            var enrollment = EnrollmentMapper.ToDomain(command);
+            var created = await _repository.AddAsync(enrollment);
+
+            await _auditLogService.StoreAsync(
+                action: AuditLog.CreateAction(),
+                entityName: "Enrollment",
+                entityId: created.Id,
+                branchId: _currentUserContext.BranchId,
+                newValues: CreateAuditSnapshot(created));
+
+            await _transaction.CommitTransactionAsync();
+
+            return EnrollmentMapper.ToResponse(created);
+        }
+        catch (Exception ex) when (ex.GetType().Name == "DbUpdateConcurrencyException")
+        {
+            await _transaction.RollbackTransactionAsync();
+            throw new ConcurrencyConflictException(
+                "That group was updated by another request while we were saving this enrollment. Please refresh and try again.");
+        }
+        catch
+        {
+            await _transaction.RollbackTransactionAsync();
+            throw;
+        }
     }
 
     public async Task<EnrollmentResponseDto> UpdateAsync(Guid id, UpdateEnrollmentCommand command)
@@ -105,37 +114,76 @@ public class EnrollmentService : IEnrollmentService
             throw new DomainException("Branch context is missing.");
         command.BranchId = branchId;
 
-        var existing = await _repository.GetByIdAsync(id);
-        if (existing is null) throw new NotFoundException($"Enrollment with id {id} not found.");
-
-        var oldValues = CreateAuditSnapshot(existing);
-
-        existing.UpdateStudentId(command.StudentId);
-        existing.UpdateSubjectId(command.SubjectId);
-        existing.UpdateGroupId(command.GroupId);
-        existing.UpdateBranchId(command.BranchId);
-        existing.UpdateNotes(command.Notes);
-
-        if (command.PlanId.HasValue && command.PlanId.Value != Guid.Empty)
+        await _transaction.BeginTransactionAsync();
+        try
         {
-            var latestPlan = existing.GetLatestPlan();
-            if (latestPlan == null || latestPlan.Id != command.PlanId.Value)
+            var existing = await _repository.GetByIdAsync(id);
+            if (existing is null)
+                throw new NotFoundException($"Enrollment with id {id} not found.");
+            if (existing.BranchId != branchId)
+                throw new DomainException("The enrollment does not belong to the current branch.");
+
+            var oldValues = CreateAuditSnapshot(existing);
+            var resolvedGroupId = existing.GroupId;
+            var isGroupChanging = command.GroupId != Guid.Empty && command.GroupId != existing.GroupId;
+
+            if (isGroupChanging)
             {
-                existing.AddPlan(command.PlanId.Value);
+                var availableGroups = await _groupQueryService.GetAvailableGroupsByLevelSubjectBranch(
+                    levelId: command.LevelId,
+                    subjectId: command.SubjectId,
+                    branchId: command.BranchId);
+
+                var selectedGroup = EvaluateStudentGroup(availableGroups, command.PreferedScheduleId, command.GroupId);
+                if (!selectedGroup.HasAvailableSpace())
+                    throw new UnAvailableResourceException("The selected group has just reached capacity. Please refresh and try again.");
+
+                // Touch the target group row so seat moves participate in the
+                // same optimistic concurrency guard as enrollment creation.
+                selectedGroup.TouchCapacityGuard();
+                resolvedGroupId = selectedGroup.Id;
             }
+
+            existing.UpdateStudentId(command.StudentId);
+            existing.UpdateSubjectId(command.SubjectId);
+            existing.UpdateGroupId(resolvedGroupId);
+            existing.UpdateBranchId(command.BranchId);
+            existing.UpdateNotes(command.Notes);
+
+            if (command.PlanId.HasValue && command.PlanId.Value != Guid.Empty)
+            {
+                var latestPlan = existing.GetLatestPlan();
+                if (latestPlan == null || latestPlan.Id != command.PlanId.Value)
+                {
+                    existing.AddPlan(command.PlanId.Value);
+                }
+            }
+
+            var updated = await _repository.UpdateAsync(existing);
+
+            await _auditLogService.StoreAsync(
+                action: AuditLog.UpdateAction(),
+                entityName: "Enrollment",
+                entityId: updated.Id,
+                branchId: _currentUserContext.BranchId,
+                oldValues: oldValues,
+                newValues: CreateAuditSnapshot(updated));
+
+            await _transaction.CommitTransactionAsync();
+
+            return EnrollmentMapper.ToResponse(updated);
         }
-
-        var updated = await _repository.UpdateAsync(existing);
-
-        await _auditLogService.StoreAsync(
-            action: AuditLog.UpdateAction(),
-            entityName: "Enrollment",
-            entityId: updated.Id,
-            branchId: _currentUserContext.BranchId,
-            oldValues: oldValues,
-            newValues: CreateAuditSnapshot(updated));
-
-        return EnrollmentMapper.ToResponse(updated);
+        catch (Exception ex) when (ex.GetType().Name == "DbUpdateConcurrencyException")
+        {
+            await _transaction.RollbackTransactionAsync();
+            throw new ConcurrencyConflictException(
+                "That group was updated by another request while we were saving this enrollment. Please refresh and try again.");
+        }
+        catch
+        {
+            await _transaction.RollbackTransactionAsync();
+            throw;
+        }
     }
 
     public async Task<EnrollmentResponseDto> AddCreditAsync(Guid id, decimal amount)
@@ -215,6 +263,38 @@ public class EnrollmentService : IEnrollmentService
         }
     }
 
+    public async Task<EnrollmentResponseDto> CompleteEnrollmentAsync(CompleteEnrollmentCommand command)
+    {
+        var branchId = _currentUserContext.BranchId;
+        if (branchId == Guid.Empty)
+            throw new DomainException("Branch context is missing.");
+
+        command.CompletedByUserId = _currentUserContext.NameIdentifier;
+
+        var existing = await _repository.GetByIdAsync(command.EnrollmentId);
+        if (existing is null)
+            throw new NotFoundException($"Enrollment with id {command.EnrollmentId} not found.");
+        if (existing.BranchId != branchId)
+            throw new DomainException("The enrollment does not belong to the current branch.");
+
+        var oldValues = CreateAuditSnapshot(existing);
+
+        existing.CompleteEnrollment(command.Notes);
+
+        var updated = await _repository.UpdateAsync(existing);
+
+        await _auditLogService.StoreAsync(
+            action: AuditLog.UpdateAction(),
+            entityName: "Enrollment",
+            entityId: updated.Id,
+            branchId: branchId,
+            oldValues: oldValues,
+            newValues: CreateAuditSnapshot(updated),
+            message: $"Completed enrollment {updated.Id}");
+
+        return EnrollmentMapper.ToResponse(updated);
+    }
+
     public async Task DeleteAsync(Guid id)
     {
         var existing = await _repository.GetByIdAsync(id);
@@ -238,21 +318,20 @@ public class EnrollmentService : IEnrollmentService
             throw new DomainException("Student already has an active enrollment for this subject.");
     }
 
-    private Guid EvaluateStudentGroup(List<Group> availableGroups, Guid? PreferedScheduleId, Guid? groupId)
+    private Group EvaluateStudentGroup(List<Group> availableGroups, Guid? PreferedScheduleId, Guid? groupId)
     {
         if (!availableGroups.Any())
             throw new UnAvailableResourceException("No available groups with free capacity for the selected level, subject, and branch.");
 
         if (groupId.HasValue && groupId.Value != Guid.Empty)
         {
-            CheckGroupAvailability(availableGroups, groupId.Value);
-            return groupId.Value;
+            return CheckGroupAvailability(availableGroups, groupId.Value);
         }
 
         return AssignNewGroup(availableGroups, PreferedScheduleId);
     }
 
-    private Guid AssignNewGroup(List<Group> availableGroups, Guid? PreferedScheduleId)
+    private Group AssignNewGroup(List<Group> availableGroups, Guid? PreferedScheduleId)
     {
         var groupPrefered = availableGroups.FirstOrDefault(g => g.Schedule.Id == PreferedScheduleId);
         if (groupPrefered == null)
@@ -260,15 +339,18 @@ public class EnrollmentService : IEnrollmentService
             var first = availableGroups.FirstOrDefault();
             if (first == null)
                 throw new UnAvailableResourceException("No available groups with free capacity for the selected level, subject, and branch.");
-            return first.Id;
+            return first;
         }
-        return groupPrefered.Id;
+        return groupPrefered;
     }
 
-    private void CheckGroupAvailability(List<Group> availableGroups, Guid groupId)
+    private Group CheckGroupAvailability(List<Group> availableGroups, Guid groupId)
     {
-        if (!availableGroups.Select(g => g.Id).Contains(groupId))
+        var group = availableGroups.FirstOrDefault(g => g.Id == groupId);
+        if (group == null)
             throw new UnAvailableResourceException("The selected group is either full, belongs to a different subject/branch, or does not exist.");
+
+        return group;
     }
 
     private static object CreateAuditSnapshot(Enrollment enrollment)
@@ -278,6 +360,7 @@ public class EnrollmentService : IEnrollmentService
             enrollment.Id,
             enrollment.EnrolledAt,
             enrollment.DroppedAt,
+            enrollment.CompletedAt,
             enrollment.Status,
             enrollment.Notes,
             enrollment.StudentId,

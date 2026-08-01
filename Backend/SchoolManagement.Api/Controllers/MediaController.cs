@@ -1,20 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Security;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.Extensions.FileProviders;
-using SchoolManagement.Application.Academic.Dtos.Requests;
-using SchoolManagement.Application.Core.Dtos.Requests;
-using SchoolManagement.Application.Common.Dtos.Requests;
-using SchoolManagement.Application.Academic.Interfaces.Services;
-using SchoolManagement.Application.Core.Interfaces.Services;
+using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Common.Interfaces.Services;
-using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Entities;
-using SchoolManagement.Application.Academic.Dtos.Responses;
-using SchoolManagement.Application.Core.Dtos.Responses;
 using SchoolManagement.Application.Common.Dtos.Responses;
+using SchoolManagement.Domain.Common.Entities;
 
 namespace SchoolManagement.Api.Controllers;
 

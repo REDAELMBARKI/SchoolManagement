@@ -178,6 +178,8 @@ public class Invoice : AggregateRoot
         if (Status == InvoiceStatus.Cancelled)
             return;
 
+        var oldStatus = Status;
+
         if (Charge?.Status == ChargeStatus.Waived)
         {
             Status = InvoiceStatus.Waived;
@@ -199,6 +201,12 @@ public class Invoice : AggregateRoot
         else
         {
             Status = InvoiceStatus.Pending;
+        }
+
+        if (Status == InvoiceStatus.PastDue && oldStatus != InvoiceStatus.PastDue)
+        {
+            var amountDue = TotalAmount - PaidAmount;
+            AddDomainEvent(new InvoiceOverdueDomainEvent(Id, EnrollmentId, DateTime.UtcNow, amountDue));
         }
     }
 }

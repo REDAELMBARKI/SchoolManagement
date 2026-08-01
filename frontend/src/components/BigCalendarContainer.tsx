@@ -1,9 +1,6 @@
 import BigCalendar from "./BigCalender";
 
-const BigCalendarContainer = ({
-  type: _type,
-  id: _id,
-}: {
+const BigCalendarContainer = (_props: {
   type: "teacherId" | "classId";
   id: string | number;
 }) => {

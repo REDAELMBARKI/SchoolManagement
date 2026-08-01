@@ -1,7 +1,9 @@
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using SchoolManagement.Application.Interfaces.Services;
+using SchoolManagement.Application.Academic.Interfaces.Services;
+using SchoolManagement.Application.Core.Interfaces.Services;
+using SchoolManagement.Application.Common.Interfaces.Services;
 
 namespace SchoolManagement.Infrastructure.Data.Configurations.Extensions;
 

@@ -1,7 +1,11 @@
 using SchoolManagement.Infrastructure.Data.Factories;
-using SchoolManagement.Domain.Entities;
+using SchoolManagement.Domain.Academic.Entities;
+using SchoolManagement.Domain.Core.Entities;
+using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Infrastructure.Data ;
-using SchoolManagement.Infrastructure.Repositories;
+using SchoolManagement.Infrastructure.Academic.Repositories;
+using SchoolManagement.Infrastructure.Core.Repositories;
+using SchoolManagement.Infrastructure.Common.Repositories;
 namespace SchoolManagement.Infrastructure.Data.Seeders ; 
 public class SubjectSeeder : Seeder
 {

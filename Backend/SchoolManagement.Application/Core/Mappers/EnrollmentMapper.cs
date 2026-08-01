@@ -32,6 +32,7 @@ public static class EnrollmentMapper
             Id = e.Id,
             EnrolledAt = e.EnrolledAt,
             DroppedAt = e.DroppedAt,
+            CompletedAt = e.CompletedAt,
             Status = e.Status,
             Notes = e.Notes,
             CreditBalance = e.CreditBalance,

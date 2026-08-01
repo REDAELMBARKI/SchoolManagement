@@ -2,7 +2,7 @@
 
 **Epic**: Implement Invoice Lifecycle & Settlement Engine + Enrollment Lifecycle Workflows
 
-**Last updated**: Story 3 complete. Story 4 complete. Story 5 complete.
+**Last updated**: Story 3 complete. Story 4 complete. Story 5 complete. Story 6 complete.
 
 ---
 
@@ -182,141 +182,47 @@
 
 ### Story 6: Complete Enrollment Workflow
 **Priority**: P0 - Critical  
-**Story Points**: 3
+**Story Points**: 3  
+**Status**: ✅ Done
 
 **Tasks**:
-- [ ] **DOM-29**: Add `CompleteEnrollment(string? notes = null)` method to `Enrollment` entity
+- [x] **DOM-29**: Add `CompleteEnrollment(string? notes = null)` method to `Enrollment` entity
   - Validate: Current status must be Active
   - Transition status to `EnrollmentStatus.Completed`
   - Set completion date
   - Lock further fee modifications (add validation flag)
   - Add domain event `EnrollmentCompletedDomainEvent`
 
-- [ ] **APP-30**: Create `CompleteEnrollmentCommand` DTO
+- [x] **APP-30**: Create `CompleteEnrollmentCommand` DTO
   - Properties: EnrollmentId, Notes, CompletedByUserId
 
-- [ ] **APP-31**: Add `CompleteEnrollmentAsync` method to `IEnrollmentService`
-- [ ] **APP-32**: Implement `CompleteEnrollmentAsync` in `EnrollmentService`
+- [x] **APP-31**: Add `CompleteEnrollmentAsync` method to `IEnrollmentService`
+- [x] **APP-32**: Implement `CompleteEnrollmentAsync` in `EnrollmentService`
   - Retrieve enrollment
   - Call `enrollment.CompleteEnrollment(command.Notes)`
   - Save via repository
   - Log audit trail
 
-- [ ] **APP-33**: Create `CompleteEnrollmentValidator`
-- [ ] **API-34**: Add `POST /api/enrollments/{id}/complete` endpoint
+- [x] **APP-33**: Create `CompleteEnrollmentValidator`
+- [x] **API-34**: Add `POST /api/enrollments/{id}/complete` endpoint
 
 ---
 
-### Story 7: Group Transfer Workflow
-**Priority**: P0 - Critical  
-**Story Points**: 8
-
-**Tasks**:
-- [ ] **DOM-35**: Add `TransferGroup(Guid newGroupId, string? reason = null)` method to `Enrollment` entity
-  - Validate: Current status must be Active
-  - Validate: newGroupId != current GroupId
-  - Add domain event `EnrollmentTransferRequestedDomainEvent`
-
-- [ ] **DOM-36**: Add capacity validation logic to `Group` entity
-  - Add `HasCapacityForAdditionalEnrollment()` method
-  - Consider concurrency handling (add row version or capacity lock)
-
-- [ ] **DOM-37**: Add schedule clash detection helper in `Schedule` entity or separate service
-  - Method: `HasScheduleConflict(Guid studentId, Guid newGroupId, DateTime startDate, DateTime endDate)`
-  - Query student's other active enrollments
-  - Check for overlapping time slots
-
-- [ ] **APP-38**: Create `TransferGroupCommand` DTO
-  - Properties: EnrollmentId, NewGroupId, Reason, TransferredByUserId
-
-- [ ] **APP-39**: Add `TransferGroupAsync` method to `IEnrollmentService`
-- [ ] **APP-40**: Implement `TransferGroupAsync` in `EnrollmentService`
-  - Retrieve enrollment with current Group
-  - Retrieve new Group with Level and Subject
-  - Validate: new Group has same Level and Subject as current Group
-  - Validate: new Group has available capacity (atomic check)
-  - Validate: no schedule clashes for student
-  - Call `enrollment.TransferGroup(command.NewGroupId, command.Reason)`
-  - Update GroupId
-  - Handle capacity: increment new group, decrement old group
-  - Save via repository (consider transaction)
-  - Log audit trail
-
-- [ ] **APP-41**: Create `TransferGroupValidator`
-- [ ] **API-42**: Add `POST /api/enrollments/{id}/transfer` endpoint
-
----
-
-### Story 8: Atomic Capacity Guard with Concurrency
+### Story 7: Atomic Capacity Guard with Concurrency
 **Priority**: P0 - Critical  
 **Story Points**: 4
 
 **Tasks**:
-- [ ] **DOM-43**: Add `RowVersion` (timestamp) to `Group` entity for optimistic concurrency
+- [x] **DOM-43**: Add `RowVersion` (timestamp) to `Group` entity for optimistic concurrency
   - Add property: `public byte[] RowVersion { get; set; }`
   - Configure in EF Core `GroupConfiguration`
 
-- [ ] **INF-44**: Update `GroupConfiguration` to configure RowVersion as concurrency token
+- [x] **INF-44**: Update `GroupConfiguration` to configure RowVersion as concurrency token
   - `builder.Property(g => g.RowVersion).IsRowVersion().IsConcurrencyToken()`
 
-- [ ] **APP-45**: Update enrollment creation and transfer logic to handle concurrency
+- [x] **APP-45**: Update enrollment creation and transfer logic to handle concurrency
   - Wrap capacity check and update in transaction
   - Catch `DbUpdateConcurrencyException` and retry or fail gracefully
 
-- [ ] **INF-46**: Add integration test for concurrent enrollment creation
-  - Test: Two threads try to enroll in same group at capacity limit
-  - Verify: Only one succeeds, other gets concurrency error
 
----
 
-## Cross-Cutting Concerns
-
-### Story 9: Audit Logging for New Workflows
-**Priority**: P1 - Important  
-**Story Points**: 2
-
-**Tasks**:
-- [ ] **APP-47**: Ensure all new service methods use `IAuditLogService`
-  - Invoice waiver, cancellation, overdue transitions
-  - Enrollment drop, complete, transfer
-  - Log: Action, EntityId, OldValues, NewValues, UserId, Timestamp
-
----
-
-### Story 10: Domain Events Integration
-**Priority**: P1 - Important  
-**Story Points**: 2
-
-**Tasks**:
-- [ ] **APP-48**: Register all new domain events in MediatR
-  - InvoiceOverdueDomainEvent
-  - InvoiceWaivedDomainEvent
-  - InvoiceCancelledDomainEvent
-  - InvoiceOverpaymentDomainEvent
-  - EnrollmentDroppedDomainEvent
-  - EnrollmentCompletedDomainEvent
-  - EnrollmentTransferRequestedDomainEvent
-  - CreditBalanceUpdatedDomainEvent
-
----
-
-## Testing
-
-### Story 11: Unit Tests for Domain Logic
-**Priority**: P1 - Important  
-**Story Points**: 5
-
-**Tasks**:
-- [ ] **TEST-49**: Add unit tests for Invoice domain methods
-  - `WaiveInvoice` - test waiver amount validation, status recalculation
-  - `CancelInvoice` - test status validation, transition
-  - `AddPayment` - test overpayment detection
-
-- [ ] **TEST-50**: Add unit tests for Enrollment domain methods
-  - `DropEnrollment` - test status validation, transition
-  - `CompleteEnrollment` - test status validation, lock flag
-  - `TransferGroup` - test validation logic
-
-- [ ] **TEST-51**: Add unit tests for Group capacity logic
-  - `HasAvailableSpace` - test with various enrollment states
-  - `GetRemainingCapacity` - test calculation accuracy

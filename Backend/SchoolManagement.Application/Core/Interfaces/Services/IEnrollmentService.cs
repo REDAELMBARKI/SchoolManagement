@@ -14,6 +14,7 @@ public interface IEnrollmentService
     Task<EnrollmentResponseDto> CreateAsync(EnrollmentCommand command);
     Task<EnrollmentResponseDto> UpdateAsync(Guid id, UpdateEnrollmentCommand command);
     Task<EnrollmentResponseDto> DropEnrollmentAsync(DropEnrollmentCommand command);
+    Task<EnrollmentResponseDto> CompleteEnrollmentAsync(CompleteEnrollmentCommand command);
     Task<EnrollmentResponseDto> AddCreditAsync(Guid id, decimal amount);
     Task DeleteAsync(Guid id);
 }

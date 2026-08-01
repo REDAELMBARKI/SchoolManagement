@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Domain.Common;
-using SchoolManagement.Domain.Entities;
+using SchoolManagement.Domain.Academic.Entities;
+using SchoolManagement.Domain.Core.Entities;
+using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Infrastructure.Data.Configurations.Entities;
 using System.Linq;

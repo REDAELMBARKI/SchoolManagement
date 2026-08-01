@@ -1,0 +1,21 @@
+- Offline frontend login lets a user enter the app as `Admin` or `Student` without real authentication.
+- The frontend has dashboard screens for `Admin`, `Student`, `Teacher`, and `Parent`.
+- The frontend shows dashboard widgets such as announcements, calendars, attendance charts, student counts, finance charts, and event lists using local mock/demo data.
+- The frontend has list pages for intakes, students, teachers, parents, subjects, classes, lessons, exams, assignments, results, events, announcements, attendance, and messages.
+- The frontend has detail pages for a single student and a single teacher.
+- The frontend has generic create, edit, and delete pages/modals for table records.
+- The frontend has form UIs for intakes, students, teachers, subjects, classes, and exams.
+- Most frontend create, update, and delete actions are currently stubbed and return local success responses instead of calling a full live backend flow.
+- The backend exposes a login endpoint at `api/auth/login` that returns a JWT for valid users.
+- The backend exposes student CRUD endpoints.
+- The backend exposes a student registration endpoint.
+- The backend exposes intake CRUD endpoints.
+- The backend intake flow supports lead-source linking, commercial-agent assignment, subject selection, follow-up fields, notes, and fee-related fields.
+- The backend exposes group CRUD endpoints.
+- The backend exposes a schedule lookup endpoint by group.
+- The backend exposes enrollment CRUD endpoints.
+- The backend supports enrollment-specific actions to drop an enrollment and complete an enrollment.
+- The backend exposes invoice CRUD endpoints.
+- The backend supports invoice-specific actions to waive an invoice and cancel an invoice.
+- The backend exposes read endpoints for lead sources, genders, OPCs, and ads.
+- The backend exposes a media upload endpoint with basic image extension and MIME-type validation.

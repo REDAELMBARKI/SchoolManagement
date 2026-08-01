@@ -1,6 +1,8 @@
 using SchoolManagement.Infrastructure.Data.Factories;
 using SchoolManagement.Infrastructure.Data ;
-using SchoolManagement.Domain.Entities;
+using SchoolManagement.Domain.Academic.Entities;
+using SchoolManagement.Domain.Core.Entities;
+using SchoolManagement.Domain.Common.Entities;
 
 namespace SchoolManagement.Infrastructure.Data.Seeders;
 

@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SchoolManagement.Domain.Entities;
+using SchoolManagement.Domain.Academic.Entities;
+using SchoolManagement.Domain.Core.Entities;
+using SchoolManagement.Domain.Common.Entities;
 
 namespace SchoolManagement.Infrastructure.Data.Configurations.Entities;
 
@@ -18,6 +20,10 @@ public class GroupConfiguration : IEntityTypeConfiguration<Group>
 
         entityTypeBuilder.Property(g => g.Capacity)
             .IsRequired();
+
+        entityTypeBuilder.Property(g => g.RowVersion)
+            .IsRowVersion()
+            .IsConcurrencyToken();
 
         entityTypeBuilder.Property(g => g.BranchId)
             .IsRequired();

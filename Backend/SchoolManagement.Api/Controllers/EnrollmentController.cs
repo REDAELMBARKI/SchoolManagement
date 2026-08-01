@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Academic.Dtos.Commands;
 using SchoolManagement.Application.Core.Dtos.Commands;
 using SchoolManagement.Application.Common.Dtos.Commands;
@@ -73,6 +73,18 @@ public class EnrollmentController : ControllerBase
         {
             return NotFound(ex.Message);
         }
+        catch (ConcurrencyConflictException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (UnAvailableResourceException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (DomainException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
         catch (Exception ex)
         {
             return Problem(
@@ -103,6 +115,18 @@ public class EnrollmentController : ControllerBase
         catch (NotFoundException)
         {
             return NotFound();
+        }
+        catch (ConcurrencyConflictException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (UnAvailableResourceException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (DomainException ex)
+        {
+            return BadRequest(new { message = ex.Message });
         }
         catch (Exception ex)
         {
@@ -154,11 +178,63 @@ public class EnrollmentController : ControllerBase
         {
             return NotFound();
         }
+        catch (ConcurrencyConflictException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (UnAvailableResourceException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (DomainException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
         catch (Exception ex)
         {
             return Problem(
                 statusCode: 500,
                 title: "Drop error",
+                detail: ex.Message
+            );
+        }
+    }
+
+    [HttpPost("{id}/complete")]
+    public async Task<IActionResult> Complete(Guid id, [FromBody] CompleteEnrollmentRequestDto dto)
+    {
+        try
+        {
+            var command = new CompleteEnrollmentCommand
+            {
+                EnrollmentId = id,
+                Notes = dto.Notes
+            };
+
+            var enrollment = await _enrollmentService.CompleteEnrollmentAsync(command);
+            return Ok(enrollment);
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
+        catch (ConcurrencyConflictException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (UnAvailableResourceException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (DomainException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return Problem(
+                statusCode: 500,
+                title: "Complete error",
                 detail: ex.Message
             );
         }

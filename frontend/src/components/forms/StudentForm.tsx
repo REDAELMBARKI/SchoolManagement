@@ -7,14 +7,10 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
   studentSchema,
   StudentSchema,
-  teacherSchema,
-  TeacherSchema,
 } from "@/lib/formValidationSchemas";
 import {
   createStudent,
-  createTeacher,
   updateStudent,
-  updateTeacher,
 } from "@/lib/actions";
 import { toast } from "react-toastify";
 import { mockUploadImage } from "@/lib/mockUpload";

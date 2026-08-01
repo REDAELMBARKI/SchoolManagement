@@ -93,8 +93,10 @@ builder.Services.AddScoped<IAuditLogService, AuditLogService>();
 
 // add media tr event publisher 
 builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
-
+{
+    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(InvoiceService).Assembly);
+});
 
 builder.Services.AddSwaggerGen();
 builder.Services.AddFluentValidationAutoValidation();

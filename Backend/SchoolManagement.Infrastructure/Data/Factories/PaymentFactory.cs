@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Domain.Entities;
+using SchoolManagement.Domain.Academic.Entities;
+using SchoolManagement.Domain.Core.Entities;
+using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Enums;
 using SchoolManagement.Infrastructure.Data;
 

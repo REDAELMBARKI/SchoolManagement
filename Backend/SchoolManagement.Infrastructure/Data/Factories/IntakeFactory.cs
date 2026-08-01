@@ -1,8 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Domain.Entities;
+using SchoolManagement.Domain.Academic.Entities;
+using SchoolManagement.Domain.Core.Entities;
+using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Infrastructure.Data;
 using SchoolManagement.Domain.Utils;
-using SchoolManagement.Infrastructure.Repositories;
+using SchoolManagement.Infrastructure.Academic.Repositories;
+using SchoolManagement.Infrastructure.Core.Repositories;
+using SchoolManagement.Infrastructure.Common.Repositories;
 using Slugify;
 using SchoolManagement.Domain.Enums;
 
