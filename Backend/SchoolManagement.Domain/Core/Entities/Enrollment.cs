@@ -142,7 +142,15 @@ public class Enrollment : AggregateRoot
 
         }
 
+        enrollment.AddDomainEvent(new EnrollmentCreatedDomainEvent(
 
+            enrollment.Id,
+
+            enrollment.StudentId,
+
+            enrollment.BranchId,
+
+            enrollment.EnrolledAt));
 
         return enrollment;
 

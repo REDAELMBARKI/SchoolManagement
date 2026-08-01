@@ -100,6 +100,16 @@ public class Charge : AggregateRoot
         UpdateStatus();
     }
 
+    /// <summary>Reverses a payment amount — called when a refund is issued.</summary>
+    internal void ReversePayment(decimal amount)
+    {
+        if (amount <= 0)
+            throw new DomainException("Reverse amount must be greater than zero.");
+
+        PaidAmount = Math.Max(0, PaidAmount - amount);
+        UpdateStatus();
+    }
+
     private void UpdateStatus()
     {
         if (Status == ChargeStatus.Cancelled)

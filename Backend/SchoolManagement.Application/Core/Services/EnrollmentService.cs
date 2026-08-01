@@ -1,3 +1,4 @@
+using MediatR;
 using SchoolManagement.Application.Academic.Interfaces.Queries;
 using SchoolManagement.Application.Common.Interfaces;
 using SchoolManagement.Application.Common.Interfaces.Services;
@@ -9,6 +10,7 @@ using SchoolManagement.Application.Core.Mappers;
 using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
+using SchoolManagement.Domain.Core.DomainEvents;
 using SchoolManagement.Domain.Core.Interfaces;
 
 namespace SchoolManagement.Application.Core.Services;
@@ -23,6 +25,7 @@ public class EnrollmentService : IEnrollmentService
     private readonly IInvoiceQueryService _invoiceQueryService;
     private readonly IInvoiceService _invoiceService;
     private readonly ITransaction _transaction;
+    private readonly IMediator _mediator;
 
     public EnrollmentService(
         IEnrollmentRepository repository,
@@ -32,7 +35,8 @@ public class EnrollmentService : IEnrollmentService
         IAuditLogService auditLogService,
         IInvoiceQueryService invoiceQueryService,
         IInvoiceService invoiceService,
-        ITransaction transaction)
+        ITransaction transaction,
+        IMediator mediator)
     {
         _repository = repository;
         _queryService = queryService;
@@ -42,6 +46,7 @@ public class EnrollmentService : IEnrollmentService
         _invoiceQueryService = invoiceQueryService;
         _invoiceService = invoiceService;
         _transaction = transaction;
+        _mediator = mediator;
     }
 
     public async Task<List<EnrollmentResponseDto>> GetAllAsync()
@@ -89,6 +94,11 @@ public class EnrollmentService : IEnrollmentService
                 entityId: created.Id,
                 branchId: _currentUserContext.BranchId,
                 newValues: CreateAuditSnapshot(created));
+
+            // Publish domain events 
+            foreach (var domainEvent in created.DomainEvents)
+                await _mediator.Publish(domainEvent);
+            created.ClearDomainEvents();
 
             await _transaction.CommitTransactionAsync();
 
@@ -242,6 +252,11 @@ public class EnrollmentService : IEnrollmentService
             }
 
             var updated = await _repository.UpdateAsync(existing);
+
+            // Publish domain events (e.g. commission clawback handler listens here)
+            foreach (var domainEvent in updated.DomainEvents)
+                await _mediator.Publish(domainEvent);
+            updated.ClearDomainEvents();
 
             await _auditLogService.StoreAsync(
                 action: AuditLog.UpdateAction(),

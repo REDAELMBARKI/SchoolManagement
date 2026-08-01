@@ -114,6 +114,29 @@ public class Invoice : AggregateRoot
         CreditAppliedAmount += amount;
     }
 
+    /// <summary>
+    /// Reduces PaidAmount when a refund is issued against a payment on this invoice.
+    /// Recalculates status after deduction.
+    /// </summary>
+    public void DeductRefund(decimal refundAmount)
+    {
+        if (refundAmount <= 0)
+            throw new DomainException("Refund amount must be greater than zero.");
+        if (refundAmount > PaidAmount)
+            throw new DomainException("Refund amount cannot exceed the invoice paid amount.");
+
+        PaidAmount -= refundAmount;
+
+        // Reverse the charge payment tracking if charge exists
+        if (Charge != null &&
+            (Charge.Status == ChargeStatus.Paid || Charge.Status == ChargeStatus.PartiallyPaid))
+        {
+            Charge.ReversePayment(refundAmount);
+        }
+
+        RecalculateStatus();
+    }
+
     public void WaiveInvoice(decimal waivedAmount, string reason)
     {
         if (waivedAmount <= 0)
@@ -152,8 +175,7 @@ public class Invoice : AggregateRoot
     }
 
     public void CancelInvoice(string reason)
-    {
-        if (string.IsNullOrWhiteSpace(reason))
+    {        if (string.IsNullOrWhiteSpace(reason))
             throw new DomainException("Cancellation reason is required.");
 
         if (Status == InvoiceStatus.Cancelled)
@@ -174,7 +196,8 @@ public class Invoice : AggregateRoot
     }
 
     public void RecalculateStatus()
-    {        if (Status == InvoiceStatus.Cancelled)
+    {        
+        if (Status == InvoiceStatus.Cancelled)
             return;
 
         var oldStatus = Status;

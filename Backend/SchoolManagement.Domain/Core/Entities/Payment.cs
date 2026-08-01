@@ -126,4 +126,19 @@ public class Payment : AggregateRoot
             throw new DomainException("Method details JSON cannot be empty.");
         MethodDetailsJson = methodDetailsJson;
     }
+
+    /// <summary>Total amount already refunded across all refund records.</summary>
+    public decimal GetTotalRefunded() => Refunds.Sum(r => r.Amount);
+
+    /// <summary>Amount still available to refund.</summary>
+    public decimal GetRefundableAmount() => Amount - GetTotalRefunded();
+
+    /// <summary>
+    /// Marks the payment as Refunded once it has been fully refunded.
+    /// Called after a refund record is saved.
+    /// </summary>
+    public void MarkAsRefunded()
+    {
+        Status = PaymentStatus.Refunded;
+    }
 }

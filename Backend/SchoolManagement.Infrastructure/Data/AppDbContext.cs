@@ -63,6 +63,9 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
     public DbSet<Invoice> Invoices { get; set; }
     public DbSet<Charge> Charges { get; set; }
     public DbSet<Expense> Expenses { get; set; }
+    public DbSet<PayrollPayment> PayrollPayments { get; set; }
+    public DbSet<Commission> Commissions { get; set; }
+    public DbSet<Refund> Refunds { get; set; }
     public DbSet<AuditLog> AuditLogs { get; set; }
 
     public DbSet<Media> Medias { get; set; }
@@ -111,6 +114,9 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
         modelBuilder.ApplyConfiguration(new LeadSourceConfiguration());
         modelBuilder.ApplyConfiguration(new OpcLeadSourceConfiguration());
         modelBuilder.ApplyConfiguration(new AdLeadSourceConfiguration());
+        modelBuilder.ApplyConfiguration(new CommissionConfiguration());
+        modelBuilder.ApplyConfiguration(new RefundConfiguration());
+        modelBuilder.ApplyConfiguration(new PayrollPaymentConfiguration());
     }
 
  

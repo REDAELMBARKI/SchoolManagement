@@ -12,6 +12,7 @@ using FluentValidation.AspNetCore;
 using SchoolManagement.Infrastructure.Data.Configurations.Extensions;
 using SchoolManagement.Application.Core.Services;
 using SchoolManagement.Application.Options;
+using SchoolManagement.Application.Core.Services;
 using SchoolManagement.Application.Core.Validators;
 using SchoolManagement.Infrastructure.Academic.Repositories;
 using SchoolManagement.Infrastructure.Core.Repositories;
@@ -21,6 +22,7 @@ using SchoolManagement.Application.Academic.Interfaces.Services;
 using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Application.Common.Interfaces.Services;
 using SchoolManagement.Infrastructure.Common.Services;
+using SchoolManagement.Domain.Core.Interfaces;
 using Hangfire;
 
 Log.Logger = new LoggerConfiguration()
@@ -67,6 +69,9 @@ builder.Services.AddJwtConfigExtension(builder.Configuration);
 builder.Services.Configure<BillingOptions>(
     builder.Configuration.GetSection(BillingOptions.SectionName));
 
+builder.Services.Configure<CommissionSettings>(
+    builder.Configuration.GetSection(CommissionSettings.SectionName));
+
 // Di registration 
 builder.Services.Scan(scan => scan
     .FromAssemblies(typeof(Program).Assembly, typeof(StudentService).Assembly, typeof(CurrentUserContext).Assembly)
@@ -88,6 +93,10 @@ builder.Services.Scan(scan => scan
 builder.Services.AddScoped<ITransaction, EfTransaction>();
 builder.Services.AddScoped<ICurrentUserContext, CurrentUserContext>();
 builder.Services.AddScoped<IAuditLogService, AuditLogService>();
+builder.Services.AddScoped<ICommissionRepository, CommissionRepository>();
+builder.Services.AddScoped<ICommissionService, CommissionService>();
+builder.Services.AddScoped<IRefundRepository, RefundRepository>();
+builder.Services.AddScoped<IRefundService, RefundService>();
 
 // end Di registration
 

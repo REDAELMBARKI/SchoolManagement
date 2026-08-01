@@ -6,14 +6,15 @@ using SchoolManagement.Infrastructure.Data;
 
 namespace SchoolManagement.Infrastructure.Core.Repositories;
 
-public class PaymentRepository : Repository<Payment>, IPaymentRepository
+public class RefundRepository : Repository<Refund>, IRefundRepository
 {
-    public PaymentRepository(AppDbContext context) : base(context) { }
+    public RefundRepository(AppDbContext context) : base(context) { }
 
-    public async Task<Payment?> GetByIdWithRefundsAsync(Guid id)
+    public async Task<List<Refund>> GetByPaymentIdAsync(Guid paymentId)
     {
         return await Query()
-            .Include(p => p.Refunds)
-            .FirstOrDefaultAsync(p => p.Id == id);
+            .Where(r => r.PaymentId == paymentId)
+            .OrderByDescending(r => r.RefundedAt)
+            .ToListAsync();
     }
 }
