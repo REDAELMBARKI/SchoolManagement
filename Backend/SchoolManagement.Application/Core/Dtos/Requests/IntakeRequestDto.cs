@@ -2,7 +2,7 @@
 using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Common.Entities;
-using SchoolManagement.Domain.Enums;
+using SchoolManagement.Domain.Core.Enums;
 using SchoolManagement.Domain.Common.ValueObjects;
 
 namespace SchoolManagement.Application.Core.Dtos.Requests;
@@ -54,6 +54,3 @@ public class IntakeRequestDto
     public decimal AmountRemaining => TotalFees - AmountPaid;
     public bool IsFullyPaid => AmountRemaining <= 0;
 }
-
-
-

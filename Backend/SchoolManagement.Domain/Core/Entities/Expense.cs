@@ -5,20 +5,22 @@ using SchoolManagement.Domain.Core.Enums;
 
 namespace SchoolManagement.Domain.Core.Entities;
 
+/// <summary>
+/// Records a cash outflow from the school — simple CRUD, no approval pipeline.
+/// Cash already left the drawer; this is the historical record for financial reporting.
+/// </summary>
 public class Expense : AggregateRoot
 {
     public ExpenseType Category { get; private set; }
     public string PayeeName { get; private set; } = string.Empty;
     public string? Description { get; private set; }
     public decimal Amount { get; private set; }
-    public ExpenseStatus Status { get; private set; }
-    public Guid? RequestedBy { get; private set; }
-    public Guid? ApprovedBy { get; private set; }
-    public DateTime RequestedDate { get; private set; }
-    public DateTime? PaidDate { get; private set; }
-    public PaymentMethod? PaymentMethod { get; private set; }
+    public DateTime ExpenseDate { get; private set; }
+    public PaymentMethod PaymentMethod { get; private set; }
     public string? Reference { get; private set; }
+    public Guid ProcessedByStaffId { get; private set; }
     public Guid BranchId { get; private set; }
+    public string CurrencyCode { get; private set; } = "MAD";
 
     public virtual Branch Branch { get; private set; } = null!;
 
@@ -28,10 +30,12 @@ public class Expense : AggregateRoot
         ExpenseType category,
         string payeeName,
         decimal amount,
-        DateTime requestedDate,
+        DateTime expenseDate,
+        PaymentMethod paymentMethod,
         Guid branchId,
+        Guid processedByStaffId,
         string? description = null,
-        Guid? requestedBy = null)
+        string? reference = null)
     {
         if (string.IsNullOrWhiteSpace(payeeName))
             throw new DomainException("Payee name cannot be empty.");
@@ -39,17 +43,20 @@ public class Expense : AggregateRoot
             throw new DomainException("Amount must be greater than zero.");
         if (branchId == Guid.Empty)
             throw new DomainException("Branch ID must not be empty.");
+        if (processedByStaffId == Guid.Empty)
+            throw new DomainException("Staff ID must not be empty.");
 
         return new Expense
         {
             Category = category,
             PayeeName = payeeName,
             Amount = amount,
-            RequestedDate = requestedDate,
+            ExpenseDate = expenseDate,
+            PaymentMethod = paymentMethod,
+            BranchId = branchId,
+            ProcessedByStaffId = processedByStaffId,
             Description = description,
-            RequestedBy = requestedBy,
-            Status = ExpenseStatus.Pending,
-            BranchId = branchId
+            Reference = reference
         };
     }
 
@@ -77,32 +84,12 @@ public class Expense : AggregateRoot
         Amount = amount;
     }
 
-    public void UpdateStatus(ExpenseStatus status)
+    public void UpdateExpenseDate(DateTime expenseDate)
     {
-        Status = status;
+        ExpenseDate = expenseDate;
     }
 
-    public void UpdateRequestedBy(Guid? requestedBy)
-    {
-        RequestedBy = requestedBy;
-    }
-
-    public void UpdateApprovedBy(Guid? approvedBy)
-    {
-        ApprovedBy = approvedBy;
-    }
-
-    public void UpdateRequestedDate(DateTime requestedDate)
-    {
-        RequestedDate = requestedDate;
-    }
-
-    public void UpdatePaidDate(DateTime? paidDate)
-    {
-        PaidDate = paidDate;
-    }
-
-    public void UpdatePaymentMethod(PaymentMethod? paymentMethod)
+    public void UpdatePaymentMethod(PaymentMethod paymentMethod)
     {
         PaymentMethod = paymentMethod;
     }
@@ -117,5 +104,12 @@ public class Expense : AggregateRoot
         if (branchId == Guid.Empty)
             throw new DomainException("Branch ID must not be empty.");
         BranchId = branchId;
+    }
+
+    public void UpdateProcessedByStaffId(Guid processedByStaffId)
+    {
+        if (processedByStaffId == Guid.Empty)
+            throw new DomainException("Staff ID must not be empty.");
+        ProcessedByStaffId = processedByStaffId;
     }
 }

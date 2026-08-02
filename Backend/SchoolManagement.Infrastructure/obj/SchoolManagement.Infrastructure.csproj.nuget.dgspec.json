@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj": {}
+    "C:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj": {}
   },
   "projects": {
-    "c:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj": {
+    "C:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj",
+        "projectUniqueName": "C:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj",
         "projectName": "SchoolManagement.Application",
-        "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj",
+        "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj",
         "packagesPath": "C:\\Users\\OBLIVION\\.nuget\\packages\\",
-        "outputPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Application\\obj\\",
+        "outputPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -34,8 +34,8 @@
             "framework": "net10.0",
             "targetAlias": "net10.0",
             "projectReferences": {
-              "c:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj": {
-                "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj"
+              "C:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj": {
+                "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj"
               }
             }
           }
@@ -388,14 +388,14 @@
         }
       }
     },
-    "c:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj": {
+    "C:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj",
+        "projectUniqueName": "C:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj",
         "projectName": "SchoolManagement.CrossCutting.Identity",
-        "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj",
+        "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj",
         "packagesPath": "C:\\Users\\OBLIVION\\.nuget\\packages\\",
-        "outputPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\obj\\",
+        "outputPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -740,14 +740,14 @@
         }
       }
     },
-    "c:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj": {
+    "C:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj",
+        "projectUniqueName": "C:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj",
         "projectName": "SchoolManagement.Domain",
-        "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj",
+        "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj",
         "packagesPath": "C:\\Users\\OBLIVION\\.nuget\\packages\\",
-        "outputPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\obj\\",
+        "outputPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -1100,14 +1100,14 @@
         }
       }
     },
-    "c:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj": {
+    "C:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj",
+        "projectUniqueName": "C:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj",
         "projectName": "SchoolManagement.Infrastructure",
-        "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj",
+        "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\SchoolManagement.Infrastructure.csproj",
         "packagesPath": "C:\\Users\\OBLIVION\\.nuget\\packages\\",
-        "outputPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\obj\\",
+        "outputPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -1130,14 +1130,14 @@
             "framework": "net10.0",
             "targetAlias": "net10.0",
             "projectReferences": {
-              "c:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj": {
-                "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj"
+              "C:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj": {
+                "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Application\\SchoolManagement.Application.csproj"
               },
-              "c:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj": {
-                "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj"
+              "C:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj": {
+                "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.CrossCutting.Identity\\SchoolManagement.CrossCutting.Identity.csproj"
               },
-              "c:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj": {
-                "projectPath": "c:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj"
+              "C:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj": {
+                "projectPath": "C:\\SchoolManagement\\Backend\\SchoolManagement.Domain\\SchoolManagement.Domain.csproj"
               }
             }
           }

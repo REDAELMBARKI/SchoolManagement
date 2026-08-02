@@ -67,6 +67,14 @@ public class ScheduleQueryService : IScheduleQueryService
         return schedule == null ? null : ScheduleMapper.ToResponse(schedule);
     }
 
+    public async Task<List<Schedule>> GetSchedulesByGroupIdAsync(Guid groupId)
+    {
+        return await _context.Schedules
+            .Include(s => s.TimeSlot)
+            .Include(s => s.Day)
+            .Where(s => s.GroupId == groupId && EF.Property<DateTime?>(s, "DeletedAt") == null)
+            .ToListAsync();
+    }
 
 
 }

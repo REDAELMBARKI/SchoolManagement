@@ -240,4 +240,45 @@ public class EnrollmentController : ControllerBase
         }
     }
 
+    [HttpPost("{id}/transfer")]
+    public async Task<IActionResult> TransferGroup(Guid id, [FromBody] TransferGroupRequestDto dto)
+    {
+        try
+        {
+            var command = new TransferGroupCommand
+            {
+                EnrollmentId = id,
+                NewGroupId = dto.NewGroupId,
+                Reason = dto.Reason
+            };
+
+            var enrollment = await _enrollmentService.TransferGroupAsync(command);
+            return Ok(enrollment);
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (ConcurrencyConflictException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (UnAvailableResourceException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (DomainException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return Problem(
+                statusCode: 500,
+                title: "Transfer error",
+                detail: ex.Message
+            );
+        }
+    }
+
 }

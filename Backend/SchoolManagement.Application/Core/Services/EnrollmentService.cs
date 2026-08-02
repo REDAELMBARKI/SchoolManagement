@@ -11,6 +11,7 @@ using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
 using SchoolManagement.Domain.Core.DomainEvents;
+using SchoolManagement.Domain.Core.Enums;
 using SchoolManagement.Domain.Core.Interfaces;
 
 namespace SchoolManagement.Application.Core.Services;
@@ -20,6 +21,7 @@ public class EnrollmentService : IEnrollmentService
     private readonly IEnrollmentRepository _repository;
     private readonly IEnrollmentQueryService _queryService;
     private readonly IGroupQueryService _groupQueryService;
+    private readonly IScheduleQueryService _scheduleQueryService;
     private readonly ICurrentUserContext _currentUserContext;
     private readonly IAuditLogService _auditLogService;
     private readonly IInvoiceQueryService _invoiceQueryService;
@@ -31,6 +33,7 @@ public class EnrollmentService : IEnrollmentService
         IEnrollmentRepository repository,
         IEnrollmentQueryService queryService,
         IGroupQueryService groupQueryService,
+        IScheduleQueryService scheduleQueryService,
         ICurrentUserContext currentUserContext,
         IAuditLogService auditLogService,
         IInvoiceQueryService invoiceQueryService,
@@ -41,6 +44,7 @@ public class EnrollmentService : IEnrollmentService
         _repository = repository;
         _queryService = queryService;
         _groupQueryService = groupQueryService;
+        _scheduleQueryService = scheduleQueryService;
         _currentUserContext = currentUserContext;
         _auditLogService = auditLogService;
         _invoiceQueryService = invoiceQueryService;
@@ -310,6 +314,88 @@ public class EnrollmentService : IEnrollmentService
         return EnrollmentMapper.ToResponse(updated);
     }
 
+    public async Task<EnrollmentResponseDto> TransferGroupAsync(TransferGroupCommand command)
+    {
+        var branchId = _currentUserContext.BranchId;
+        if (branchId == Guid.Empty)
+            throw new DomainException("Branch context is missing.");
+
+        await _transaction.BeginTransactionAsync();
+        try
+        {
+            // Load enrollment with current group
+            var enrollment = await _repository.GetByIdAsync(command.EnrollmentId);
+            if (enrollment is null)
+                throw new NotFoundException($"Enrollment with id {command.EnrollmentId} not found.");
+            if (enrollment.BranchId != branchId)
+                throw new DomainException("The enrollment does not belong to the current branch.");
+
+            var oldGroupId = enrollment.GroupId;
+
+            // Load both groups
+            var oldGroup = await _groupQueryService.GetByIdAsync(oldGroupId);
+            var newGroup = await _groupQueryService.GetByIdAsync(command.NewGroupId);
+
+            if (oldGroup is null)
+                throw new NotFoundException($"Current group with id {oldGroupId} not found.");
+            if (newGroup is null)
+                throw new NotFoundException($"Target group with id {command.NewGroupId} not found.");
+ 
+            // Validate same level and subject
+            if (oldGroup.LevelId != newGroup.LevelId)
+                throw new DomainException("Cannot transfer to a group with a different level.");
+            if (oldGroup.SubjectId != newGroup.SubjectId)
+                throw new DomainException("Cannot transfer to a group with a different subject.");
+
+            // Check new group has space
+            if (!newGroup.HasAvailableSpace())
+                throw new UnAvailableResourceException("The target group has reached capacity.");
+
+            // Schedule clash detection
+            await ValidateNoScheduleConflictsAsync(enrollment.StudentId, command.EnrollmentId, command.NewGroupId);
+
+            var oldValues = CreateAuditSnapshot(enrollment);
+
+            // Transfer the group
+            enrollment.TransferGroup(command.NewGroupId, command.Reason);
+
+            // Touch groups for optimistic concurrency
+            oldGroup.TouchCapacityGuard();
+            newGroup.TouchCapacityGuard();
+
+            var updated = await _repository.UpdateAsync(enrollment);
+
+            // Publish domain events
+            foreach (var domainEvent in updated.DomainEvents)
+                await _mediator.Publish(domainEvent);
+            updated.ClearDomainEvents();
+
+            await _auditLogService.StoreAsync(
+                action: AuditLog.UpdateAction(),
+                entityName: "Enrollment",
+                entityId: updated.Id,
+                branchId: branchId,
+                oldValues: oldValues,
+                newValues: CreateAuditSnapshot(updated),
+                message: $"Transferred from group {oldGroupId} to {command.NewGroupId}. Reason: {command.Reason}");
+
+            await _transaction.CommitTransactionAsync();
+
+            return EnrollmentMapper.ToResponse(updated);
+        }
+        catch (Exception ex) when (ex.GetType().Name == "DbUpdateConcurrencyException")
+        {
+            await _transaction.RollbackTransactionAsync();
+            throw new ConcurrencyConflictException(
+                "One of the groups was updated by another request. Please refresh and try again.");
+        }
+        catch
+        {
+            await _transaction.RollbackTransactionAsync();
+            throw;
+        }
+    }
+
     public async Task DeleteAsync(Guid id)
     {
         var existing = await _repository.GetByIdAsync(id);
@@ -366,6 +452,48 @@ public class EnrollmentService : IEnrollmentService
             throw new UnAvailableResourceException("The selected group is either full, belongs to a different subject/branch, or does not exist.");
 
         return group;
+    }
+
+    private async Task ValidateNoScheduleConflictsAsync(Guid studentId, Guid currentEnrollmentId, Guid newGroupId)
+    {
+        // Get all active enrollments for this student (excluding current one)
+        var studentEnrollments = await _queryService.GetAllAsync();
+        var activeEnrollments = studentEnrollments
+            .Where(e => e.StudentId == studentId && 
+                       e.Id != currentEnrollmentId && 
+                       e.Status == EnrollmentStatus.Active)
+            .ToList();
+
+        // Get all schedule sessions for existing enrollments
+        var existingSchedules = new List<Schedule>();
+        foreach (var enrollment in activeEnrollments)
+        {
+            var schedules = await _scheduleQueryService.GetSchedulesByGroupIdAsync(enrollment.GroupId);
+            existingSchedules.AddRange(schedules);
+        }
+
+        // Get all schedule sessions for new group
+        var newGroupSchedules = await _scheduleQueryService.GetSchedulesByGroupIdAsync(newGroupId);
+
+        // Check for conflicts
+        foreach (var newSchedule in newGroupSchedules)
+        {
+            foreach (var existingSchedule in existingSchedules)
+            {
+                // Same day?
+                if (newSchedule.DayId == existingSchedule.DayId)
+                {
+                    // Time overlap? (StartTime < existing.EndTime AND EndTime > existing.StartTime)
+                    if (newSchedule.TimeSlot.StartTime < existingSchedule.TimeSlot.EndTime &&
+                        newSchedule.TimeSlot.EndTime > existingSchedule.TimeSlot.StartTime)
+                    {
+                        throw new DomainException(
+                            $"Schedule conflict detected: Student has another class on {existingSchedule.Day.Name} " +
+                            $"from {existingSchedule.TimeSlot.StartTime:HH:mm} to {existingSchedule.TimeSlot.EndTime:HH:mm}.");
+                    }
+                }
+            }
+        }
     }
 
     private static object CreateAuditSnapshot(Enrollment enrollment)

@@ -62,7 +62,14 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
     public DbSet<Plan> Plans { get; set; }
     public DbSet<Invoice> Invoices { get; set; }
     public DbSet<Charge> Charges { get; set; }
+    // <summary> 
+    // expenses any bills but not salaries
+    // </summary>
     public DbSet<Expense> Expenses { get; set; }
+   
+    // <summary> 
+    // only emplyee salaries payrolls
+    // </summary>
     public DbSet<PayrollPayment> PayrollPayments { get; set; }
     public DbSet<Commission> Commissions { get; set; }
     public DbSet<Refund> Refunds { get; set; }
@@ -117,6 +124,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
         modelBuilder.ApplyConfiguration(new CommissionConfiguration());
         modelBuilder.ApplyConfiguration(new RefundConfiguration());
         modelBuilder.ApplyConfiguration(new PayrollPaymentConfiguration());
+        modelBuilder.ApplyConfiguration(new ExpenseConfiguration());
     }
 
  

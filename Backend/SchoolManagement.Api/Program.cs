@@ -23,6 +23,8 @@ using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Application.Common.Interfaces.Services;
 using SchoolManagement.Infrastructure.Common.Services;
 using SchoolManagement.Domain.Core.Interfaces;
+using SchoolManagement.Application.Core.Interfaces.Queries;
+using SchoolManagement.Infrastructure.Core.Queries;
 using Hangfire;
 
 Log.Logger = new LoggerConfiguration()
@@ -97,6 +99,9 @@ builder.Services.AddScoped<ICommissionRepository, CommissionRepository>();
 builder.Services.AddScoped<ICommissionService, CommissionService>();
 builder.Services.AddScoped<IRefundRepository, RefundRepository>();
 builder.Services.AddScoped<IRefundService, RefundService>();
+builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
+builder.Services.AddScoped<IExpenseService, ExpenseService>();
+builder.Services.AddScoped<IExpenseQueryService, ExpenseQueryService>();
 
 // end Di registration
 

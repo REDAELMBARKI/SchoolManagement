@@ -402,7 +402,23 @@ public class Enrollment : AggregateRoot
 
     }
 
+    public void TransferGroup(Guid newGroupId, string reason)
+    {
+        if (newGroupId == Guid.Empty)
+            throw new DomainException("New group ID must not be empty.");
+        if (string.IsNullOrWhiteSpace(reason))
+            throw new DomainException("Transfer reason is required.");
+        if (Status != EnrollmentStatus.Active)
+            throw new DomainException("Only active enrollments can be transferred.");
+        if (GroupId == newGroupId)
+            throw new DomainException("Student is already in this group.");
 
+        var oldGroupId = GroupId;
+        GroupId = newGroupId;
+        Notes = $"Transferred from group {oldGroupId} to {newGroupId}. Reason: {reason}";
+        
+        AddDomainEvent(new EnrollmentGroupTransferredDomainEvent(Id, StudentId, oldGroupId, newGroupId, reason, DateTime.UtcNow));
+    }
 
     private void EnsureFeesNotLocked()
 
@@ -415,8 +431,3 @@ public class Enrollment : AggregateRoot
     }
 
 }
-
-
-
-
-

@@ -1,7 +1,7 @@
 ﻿using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Common.Entities;
-using SchoolManagement.Domain.Enums;
+using SchoolManagement.Domain.Core.Enums;
 
 namespace SchoolManagement.Application.Core.Dtos.Responses;
 
@@ -33,4 +33,4 @@ public class IntakeResponseDto {
     public BranchResponseDto Branch { get; set; } = null!;
     public CommercialAgentResponseDto? CommercialAgent { get; set; }
     public ICollection<StudentResponseDto> Students { get; set; } = new List<StudentResponseDto>();
-} 
+}

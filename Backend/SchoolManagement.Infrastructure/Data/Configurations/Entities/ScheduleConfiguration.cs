@@ -54,7 +54,7 @@ public class ScheduleConfiguration : IEntityTypeConfiguration<Schedule>
             .OnDelete(DeleteBehavior.Restrict);
 
         entityTypeBuilder.HasOne(sc => sc.Group)
-            .WithMany()
+            .WithMany(g => g.Schedules)
             .HasForeignKey(sc => sc.GroupId)
             .OnDelete(DeleteBehavior.Restrict);
 

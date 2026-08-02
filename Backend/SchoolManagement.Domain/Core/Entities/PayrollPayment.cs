@@ -1,4 +1,6 @@
+using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Common;
+using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
 using SchoolManagement.Domain.Core.DomainEvents;
 using SchoolManagement.Domain.Core.Enums;

@@ -17,9 +17,6 @@ public class Group : AggregateRoot
 
     // FKs
     public Guid BranchId { get; private set; }
-
-    public Guid ScheduleId { get; private set; }
-
     public Guid LevelId { get; private set; }
     public Guid SubjectId { get; private set; }
 
@@ -29,7 +26,7 @@ public class Group : AggregateRoot
     public virtual Branch Branch { get; private set; } = null!;
     public virtual Level Level { get; private set; } = null!;
     public virtual Subject Subject { get; private set; } = null!;
-    public virtual Schedule Schedule { get; private set; } = null!;
+    public virtual ICollection<Schedule> Schedules { get; private set; } = new List<Schedule>();
 
     private Group() { } // For EF Core
 
@@ -124,16 +121,6 @@ public class Group : AggregateRoot
             throw new DomainException("Subject ID must not be empty.");
         }
         SubjectId = subjectId;
-    }
-
-
-    public void UpdateScheduleId(Guid scheduleId)
-    {
-        if (scheduleId == Guid.Empty)
-        {
-            throw new DomainException("schedule ID must not be empty.");
-        }
-        ScheduleId = scheduleId;
     }
 
     // Check if group has space for more enrollments

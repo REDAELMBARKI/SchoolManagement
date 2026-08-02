@@ -12,5 +12,6 @@ public interface IScheduleQueryService : IEntityQuery<Schedule>
 {
     Task<List<ScheduleResponseDto>> GetAllResponsesAsync();
     Task<ScheduleResponseDto?> GetResponseByIdAsync(Guid id);
-    //Task<GroupedScheduleDto> GetGroupScheduleAsync(int groupId);
+  
+    Task<List<Schedule>> GetSchedulesByGroupIdAsync(Guid groupId);
 }

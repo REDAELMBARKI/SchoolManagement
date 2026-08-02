@@ -77,92 +77,151 @@ After lockout               → frozen, nothing changes
 
 ---
 
+## ✅ Story 7: Cash Refund System - COMPLETE
+
+### Design Decisions
+- **All refunds are cash in-person** — regardless of original payment method (Cash or Card)
+- **Separate Refunds table** (Option B) — clarity and scalability for partial/multi-refund support
+- **Partial refunds supported** — via `Payment.GetRefundableAmount()` minus sum of existing refunds
+- **Manual process** — student comes to school to collect cash, recorded in system
+
+### Refund Status Lifecycle
+```
+Payment created              → Payment.Status = Paid, Refunded = false
+Refund recorded (partial)    → Refund created, Payment.Refunded = false
+Refund recorded (full)       → Refund created, Payment.Refunded = true (auto-marked)
+```
+
+### What was built
+- ✅ `Refund` entity (AggregateRoot): `Create()`, `PaymentId`, `RefundAmount`, `Reason`, `RefundedAt`, `ProcessedByUserId`
+- ✅ `IRefundRepository` with custom queries
+- ✅ `RefundRepository` implementation
+- ✅ `RefundConfiguration` EF Core config + registered in `AppDbContext`
+- ✅ `RefundService`: `RefundPaymentAsync()` with transaction rollback on failure
+- ✅ `Payment.GetRefundableAmount()` — calculates remaining refundable amount
+- ✅ `Payment.MarkAsRefunded()` — auto-called when fully refunded
+- ✅ `Invoice.DeductRefund(amount)` — reverses PaidAmount
+- ✅ `Charge.ReversePayment(amount)` — reverses PaidAmount on charge
+- ✅ `PaymentController.RefundPayment` — POST /api/payments/{id}/refund endpoint
+- ✅ Refund validation: payment must exist, amount > 0, amount <= refundable
+- ✅ Invoice status recalculation after refund
+- ✅ Credit balance reversal if payment was applied as credit
+- ✅ Audit logging for refund operations
+- ✅ DI registered in Program.cs
+
+### Pending
+- ⚠️ EF migration needed: `dotnet ef migrations add AddRefunds`
+
+---
+
 ## ❌ Remaining P0 Critical Workflows
 
-### Story 7: Payment Reversal & Refund Workflow
+### Story 8: Expense CRUD — Cash Outflow Tracking (Redesigned)
 **Priority**: P0 - Critical  
 **Story Points**: 5
 
-**Current State**: PaymentService.DeleteAsync does hard deletion without reversal
+**Architecture Redesign**: Expenses follow a simple CRUD model — **no approval pipeline**.
+Cash already left the drawer; the expense record is the historical entry for financial
+reporting and net-gain calculation (Net Gain = Total Payments Received − Total Expenses
+Recorded). Salaries are tracked separately via the `PayrollPayment` entity.
 
-**Tasks**:
-- [ ] **DOM-59**: Add `RefundPayment(refundAmount, reason, method)` method to Payment entity
-  - Validate: Payment exists and has sufficient amount
-  - Add domain event `PaymentRefundedDomainEvent`
+**Current State**: Domain entity and EF configuration are done; application, infrastructure,
+and API layers are NOT yet implemented.
 
-- [ ] **APP-60**: Replace PaymentService.DeleteAsync with `RefundPaymentAsync()`
-  - Retrieve payment with Invoice and Enrollment
-  - Call payment.RefundPayment()
-  - Deduct refundAmount from Invoice.PaidAmount
-  - Recalculate Invoice.Status
-  - If payment was applied as credit, reverse Enrollment.CreditBalance
-  - Save via transaction
-  - Log audit trail
+#### ✅ Already Implemented
 
-- [ ] **APP-61**: Create `RefundPaymentCommand` DTO
-- [ ] **APP-62**: Create `RefundPaymentValidator`
-- [ ] **API-63**: Add `POST /api/payments/{id}/refund` endpoint in PaymentController
+- [x] **DOM-64**: `Expense` entity (AggregateRoot) — simple CRUD, no approval workflow
+  - `Create()` factory method (category, payeeName, amount, expenseDate, paymentMethod,
+    branchId, processedByStaffId required; description, reference optional)
+  - Update methods: `UpdateCategory`, `UpdatePayeeName`, `UpdateDescription`,
+    `UpdateAmount`, `UpdateExpenseDate`, `UpdatePaymentMethod`, `UpdateReference`,
+    `UpdateBranchId`, `UpdateProcessedByStaffId`
+  - Properties: `Category`, `PayeeName`, `Description?`, `Amount`, `ExpenseDate`,
+    `PaymentMethod`, `Reference?`, `ProcessedByStaffId`, `BranchId`, `CurrencyCode` (default "MAD")
+- [x] **DOM-65**: `ExpenseType` enum — Salary, Vendor, Utilities, Maintenance, Supplies, Rent, Other
+- [x] **DOM-66**: `PaymentMethod` enum — Cash, CreditCard, DebitCard, BankTransfer, Check
+- [x] **INF-67**: `ExpenseConfiguration` EF Core config (table, columns, indexes, Branch FK)
+- [x] **INF-68**: `DbSet<Expense>` registered in `AppDbContext`
+
+#### ❌ Still Needs Implementation
+
+- [ ] **INF-69**: Create `IExpenseRepository` interface in `Domain/Core/Interfaces/`
+- [ ] **INF-70**: Implement `ExpenseRepository` in `Infrastructure/Core/Repositories/`
+- [ ] **INF-71**: Create `ExpenseQueryService` in `Infrastructure/Core/Queries/`
+  - GET by branch, by date range, by category, by staff
+- [ ] **APP-72**: Create `IExpenseService` interface in `Application/Core/Interfaces/Services/`
+- [ ] **APP-73**: Implement `ExpenseService` in `Application/Core/Services/`
+  - `CreateExpenseAsync()`, `GetExpenseByIdAsync()`, `GetExpensesAsync()` (filtered list),
+    `UpdateExpenseAsync()`, `DeleteExpenseAsync()`
+- [ ] **APP-74**: Create Expense DTOs (Command, Request, Response) in `Application/Core/Dtos/`
+- [ ] **APP-75**: Create `ExpenseValidator` in `Application/Core/Validators/`
+- [ ] **APP-76**: Create `ExpenseMapper` in `Application/Core/Mappers/`
+- [ ] **API-77**: Create `ExpenseController` with CRUD endpoints
+  - POST   /api/expenses
+  - GET    /api/expenses/{id}
+  - GET    /api/expenses (filtered: branch, date range, category, staff)
+  - PUT    /api/expenses/{id}
+  - DELETE /api/expenses/{id}
+- [ ] **INF-78**: Create `ExpenseSeeder` in `Infrastructure/Data/Seeders/`
+- [ ] **INF-79**: Register Expense DI in `Program.cs` (if assembly scan doesn't pick it up)
+- [ ] ⚠️ EF migration needed: `dotnet ef migrations add AddExpenses`
 
 ---
 
-### Story 8: Multi-Level Expense Approval Pipeline
-**Priority**: P0 - Critical  
-**Story Points**: 6
-
-**Current State**: Expense entity exists but lacks approval workflow
-
-**Tasks**:
-- [ ] **DOM-64**: Add `SubmitExpense(requestedByUserId)` method to Expense entity
-- [ ] **DOM-65**: Add `ApproveExpense(approverUserId)` method to Expense entity
-- [ ] **DOM-66**: Add `RejectExpense(approverUserId, reason)` method to Expense entity
-- [ ] **DOM-67**: Add `MarkAsPaid(paymentMethod, referenceCode, paidAt)` method to Expense entity
-- [ ] **APP-68**: Create `ExpenseService` in Application/Core/Services/
-- [ ] **APP-69**: Implement `SubmitExpenseAsync()`, `ApproveExpenseAsync()`, `RejectExpenseAsync()`, `MarkExpensePaidAsync()`
-- [ ] **APP-70**: Create ExpenseCommand DTOs
-- [ ] **APP-71**: Create ExpenseValidators
-- [ ] **API-72**: Create `ExpenseController`
-  - POST /api/expenses/submit
-  - POST /api/expenses/{id}/approve
-  - POST /api/expenses/{id}/reject
-  - POST /api/expenses/{id}/mark-paid
-- [ ] **INF-73**: Create IExpenseRepository interface (if not exists)
-- [ ] **INF-74**: Implement ExpenseRepository in Infrastructure (if not exists)
-
----
-
-### Story 14: Group Transfer Workflow
+### Story 9: Group Transfer Workflow
 **Priority**: P0 - Critical  
 **Story Points**: 8
 
-**Current State**: Not implemented at all
+ **Current State**: ✅ Implemented
 
 **Tasks**:
-- [ ] **DOM-9**: Add `TransferGroup(Guid newGroupId, string? reason)` method to Enrollment entity
+- [x] **DOM-9**: Add `TransferGroup(Guid newGroupId, string? reason)` method to Enrollment entity
   - Validate: Current status must be Active
   - Validate: newGroupId != current GroupId
-  - Add domain event `EnrollmentTransferRequestedDomainEvent`
+  - Add domain event `EnrollmentGroupTransferredDomainEvent`
 
-- [ ] **DOM-10**: Schedule clash detection in application layer
+- [x] **DOM-10**: Schedule clash detection in application layer
   - Load all Schedule rows for new group
   - Load all Schedule rows for student's other active enrollments
   - Check for overlapping day + time slots (standard interval overlap)
 
-- [ ] **APP-11**: Create `TransferGroupCommand` DTO
-- [ ] **APP-12**: Add `TransferGroupAsync` to IEnrollmentService
-- [ ] **APP-13**: Implement `TransferGroupAsync` in EnrollmentService
+- [x] **APP-11**: Create `TransferGroupCommand` DTO
+- [x] **APP-12**: Add `TransferGroupAsync` to IEnrollmentService
+- [x] **APP-13**: Implement `TransferGroupAsync` in EnrollmentService
   - Validate same Level and Subject
   - Validate new group has available capacity (atomic)
   - Validate no schedule clashes
   - Update GroupId, adjust capacities, save with transaction, audit log
 
-- [ ] **APP-14**: Create `TransferGroupValidator` using FluentValidation
-- [ ] **API-15**: Add `POST /api/enrollments/{id}/transfer` endpoint in EnrollmentController
+- [x] **APP-14**: Create `TransferGroupRequestDto` for API input
+- [x] **API-15**: Add `POST /api/enrollments/{id}/transfer` endpoint in EnrollmentController
+
+**What was built**:
+- ✅ `Enrollment.TransferGroup()` domain method with validation
+- ✅ `EnrollmentGroupTransferredDomainEvent` event
+- ✅ `TransferGroupCommand` DTO in Application layer
+- ✅ `TransferGroupRequestDto` for API
+- ✅ `IScheduleQueryService.GetSchedulesByGroupIdAsync()` method
+- ✅ `ScheduleQueryService.GetSchedulesByGroupIdAsync()` implementation
+- ✅ `EnrollmentService.TransferGroupAsync()` with:
+  - Same Level/Subject validation
+  - Group capacity validation
+  - Schedule clash detection (checks day + time overlap using TimeSlot.StartTime/EndTime)
+  - Atomic transaction with optimistic concurrency on groups
+  - Audit logging
+  - Domain event publishing
+- ✅ `POST /api/enrollments/{id}/transfer` endpoint with full error handling
+- ✅ Removed obsolete `Group.ScheduleId` property (groups now have many schedules)
+- ✅ Updated `ScheduleConfiguration` to map Group.Schedules collection
+
+**Pending**:
+- ⚠️ EF migration needed for: Group.ScheduleId removal, refunds table, commissions table
 
 ---
 
 ## ❌ Remaining P1 Important Workflows
 
-### Story 9: Payment Plan Discount & Fee Evaluation
+### Story 10: Payment Plan Discount & Fee Evaluation
 **Priority**: P1 - Important  
 **Story Points**: 4
 
@@ -202,11 +261,11 @@ After lockout               → frozen, nothing changes
 | Story | Priority | Status |
 |---|---|---|
 | Story 1: Invoice Overdue Notification | P0 | ✅ Done |
-| Story 3: Group Transfer | P0 | ❌ Pending (renamed Story 14) |
 | Story 5: Commission Calculation Engine | P0 | ✅ Done |
 | Story 6: Commission Clawback Rules | P0 | ✅ Done (merged into Story 5) |
-| Story 7: Payment Refund | P0 | ❌ Pending |
-| Story 8: Expense Approval Pipeline | P0 | ❌ Pending |
+| Story 7: Payment Refund | P0 | ✅ Done |
+| Story 14: Group Transfer | P0 | ✅ Done |
+| Story 8: Expense CRUD (Cash Outflow Tracking) | P0 | ❌ Pending (domain + EF done) |
 | Story 9: Payment Plan Discounts | P1 | ❌ Pending |
 | Story 10: Media Ownership Validation | P1 | ❌ Pending |
 | Story 13: Background Jobs & Notifications | P2 | ❌ Pending |

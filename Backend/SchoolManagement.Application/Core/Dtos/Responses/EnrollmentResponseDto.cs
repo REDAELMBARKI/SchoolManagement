@@ -1,4 +1,4 @@
-﻿using SchoolManagement.Domain.Enums;
+﻿using SchoolManagement.Domain.Core.Enums;
 
 namespace SchoolManagement.Application.Core.Dtos.Responses;
 
