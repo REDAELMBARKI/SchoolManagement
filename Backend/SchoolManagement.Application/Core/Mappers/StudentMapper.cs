@@ -39,6 +39,7 @@ public static class StudentMapper
             Email = student.Email?.Value ?? string.Empty,
             Phone = student.Phone,
             DateOfBirth = student.DateOfBirth,
+            CreditBalance = student.CreditBalance,
             IntakeId = student.IntakeId,
             IsDirectRegistration = student.IsDirectRegistration,
             BranchId = student.BranchId,

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-﻿using SchoolManagement.Domain.Core.Enums;
-=======
-using SchoolManagement.Domain.Enums;
->>>>>>> 5fb5c4738af634e9e79c8340f0172f22f69d2a31
+using SchoolManagement.Domain.Core.Enums;
 
 namespace SchoolManagement.Application.Core.Dtos.Responses;
 
@@ -17,8 +13,6 @@ public class EnrollmentResponseDto
     public EnrollmentStatus Status { get; set; } = EnrollmentStatus.Active; // Active / Dropped / Completed
     
     public string? Notes { get; set; }
-
-    public decimal CreditBalance { get; set; }
     
     // Foreign Keys 
     public Guid StudentId { get; set; }

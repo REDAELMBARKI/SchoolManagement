@@ -518,8 +518,7 @@ public class EnrollmentService : IEnrollmentService
             enrollment.StudentId,
             enrollment.SubjectId,
             enrollment.GroupId,
-            enrollment.BranchId,
-            enrollment.CreditBalance
+            enrollment.BranchId
         };
     }
 }

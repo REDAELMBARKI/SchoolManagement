@@ -34,6 +34,7 @@ public class PaymentService : IPaymentService
     private readonly IPaymentRepository _repository;
     private readonly IInvoiceRepository _invoiceRepository;
     private readonly IEnrollmentRepository _enrollmentRepository;
+    private readonly IStudentRepository _studentRepository;
     private readonly IPaymentQueryService _query;
     private readonly ICurrentUserContext _currentUserContext;
     private readonly IAuditLogService _auditLogService;
@@ -43,6 +44,7 @@ public class PaymentService : IPaymentService
         IPaymentRepository repository,
         IInvoiceRepository invoiceRepository,
         IEnrollmentRepository enrollmentRepository,
+        IStudentRepository studentRepository,
         IPaymentQueryService paymentQueryService,
         ICurrentUserContext currentUserContext,
         IAuditLogService auditLogService,
@@ -51,6 +53,7 @@ public class PaymentService : IPaymentService
         _repository = repository;
         _invoiceRepository = invoiceRepository;
         _enrollmentRepository = enrollmentRepository;
+        _studentRepository = studentRepository;
         _query = paymentQueryService;
         _currentUserContext = currentUserContext;
         _auditLogService = auditLogService;
@@ -142,8 +145,12 @@ public class PaymentService : IPaymentService
         if (enrollment == null)
             throw new NotFoundException($"No enrollment found with id {enrollmentId}");
 
-        enrollment.AddCredit(overpaymentAmount);
-        await _enrollmentRepository.UpdateAsync(enrollment);
+        var student = enrollment.Student;
+        if (student == null)
+            throw new NotFoundException($"No student found for enrollment {enrollmentId}");
+
+        student.AddCredit(overpaymentAmount);
+        await _studentRepository.UpdateAsync(student);
     }
 
     public async Task<PaymentResponseDto> UpdateAsync(Guid id, UpdatePaymentCommand command)

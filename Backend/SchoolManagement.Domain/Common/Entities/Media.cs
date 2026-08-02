@@ -1,4 +1,5 @@
 using SchoolManagement.Domain.Common;
+using SchoolManagement.Domain.Common.Enums;
 using SchoolManagement.Domain.Common.Exceptions;
 
 namespace SchoolManagement.Domain.Common.Entities;
@@ -11,10 +12,10 @@ public class Media : AggregateRoot
     public string? AltText { get; private set; }
     public int? Width { get; private set; }
     public int? Height { get; private set; }
-    public string OwnerType { get; private set; } = string.Empty;
+    public OwnerType OwnerType { get; private set; } = OwnerType.Student;
     public Guid OwnerId { get; private set; }
     public MediaType MediaType { get; private set; }
-    public MediaCollection? Collection { get; private set; } // vidoo / avatar / thumanail / banner / document / photo
+    public MediaCollection Collection { get; private set; } // vidoo / avatar / thumanail / banner / document / photo
     public int Order { get; private set; } = 0;
     public bool IsMain { get; private set; } = false;
     public string StorageProvider { get; private set; } = string.Empty;
@@ -23,7 +24,7 @@ public class Media : AggregateRoot
 
     private Media() { }
 
-    public static Media Create(string url, string mimeType, long size, string? altText, int? width, int? height, string ownerType, Guid ownerId, MediaType mediaType, MediaCollection? collection, int order, bool isMain, string storageProvider, Guid branchId)
+    public static Media Create(string url, string mimeType, long size, string? altText, int? width, int? height, OwnerType ownerType, Guid ownerId, MediaType mediaType, MediaCollection? collection, int order, bool isMain, string storageProvider, Guid branchId)
     {
         if (string.IsNullOrWhiteSpace(url))
         {
@@ -37,10 +38,7 @@ public class Media : AggregateRoot
         {
             throw new DomainException("Size cannot be negative.");
         }
-        if (string.IsNullOrWhiteSpace(ownerType))
-        {
-            throw new DomainException("Owner type cannot be empty.");
-        }
+      
         if (ownerId == Guid.Empty)
         {
             throw new DomainException("Owner ID must not be empty.");
@@ -172,21 +170,3 @@ public class Media : AggregateRoot
     }
 }
 
-public enum MediaType
-{
-    Photo,
-    Banner,
-    Document,
-    Video,
-    Avatar
-}
-
-public enum MediaCollection
-{
-    Unknown,
-    Avatar,
-    Banner,
-    Document,
-    Photo,
-    Video,
-}

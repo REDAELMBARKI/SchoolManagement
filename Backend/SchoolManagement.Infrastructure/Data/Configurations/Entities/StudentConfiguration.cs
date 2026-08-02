@@ -35,6 +35,12 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
         entityTypeBuilder.Property(s => s.DateOfBirth)
             .IsRequired();
 
+        // CreditBalance
+        entityTypeBuilder.Property(s => s.CreditBalance)
+            .IsRequired()
+            .HasPrecision(18, 2)
+            .HasDefaultValue(0);
+
             
         entityTypeBuilder.Property(s => s.IntakeId)
             .IsRequired(false);

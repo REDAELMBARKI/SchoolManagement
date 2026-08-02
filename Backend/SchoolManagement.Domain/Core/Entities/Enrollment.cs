@@ -30,10 +30,6 @@ public class Enrollment : AggregateRoot
 
     public string? Notes { get; private set; }
 
-    public decimal CreditBalance { get; private set; }
-
-
-
     // FKs
 
     public Guid StudentId { get; private set; }
@@ -82,9 +78,7 @@ public class Enrollment : AggregateRoot
 
         EnrollmentStatus status = EnrollmentStatus.Active,
 
-        string? notes = null,
-
-        decimal creditBalance = 0)
+        string? notes = null)
 
     {
 
@@ -104,10 +98,6 @@ public class Enrollment : AggregateRoot
 
             throw new DomainException("Branch ID must not be empty.");
 
-        if (creditBalance < 0)
-
-            throw new DomainException("Credit balance cannot be negative.");
-
 
 
         var enrollment = new Enrollment
@@ -126,9 +116,7 @@ public class Enrollment : AggregateRoot
 
             Status = status,
 
-            Notes = notes,
-
-            CreditBalance = creditBalance
+            Notes = notes
 
         };
 
@@ -341,64 +329,6 @@ public class Enrollment : AggregateRoot
             throw new DomainException("Branch ID must not be empty.");
 
         BranchId = branchId;
-
-    }
-
-
-
-    public void AddCredit(decimal amount)
-
-    {
-
-        EnsureFeesNotLocked();
-
-
-
-        if (amount <= 0)
-
-            throw new DomainException("Credit amount must be greater than zero.");
-
-        CreditBalance += amount;
-
-    }
-
-
-
-    public void UseCredit(decimal amount)
-
-    {
-
-        EnsureFeesNotLocked();
-
-
-
-        if (amount <= 0)
-
-            throw new DomainException("Credit amount must be greater than zero.");
-
-        if (amount > CreditBalance)
-
-            throw new DomainException("Insufficient credit balance.");
-
-        CreditBalance -= amount;
-
-    }
-
-
-
-    public void UpdateCreditBalance(decimal amount)
-
-    {
-
-        EnsureFeesNotLocked();
-
-
-
-        if (amount < 0)
-
-            throw new DomainException("Credit balance cannot be negative.");
-
-        CreditBalance = amount;
 
     }
 

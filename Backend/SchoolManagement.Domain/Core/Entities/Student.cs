@@ -10,6 +10,7 @@ public class Student : Person
     public string Phone { get; private set; } = string.Empty;
     public DateOnly DateOfBirth { get; private set; }
     public bool IsDirectRegistration { get; private set; }
+    public decimal CreditBalance { get; private set; }
 
     // fks
     public Guid? IntakeId { get; private set; }
@@ -135,5 +136,28 @@ public class Student : Person
         if (branchId == Guid.Empty)
             throw new DomainException("Branch ID must not be empty.");
         BranchId = branchId;
+    }
+
+    public void AddCredit(decimal amount)
+    {
+        if (amount <= 0)
+            throw new DomainException("Credit amount must be greater than zero.");
+        CreditBalance += amount;
+    }
+
+    public void UseCredit(decimal amount)
+    {
+        if (amount <= 0)
+            throw new DomainException("Credit amount must be greater than zero.");
+        if (amount > CreditBalance)
+            throw new DomainException($"Insufficient credit balance. Available: {CreditBalance:C}, Required: {amount:C}");
+        CreditBalance -= amount;
+    }
+
+    public void UpdateCreditBalance(decimal amount)
+    {
+        if (amount < 0)
+            throw new DomainException("Credit balance cannot be negative.");
+        CreditBalance = amount;
     }
 }

@@ -21,10 +21,6 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
         entityTypeBuilder.Property(e => e.BranchId)
             .IsRequired();
 
-        entityTypeBuilder.Property(e => e.CreditBalance)
-            .IsRequired()
-            .HasPrecision(18, 2);
-
         entityTypeBuilder.Property(e => e.DroppedAt);
 
         entityTypeBuilder.Property(e => e.CompletedAt);

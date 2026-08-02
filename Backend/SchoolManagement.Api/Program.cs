@@ -26,6 +26,7 @@ using SchoolManagement.Domain.Core.Interfaces;
 using SchoolManagement.Application.Core.Interfaces.Queries;
 using SchoolManagement.Infrastructure.Core.Queries;
 using Hangfire;
+using System.Text.Json.Serialization;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Error()
@@ -55,6 +56,8 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 
 
+
+
 // add hangfire 
 builder.Services.AddHangfire(config => 
   config.UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"))
@@ -63,7 +66,13 @@ builder.Services.AddHangfire(config =>
 builder.Services.AddHangfireServer();
 
 // Add controllers
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+     .AddJsonOptions(options =>
+     {
+         // configure enum to be serialized as string in json
+         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+     });
+
 builder.Services.AddHttpContextAccessor();
 // add jwt barear 
 builder.Services.AddJwtConfigExtension(builder.Configuration);

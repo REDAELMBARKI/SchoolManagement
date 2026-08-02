@@ -19,6 +19,8 @@ public class StudentResponseDto
     public string Phone { get; set; } = string.Empty;
     
     public DateOnly DateOfBirth { get; set; }
+
+    public decimal CreditBalance { get; set; }
     
     // Foreign Keys
     public Guid? IntakeId { get; set; }

@@ -14,6 +14,7 @@ using SchoolManagement.Domain.Common.Interfaces;
 using SchoolManagement.Application.Academic.Interfaces.Services;
 using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Application.Common.Interfaces.Services;
+using SchoolManagement.Domain.Common.Enums;
 
 namespace SchoolManagement.Application.Common.Services;
 
@@ -26,10 +27,10 @@ public class MediaService : IMediaService
         _main_repo = main_repo;
     }
 
-    public async Task<MediaResponseDto> Upload(IFormFile file, MediaCollection collection, MediaType mediaType)
+    public async Task<MediaResponseDto> Upload(IFormFile file, Guid OwnerId , OwnerType OwnerType,  MediaCollection collection, MediaType mediaType)
     {
         // Store the media
-        string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+        string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
         if (!Directory.Exists(filePath))
         {
             Directory.CreateDirectory(filePath);
@@ -52,8 +53,8 @@ public class MediaService : IMediaService
             altText: null,
             width: null, // TODO: Add ImageSharp package to get dimensions
             height: null, // TODO: Add ImageSharp package to get dimensions
-            ownerType: "Unknown", // Temporary
-            ownerId: Guid.Empty, // Temporary
+            ownerType: OwnerType, // Temporary
+            ownerId: OwnerId , // Temporary
             mediaType: mediaType,
             collection: collection,
             order: 0,

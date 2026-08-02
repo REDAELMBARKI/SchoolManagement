@@ -38,6 +38,7 @@ public class InvoiceService : IInvoiceService
     private readonly IInvoiceQueryService _query;
     private readonly IEnrollmentQueryService _enrollmentQuery;
     private readonly IEnrollmentRepository _enrollmentRepository;
+    private readonly IStudentRepository _studentRepository;
     private readonly IAuditLogService _auditLogService;
     private readonly ICurrentUserContext _currentUserContext;
     private readonly ILogger<InvoiceService> _logger;
@@ -48,6 +49,7 @@ public class InvoiceService : IInvoiceService
         IInvoiceQueryService query,
         IEnrollmentQueryService enrollmentQuery,
         IEnrollmentRepository enrollmentRepository,
+        IStudentRepository studentRepository,
         IAuditLogService auditLogService,
         ICurrentUserContext currentUserContext,
         ILogger<InvoiceService> logger,
@@ -56,9 +58,10 @@ public class InvoiceService : IInvoiceService
         _repository = repository;
         _query = query;
         _enrollmentQuery = enrollmentQuery;
+        _enrollmentRepository = enrollmentRepository;
+        _studentRepository = studentRepository;
         _auditLogService = auditLogService;
         _currentUserContext = currentUserContext;
-        _enrollmentRepository = enrollmentRepository;
         _logger = logger;
         _billingOptions = billingOptions.Value;
     }
@@ -267,12 +270,12 @@ public class InvoiceService : IInvoiceService
             decimal chargeAmount = plan.Amount;
             decimal creditApplied = 0;
 
-            if (_billingOptions.ApplyCreditOnRenewalOnly && enrollment.CreditBalance > 0)
+            if (_billingOptions.ApplyCreditOnRenewalOnly && enrollment.Student.CreditBalance > 0)
             {
-                creditApplied = Math.Min(enrollment.CreditBalance, plan.Amount);
+                creditApplied = Math.Min(enrollment.Student.CreditBalance, plan.Amount);
                 chargeAmount = plan.Amount - creditApplied;
-                enrollment.UpdateCreditBalance(enrollment.CreditBalance - creditApplied);
-                await _enrollmentRepository.UpdateAsync(enrollment);
+                enrollment.Student.UpdateCreditBalance(enrollment.Student.CreditBalance - creditApplied);
+                await _studentRepository.UpdateAsync(enrollment.Student);
             }
 
             var nextPeriodStart = expiringInvoice.PeriodEnd.AddDays(1);

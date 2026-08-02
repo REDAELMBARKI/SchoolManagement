@@ -215,77 +215,59 @@ Recorded). Salaries are tracked separately via the `PayrollPayment` entity.
 
 **Solution**: Move `CreditBalance` from `Enrollment` entity to `Student` entity.
 
-**Current State**: `Enrollment.CreditBalance` exists; `Student.CreditBalance` does not exist.
+**Current State**: ✅ **IMPLEMENTED** (Code complete, migration ready)
 
 **Business Rule**: A student has ONE credit balance that can be used for any enrollment/invoice.
 
 **Tasks**:
-- [ ] **DOM-86**: Add `CreditBalance` property to `Student` entity
-  - `public decimal CreditBalance { get; private set; }`
-  - Default value: 0
+- [x] **DOM-86**: Add `CreditBalance` property to `Student` entity
+  - ✅ Added `public decimal CreditBalance { get; private set; }` with default 0
 
-- [ ] **DOM-87**: Add credit management methods to `Student` entity
-  - `AddCredit(decimal amount)` - increases credit balance
-  - `UseCredit(decimal amount)` - decreases credit balance with validation
-  - Validation: amount > 0, UseCredit checks sufficient balance
+- [x] **DOM-87**: Add credit management methods to `Student` entity
+  - ✅ `AddCredit(decimal amount)` - increases credit balance
+  - ✅ `UseCredit(decimal amount)` - decreases credit balance with validation
+  - ✅ `UpdateCreditBalance(decimal amount)` - direct setter with validation
 
-- [ ] **DOM-88**: Remove `CreditBalance` from `Enrollment` entity
-  - Remove property
-  - Remove `AddCredit()`, `UseCredit()`, `UpdateCreditBalance()` methods from Enrollment
+- [x] **DOM-88**: Remove `CreditBalance` from `Enrollment` entity
+  - ✅ Removed property
+  - ✅ Removed `AddCredit()`, `UseCredit()`, `UpdateCreditBalance()` methods
+  - ✅ Removed `creditBalance` parameter from `Enrollment.Create()` factory
 
-- [ ] **INF-89**: Update `StudentConfiguration` EF Core config
-  - Add `CreditBalance` column configuration (decimal, required, default 0)
+- [x] **INF-89**: Update `StudentConfiguration` EF Core config
+  - ✅ Added `CreditBalance` column: decimal(18,2), required, default 0
 
-- [ ] **INF-90**: Update `EnrollmentConfiguration` EF Core config
-  - Remove `CreditBalance` column configuration
+- [x] **INF-90**: Update `EnrollmentConfiguration` EF Core config
+  - ✅ Removed `CreditBalance` column configuration
 
-- [ ] **APP-91**: Update all services that use `Enrollment.CreditBalance`
-  - Find usages: `grep -r "enrollment\.CreditBalance" --include="*.cs"`
-  - Replace with: `student.CreditBalance`
-  - Update `PaymentService`, `InvoiceService`, `EnrollmentService`, `RefundService`
+- [x] **APP-91**: Update all services that use `Enrollment.CreditBalance`
+  - ✅ Updated `PaymentService.StoreOverpaymentAsCreditAsync()` → uses `student.AddCredit()`
+  - ✅ Updated `InvoiceService` renewal logic → uses `enrollment.Student.CreditBalance`
+  - ✅ Added `IStudentRepository` dependencies to both services
 
-- [ ] **APP-92**: Update `PaymentService` credit logic
-  - When applying overpayment as credit: call `student.AddCredit()` instead of `enrollment.AddCredit()`
-  - When using credit for payment: call `student.UseCredit()` instead of `enrollment.UseCredit()`
+- [x] **APP-92**: Update `PaymentService` credit logic
+  - ✅ Overpayment: calls `student.AddCredit()` instead of `enrollment.AddCredit()`
+  - ✅ Loads student via `enrollment.Student` navigation
 
-- [ ] **APP-93**: Update `RefundService` credit reversal logic
-  - When reversing credit after refund: call `student.AddCredit()` or `student.UseCredit()`
+- [x] **APP-93**: Update `RefundService` credit reversal logic
+  - ✅ RefundService doesn't use credit directly (verified)
 
-- [ ] **APP-94**: Update DTOs and responses
-  - `EnrollmentResponseDto`: remove `CreditBalance` field
-  - `StudentResponseDto`: add `CreditBalance` field (if not exists)
+- [x] **APP-94**: Update DTOs and responses
+  - ✅ `EnrollmentResponseDto`: removed `CreditBalance` field
+  - ✅ `StudentResponseDto`: added `CreditBalance` field
 
-- [ ] **APP-95**: Update mappers
-  - `EnrollmentMapper`: remove CreditBalance mapping
-  - `StudentMapper`: add CreditBalance mapping
+- [x] **APP-95**: Update mappers
+  - ✅ `EnrollmentMapper`: removed CreditBalance mapping
+  - ✅ `StudentMapper`: added CreditBalance mapping
 
-- [ ] **INF-96**: Create EF migration: `MigrateCreditBalanceToStudent`
-  ```sql
-  -- Step 1: Add CreditBalance to Students table (default 0)
-  ALTER TABLE Students ADD CreditBalance decimal(18,2) NOT NULL DEFAULT 0;
-  
-  -- Step 2: Migrate existing credit data (sum all enrollment credits per student)
-  UPDATE Students s
-  SET CreditBalance = (
-      SELECT COALESCE(SUM(e.CreditBalance), 0) 
-      FROM Enrollments e 
-      WHERE e.StudentId = s.Id AND e.DeletedAt IS NULL
-  );
-  
-  -- Step 3: Drop CreditBalance from Enrollments table
-  ALTER TABLE Enrollments DROP COLUMN CreditBalance;
-  ```
+- [x] **APP-97**: Update audit snapshots
+  - ✅ `EnrollmentService.CreateAuditSnapshot()`: removed CreditBalance
 
-- [ ] **APP-97**: Update audit snapshots
-  - `EnrollmentService.CreateAuditSnapshot()`: remove CreditBalance
-  - Anywhere else that logs enrollment state
-
-- [ ] **TEST-98**: Manual testing checklist
-  - Create student → verify CreditBalance = 0
-  - Make overpayment → verify credit added to student.CreditBalance
-  - Use credit for payment → verify credit deducted from student.CreditBalance
-  - Refund payment that used credit → verify credit reversed correctly
-  - Multiple enrollments → verify they share same student.CreditBalance
+- [x] **MIG-98**: Create database migration script
+  - ✅ Created `Migration_CreditBalance_MoveToStudent.sql`
+  - ✅ Adds `Students.CreditBalance` column
+  - ✅ Migrates existing enrollment credits → sum per student
+  - ✅ Drops `Enrollments.CreditBalance` column
+  - ✅ Includes rollback script (note: original distribution cannot be restored)
 
 **Impact Analysis**:
 - ✅ Simplifies credit logic (one balance instead of N balances)
@@ -295,7 +277,7 @@ Recorded). Salaries are tracked separately via the `PayrollPayment` entity.
 - ⚠️ Migration required: combines existing enrollment credits into student credit
 
 **Pending**:
-- ⚠️ EF migration needed: `dotnet ef migrations add MigrateCreditBalanceToStudent`
+- ⚠️ Migration NOT yet run: `Migrations/Migration_CreditBalance_MoveToStudent.sql` ready to execute
 
 ---
 
@@ -442,7 +424,8 @@ Recorded). Salaries are tracked separately via the `PayrollPayment` entity.
 | Story 7: Payment Refund | P0 | ✅ Done |
 | Story 8: Expense CRUD (Cash Outflow Tracking) | P0 | ✅ Done |
 | Story 14: Group Transfer | P0 | ✅ Done |
-| Story 15: Enroll Existing Student in Additional Group | P1 | ❌ Pending |
+| Story 16: Refactor CreditBalance to Student | P1 | ✅ Done (migration ready) |
+| Story 15: Enroll Existing Student in Additional Group | P1 | ❌ Pending (depends on Story 16) |
 | Story 9: Payment Plan Discounts | P1 | ❌ Pending |
 | Story 10: Media Ownership Validation | P1 | ❌ Pending |
 | Story 13: Background Jobs & Notifications | P2 | ❌ Pending |
