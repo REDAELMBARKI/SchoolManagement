@@ -1,4 +1,4 @@
-﻿using SchoolManagement.Application.Academic.Dtos.Commands;
+using SchoolManagement.Application.Academic.Dtos.Commands;
 using SchoolManagement.Application.Core.Dtos.Commands;
 using SchoolManagement.Application.Academic.Dtos.Requests;
 using SchoolManagement.Application.Core.Dtos.Requests;

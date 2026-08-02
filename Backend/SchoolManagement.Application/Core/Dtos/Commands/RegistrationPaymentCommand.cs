@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 ﻿using SchoolManagement.Domain.Core.Enums;
+=======
+using SchoolManagement.Domain.Enums;
+>>>>>>> 5fb5c4738af634e9e79c8340f0172f22f69d2a31
 
 namespace SchoolManagement.Application.Core.Dtos.Commands;
 

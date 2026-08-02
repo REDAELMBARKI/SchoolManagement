@@ -63,6 +63,9 @@ public class EnrollmentService : IEnrollmentService
         return await _queryService.GetResponseByIdAsync(id);
     }
 
+
+    private void EnsureNo
+
     public async Task<EnrollmentResponseDto> CreateAsync(EnrollmentCommand command)
     {
         var branchId = _currentUserContext.BranchId;
@@ -73,17 +76,23 @@ public class EnrollmentService : IEnrollmentService
         await _transaction.BeginTransactionAsync();
         try
         {
+            // 1. Prevent duplicate enrollments in same subject
             await EnsureNoDuplicateActiveEnrollmentAsync(command.StudentId, command.SubjectId);
 
             var availableGroups = await _groupQueryService.GetAvailableGroupsByLevelSubjectBranch(
                 levelId: command.LevelId,
                 subjectId: command.SubjectId,
                 branchId: command.BranchId);
-
+            
+            // 2. Choose a group that doesn't conflict with other enrollment schedules 
             var selectedGroup = EvaluateStudentGroup(availableGroups, command.PreferedScheduleId, command.GroupId);
+            
             if (!selectedGroup.HasAvailableSpace())
                 throw new UnAvailableResourceException("The selected group has just reached capacity. Please refresh and try again.");
 
+            // 3. Check for schedule conflicts with student's other active enrollments
+            await ValidateNoScheduleConflictsAsync(command.StudentId, Guid.Empty, selectedGroup.Id);
+     
             // Touch the group row so EF can enforce optimistic concurrency on
             // the seat allocation save.
             selectedGroup.TouchCapacityGuard();

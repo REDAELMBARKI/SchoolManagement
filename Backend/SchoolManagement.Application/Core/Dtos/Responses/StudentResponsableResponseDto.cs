@@ -1,4 +1,4 @@
-﻿namespace SchoolManagement.Application.Core.Dtos.Responses;
+namespace SchoolManagement.Application.Core.Dtos.Responses;
 
 public class StudentResponsableResponseDto
 {

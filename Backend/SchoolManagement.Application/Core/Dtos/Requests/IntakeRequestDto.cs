@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Common.Entities;

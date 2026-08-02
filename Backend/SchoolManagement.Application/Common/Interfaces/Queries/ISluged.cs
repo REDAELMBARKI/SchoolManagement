@@ -1,4 +1,4 @@
-﻿namespace SchoolManagement.Application.Common.Interfaces.Queries;
+namespace SchoolManagement.Application.Common.Interfaces.Queries;
 
 public interface ISluged
 {

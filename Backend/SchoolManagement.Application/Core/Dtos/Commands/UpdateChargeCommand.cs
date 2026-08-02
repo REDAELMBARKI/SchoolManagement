@@ -1,4 +1,4 @@
-﻿namespace SchoolManagement.Application.Core.Dtos.Commands;
+namespace SchoolManagement.Application.Core.Dtos.Commands;
 
 public class UpdateChargeCommand
 {

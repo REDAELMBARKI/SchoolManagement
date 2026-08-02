@@ -114,61 +114,43 @@ Refund recorded (full)       → Refund created, Payment.Refunded = true (auto-m
 
 ---
 
-## ❌ Remaining P0 Critical Workflows
+## ✅ Story 8: Expense CRUD — Cash Outflow Tracking - COMPLETE
 
-### Story 8: Expense CRUD — Cash Outflow Tracking (Redesigned)
-**Priority**: P0 - Critical  
-**Story Points**: 5
-
-**Architecture Redesign**: Expenses follow a simple CRUD model — **no approval pipeline**.
+**Architecture**: Expenses follow a simple CRUD model — **no approval pipeline**.
 Cash already left the drawer; the expense record is the historical entry for financial
 reporting and net-gain calculation (Net Gain = Total Payments Received − Total Expenses
 Recorded). Salaries are tracked separately via the `PayrollPayment` entity.
 
-**Current State**: Domain entity and EF configuration are done; application, infrastructure,
-and API layers are NOT yet implemented.
-
-#### ✅ Already Implemented
-
-- [x] **DOM-64**: `Expense` entity (AggregateRoot) — simple CRUD, no approval workflow
-  - `Create()` factory method (category, payeeName, amount, expenseDate, paymentMethod,
-    branchId, processedByStaffId required; description, reference optional)
-  - Update methods: `UpdateCategory`, `UpdatePayeeName`, `UpdateDescription`,
-    `UpdateAmount`, `UpdateExpenseDate`, `UpdatePaymentMethod`, `UpdateReference`,
-    `UpdateBranchId`, `UpdateProcessedByStaffId`
-  - Properties: `Category`, `PayeeName`, `Description?`, `Amount`, `ExpenseDate`,
-    `PaymentMethod`, `Reference?`, `ProcessedByStaffId`, `BranchId`, `CurrencyCode` (default "MAD")
-- [x] **DOM-65**: `ExpenseType` enum — Salary, Vendor, Utilities, Maintenance, Supplies, Rent, Other
-- [x] **DOM-66**: `PaymentMethod` enum — Cash, CreditCard, DebitCard, BankTransfer, Check
-- [x] **INF-67**: `ExpenseConfiguration` EF Core config (table, columns, indexes, Branch FK)
-- [x] **INF-68**: `DbSet<Expense>` registered in `AppDbContext`
-
-#### ❌ Still Needs Implementation
-
-- [ ] **INF-69**: Create `IExpenseRepository` interface in `Domain/Core/Interfaces/`
-- [ ] **INF-70**: Implement `ExpenseRepository` in `Infrastructure/Core/Repositories/`
-- [ ] **INF-71**: Create `ExpenseQueryService` in `Infrastructure/Core/Queries/`
-  - GET by branch, by date range, by category, by staff
-- [ ] **APP-72**: Create `IExpenseService` interface in `Application/Core/Interfaces/Services/`
-- [ ] **APP-73**: Implement `ExpenseService` in `Application/Core/Services/`
-  - `CreateExpenseAsync()`, `GetExpenseByIdAsync()`, `GetExpensesAsync()` (filtered list),
-    `UpdateExpenseAsync()`, `DeleteExpenseAsync()`
-- [ ] **APP-74**: Create Expense DTOs (Command, Request, Response) in `Application/Core/Dtos/`
-- [ ] **APP-75**: Create `ExpenseValidator` in `Application/Core/Validators/`
-- [ ] **APP-76**: Create `ExpenseMapper` in `Application/Core/Mappers/`
-- [ ] **API-77**: Create `ExpenseController` with CRUD endpoints
+### What was built
+- ✅ `Expense` entity (AggregateRoot) — simple CRUD, no approval workflow
+  - `Create()` factory method with all required fields
+  - Update methods for all properties
+- ✅ `ExpenseType` enum — Salary, Vendor, Utilities, Maintenance, Supplies, Rent, Other
+- ✅ `PaymentMethod` enum — Cash, CreditCard, DebitCard, BankTransfer, Check
+- ✅ `IExpenseRepository` interface in Domain/Core/Interfaces
+- ✅ `ExpenseRepository` implementation in Infrastructure/Core/Repositories
+- ✅ `IExpenseQueryService` interface with filtering (by branch, date range, category, staff)
+- ✅ `ExpenseQueryService` implementation in Infrastructure/Core/Queries
+- ✅ `IExpenseService` interface in Application/Core/Interfaces/Services
+- ✅ `ExpenseService` implementation with full CRUD operations
+- ✅ Expense DTOs: `ExpenseCommand`, `UpdateExpenseCommand`, Request/Response DTOs
+- ✅ `ExpenseValidator` in Application/Core/Validators
+- ✅ `ExpenseMapper` in Application/Core/Mappers
+- ✅ `ExpenseController` with CRUD endpoints:
   - POST   /api/expenses
   - GET    /api/expenses/{id}
   - GET    /api/expenses (filtered: branch, date range, category, staff)
   - PUT    /api/expenses/{id}
   - DELETE /api/expenses/{id}
-- [ ] **INF-78**: Create `ExpenseSeeder` in `Infrastructure/Data/Seeders/`
-- [ ] **INF-79**: Register Expense DI in `Program.cs` (if assembly scan doesn't pick it up)
-- [ ] ⚠️ EF migration needed: `dotnet ef migrations add AddExpenses`
+- ✅ `ExpenseConfiguration` EF Core config
+- ✅ DI registration in Program.cs
+
+### Pending
+- ⚠️ EF migration needed: `dotnet ef migrations add AddExpenses`
 
 ---
 
-### Story 9: Group Transfer Workflow
+## ❌ Remaining P0 Critical Workflows
 **Priority**: P0 - Critical  
 **Story Points**: 8
 
@@ -264,8 +246,8 @@ and API layers are NOT yet implemented.
 | Story 5: Commission Calculation Engine | P0 | ✅ Done |
 | Story 6: Commission Clawback Rules | P0 | ✅ Done (merged into Story 5) |
 | Story 7: Payment Refund | P0 | ✅ Done |
+| Story 8: Expense CRUD (Cash Outflow Tracking) | P0 | ✅ Done |
 | Story 14: Group Transfer | P0 | ✅ Done |
-| Story 8: Expense CRUD (Cash Outflow Tracking) | P0 | ❌ Pending (domain + EF done) |
 | Story 9: Payment Plan Discounts | P1 | ❌ Pending |
 | Story 10: Media Ownership Validation | P1 | ❌ Pending |
 | Story 13: Background Jobs & Notifications | P2 | ❌ Pending |

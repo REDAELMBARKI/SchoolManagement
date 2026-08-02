@@ -1,4 +1,4 @@
-﻿namespace SchoolManagement.Application.Academic.Dtos.Requests;
+namespace SchoolManagement.Application.Academic.Dtos.Requests;
 
 public class GroupRequestDto
 {

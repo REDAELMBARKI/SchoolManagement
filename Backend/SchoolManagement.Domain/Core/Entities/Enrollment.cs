@@ -402,6 +402,8 @@ public class Enrollment : AggregateRoot
 
     }
 
+
+
     public void TransferGroup(Guid newGroupId, string reason)
     {
         if (newGroupId == Guid.Empty)
@@ -419,6 +421,8 @@ public class Enrollment : AggregateRoot
         
         AddDomainEvent(new EnrollmentGroupTransferredDomainEvent(Id, StudentId, oldGroupId, newGroupId, reason, DateTime.UtcNow));
     }
+
+
 
     private void EnsureFeesNotLocked()
 

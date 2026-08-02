@@ -1,4 +1,4 @@
-﻿namespace SchoolManagement.Application.Common.Dtos.Responses;
+namespace SchoolManagement.Application.Common.Dtos.Responses;
 
 public class GenderResponseDto
 {

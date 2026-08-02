@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using SchoolManagement.Domain.Core.DomainEvents;
 using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Core.Entities;

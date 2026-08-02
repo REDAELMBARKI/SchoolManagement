@@ -50,3 +50,4 @@ bld/
 *~
 *.tmp
 *.log
+.env
