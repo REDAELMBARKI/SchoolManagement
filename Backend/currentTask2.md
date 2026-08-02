@@ -203,7 +203,201 @@ Recorded). Salaries are tracked separately via the `PayrollPayment` entity.
 
 ## ❌ Remaining P1 Important Workflows
 
-### Story 10: Payment Plan Discount & Fee Evaluation
+### Story 16: Refactor CreditBalance from Enrollment to Student (Domain Fix)
+**Priority**: P1 - Important (Prerequisite for Story 15)  
+**Story Points**: 5
+
+**Problem**: `CreditBalance` is currently stored on the `Enrollment` entity, but this creates confusion:
+- A student with 3 enrollments has 3 separate credit balances
+- Credit cannot be shared across subjects (English credit can't pay for Math)
+- Overpayments on one enrollment can't be applied to another
+- Doesn't match real-world school accounting (credit belongs to student, not enrollment)
+
+**Solution**: Move `CreditBalance` from `Enrollment` entity to `Student` entity.
+
+**Current State**: `Enrollment.CreditBalance` exists; `Student.CreditBalance` does not exist.
+
+**Business Rule**: A student has ONE credit balance that can be used for any enrollment/invoice.
+
+**Tasks**:
+- [ ] **DOM-86**: Add `CreditBalance` property to `Student` entity
+  - `public decimal CreditBalance { get; private set; }`
+  - Default value: 0
+
+- [ ] **DOM-87**: Add credit management methods to `Student` entity
+  - `AddCredit(decimal amount)` - increases credit balance
+  - `UseCredit(decimal amount)` - decreases credit balance with validation
+  - Validation: amount > 0, UseCredit checks sufficient balance
+
+- [ ] **DOM-88**: Remove `CreditBalance` from `Enrollment` entity
+  - Remove property
+  - Remove `AddCredit()`, `UseCredit()`, `UpdateCreditBalance()` methods from Enrollment
+
+- [ ] **INF-89**: Update `StudentConfiguration` EF Core config
+  - Add `CreditBalance` column configuration (decimal, required, default 0)
+
+- [ ] **INF-90**: Update `EnrollmentConfiguration` EF Core config
+  - Remove `CreditBalance` column configuration
+
+- [ ] **APP-91**: Update all services that use `Enrollment.CreditBalance`
+  - Find usages: `grep -r "enrollment\.CreditBalance" --include="*.cs"`
+  - Replace with: `student.CreditBalance`
+  - Update `PaymentService`, `InvoiceService`, `EnrollmentService`, `RefundService`
+
+- [ ] **APP-92**: Update `PaymentService` credit logic
+  - When applying overpayment as credit: call `student.AddCredit()` instead of `enrollment.AddCredit()`
+  - When using credit for payment: call `student.UseCredit()` instead of `enrollment.UseCredit()`
+
+- [ ] **APP-93**: Update `RefundService` credit reversal logic
+  - When reversing credit after refund: call `student.AddCredit()` or `student.UseCredit()`
+
+- [ ] **APP-94**: Update DTOs and responses
+  - `EnrollmentResponseDto`: remove `CreditBalance` field
+  - `StudentResponseDto`: add `CreditBalance` field (if not exists)
+
+- [ ] **APP-95**: Update mappers
+  - `EnrollmentMapper`: remove CreditBalance mapping
+  - `StudentMapper`: add CreditBalance mapping
+
+- [ ] **INF-96**: Create EF migration: `MigrateCreditBalanceToStudent`
+  ```sql
+  -- Step 1: Add CreditBalance to Students table (default 0)
+  ALTER TABLE Students ADD CreditBalance decimal(18,2) NOT NULL DEFAULT 0;
+  
+  -- Step 2: Migrate existing credit data (sum all enrollment credits per student)
+  UPDATE Students s
+  SET CreditBalance = (
+      SELECT COALESCE(SUM(e.CreditBalance), 0) 
+      FROM Enrollments e 
+      WHERE e.StudentId = s.Id AND e.DeletedAt IS NULL
+  );
+  
+  -- Step 3: Drop CreditBalance from Enrollments table
+  ALTER TABLE Enrollments DROP COLUMN CreditBalance;
+  ```
+
+- [ ] **APP-97**: Update audit snapshots
+  - `EnrollmentService.CreateAuditSnapshot()`: remove CreditBalance
+  - Anywhere else that logs enrollment state
+
+- [ ] **TEST-98**: Manual testing checklist
+  - Create student → verify CreditBalance = 0
+  - Make overpayment → verify credit added to student.CreditBalance
+  - Use credit for payment → verify credit deducted from student.CreditBalance
+  - Refund payment that used credit → verify credit reversed correctly
+  - Multiple enrollments → verify they share same student.CreditBalance
+
+**Impact Analysis**:
+- ✅ Simplifies credit logic (one balance instead of N balances)
+- ✅ Enables credit sharing across enrollments
+- ✅ Matches real-world accounting
+- ⚠️ Breaking change: APIs that return `EnrollmentResponseDto.CreditBalance` will need frontend updates
+- ⚠️ Migration required: combines existing enrollment credits into student credit
+
+**Pending**:
+- ⚠️ EF migration needed: `dotnet ef migrations add MigrateCreditBalanceToStudent`
+
+---
+
+### Story 15: Enroll Existing Student in Additional Group (Multi-Subject Enrollment)
+**Priority**: P1 - Important  
+**Story Points**: 3
+
+**Context**: A student who already exists and has at least one enrollment wants to enroll in another subject (e.g., they're already taking English, now they want to add Math). The student is already known/selected (e.g., from their profile page).
+
+**Prerequisites**: Story 16 must be completed first (CreditBalance moved to Student entity).
+
+**Current State**: Not implemented. Currently, enrollment creation flow requires full student + enrollment info. Need a simplified flow when student already exists.
+
+**Key Difference from Regular Enrollment**:
+- Student already exists → only need StudentId
+- **Payment IS required** (enforces financial accountability - no unpaid enrollments)
+- Exception: If student has sufficient CreditBalance, can use credit instead of new payment
+- Must reuse schedule conflict validation from TransferGroup workflow
+- Must reuse enrollment creation factory/logic (don't duplicate)
+
+**Tasks**:
+- [ ] **APP-80**: Create `EnrollStudentInAdditionalGroupCommand` DTO
+  - Required: `StudentId`, `SubjectId`, `LevelId`
+  - Optional: `GroupId` (or `PreferedScheduleId`), `Notes`, `PlanId`
+  - **Required: `PaymentData` (RegistrationPaymentRequestDto)** OR flag `UseCreditBalance: bool`
+  - If `UseCreditBalance = true`: validate student has sufficient credit
+
+- [ ] **APP-81**: Create `EnrollStudentInAdditionalGroupRequestDto` for API
+  - Same fields as command
+  - Validation: either PaymentData provided OR UseCreditBalance = true (not both)
+
+- [ ] **APP-82**: Create `EnrollStudentInAdditionalGroupValidator` using FluentValidation
+  - StudentId must not be empty
+  - SubjectId must not be empty
+  - LevelId must not be empty
+  - Either PaymentData OR UseCreditBalance must be provided
+  - If UseCreditBalance: amount must be > 0
+
+- [ ] **APP-83**: Add `EnrollStudentInAdditionalGroupAsync()` to IEnrollmentService
+  - Parameters: `Guid studentId`, `EnrollStudentInAdditionalGroupCommand command`
+  - Returns: `EnrollmentResponseDto`
+
+- [ ] **APP-84**: Implement `EnrollStudentInAdditionalGroupAsync()` in EnrollmentService
+  - Load student from repository (NotFoundException if missing)
+  - Validate no duplicate active enrollment in same subject
+  - Load available groups for level/subject/branch
+  - Evaluate and select group (reuse `EvaluateStudentGroup()`)
+  - Check schedule conflicts (reuse `ValidateNoScheduleConflictsAsync()`)
+  - **Handle payment:**
+    - If `UseCreditBalance = true`: call `student.UseCredit(amount)` (validates sufficient balance)
+    - If `PaymentData` provided: create payment record via `PaymentService`
+  - Create enrollment using domain factory `Enrollment.Create()`
+  - Create invoice and link to payment
+  - Atomic transaction with group capacity guard
+  - Audit logging
+  - Publish domain events
+
+- [ ] **API-85**: Add `POST /api/enrollments/student/{studentId}/enroll-additional` endpoint
+  - Route parameter: `studentId`
+  - Body: `EnrollStudentInAdditionalGroupRequestDto`
+  - Calls `EnrollStudentInAdditionalGroupAsync()`
+  - Returns 201 Created with `EnrollmentResponseDto`
+  - Error handling:
+    - 400 Bad Request: validation errors, missing payment data
+    - 404 Not Found: student or group not found
+    - 409 Conflict: schedule conflict, duplicate enrollment, insufficient capacity, insufficient credit balance
+
+**Payment Logic**:
+```csharp
+// Option 1: Pay with new payment
+{
+  "paymentData": { 
+    "amount": 500, 
+    "method": "Cash",
+    ...
+  }
+}
+
+// Option 2: Pay with credit balance
+{
+  "useCreditBalance": true,
+  "amount": 500  // must have >= 500 credit
+}
+
+// Invalid: Must choose one
+{
+  "useCreditBalance": true,
+  "paymentData": { ... }  // ❌ Error: cannot use both
+}
+```
+
+**What will be built**:
+- Simplified enrollment flow for existing students
+- Reuses schedule conflict detection from transfer workflow
+- Reuses enrollment creation logic (no duplication)
+- **Enforces payment** (either new payment OR credit balance)
+- Uses student's unified CreditBalance (from Story 16)
+- Clear separation: student already exists vs. new student registration
+
+---
+
+### Story 9: Payment Plan Discount & Fee Evaluation
 **Priority**: P1 - Important  
 **Story Points**: 4
 
@@ -248,6 +442,7 @@ Recorded). Salaries are tracked separately via the `PayrollPayment` entity.
 | Story 7: Payment Refund | P0 | ✅ Done |
 | Story 8: Expense CRUD (Cash Outflow Tracking) | P0 | ✅ Done |
 | Story 14: Group Transfer | P0 | ✅ Done |
+| Story 15: Enroll Existing Student in Additional Group | P1 | ❌ Pending |
 | Story 9: Payment Plan Discounts | P1 | ❌ Pending |
 | Story 10: Media Ownership Validation | P1 | ❌ Pending |
 | Story 13: Background Jobs & Notifications | P2 | ❌ Pending |
