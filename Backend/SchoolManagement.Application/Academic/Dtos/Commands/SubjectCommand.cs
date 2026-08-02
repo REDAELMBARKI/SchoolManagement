@@ -1,4 +1,4 @@
-﻿namespace SchoolManagement.Application.Academic.Dtos.Commands;
+namespace SchoolManagement.Application.Academic.Dtos.Commands;
 
 public class SubjectCommand
 {

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using SchoolManagement.Application.Common.Interfaces;
 using SchoolManagement.Application.Academic.Dtos.Commands;
 using SchoolManagement.Application.Core.Dtos.Commands;

@@ -1,4 +1,4 @@
-﻿namespace SchoolManagement.Application.Core.Dtos.Requests;
+namespace SchoolManagement.Application.Core.Dtos.Requests;
 
 public class CommercialAgentRequestDto
 {

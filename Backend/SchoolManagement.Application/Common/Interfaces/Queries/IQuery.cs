@@ -1,4 +1,4 @@
-﻿namespace SchoolManagement.Application.Common.Interfaces.Queries;
+namespace SchoolManagement.Application.Common.Interfaces.Queries;
 
 // Keep this simple, just for shared markers if needed
 // Each specific query interface will define its own entity and response methods

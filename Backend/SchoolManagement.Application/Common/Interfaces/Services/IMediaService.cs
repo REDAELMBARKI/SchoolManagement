@@ -1,4 +1,4 @@
-﻿
+
 using Microsoft.AspNetCore.Http;
 using SchoolManagement.Application.Academic.Dtos.Responses;
 using SchoolManagement.Application.Core.Dtos.Responses;

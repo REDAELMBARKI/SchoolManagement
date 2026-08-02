@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using SchoolManagement.Domain.Enums;
 
 namespace SchoolManagement.Application.Core.Dtos.Commands;

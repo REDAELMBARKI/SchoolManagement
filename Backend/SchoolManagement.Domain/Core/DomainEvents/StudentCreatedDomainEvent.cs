@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 
 namespace SchoolManagement.Domain.Core.DomainEvents;
 

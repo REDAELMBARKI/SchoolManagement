@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Common.Exceptions;

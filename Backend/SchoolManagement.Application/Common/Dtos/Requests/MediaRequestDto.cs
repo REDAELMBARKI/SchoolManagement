@@ -1,4 +1,4 @@
-﻿namespace SchoolManagement.Application.Common.Dtos.Requests;
+namespace SchoolManagement.Application.Common.Dtos.Requests;
 
 public class MediaRequestDto
 {

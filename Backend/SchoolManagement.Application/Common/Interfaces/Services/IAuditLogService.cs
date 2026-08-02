@@ -1,4 +1,4 @@
-﻿namespace SchoolManagement.Application.Common.Interfaces.Services;
+namespace SchoolManagement.Application.Common.Interfaces.Services;
 
 public interface IAuditLogService
 {

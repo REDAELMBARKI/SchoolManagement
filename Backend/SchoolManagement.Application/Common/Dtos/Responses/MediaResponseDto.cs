@@ -1,4 +1,4 @@
-﻿
+
 using SchoolManagement.Domain.Entities ;
 namespace SchoolManagement.Application.Common.Dtos.Responses;
 
