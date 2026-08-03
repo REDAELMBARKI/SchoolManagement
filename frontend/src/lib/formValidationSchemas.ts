@@ -122,6 +122,95 @@ export const intakeConvertSchema = z
 
 export type IntakeConvertSchema = z.infer<typeof intakeConvertSchema>;
 
+// ── Intake ──────────────────────────────────────────────────────────────────
+
+export const INTAKE_STATUSES = [
+  "New",
+  "Contacted",
+  "Interested",
+  "Enrolled",
+  "NotInterested",
+] as const;
+
+export type IntakeStatus = (typeof INTAKE_STATUSES)[number];
+
+export const intakeSchema = z
+  .object({
+    id: z.string().optional(),
+    firstName: z
+      .string()
+      .min(3, { message: "First name must be at least 3 characters!" })
+      .max(50, { message: "First name must be at most 50 characters!" }),
+    lastName: z
+      .string()
+      .min(3, { message: "Last name must be at least 3 characters!" })
+      .max(50, { message: "Last name must be at most 50 characters!" }),
+    email: z
+      .string()
+      .email({ message: "Invalid email address!" })
+      .max(255)
+      .optional()
+      .or(z.literal("")),
+    phone: z
+      .string()
+      .max(20, { message: "Phone must be at most 20 characters!" })
+      .optional()
+      .or(z.literal("")),
+    dateOfBirth: z.string().optional().or(z.literal("")),
+    genderId: z.string().optional().or(z.literal("")),
+    subjectId: z.string().min(1, { message: "Subject is required!" }),
+    branchId: z.string().optional().or(z.literal("")),
+    intakeDate: z.string().min(1, { message: "Intake date is required!" }),
+    status: z.enum(INTAKE_STATUSES, { message: "Status is required!" }),
+    followUpDate: z.string().optional().or(z.literal("")),
+    notes: z.string().optional().or(z.literal("")),
+    isIndependent: z.boolean(),
+    // Backend LeadSourceType enum only accepts "Opc" | "Ad"
+    leadSourceType: z
+      .enum(["Opc", "Ad"] as const)
+      .optional()
+      .or(z.literal("")),
+    leadSourceId: z.string().optional().or(z.literal("")),
+    commercialAgentId: z.string().optional().or(z.literal("")),
+    totalFees: z.coerce
+      .number({ invalid_type_error: "Total fees must be a number!" })
+      .positive({ message: "Total fees must be greater than 0!" }),
+    amountPaid: z.coerce
+      .number({ invalid_type_error: "Amount paid must be a number!" })
+      .min(0, { message: "Amount paid must be 0 or more!" }),
+  })
+  .refine(
+    (data) => {
+      if (data.followUpDate && data.intakeDate && data.followUpDate <= data.intakeDate)
+        return false;
+      return true;
+    },
+    { message: "Follow-up date must be after intake date!", path: ["followUpDate"] }
+  )
+  .refine(
+    (data) => {
+      if (data.amountPaid > data.totalFees) return false;
+      return true;
+    },
+    { message: "Amount paid cannot exceed total fees!", path: ["amountPaid"] }
+  )
+  .refine(
+    (data) => {
+      // When the intake is NOT independent, a lead source must be identified
+      if (!data.isIndependent && (!data.leadSourceId || data.leadSourceId.trim() === ""))
+        return false;
+      return true;
+    },
+    {
+      message: "Lead source is required for non-independent intakes!",
+      path: ["leadSourceId"],
+    }
+  );
+
+export type IntakeSchema = z.infer<typeof intakeSchema>;
+
+// ── Exam ─────────────────────────────────────────────────────────────────────
+
 export const examSchema = z.object({
   id: z.coerce.number().optional(),
   title: z.string().min(1, { message: "Title name is required!" }),

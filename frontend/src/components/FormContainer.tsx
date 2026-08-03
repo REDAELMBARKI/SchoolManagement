@@ -48,16 +48,33 @@ const FormContainer = ({ table, type, data, id }: FormContainerProps) => {
         break;
       case "intake":
         relatedData = {
-          leadSources: [
-            { id: 1, name: "Website" },
-            { id: 2, name: "Referral" },
-            { id: 3, name: "Walk-in" }
+          subjects: [
+            { id: "sub-1", name: "English" },
+            { id: "sub-2", name: "Math" },
+            { id: "sub-3", name: "Physics" },
+            { id: "sub-4", name: "Chemistry" },
+            { id: "sub-5", name: "Biology" },
           ],
-          opcs: [
-            { id: 1, name: "Online Platform" },
-            { id: 2, name: "Social Media" },
-            { id: 3, name: "Email Campaign" }
-          ]
+          branches: [
+            { id: "branch-1", name: "Main Branch" },
+            { id: "branch-2", name: "North Campus" },
+          ],
+          genders: [
+            { id: "gender-1", name: "Male" },
+            { id: "gender-2", name: "Female" },
+          ],
+          leadSources: [
+            { id: "ls-1", name: "Website" },
+            { id: "ls-2", name: "Referral" },
+            { id: "ls-3", name: "Walk-in" },
+            { id: "ls-4", name: "Social Media" },
+            { id: "ls-5", name: "Email Campaign" },
+          ],
+          commercialAgents: [
+            { id: "agent-1", name: "Sara Opc" },
+            { id: "agent-2", name: "Karim Ref" },
+            { id: "agent-3", name: "Youcef Opc" },
+          ],
         };
         break;
       default:
