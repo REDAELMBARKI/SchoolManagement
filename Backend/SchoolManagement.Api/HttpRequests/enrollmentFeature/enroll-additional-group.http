@@ -1,0 +1,209 @@
+### Story 15: Enroll Existing Student in Additional Group
+### Allows students who already have enrollments to enroll in additional subjects
+### Payment is enforced - either new payment or credit balance
+
+@baseUrl = https://localhost:7001
+@studentId = PUT_EXISTING_STUDENT_ID_HERE
+@subjectId = PUT_SUBJECT_ID_HERE
+@levelId = PUT_LEVEL_ID_HERE
+
+### ============================================================================
+### Test 1: Enroll with Cash Payment
+### ============================================================================
+POST {{baseUrl}}/api/enrollments/student/{{studentId}}/enroll-additional
+Content-Type: application/json
+
+{
+  "subjectId": "{{subjectId}}",
+  "levelId": "{{levelId}}",
+  "amount": 500.00,
+  "notes": "Additional enrollment for Math subject",
+  "paymentData": {
+    "amountPaid": 500.00,
+    "method": "Cash"
+  },
+  "useCreditBalance": false
+}
+
+### ============================================================================
+### Test 2: Enroll with Credit Balance
+### (Student must have sufficient credit balance)
+### ============================================================================
+POST {{baseUrl}}/api/enrollments/student/{{studentId}}/enroll-additional
+Content-Type: application/json
+
+{
+  "subjectId": "{{subjectId}}",
+  "levelId": "{{levelId}}",
+  "amount": 300.00,
+  "notes": "Using credit balance for Science enrollment",
+  "useCreditBalance": true
+}
+
+### ============================================================================
+### Test 3: Enroll with Card Payment
+### ============================================================================
+POST {{baseUrl}}/api/enrollments/student/{{studentId}}/enroll-additional
+Content-Type: application/json
+
+{
+  "subjectId": "{{subjectId}}",
+  "levelId": "{{levelId}}",
+  "amount": 450.00,
+  "paymentData": {
+    "amountPaid": 450.00,
+    "transferFees": 10.00,
+    "method": "Card",
+    "externalReferenceCode": "TXN-2026-08-001",
+    "currencyCode": "USD"
+  },
+  "useCreditBalance": false
+}
+
+### ============================================================================
+### Test 4: Enroll with Specific Group
+### ============================================================================
+POST {{baseUrl}}/api/enrollments/student/{{studentId}}/enroll-additional
+Content-Type: application/json
+
+{
+  "subjectId": "{{subjectId}}",
+  "levelId": "{{levelId}}",
+  "groupId": "PUT_SPECIFIC_GROUP_ID_HERE",
+  "amount": 500.00,
+  "notes": "Enrolled in specific group",
+  "paymentData": {
+    "amountPaid": 500.00,
+    "method": "Cash",
+    "currencyCode": "USD"
+  }
+}
+
+### ============================================================================
+### Test 5: Enroll with Payment Plan
+### ============================================================================
+POST {{baseUrl}}/api/enrollments/student/{{studentId}}/enroll-additional
+Content-Type: application/json
+
+{
+  "subjectId": "{{subjectId}}",
+  "levelId": "{{levelId}}",
+  "planId": "PUT_PLAN_ID_HERE",
+  "amount": 500.00,
+  "paymentData": {
+    "amountPaid": 500.00,
+    "method": "Cash",
+    "currencyCode": "USD"
+  }
+}
+
+### ============================================================================
+### Test 6: ERROR - Missing Payment (should fail validation)
+### ============================================================================
+POST {{baseUrl}}/api/enrollments/student/{{studentId}}/enroll-additional
+Content-Type: application/json
+
+{
+  "subjectId": "{{subjectId}}",
+  "levelId": "{{levelId}}",
+  "amount": 500.00,
+  "useCreditBalance": false
+}
+
+### ============================================================================
+### Test 7: ERROR - Both Payment Options (should fail validation)
+### ============================================================================
+POST {{baseUrl}}/api/enrollments/student/{{studentId}}/enroll-additional
+Content-Type: application/json
+
+{
+  "subjectId": "{{subjectId}}",
+  "levelId": "{{levelId}}",
+  "amount": 500.00,
+  "paymentData": {
+    "amountPaid": 500.00,
+    "method": "Cash",
+    "currencyCode": "USD"
+  },
+  "useCreditBalance": true
+}
+
+### ============================================================================
+### Test 8: ERROR - Insufficient Credit Balance (should fail)
+### ============================================================================
+POST {{baseUrl}}/api/enrollments/student/{{studentId}}/enroll-additional
+Content-Type: application/json
+
+{
+  "subjectId": "{{subjectId}}",
+  "levelId": "{{levelId}}",
+  "amount": 999999.00,
+  "useCreditBalance": true
+}
+
+### ============================================================================
+### Test 9: ERROR - Duplicate Enrollment (enroll in same subject twice)
+### ============================================================================
+POST {{baseUrl}}/api/enrollments/student/{{studentId}}/enroll-additional
+Content-Type: application/json
+
+{
+  "subjectId": "{{subjectId}}",
+  "levelId": "{{levelId}}",
+  "amount": 500.00,
+  "paymentData": {
+    "amountPaid": 500.00,
+    "method": "Cash",
+    "currencyCode": "USD"
+  }
+}
+
+### ============================================================================
+### Test 10: ERROR - Schedule Conflict (if student has conflicting schedule)
+### ============================================================================
+POST {{baseUrl}}/api/enrollments/student/{{studentId}}/enroll-additional
+Content-Type: application/json
+
+{
+  "subjectId": "PUT_DIFFERENT_SUBJECT_ID_HERE",
+  "levelId": "{{levelId}}",
+  "preferredScheduleId": "PUT_CONFLICTING_SCHEDULE_ID_HERE",
+  "amount": 500.00,
+  "paymentData": {
+    "amountPaid": 500.00,
+    "method": "Cash",
+    "currencyCode": "USD"
+  }
+}
+
+### ============================================================================
+### Test 11: ERROR - Student Not Found
+### ============================================================================
+POST {{baseUrl}}/api/enrollments/student/00000000-0000-0000-0000-000000000000/enroll-additional
+Content-Type: application/json
+
+{
+  "subjectId": "{{subjectId}}",
+  "levelId": "{{levelId}}",
+  "amount": 500.00,
+  "paymentData": {
+    "amountPaid": 500.00,
+    "method": "Cash",
+    "currencyCode": "USD"
+  }
+}
+
+### ============================================================================
+### Test 12: ERROR - Missing Required Fields
+### ============================================================================
+POST {{baseUrl}}/api/enrollments/student/{{studentId}}/enroll-additional
+Content-Type: application/json
+
+{
+  "amount": 500.00,
+  "paymentData": {
+    "amountPaid": 500.00,
+    "method": "Cash",
+    "currencyCode": "USD"
+  }
+}

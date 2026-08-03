@@ -12,6 +12,5 @@ public class ExpenseResponseDto
     public string? Reference { get; set; }
     public Guid ProcessedByStaffId { get; set; }
     public Guid BranchId { get; set; }
-    public string CurrencyCode { get; set; } = "MAD";
     public DateTime CreatedAt { get; set; }
 }

@@ -143,7 +143,6 @@ public class ExpenseService : IExpenseService
         e.PaymentMethod,
         e.Reference,
         e.ProcessedByStaffId,
-        e.BranchId,
-        e.CurrencyCode
+        e.BranchId
     };
 }

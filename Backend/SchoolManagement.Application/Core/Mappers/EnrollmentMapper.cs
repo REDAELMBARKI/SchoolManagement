@@ -84,8 +84,7 @@ public static class EnrollmentMapper
                 BranchId = p.BranchId,
                 ReceivedByStaffId = p.ReceivedByStaffId,
                 ExternalReferenceCode = p.ExternalReferenceCode,
-                MethodDetailsJson = p.MethodDetailsJson,
-                CurrencyCode = p.CurrencyCode
+                MethodDetailsJson = p.MethodDetailsJson
             }).ToList() ?? new List<PaymentResponseDto>(),
             EnrollmentPlans = e.EnrollmentPlans?.Select(ep => new EnrollmentPlanResponseDto
             {

@@ -281,4 +281,60 @@ public class EnrollmentController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Enrolls an existing student in an additional group/subject.
+    /// Used when a student already exists and wants to add another subject.
+    /// Payment is enforced - either via new payment data or student credit balance.
+    /// </summary>
+    /// <param name="studentId">The existing student's ID</param>
+    /// <param name="dto">Enrollment details with payment options</param>
+    /// <returns>The created enrollment</returns>
+    [HttpPost("student/{studentId}/enroll-additional")]
+    public async Task<IActionResult> EnrollStudentInAdditionalGroup(Guid studentId, [FromBody] EnrollStudentInAdditionalGroupRequestDto dto)
+    {
+        try
+        {
+            var command = new EnrollStudentInAdditionalGroupCommand
+            {
+                StudentId = studentId,
+                SubjectId = dto.SubjectId,
+                LevelId = dto.LevelId,
+                GroupId = dto.GroupId,
+                PreferredScheduleId = dto.PreferredScheduleId,
+                PlanId = dto.PlanId,
+                Notes = dto.Notes,
+                PaymentData = dto.PaymentData,
+                UseCreditBalance = dto.UseCreditBalance,
+                Amount = dto.Amount
+            };
+
+            var enrollment = await _enrollmentService.EnrollStudentInAdditionalGroupAsync(studentId, command);
+            return CreatedAtAction(nameof(GetById), new { id = enrollment.Id }, enrollment);
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (ConcurrencyConflictException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (UnAvailableResourceException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (DomainException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return Problem(
+                statusCode: 500,
+                title: "Enroll additional group error",
+                detail: ex.Message
+            );
+        }
+    }
+
 }

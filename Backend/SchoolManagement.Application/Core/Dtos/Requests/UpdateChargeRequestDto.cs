@@ -35,6 +35,4 @@ public class UpdateChargeRequestDto
     public Guid? SourceId { get; set; }
 
     public Guid? AcademicTermId { get; set; }
-
-    public string CurrencyCode { get; set; } = "USD";
 }

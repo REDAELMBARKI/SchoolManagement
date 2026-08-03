@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-﻿using SchoolManagement.Domain.Core.Enums;
-=======
-using SchoolManagement.Domain.Enums;
->>>>>>> 5fb5c4738af634e9e79c8340f0172f22f69d2a31
+using SchoolManagement.Domain.Core.Enums;
 
 namespace SchoolManagement.Application.Core.Dtos.Commands;
 
@@ -28,6 +24,4 @@ public class RegistrationPaymentCommand
     public string? ExternalReferenceCode { get; set; }
 
     public string MethodDetailsJson { get; set; } = "{}";
-
-    public string CurrencyCode { get; set; } = "USD";
 }

@@ -223,8 +223,7 @@ public class PaymentService : IPaymentService
             payment.BranchId,
             payment.ReceivedByStaffId,
             payment.ExternalReferenceCode,
-            payment.MethodDetailsJson,
-            payment.CurrencyCode
+            payment.MethodDetailsJson
         };
     }
 }

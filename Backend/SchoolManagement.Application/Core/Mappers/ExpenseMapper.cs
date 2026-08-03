@@ -35,7 +35,6 @@ public static class ExpenseMapper
             Reference = expense.Reference,
             ProcessedByStaffId = expense.ProcessedByStaffId,
             BranchId = expense.BranchId,
-            CurrencyCode = expense.CurrencyCode,
             CreatedAt = expense.CreatedAt
         };
     }

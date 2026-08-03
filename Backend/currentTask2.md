@@ -299,10 +299,11 @@ Recorded). Salaries are tracked separately via the `PayrollPayment` entity.
 - Must reuse enrollment creation factory/logic (don't duplicate)
 
 **Tasks**:
-- [ ] **APP-80**: Create `EnrollStudentInAdditionalGroupCommand` DTO
+- [ ] **APP-80**: Create `EnrollStudentInAdditionalGroupCommand` 
   - Required: `StudentId`, `SubjectId`, `LevelId`
-  - Optional: `GroupId` (or `PreferedScheduleId`), `Notes`, `PlanId`
-  - **Required: `PaymentData` (RegistrationPaymentRequestDto)** OR flag `UseCreditBalance: bool`
+  - Optional:  `PreferedScheduleId`, `Notes`, `PlanId`
+  - **Required: `PaymentData` (RegistrationPaymentRequestDto)** OR flag `UseCreditBalance: bool` , always use the payment amount as the main only check the Creditbalance  when the paiment amount in the requesst is  not enough ;
+
   - If `UseCreditBalance = true`: validate student has sufficient credit
 
 - [ ] **APP-81**: Create `EnrollStudentInAdditionalGroupRequestDto` for API
@@ -345,29 +346,6 @@ Recorded). Salaries are tracked separately via the `PayrollPayment` entity.
     - 404 Not Found: student or group not found
     - 409 Conflict: schedule conflict, duplicate enrollment, insufficient capacity, insufficient credit balance
 
-**Payment Logic**:
-```csharp
-// Option 1: Pay with new payment
-{
-  "paymentData": { 
-    "amount": 500, 
-    "method": "Cash",
-    ...
-  }
-}
-
-// Option 2: Pay with credit balance
-{
-  "useCreditBalance": true,
-  "amount": 500  // must have >= 500 credit
-}
-
-// Invalid: Must choose one
-{
-  "useCreditBalance": true,
-  "paymentData": { ... }  // ❌ Error: cannot use both
-}
-```
 
 **What will be built**:
 - Simplified enrollment flow for existing students
@@ -425,7 +403,7 @@ Recorded). Salaries are tracked separately via the `PayrollPayment` entity.
 | Story 8: Expense CRUD (Cash Outflow Tracking) | P0 | ✅ Done |
 | Story 14: Group Transfer | P0 | ✅ Done |
 | Story 16: Refactor CreditBalance to Student | P1 | ✅ Done (migration ready) |
-| Story 15: Enroll Existing Student in Additional Group | P1 | ❌ Pending (depends on Story 16) |
+| Story 15: Enroll Existing Student in Additional Group | P1 | ✅ Done (ready for testing) |
 | Story 9: Payment Plan Discounts | P1 | ❌ Pending |
 | Story 10: Media Ownership Validation | P1 | ❌ Pending |
 | Story 13: Background Jobs & Notifications | P2 | ❌ Pending |

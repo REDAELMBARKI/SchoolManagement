@@ -61,8 +61,7 @@ public static class PaymentMapper
             BranchId = payment.BranchId,
             ReceivedByStaffId = payment.ReceivedByStaffId,
             ExternalReferenceCode = payment.ExternalReferenceCode,
-            MethodDetailsJson = payment.MethodDetailsJson,
-            CurrencyCode = payment.CurrencyCode
+            MethodDetailsJson = payment.MethodDetailsJson
         };
     }
 }

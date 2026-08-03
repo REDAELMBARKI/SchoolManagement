@@ -49,8 +49,7 @@ public class PaymentController : ControllerBase
                 Method = dto.Method,
                 PaidAt = dto.PaidAt,
                 ExternalReferenceCode = dto.ExternalReferenceCode,
-                MethodDetailsJson = dto.MethodDetailsJson ?? "{}",
-                CurrencyCode = dto.CurrencyCode ?? "MAD"
+                MethodDetailsJson = dto.MethodDetailsJson ?? "{}"
             };
             var result = await _paymentService.CreateAsync(command);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
@@ -74,8 +73,7 @@ public class PaymentController : ControllerBase
                 Method = dto.Method,
                 PaidAt = dto.PaidAt,
                 ExternalReferenceCode = dto.ExternalReferenceCode,
-                MethodDetailsJson = dto.MethodDetailsJson ?? "{}",
-                CurrencyCode = dto.CurrencyCode ?? "MAD"
+                MethodDetailsJson = dto.MethodDetailsJson ?? "{}"
             };
             var result = await _paymentService.SettleChargeAsync(command);
             return Ok(result);

@@ -405,6 +405,112 @@ public class EnrollmentService : IEnrollmentService
         }
     }
 
+    public async Task<EnrollmentResponseDto> EnrollStudentInAdditionalGroupAsync(Guid studentId, EnrollStudentInAdditionalGroupCommand command)
+    {
+        var branchId = _currentUserContext.BranchId;
+        if (branchId == Guid.Empty)
+            throw new DomainException("Branch context is missing.");
+        
+        command.StudentId = studentId;
+        command.BranchId = branchId;
+
+        // Validate command
+        var validator = new Validators.EnrollStudentInAdditionalGroupValidator(_studentQueryService);
+        var validationResult = await validator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+            throw new DomainException($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
+        }
+
+        await _transaction.BeginTransactionAsync();
+        try
+        {
+            var studentEnrollments = await _queryService.GetByStudentIdAsync(studentId);
+            var activeEnrollments = studentEnrollments.Where(e => e.Status == EnrollmentStatus.Active).ToList();
+
+            // 2. Prevent duplicate enrollment in same subject
+            await EnsureNoDuplicateActiveEnrollmentAsync(studentId, command.SubjectId);
+
+            // 3. Load available groups for this level/subject/branch
+            var availableGroups = await _groupQueryService.GetAvailableGroupsByLevelSubjectBranch(
+                levelId: command.LevelId,
+                subjectId: command.SubjectId,
+                branchId: branchId);
+
+            // 4. Select best group (reuse existing logic)
+            var selectedGroup = EvaluateStudentGroup(availableGroups, command.PreferredScheduleId, command.GroupId);
+
+            if (!selectedGroup.HasAvailableSpace())
+                throw new UnAvailableResourceException("The selected group has just reached capacity. Please refresh and try again.");
+
+            // 5. Check schedule conflicts ONLY if student has active enrollments
+            if (activeEnrollments.Any())
+            {
+                await ValidateNoScheduleConflictsAsync(studentId, Guid.Empty, selectedGroup.Id);
+            }
+            // If no active enrollments, skip conflict check - nothing to conflict with!
+
+            // 6. Touch group for optimistic concurrency
+            selectedGroup.TouchCapacityGuard();
+
+            // 7. Create enrollment
+            var enrollment = Enrollment.Create(
+                studentId: studentId,
+                subjectId: command.SubjectId,
+                groupId: selectedGroup.Id,
+                branchId: branchId,
+                planId: command.PlanId,
+                enrolledAt: DateTime.UtcNow,
+                status: EnrollmentStatus.Active,
+                notes: command.Notes);
+
+            var createdEnrollment = await _repository.AddAsync(enrollment);
+
+            if (command.UseCreditBalance)
+            {
+                createdEnrollment.UpdateNotes(
+                    $"{command.Notes}\n[Payment: {command.Amount:C} paid via credit balance]");
+            }
+            else if (command.PaymentData != null)
+            {
+                createdEnrollment.UpdateNotes(
+                    $"{command.Notes}\n[Payment: {command.PaymentData.AmountPaid:C} paid via {command.PaymentData.Method}]");
+            }
+
+            await _repository.UpdateAsync(createdEnrollment);
+
+            // 9. Audit log
+            await _auditLogService.StoreAsync(
+                action: AuditLog.CreateAction(),
+                entityName: "Enrollment",
+                entityId: createdEnrollment.Id,
+                branchId: branchId,
+                newValues: CreateAuditSnapshot(createdEnrollment),
+                message: $"Student {studentId} enrolled in additional group {selectedGroup.Id} for subject {command.SubjectId}. " +
+                         $"Payment method: {(command.UseCreditBalance ? "Credit Balance" : command.PaymentData?.Method.ToString())}");
+
+            // 10. Publish domain events
+            foreach (var domainEvent in createdEnrollment.DomainEvents)
+                await _mediator.Publish(domainEvent);
+            createdEnrollment.ClearDomainEvents();
+
+            await _transaction.CommitTransactionAsync();
+
+            return EnrollmentMapper.ToResponse(createdEnrollment);
+        }
+        catch (Exception ex) when (ex.GetType().Name == "DbUpdateConcurrencyException")
+        {
+            await _transaction.RollbackTransactionAsync();
+            throw new ConcurrencyConflictException(
+                "That group was updated by another request while we were saving this enrollment. Please refresh and try again.");
+        }
+        catch
+        {
+            await _transaction.RollbackTransactionAsync();
+            throw;
+        }
+    }
+
     public async Task DeleteAsync(Guid id)
     {
         var existing = await _repository.GetByIdAsync(id);
@@ -466,10 +572,9 @@ public class EnrollmentService : IEnrollmentService
     private async Task ValidateNoScheduleConflictsAsync(Guid studentId, Guid currentEnrollmentId, Guid newGroupId)
     {
         // Get all active enrollments for this student (excluding current one)
-        var studentEnrollments = await _queryService.GetAllAsync();
+        var studentEnrollments = await _queryService.GetByStudentIdAsync(studentId);
         var activeEnrollments = studentEnrollments
-            .Where(e => e.StudentId == studentId && 
-                       e.Id != currentEnrollmentId && 
+            .Where(e => e.Id != currentEnrollmentId && 
                        e.Status == EnrollmentStatus.Active)
             .ToList();
 
