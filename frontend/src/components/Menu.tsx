@@ -1,7 +1,30 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { role } from "@/lib/data";
 
-const menuItems = [
+type MenuItem = {
+  icon: string;
+  label: string;
+  href: string;
+  visible: string[];
+};
+
+type MenuGroup = {
+  icon: string;
+  label: string;
+  visible: string[];
+  children: MenuItem[];
+};
+
+type MenuSection = {
+  title: string;
+  items: (MenuItem | MenuGroup)[];
+};
+
+const isMenuGroup = (item: MenuItem | MenuGroup): item is MenuGroup =>
+  "children" in item;
+
+const menuItems: MenuSection[] = [
   {
     title: "MENU",
     items: [
@@ -35,6 +58,27 @@ const menuItems = [
         href: "/list/parents",
         visible: ["admin", "teacher"],
       },
+      // ── Intakes dropdown group ───────────────────────────────────────
+      {
+        icon: "/student.png",
+        label: "Intakes",
+        visible: ["admin", "teacher"],
+        children: [
+          {
+            icon: "/lesson.png",
+            label: "All Intakes",
+            href: "/list/intakes",
+            visible: ["admin", "teacher"],
+          },
+          {
+            icon: "/create.png",
+            label: "New Intake",
+            href: "/list/intakes/new",
+            visible: ["admin"],
+          },
+        ],
+      },
+      // ────────────────────────────────────────────────────────────────
       {
         icon: "/subject.png",
         label: "Subjects",
@@ -95,12 +139,6 @@ const menuItems = [
         href: "/list/announcements",
         visible: ["admin", "teacher", "student", "parent"],
       },
-      {
-        icon: "/student.png",
-        label: "Intakes",
-        href: "/list/intakes",
-        visible: ["admin", "teacher"],
-      },
     ],
   },
   {
@@ -126,71 +164,104 @@ const menuItems = [
       },
     ],
   },
-  {
-    title: "FORMS",
-    items: [
-      {
-        icon: "/teacher.png",
-        label: "Teacher Form",
-        href: "/list/teachers/new",
-        visible: ["admin"],
-      },
-      {
-        icon: "/student.png",
-        label: "Student Form",
-        href: "/list/students/new",
-        visible: ["admin"],
-      },
-      {
-        icon: "/subject.png",
-        label: "Subject Form",
-        href: "/list/subjects/new",
-        visible: ["admin"],
-      },
-      {
-        icon: "/class.png",
-        label: "Class Form",
-        href: "/list/classes/new",
-        visible: ["admin"],
-      },
-      {
-        icon: "/exam.png",
-        label: "Exam Form",
-        href: "/list/exams/new",
-        visible: ["admin", "teacher"],
-      },
-      {
-        icon: "/student.png",
-        label: "Intake Form",
-        href: "/list/intakes/new",
-        visible: ["admin"],
-      },
-    ],
-  },
 ];
 
 const Menu = () => {
   const userRole = role as string;
+  const location = useLocation();
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
+    Intakes: location.pathname.startsWith("/list/intakes"),
+  });
+
+  const toggleGroup = (label: string) => {
+    setOpenGroups((prev) => ({ ...prev, [label]: !prev[label] }));
+  };
+
   return (
     <div className="mt-4 text-sm">
-      {menuItems.map((i) => (
-        <div className="flex flex-col gap-2" key={i.title}>
+      {menuItems.map((section) => (
+        <div className="flex flex-col gap-2" key={section.title}>
           <span className="hidden lg:block text-gray-400 font-light my-4">
-            {i.title}
+            {section.title}
           </span>
-          {i.items.map((item) => {
-            if (item.visible.includes(userRole)) {
+
+          {section.items.map((item) => {
+            if (!item.visible.includes(userRole)) return null;
+
+            // ── Dropdown group ──────────────────────────────────────────
+            if (isMenuGroup(item)) {
+              const isOpen = !!openGroups[item.label];
+              const isActive = item.children.some((c) =>
+                location.pathname.startsWith(c.href)
+              );
+
               return (
-                <Link
-                  to={item.href}
-                  key={item.label}
-                  className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-lamaSkyLight"
-                >
-                  <img src={item.icon} alt="" width={20} height={20} />
-                  <span className="hidden lg:block">{item.label}</span>
-                </Link>
+                <div key={item.label}>
+                  {/* Group trigger */}
+                  <button
+                    onClick={() => toggleGroup(item.label)}
+                    className={`w-full flex items-center justify-center lg:justify-start gap-4 py-2 md:px-2 rounded-md transition-colors
+                      ${isActive ? "bg-lamaSkyLight text-gray-700" : "text-gray-500 hover:bg-lamaSkyLight"}`}
+                  >
+                    <img src={item.icon} alt="" width={20} height={20} />
+                    <span className="hidden lg:block flex-1 text-left">
+                      {item.label}
+                    </span>
+                    {/* Chevron — only visible on lg+ */}
+                    <span
+                      className={`hidden lg:block text-gray-400 text-xs transition-transform duration-200 ${
+                        isOpen ? "rotate-180" : ""
+                      }`}
+                      style={{ display: "inline-block" }}
+                    >
+                      ▾
+                    </span>
+                  </button>
+
+                  {/* Sub-items */}
+                  {isOpen && (
+                    <div className="flex flex-col gap-1 mt-1 lg:pl-4 border-l-2 border-lamaSkyLight ml-2 lg:ml-6">
+                      {item.children.map((child) => {
+                        if (!child.visible.includes(userRole)) return null;
+                        const childActive = location.pathname === child.href;
+                        return (
+                          <Link
+                            key={child.label}
+                            to={child.href}
+                            className={`flex items-center justify-center lg:justify-start gap-3 py-1.5 px-2 rounded-md transition-colors text-xs
+                              ${childActive ? "bg-lamaPurpleLight text-gray-700 font-medium" : "text-gray-500 hover:bg-lamaSkyLight"}`}
+                          >
+                            <img
+                              src={child.icon}
+                              alt=""
+                              width={14}
+                              height={14}
+                            />
+                            <span className="hidden lg:block">
+                              {child.label}
+                            </span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               );
             }
+
+            // ── Regular link ────────────────────────────────────────────
+            const isActive = location.pathname === item.href;
+            return (
+              <Link
+                to={item.href}
+                key={item.label}
+                className={`flex items-center justify-center lg:justify-start gap-4 py-2 md:px-2 rounded-md transition-colors
+                  ${isActive ? "bg-lamaSkyLight text-gray-700" : "text-gray-500 hover:bg-lamaSkyLight"}`}
+              >
+                <img src={item.icon} alt="" width={20} height={20} />
+                <span className="hidden lg:block">{item.label}</span>
+              </Link>
+            );
           })}
         </div>
       ))}

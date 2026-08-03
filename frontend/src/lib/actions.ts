@@ -1,6 +1,7 @@
 import {
   ClassSchema,
   ExamSchema,
+  IntakeConvertSchema,
   StudentSchema,
   SubjectSchema,
   TeacherSchema,
@@ -68,6 +69,11 @@ export const updateExam = async (
   _currentState: CurrentState,
   _data: ExamSchema
 ) => ({ success: true, error: false });
+export const convertIntakeToStudent = async (
+  _currentState: CurrentState,
+  _data: IntakeConvertSchema & { intakeId: number }
+) => ({ success: true, error: false });
+
 export const deleteExam = async (
   _currentState: CurrentState,
   _data: FormData

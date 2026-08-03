@@ -78,6 +78,50 @@ export const studentSchema = z.object({
 
 export type StudentSchema = z.infer<typeof studentSchema>;
 
+export const intakeConvertSchema = z
+  .object({
+    username: z
+      .string()
+      .min(3, { message: "Username must be at least 3 characters long!" })
+      .max(20, { message: "Username must be at most 20 characters long!" }),
+    password: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters long!" }),
+    guardianFirstName: z.string().optional(),
+    guardianLastName: z.string().optional(),
+    guardianPhone: z.string().optional(),
+    guardianEmail: z
+      .string()
+      .email({ message: "Invalid email address!" })
+      .optional()
+      .or(z.literal("")),
+    guardianRelationship: z
+      .enum([
+        "Father",
+        "Mother",
+        "Guardian",
+        "Grandfather",
+        "Grandmother",
+        "Uncle",
+        "Aunt",
+        "Other",
+      ])
+      .optional(),
+  })
+  .superRefine((data, ctx) => {
+    const hasGuardianInfo =
+      data.guardianFirstName || data.guardianLastName || data.guardianEmail;
+    if (hasGuardianInfo && !data.guardianPhone) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Guardian phone is required when adding a guardian",
+        path: ["guardianPhone"],
+      });
+    }
+  });
+
+export type IntakeConvertSchema = z.infer<typeof intakeConvertSchema>;
+
 export const examSchema = z.object({
   id: z.coerce.number().optional(),
   title: z.string().min(1, { message: "Title name is required!" }),

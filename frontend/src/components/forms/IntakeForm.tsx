@@ -9,6 +9,7 @@ const IntakeForm = ({
   type,
   data,
   setOpen,
+  relatedData,
 }: {
   type: "create" | "update";
   data?: any;

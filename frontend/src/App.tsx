@@ -25,6 +25,7 @@ import AnnouncementListPage from "./pages/list/AnnouncementListPage";
 import AttendanceListPage from "./pages/list/AttendanceListPage";
 import MessagesPage from "./pages/list/MessagesPage";
 import IntakeListPage from "./pages/list/IntakeListPage";
+import IntakeConvertPage from "./pages/list/IntakeConvertPage";
 import TableCreatePage from "./pages/forms/TableCreatePage";
 import TableDeletePage from "./pages/forms/TableDeletePage";
 import TableEditPage from "./pages/forms/TableEditPage";
@@ -43,6 +44,7 @@ export default function App() {
         <Route path="settings" element={<SettingsPage />} />
         <Route path="logout" element={<LogoutPage />} />
         <Route path="list/intakes" element={<IntakeListPage />} />
+        <Route path="list/intakes/:id/convert" element={<IntakeConvertPage />} />
         <Route path="list/students" element={<StudentListPage />} />
         <Route path="list/students/:id" element={<SingleStudentPage />} />
         <Route path="list/teachers" element={<TeacherListPage />} />
