@@ -13,6 +13,12 @@ public class StudentRegistrationRequestDto
     [Required]
     public RegistrationPaymentRequestDto PaymentRegReq { get; set; } = null!;
 
+    /// <summary>
+    /// Optional parent/guardian information to be linked to the student.
+    /// If provided, creates a StudentResponsable and links them to the student.
+    /// </summary>
+    public StudentResponsableRequestDto? ResponsableRegReq { get; set; }
+
     public DateTime? PeriodStart { get; set; }
     public DateTime? PeriodEnd { get; set; }
     public DateTime? InvoiceDueDate { get; set; }

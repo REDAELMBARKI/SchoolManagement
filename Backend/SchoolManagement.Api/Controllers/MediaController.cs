@@ -2,50 +2,72 @@ using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Common.Interfaces.Services;
 using SchoolManagement.Application.Common.Dtos.Responses;
 using SchoolManagement.Domain.Common.Entities;
+using SchoolManagement.Domain.Common.Enums;
+using SchoolManagement.Domain.Common.Exceptions;
 
 namespace SchoolManagement.Api.Controllers;
 
+[ApiController]
+[Route("api/[controller]")]
 public class MediaController : ControllerBase
 {
-    private readonly IMediaService _main_service;
+    private readonly IMediaService _service;
 
-    public MediaController(IMediaService main_service)
+    public MediaController(IMediaService service)
     {
-      this._main_service = main_service ;
+        _service = service;
     }
 
-    [HttpPost]
+    /// <summary>
+    /// Uploads a media file with owner validation and storage governance.
+    /// </summary>
+    /// <param name="file">The file to upload</param>
+    /// <param name="ownerId">The ID of the owner entity (Student, User, Teacher, etc.)</param>
+    /// <param name="ownerType">The type of owner entity</param>
+    /// <param name="collection">The media collection category</param>
+    /// <param name="mediaType">The type of media (Photo, Video, Document, etc.)</param>
+    /// <returns>MediaResponseDto with uploaded media details</returns>
+    /// <response code="200">Media uploaded successfully</response>
+    /// <response code="400">Validation error (invalid file type, size limit exceeded, quota exceeded)</response>
+    /// <response code="404">Owner entity not found</response>
+    /// <response code="500">Internal server error</response>
+    [HttpPost("upload")]
     public async Task<IActionResult> Upload(
         IFormFile file,
-        MediaCollection collection ,
-        MediaType mediaType
-    )
+        [FromForm] Guid ownerId,
+        [FromForm] OwnerType ownerType,
+        [FromForm] MediaCollection collection,
+        [FromForm] MediaType mediaType)
     {
+        // Basic null/empty check
         if (file is null || file.Length == 0)
         {
-            return BadRequest("No file provided or file is empty.");
+            return BadRequest(new { error = "No file provided or file is empty." });
         }
 
-        // validation extension 
-        string[] allowedExtentions = new [] {".png" , ".jpg" , ".jpeg"} ;
-        string fileExt = Path.GetExtension(file.FileName).ToLower();
-        if (!allowedExtentions.Contains(fileExt))
+        try
         {
-            return BadRequest($"Invalid file extension. Allowed: {string.Join(", ", allowedExtentions)}");
+            var media = await _service.Upload(file, ownerId, ownerType, collection, mediaType);
+            return Ok(media);
         }
-
-        // validate memetype 
-        string[] allowedMimeTypes = new[] { "image/jpeg", "image/png", "image/webp" };
-        string fileMime = file.ContentType.ToLower();
-        if (!allowedMimeTypes.Contains(fileMime))
+        catch (ValidationException ex)
         {
-            return BadRequest($"Invalid MIME type. Allowed: {string.Join(", ", allowedMimeTypes)}");
+            return BadRequest(new { error = ex.Message });
         }
-
-        MediaResponseDto media = await this._main_service.Upload(file, collection, mediaType);
-        return Ok(media);
+        catch (NotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
+        catch (DomainException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            // Log the exception (would need ILogger injected)
+            return StatusCode(500, new { error = "An error occurred while uploading the file." });
+        }
     }
-
 }
 
  

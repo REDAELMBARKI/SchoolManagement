@@ -6,15 +6,13 @@ using SchoolManagement.Domain.Common.Entities;
 
 using SchoolManagement.Domain.Common.Exceptions;
 
-
-
 namespace SchoolManagement.Domain.Academic.Entities;
-
 
 
 public class Schedule : AggregateRoot
 
 {
+    
 
     public Guid BranchId { get; private set; }
 
@@ -29,7 +27,6 @@ public class Schedule : AggregateRoot
     public Guid GroupId { get; private set; }
 
     public Guid SubjectId { get; private set; }
-
 
 
     // navigations  

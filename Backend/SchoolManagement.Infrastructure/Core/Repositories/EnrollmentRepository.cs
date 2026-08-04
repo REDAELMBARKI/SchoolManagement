@@ -4,6 +4,7 @@ using SchoolManagement.Domain.Academic.Interfaces;
 using SchoolManagement.Domain.Core.Interfaces;
 using SchoolManagement.Domain.Common.Interfaces;
 using SchoolManagement.Infrastructure.Data;
+using SchoolManagement.Infrastructure.Common.Repositories;
 
 namespace SchoolManagement.Infrastructure.Core.Repositories;
 

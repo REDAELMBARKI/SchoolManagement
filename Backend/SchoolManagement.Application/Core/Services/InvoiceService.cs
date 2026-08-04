@@ -1,34 +1,15 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SchoolManagement.Application.Academic.Dtos.Commands;
-using SchoolManagement.Application.Core.Dtos.Commands;
-using SchoolManagement.Application.Common.Dtos.Commands;
-using SchoolManagement.Application.Academic.Dtos.Responses;
-using SchoolManagement.Application.Core.Dtos.Responses;
-using SchoolManagement.Application.Common.Dtos.Responses;
 using SchoolManagement.Application.Common.Interfaces;
-using SchoolManagement.Application.Academic.Interfaces.Queries;
 using SchoolManagement.Application.Core.Interfaces.Queries;
-using SchoolManagement.Application.Common.Interfaces.Queries;
-using SchoolManagement.Application.Academic.Interfaces.Services;
 using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Application.Common.Interfaces.Services;
-using SchoolManagement.Application.Academic.Mappers;
 using SchoolManagement.Application.Core.Mappers;
-using SchoolManagement.Application.Common.Mappers;
 using SchoolManagement.Application.Options;
-using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Common.Entities;
-using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Enums;
 using SchoolManagement.Domain.Common.Exceptions;
-using SchoolManagement.Application.Academic.Interfaces.Queries;
-using SchoolManagement.Application.Core.Interfaces.Queries;
-using SchoolManagement.Application.Common.Interfaces.Queries;
-using SchoolManagement.Domain.Academic.Interfaces;
 using SchoolManagement.Domain.Core.Interfaces;
-using SchoolManagement.Domain.Common.Interfaces;
 
 namespace SchoolManagement.Application.Core.Services;
 
@@ -167,7 +148,7 @@ public class InvoiceService : IInvoiceService
                 var enrollment = await _enrollmentRepository.GetByIdAsync(updated.EnrollmentId);
                 if (enrollment != null)
                 {
-                    enrollment.AddCredit(restoreAmount);
+                    enrollment.Student.AddCredit(restoreAmount);
                     await _enrollmentRepository.UpdateAsync(enrollment);
 
                     _logger.LogInformation(

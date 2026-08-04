@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-﻿ using SchoolManagement.Application.Academic.Dtos.Commands;
-=======
 using SchoolManagement.Application.Academic.Dtos.Commands;
->>>>>>> 5fb5c4738af634e9e79c8340f0172f22f69d2a31
 using SchoolManagement.Application.Core.Dtos.Commands;
 using SchoolManagement.Application.Academic.Dtos.Responses;
 using SchoolManagement.Application.Core.Dtos.Responses;

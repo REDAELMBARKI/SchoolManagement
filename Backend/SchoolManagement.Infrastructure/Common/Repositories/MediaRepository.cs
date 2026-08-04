@@ -11,6 +11,7 @@ using SchoolManagement.Domain.Academic.Interfaces;
 using SchoolManagement.Domain.Core.Interfaces;
 using SchoolManagement.Domain.Common.Interfaces;
 using SchoolManagement.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace SchoolManagement.Infrastructure.Common.Repositories;
 
@@ -25,5 +26,14 @@ public class MediaRepository : Repository<Media>, IMediaRepository
         await Context.Medias.AddAsync(media);
         await Context.SaveChangesAsync();
         return (media);
+    }
+
+    public async Task<long> GetTotalSizeByBranchAsync(Guid branchId)
+    {
+        var totalSize = await Context.Medias
+            .Where(m => m.BranchId == branchId)
+            .SumAsync(m => m.Size);
+
+        return totalSize;
     }
 }

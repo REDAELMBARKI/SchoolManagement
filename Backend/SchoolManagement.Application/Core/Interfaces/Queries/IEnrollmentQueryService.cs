@@ -10,6 +10,7 @@ public interface IEnrollmentQueryService : IEntityQuery<Enrollment>
 {
     Task<List<EnrollmentResponseDto>> GetAllResponsesAsync();
     Task<EnrollmentResponseDto?> GetResponseByIdAsync(Guid id);
+    Task<List<Enrollment>> GetByStudentIdAsync(Guid studentId);
     Task<bool> HasActiveEnrollmentForStudentSubjectAsync(Guid studentId, Guid subjectId);
 }
 

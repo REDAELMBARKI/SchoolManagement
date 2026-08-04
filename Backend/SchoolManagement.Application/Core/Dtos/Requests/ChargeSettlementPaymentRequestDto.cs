@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-﻿using System.ComponentModel.DataAnnotations;
-using SchoolManagement.Domain.Core.Enums;
-=======
 using System.ComponentModel.DataAnnotations;
-using SchoolManagement.Domain.Enums;
->>>>>>> 5fb5c4738af634e9e79c8340f0172f22f69d2a31
+using SchoolManagement.Domain.Core.Enums;
 
 namespace SchoolManagement.Application.Core.Dtos.Requests;
 

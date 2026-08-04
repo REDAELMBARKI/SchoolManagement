@@ -63,7 +63,7 @@ public class Media : AggregateRoot
             OwnerType = ownerType,
             OwnerId = ownerId,
             MediaType = mediaType,
-            Collection = collection,
+            Collection = collection ?? MediaCollection.Photo,
             Order = order,
             IsMain = isMain,
             StorageProvider = storageProvider,
@@ -113,12 +113,8 @@ public class Media : AggregateRoot
         Height = height;
     }
 
-    public void UpdateOwnerType(string ownerType)
+    public void UpdateOwnerType(OwnerType ownerType)
     {
-        if (string.IsNullOrWhiteSpace(ownerType))
-        {
-            throw new DomainException("Owner type cannot be empty.");
-        }
         OwnerType = ownerType;
     }
 
@@ -138,7 +134,7 @@ public class Media : AggregateRoot
 
     public void UpdateCollection(MediaCollection? collection)
     {
-        Collection = collection;
+        Collection = collection ?? MediaCollection.Photo;
     }
 
     public void UpdateOrder(int order)

@@ -5,6 +5,7 @@ using SchoolManagement.Application.Common.Dtos.Responses;
 using SchoolManagement.Application.Academic.Mappers;
 using SchoolManagement.Application.Core.Mappers;
 using SchoolManagement.Application.Common.Mappers;
+using SchoolManagement.Application.Common.Validators;
 using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Common.Entities;
@@ -15,21 +16,50 @@ using SchoolManagement.Application.Academic.Interfaces.Services;
 using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Application.Common.Interfaces.Services;
 using SchoolManagement.Domain.Common.Enums;
+using SchoolManagement.Domain.Common.Exceptions;
+using SchoolManagement.Application.Common.Interfaces;
 
 namespace SchoolManagement.Application.Common.Services;
 
 public class MediaService : IMediaService
 {
-    private readonly IMediaRepository _main_repo;
+    private readonly IMediaRepository _repository;
+    private readonly IStudentRepository _studentRepository;
+    private readonly MediaStorageValidator _validator;
+    private readonly ICurrentUserContext _currentUserContext;
+    private readonly IAuditLogService _auditLogService;
 
-    public MediaService(IMediaRepository main_repo)
+    public MediaService(
+        IMediaRepository repository,
+        IStudentRepository studentRepository,
+        MediaStorageValidator validator,
+        ICurrentUserContext currentUserContext,
+        IAuditLogService auditLogService)
     {
-        _main_repo = main_repo;
+        _repository = repository;
+        _studentRepository = studentRepository;
+        _validator = validator;
+        _currentUserContext = currentUserContext;
+        _auditLogService = auditLogService;
     }
 
-    public async Task<MediaResponseDto> Upload(IFormFile file, Guid OwnerId , OwnerType OwnerType,  MediaCollection collection, MediaType mediaType)
+    public async Task<MediaResponseDto> Upload(IFormFile file, Guid ownerId, OwnerType ownerType, MediaCollection collection, MediaType mediaType)
     {
-        // Store the media
+        // 1. Validate file (extension, MIME type, file size)
+        _validator.ValidateFile(file, mediaType);
+
+        // 2. Get branch context
+        var branchId = _currentUserContext.BranchId;
+        if (branchId == Guid.Empty)
+            throw new DomainException("Branch context is missing.");
+
+        // 3. Validate branch quota (if enabled)
+        await _validator.ValidateBranchQuotaAsync(branchId, file.Length);
+
+        // 4. Validate owner exists
+        await ValidateOwnerExistsAsync(ownerId, ownerType);
+
+        // 5. Store file to disk
         string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
         if (!Directory.Exists(filePath))
         {
@@ -44,27 +74,78 @@ public class MediaService : IMediaService
             await file.CopyToAsync(stream);
         }
 
-        // Missing OwnerType, OwnerId, BranchId in parameters, but let's use placeholders for now
-        // TODO: Update Upload method to accept OwnerType, OwnerId, BranchId
-        Media media = Media.Create(
+        // 6. Create media entity
+        var media = Media.Create(
             url: $"/uploads/{uniqueName}",
             mimeType: file.ContentType,
             size: file.Length,
             altText: null,
-            width: null, // TODO: Add ImageSharp package to get dimensions
-            height: null, // TODO: Add ImageSharp package to get dimensions
-            ownerType: OwnerType, // Temporary
-            ownerId: OwnerId , // Temporary
+            width: null,  // TODO: Add ImageSharp for dimension extraction
+            height: null,
+            ownerType: ownerType,
+            ownerId: ownerId,
             mediaType: mediaType,
             collection: collection,
             order: 0,
             isMain: false,
-            storageProvider: "Local", // Temporary
-            branchId: Guid.Empty // Temporary
+            storageProvider: "Local",
+            branchId: branchId
         );
 
-        Media storedMedia = await _main_repo.Add(media);
+        var storedMedia = await _repository.Add(media);
+
+        // 7. Audit log
+        await _auditLogService.StoreAsync(
+            action: AuditLog.CreateAction(),
+            entityName: "Media",
+            entityId: storedMedia.Id,
+            branchId: branchId,
+            newValues: new
+            {
+                storedMedia.Url,
+                storedMedia.Size,
+                storedMedia.MimeType,
+                storedMedia.OwnerType,
+                storedMedia.OwnerId,
+                storedMedia.MediaType,
+                storedMedia.Collection
+            },
+            message: $"Media uploaded for {ownerType} {ownerId}: {file.FileName} ({file.Length} bytes)");
 
         return MediaMapper.ToResponse(storedMedia);
+    }
+
+    /// <summary>
+    /// Validates that the owner entity exists in the database.
+    /// </summary>
+    private async Task ValidateOwnerExistsAsync(Guid ownerId, OwnerType ownerType)
+    {
+        switch (ownerType)
+        {
+            case OwnerType.Student:
+                var student = await _studentRepository.GetByIdAsync(ownerId);
+                if (student == null)
+                    throw new NotFoundException($"Student with ID {ownerId} not found.");
+                break;
+
+            case OwnerType.User:
+                var user = await _userRepository.GetByIdAsync(ownerId);
+                if (user == null)
+                    throw new NotFoundException($"User with ID {ownerId} not found.");
+                break;
+
+            case OwnerType.Teacher:
+                // TODO: Add ITeacherRepository when Teacher entity is implemented
+                // For now, skip validation for Teacher
+                break;
+
+            case OwnerType.Administrator:
+                // TODO: Add administrator validation logic when Admin entity is implemented
+                // For now, skip validation for Administrator
+                break;
+
+            default:
+                throw new DomainException($"Unknown owner type: {ownerType}");
+        }
     }
 }

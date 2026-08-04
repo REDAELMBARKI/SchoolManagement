@@ -6,11 +6,11 @@ using SchoolManagement.Application.Academic.Mappers;
 using SchoolManagement.Application.Core.Mappers;
 using SchoolManagement.Application.Common.Mappers;
 using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Enums;
 using SchoolManagement.Application.Academic.Interfaces.Queries;
 using SchoolManagement.Application.Core.Interfaces.Queries;
 using SchoolManagement.Application.Common.Interfaces.Queries;
 using SchoolManagement.Infrastructure.Data;
+using SchoolManagement.Domain.Core.Enums;
 
 namespace SchoolManagement.Infrastructure.Core.Queries;
 

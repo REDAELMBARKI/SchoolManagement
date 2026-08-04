@@ -76,5 +76,23 @@ public class ScheduleQueryService : IScheduleQueryService
             .ToListAsync();
     }
 
+    public async Task<List<Schedule>> GetRoomSchedulesAsync(Guid roomId, Guid dayId)
+    {
+        return await _context.Schedules
+            .Include(s => s.TimeSlot)
+            .Include(s => s.Group)
+                .ThenInclude(g => g.Subject)
+            .Where(s => s.RoomId == roomId && s.DayId == dayId && EF.Property<DateTime?>(s, "DeletedAt") == null)
+            .ToListAsync();
+    }
 
+    public async Task<List<Schedule>> GetTeacherSchedulesAsync(Guid teacherId, Guid dayId)
+    {
+        return await _context.Schedules
+            .Include(s => s.TimeSlot)
+            .Include(s => s.Group)
+                .ThenInclude(g => g.Subject)
+            .Where(s => s.TeacherId == teacherId && s.DayId == dayId && EF.Property<DateTime?>(s, "DeletedAt") == null)
+            .ToListAsync();
+    }
 }

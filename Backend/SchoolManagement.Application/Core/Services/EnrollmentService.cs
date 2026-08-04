@@ -2,16 +2,13 @@ using MediatR;
 using SchoolManagement.Application.Academic.Interfaces.Queries;
 using SchoolManagement.Application.Common.Interfaces;
 using SchoolManagement.Application.Common.Interfaces.Services;
-using SchoolManagement.Application.Core.Dtos.Commands;
-using SchoolManagement.Application.Core.Dtos.Responses;
 using SchoolManagement.Application.Core.Interfaces.Queries;
 using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Application.Core.Mappers;
 using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
-using SchoolManagement.Domain.Core.DomainEvents;
-using SchoolManagement.Domain.Core.Enums;
+using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Core.Interfaces;
 
 namespace SchoolManagement.Application.Core.Services;
@@ -28,9 +25,11 @@ public class EnrollmentService : IEnrollmentService
     private readonly IInvoiceService _invoiceService;
     private readonly ITransaction _transaction;
     private readonly IMediator _mediator;
+    private readonly IStudentQueryService _studentQueryService;
 
     public EnrollmentService(
         IEnrollmentRepository repository,
+        IStudentQueryService studentQueryService,
         IEnrollmentQueryService queryService,
         IGroupQueryService groupQueryService,
         IScheduleQueryService scheduleQueryService,
@@ -43,6 +42,7 @@ public class EnrollmentService : IEnrollmentService
     {
         _repository = repository;
         _queryService = queryService;
+        _studentQueryService = studentQueryService;
         _groupQueryService = groupQueryService;
         _scheduleQueryService = scheduleQueryService;
         _currentUserContext = currentUserContext;
@@ -63,9 +63,6 @@ public class EnrollmentService : IEnrollmentService
         return await _queryService.GetResponseByIdAsync(id);
     }
 
-
-    private void EnsureNo
-
     public async Task<EnrollmentResponseDto> CreateAsync(EnrollmentCommand command)
     {
         var branchId = _currentUserContext.BranchId;
@@ -85,7 +82,7 @@ public class EnrollmentService : IEnrollmentService
                 branchId: command.BranchId);
             
             // 2. Choose a group that doesn't conflict with other enrollment schedules 
-            var selectedGroup = EvaluateStudentGroup(availableGroups, command.PreferedScheduleId, command.GroupId);
+            var selectedGroup = EvaluateStudentGroup(availableGroups, command.PreferedGroupId);
             
             if (!selectedGroup.HasAvailableSpace())
                 throw new UnAvailableResourceException("The selected group has just reached capacity. Please refresh and try again.");
@@ -97,7 +94,7 @@ public class EnrollmentService : IEnrollmentService
             // the seat allocation save.
             selectedGroup.TouchCapacityGuard();
 
-            command.GroupId = selectedGroup.Id;
+            command.PreferedGroupId = selectedGroup.Id;
             var enrollment = EnrollmentMapper.ToDomain(command);
             var created = await _repository.AddAsync(enrollment);
 
@@ -148,7 +145,7 @@ public class EnrollmentService : IEnrollmentService
 
             var oldValues = CreateAuditSnapshot(existing);
             var resolvedGroupId = existing.GroupId;
-            var isGroupChanging = command.GroupId != Guid.Empty && command.GroupId != existing.GroupId;
+            var isGroupChanging = command.PreferedGroupId != Guid.Empty && command.PreferedGroupId != existing.GroupId;
 
             if (isGroupChanging)
             {
@@ -157,7 +154,7 @@ public class EnrollmentService : IEnrollmentService
                     subjectId: command.SubjectId,
                     branchId: command.BranchId);
 
-                var selectedGroup = EvaluateStudentGroup(availableGroups, command.PreferedScheduleId, command.GroupId);
+                var selectedGroup = EvaluateStudentGroup(availableGroups, command.PreferedGroupId);
                 if (!selectedGroup.HasAvailableSpace())
                     throw new UnAvailableResourceException("The selected group has just reached capacity. Please refresh and try again.");
 
@@ -217,7 +214,7 @@ public class EnrollmentService : IEnrollmentService
 
         var oldValues = CreateAuditSnapshot(existing);
 
-        existing.AddCredit(amount);
+        existing.Student.AddCredit(amount);
         var updated = await _repository.UpdateAsync(existing);
 
         await _auditLogService.StoreAsync(
@@ -425,7 +422,7 @@ public class EnrollmentService : IEnrollmentService
         await _transaction.BeginTransactionAsync();
         try
         {
-            var studentEnrollments = await _queryService.GetByStudentIdAsync(studentId);
+            List<Enrollment> studentEnrollments = await _queryService.GetByStudentIdAsync(studentId);
             var activeEnrollments = studentEnrollments.Where(e => e.Status == EnrollmentStatus.Active).ToList();
 
             // 2. Prevent duplicate enrollment in same subject
@@ -438,7 +435,7 @@ public class EnrollmentService : IEnrollmentService
                 branchId: branchId);
 
             // 4. Select best group (reuse existing logic)
-            var selectedGroup = EvaluateStudentGroup(availableGroups, command.PreferredScheduleId, command.GroupId);
+            var selectedGroup = EvaluateStudentGroup(availableGroups, command.PreferedGroupId);
 
             if (!selectedGroup.HasAvailableSpace())
                 throw new UnAvailableResourceException("The selected group has just reached capacity. Please refresh and try again.");
@@ -534,22 +531,22 @@ public class EnrollmentService : IEnrollmentService
             throw new DomainException("Student already has an active enrollment for this subject.");
     }
 
-    private Group EvaluateStudentGroup(List<Group> availableGroups, Guid? PreferedScheduleId, Guid? groupId)
+    private Group EvaluateStudentGroup(List<Group> availableGroups, Guid? PreferedGroupId)
     {
         if (!availableGroups.Any())
             throw new UnAvailableResourceException("No available groups with free capacity for the selected level, subject, and branch.");
 
-        if (groupId.HasValue && groupId.Value != Guid.Empty)
+        if (PreferedGroupId.HasValue && PreferedGroupId.Value != Guid.Empty)
         {
-            return CheckGroupAvailability(availableGroups, groupId.Value);
+            return CheckGroupAvailability(availableGroups, PreferedGroupId.Value);
         }
 
-        return AssignNewGroup(availableGroups, PreferedScheduleId);
+        return AssignNewGroup(availableGroups, PreferedGroupId);
     }
 
-    private Group AssignNewGroup(List<Group> availableGroups, Guid? PreferedScheduleId)
+    private Group AssignNewGroup(List<Group> availableGroups, Guid? PreferedGroupId)
     {
-        var groupPrefered = availableGroups.FirstOrDefault(g => g.Schedule.Id == PreferedScheduleId);
+        var groupPrefered = availableGroups.FirstOrDefault(g => g.Id == PreferedGroupId);
         if (groupPrefered == null)
         {
             var first = availableGroups.FirstOrDefault();

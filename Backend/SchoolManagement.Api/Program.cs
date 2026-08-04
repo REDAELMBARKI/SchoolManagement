@@ -83,6 +83,9 @@ builder.Services.Configure<BillingOptions>(
 builder.Services.Configure<CommissionSettings>(
     builder.Configuration.GetSection(CommissionSettings.SectionName));
 
+builder.Services.Configure<SchoolManagement.Application.Common.Settings.MediaStorageSettings>(
+    builder.Configuration.GetSection("MediaStorage"));
+
 // Di registration 
 builder.Services.Scan(scan => scan
     .FromAssemblies(typeof(Program).Assembly, typeof(StudentService).Assembly, typeof(CurrentUserContext).Assembly)
@@ -111,6 +114,7 @@ builder.Services.AddScoped<IRefundService, RefundService>();
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
 builder.Services.AddScoped<IExpenseQueryService, ExpenseQueryService>();
+builder.Services.AddScoped<SchoolManagement.Application.Common.Validators.MediaStorageValidator>();
 
 // end Di registration
 

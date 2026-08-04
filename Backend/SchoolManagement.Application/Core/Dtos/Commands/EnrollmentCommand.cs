@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-﻿using System.ComponentModel.DataAnnotations;
-using SchoolManagement.Domain.Core.Enums;
-=======
 using System.ComponentModel.DataAnnotations;
-using SchoolManagement.Domain.Enums;
->>>>>>> 5fb5c4738af634e9e79c8340f0172f22f69d2a31
+using SchoolManagement.Domain.Core.Enums;
 
 namespace SchoolManagement.Application.Core.Dtos.Commands;
 
@@ -18,7 +13,7 @@ public class EnrollmentCommand
 
     public Guid SubjectId { get; set; }
 
-    public Guid GroupId { get; set; }
+    public Guid? PreferedGroupId { get; set; }
 
     public Guid BranchId { get; set; }
 
@@ -26,5 +21,5 @@ public class EnrollmentCommand
 
     public Guid? PlanId { get; set; }
 
-    public Guid? PreferedScheduleId { get; set; }
+
 }

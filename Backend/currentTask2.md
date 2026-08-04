@@ -358,25 +358,282 @@ Recorded). Salaries are tracked separately via the `PayrollPayment` entity.
 ---
 
 ### Story 9: Payment Plan Discount & Fee Evaluation
-**Priority**: P1 - Important  
+**Priority**: ~~P1~~ **SKIPPED** - Not needed for current business model  
 **Story Points**: 4
 
-**Tasks**:
-- [ ] **DOM-75**: Add `CalculateNetPayable()` method to Plan entity
-- [ ] **DOM-76**: Add `GenerateInstallmentSchedule()` method to Plan entity
-- [ ] **APP-77**: Update invoice generation to use dynamic due dates
-- [ ] **APP-78**: Add discount override audit logging
+**Design Decision**: 
+- ✅ Plan entity **ALREADY supports discounts** via nullable `DiscountPercent` property
+- ✅ Default behavior: Plans created with `DiscountPercent = null` (fixed pricing, no discount)
+- ✅ Admin flexibility: Can add/update/remove discount anytime via `UpdateDiscountPercent()` method
+- ✅ Amount calculation: `Amount = BaseAmount - (BaseAmount × DiscountPercent / 100)` when discount exists
+- ✅ Validation: Discount must be 0-100% when provided
+- ❌ **No automatic discount logic needed** - school uses fixed pricing strategy
+- ❌ **No manager override discounts** - not part of current business model
+- ❌ **No promotional/seasonal discounts** - fixed pricing per plan duration
+
+**Business Context**:
+The school operates with **fixed pricing without discounts**. Plans are priced competitively from the start:
+- Example: "3 Month Plan" = 3000 MAD (no discount needed, already best price)
+- If market conditions change, admin can add discount later (e.g., 10% summer promotion)
+- Current implementation provides flexibility without complexity
+
+**What exists (no changes needed)**:
+- ✅ `Plan.DiscountPercent` property (nullable decimal)
+- ✅ `Plan.Create()` with optional `discountPercent` parameter (defaults to null)
+- ✅ `Plan.UpdateDiscountPercent()` method for admin overrides
+- ✅ `Plan.Amount` calculated property handles both scenarios
+- ✅ Validation prevents invalid discount ranges
+
+**Tasks** (Not implementing):
+- [ ] ~~**DOM-75**: Add `CalculateNetPayable()` method to Plan entity~~ (Already exists via `Amount` property)
+- [ ] ~~**DOM-76**: Add `GenerateInstallmentSchedule()` method to Plan entity~~ (Not needed - fixed pricing)
+- [ ] ~~**APP-77**: Update invoice generation to use dynamic due dates~~ (Not needed)
+- [ ] ~~**APP-78**: Add discount override audit logging~~ (Can add later if discount usage increases)
 
 ---
 
 ### Story 10: Media Polymorphic Ownership & Storage Governance
 **Priority**: P1 - Important  
-**Story Points**: 3
+**Story Points**: 3  
+**Estimated Time**: ~2.5 hours
+
+---
+
+#### ✅ What's Already Implemented
+
+**1. Media Entity** ✅ Complete  
+Location: `SchoolManagement.Domain/Common/Entities/Media.cs`
+- ✅ Polymorphic ownership via `OwnerType` + `OwnerId`
+- ✅ `OwnerType` enum: User, Student, Teacher, Administrator
+- ✅ Media metadata: URL, MimeType, Size, AltText, Width, Height
+- ✅ `MediaType` enum: Photo, Banner, Document, Video, Avatar
+- ✅ `MediaCollection` enum: Avatar, Banner, Document, Photo, Video
+- ✅ `StorageProvider` field (supports multiple storage backends)
+- ✅ `BranchId` for multi-tenancy
+- ✅ `Order` and `IsMain` for gallery management
+- ✅ Full CRUD update methods with validation
+
+**2. MediaService** ✅ Basic Upload  
+Location: `SchoolManagement.Application/Common/Services/MediaService.cs`
+- ✅ File upload to local storage (`/Uploads` folder)
+- ✅ Unique filename generation (GUID-based)
+- ✅ Media entity creation with metadata
+
+**Current Issues**:
+- ⚠️ Missing owner validation (doesn't check if owner exists)
+- ⚠️ Missing file size validation
+- ⚠️ Hardcoded `BranchId = Guid.Empty` (should use `ICurrentUserContext`)
+- ⚠️ No image dimension extraction
+- ⚠️ No storage quota enforcement
+- ⚠️ Signature mismatch: controller doesn't pass `ownerId`/`ownerType` to service
+
+**3. MediaController** ✅ Basic Endpoint  
+Location: `SchoolManagement.Api/Controllers/MediaController.cs`
+- ✅ POST `/api/media/upload` endpoint
+- ✅ File extension validation: `.png`, `.jpg`, `.jpeg`
+- ✅ MIME type validation: `image/jpeg`, `image/png`, `image/webp`
+
+**Current Issues**:
+- ⚠️ Hardcoded allowed extensions/MIME types (should be configurable)
+- ⚠️ No max file size check
+- ⚠️ Missing `ownerId` and `ownerType` parameters
+- ⚠️ No owner existence validation
+
+---
+
+#### ❌ What Needs to Be Built
+
+**Phase 1: Configuration & Validation** (30 minutes)
+- [ ] **APP-94a**: Create `MediaStorageSettings.cs` options class in Application layer
+  ```csharp
+  public class MediaStorageSettings
+  {
+      public Dictionary<MediaType, long> MaxFileSizes { get; set; }
+      public Dictionary<MediaType, string[]> AllowedExtensions { get; set; }
+      public Dictionary<MediaType, string[]> AllowedMimeTypes { get; set; }
+      public int BranchQuotaGB { get; set; }
+  }
+  ```
+
+- [ ] **APP-94b**: Add `MediaStorage` section to `appsettings.json`
+  ```json
+  {
+    "MediaStorage": {
+      "MaxFileSizes": {
+        "Photo": 5242880,      // 5 MB
+        "Avatar": 2097152,      // 2 MB
+        "Document": 10485760,   // 10 MB
+        "Video": 104857600,     // 100 MB
+        "Banner": 5242880       // 5 MB
+      },
+      "AllowedExtensions": {
+        "Photo": [".png", ".jpg", ".jpeg", ".gif", ".webp"],
+        "Avatar": [".png", ".jpg", ".jpeg"],
+        "Document": [".pdf", ".doc", ".docx", ".xls", ".xlsx"],
+        "Video": [".mp4", ".mov", ".avi"],
+        "Banner": [".png", ".jpg", ".jpeg", ".webp"]
+      },
+      "AllowedMimeTypes": {
+        "Photo": ["image/jpeg", "image/png", "image/gif", "image/webp"],
+        "Avatar": ["image/jpeg", "image/png"],
+        "Document": ["application/pdf", "application/msword", "text/plain"],
+        "Video": ["video/mp4", "video/quicktime"],
+        "Banner": ["image/jpeg", "image/png", "image/webp"]
+      },
+      "BranchQuotaGB": 10
+    }
+  }
+  ```
+
+- [ ] **APP-94c**: Create `MediaStorageValidator.cs` class
+  - `ValidateFile(IFormFile file, MediaType mediaType)` - checks extension, MIME, size
+  - `ValidateBranchQuota(Guid branchId, long newFileSize)` - checks total storage used
+
+- [ ] **APP-94d**: Register in DI (Program.cs)
+  ```csharp
+  builder.Services.Configure<MediaStorageSettings>(builder.Configuration.GetSection("MediaStorage"));
+  builder.Services.AddScoped<MediaStorageValidator>();
+  ```
+
+**Phase 2: Owner Validation** (20 minutes)
+- [ ] **DOM-93 (Alternative)**: Add `ValidateOwnerExists()` private method to MediaService (Application layer)
+  - Validates Student exists via `IStudentRepository.GetByIdAsync()`
+  - Validates User exists via `IUserRepository.GetByIdAsync()`
+  - Validates Teacher exists via `ITeacherRepository.GetByIdAsync()`
+  - Throws `NotFoundException` if owner doesn't exist
+  - **Design Decision**: Keep validation in Application layer (not Domain) to avoid repository coupling
+
+**Phase 3: Service Enhancement** (40 minutes)
+- [ ] **APP-95a**: Update `IMediaService.Upload()` signature
+  ```csharp
+  Task<MediaResponseDto> Upload(
+      IFormFile file, 
+      Guid ownerId, 
+      OwnerType ownerType, 
+      MediaCollection collection, 
+      MediaType mediaType);
+  ```
+
+- [ ] **APP-95b**: Inject dependencies into MediaService
+  - Add `IStudentRepository`, `IUserRepository`, `ITeacherRepository`
+  - Add `MediaStorageValidator`
+  - Add `ICurrentUserContext`
+  - Add `IAuditLogService`
+
+- [ ] **APP-95c**: Update `MediaService.Upload()` implementation
+  - Call `_validator.ValidateFile(file, mediaType)` first
+  - Call `_validator.ValidateBranchQuota(branchId, file.Length)` second
+  - Call `ValidateOwnerExists(ownerId, ownerType)` third
+  - Fix `branchId` to use `_currentUserContext.BranchId` (not Guid.Empty)
+  - Add audit logging after successful upload
+  - *(Optional)* Extract image dimensions using ImageSharp
+
+**Phase 4: Controller Update** (15 minutes)
+- [ ] **API-95d**: Update `MediaController.Upload()` signature
+  ```csharp
+  [HttpPost]
+  public async Task<IActionResult> Upload(
+      IFormFile file,
+      [FromForm] Guid ownerId,
+      [FromForm] OwnerType ownerType,
+      [FromForm] MediaCollection collection,
+      [FromForm] MediaType mediaType)
+  ```
+
+- [ ] **API-95e**: Remove hardcoded validation from controller (moved to service layer)
+  - Remove extension checks
+  - Remove MIME type checks
+  - Keep null/empty file check
+
+- [ ] **API-95f**: Add proper error handling
+  - Catch `ValidationException` → return 400 Bad Request
+  - Catch `NotFoundException` → return 404 Not Found
+  - Catch generic exceptions → return 500 Internal Server Error
+
+**Phase 5: Repository Extension** (Optional, 20 minutes)
+- [ ] **INF-95g**: Add `GetTotalSizeByBranchAsync(Guid branchId)` to IMediaRepository
+  ```csharp
+  Task<long> GetTotalSizeByBranchAsync(Guid branchId);
+  ```
+
+- [ ] **INF-95h**: Implement in MediaRepository
+  ```csharp
+  public async Task<long> GetTotalSizeByBranchAsync(Guid branchId)
+  {
+      return await _context.Media
+          .Where(m => m.BranchId == branchId)
+          .SumAsync(m => m.Size);
+  }
+  ```
+
+---
+
+#### 🎯 Success Criteria
+
+✅ **Owner Validation**:
+- Uploading media with non-existent owner returns 404
+- Owner type validated correctly (Student, User, Teacher, Administrator)
+
+✅ **File Validation**:
+- Invalid extensions rejected per MediaType
+- Invalid MIME types rejected per MediaType
+- Files exceeding size limit rejected with clear error message
+- Configuration-driven (admin can adjust limits in appsettings.json)
+
+✅ **Storage Governance**:
+- Branch quota enforced (optional, configurable)
+- Total storage tracked per branch
+
+✅ **Audit Trail**:
+- All uploads logged with owner info, file size, MIME type
+
+---
+
+#### 🔧 Technical Decisions
+
+**Decision 1: Owner Validation Location**  
+✅ **Chosen**: Application layer (MediaService)  
+**Rationale**: Domain layer should not depend on repositories (architectural purity)
+
+**Decision 2: Storage Configuration**  
+✅ **Chosen**: appsettings.json  
+**Rationale**: Easy to update, environment-specific, no admin UI needed (YAGNI)
+
+**Decision 3: Image Dimension Extraction**  
+⏭️ **Recommended**: Use ImageSharp library (cross-platform, modern)  
+📦 **Package**: `SixLabors.ImageSharp` (optional enhancement)
+
+---
+
+#### 📦 Optional NuGet Package
+
+```bash
+# For image dimension extraction (optional but recommended)
+dotnet add package SixLabors.ImageSharp
+```
+
+---
+
+#### 📋 Implementation Checklist Summary
+
+| Phase | Tasks | Time |
+|---|---|---|
+| Configuration & Validation | Create settings, validator | 30 min |
+| Owner Validation | Add validation logic | 20 min |
+| Service Enhancement | Update MediaService | 40 min |
+| Controller Update | Update MediaController | 15 min |
+| Repository Extension | Add quota query (optional) | 20 min |
+| Testing | Full validation testing | 30 min |
+| **TOTAL** | | **~2.5 hours** |
+
+---
 
 **Tasks**:
-- [ ] **DOM-93**: Add `ValidateOwner()` method to Media entity
-- [ ] **APP-94**: Add storage quota validation (file extensions, MIME types, max sizes)
-- [ ] **APP-95**: Integrate validation into MediaService
+- [ ] **APP-94a-d**: Configuration & validation setup
+- [ ] **DOM-93**: Owner validation (in Application layer)
+- [ ] **APP-95a-c**: Service enhancement
+- [ ] **API-95d-f**: Controller update
+- [ ] **INF-95g-h**: Repository extension (optional)
 
 ---
 
@@ -404,6 +661,6 @@ Recorded). Salaries are tracked separately via the `PayrollPayment` entity.
 | Story 14: Group Transfer | P0 | ✅ Done |
 | Story 16: Refactor CreditBalance to Student | P1 | ✅ Done (migration ready) |
 | Story 15: Enroll Existing Student in Additional Group | P1 | ✅ Done (ready for testing) |
-| Story 9: Payment Plan Discounts | P1 | ❌ Pending |
+| Story 9: Payment Plan Discounts | ~~P1~~ SKIPPED | ✅ Not needed (fixed pricing) |
 | Story 10: Media Ownership Validation | P1 | ❌ Pending |
 | Story 13: Background Jobs & Notifications | P2 | ❌ Pending |
