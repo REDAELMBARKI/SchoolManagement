@@ -91,18 +91,18 @@ const toTimeStr = (m: number) => {
 
 const formatDisplay = (t: string) => t.slice(0, 5); // "08:00"
 
-/** Rechain all sessions in a day starting from DAY_START. */
-const rechain = (sessions: Session[]): Session[] => {
-  let cursor = DAY_START;
-  return sessions.map((s) => {
-    const start = cursor;
-    const end   = start + s.durationMinutes;
-    cursor = end;
-    return {
-      ...s,
-      startTime: toTimeStr(start),
-      endTime:   toTimeStr(end),
-    };
+/** Snap raw minutes to nearest 30-min slot, clamped to [DAY_START, DAY_END - 30] */
+const snapToSlot = (minutes: number) =>
+  Math.max(DAY_START, Math.min(DAY_END - 30, Math.round(minutes / 30) * 30));
+
+/** True if [start, start+duration) overlaps any session (optionally excluding one by scheduleId) */
+const hasOverlap = (sessions: Session[], start: number, duration: number, excludeId?: string) => {
+  const end = start + duration;
+  return sessions.some((s) => {
+    if (s.scheduleId === excludeId) return false;
+    const sStart = toMinutes(s.startTime);
+    const sEnd   = toMinutes(s.endTime);
+    return start < sEnd && end > sStart;
   });
 };
 
@@ -336,11 +336,27 @@ type DayRowProps = {
 };
 
 const DayRow = ({ day, onSessionClick, onAddClick }: DayRowProps) => {
-  const lastEnd = day.sessions.length
-    ? toMinutes(day.sessions[day.sessions.length - 1].endTime)
-    : DAY_START;
-  const addLeft = (lastEnd - DAY_START) * PIXELS_PER_MINUTE;
+  const rowRef = useRef<HTMLDivElement>(null);
+  const [hoverMinutes, setHoverMinutes] = useState<number | null>(null);
   const rowWidth = (DAY_END - DAY_START) * PIXELS_PER_MINUTE;
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = rowRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const rawMinutes = DAY_START + (e.clientX - rect.left) / PIXELS_PER_MINUTE;
+    const snapped = snapToSlot(rawMinutes);
+    // Hide "+" when hovering directly over an existing session block
+    const overSession = day.sessions.some((s) => {
+      const sStart = toMinutes(s.startTime);
+      const sEnd   = toMinutes(s.endTime);
+      return snapped >= sStart && snapped < sEnd;
+    });
+    setHoverMinutes(overSession ? null : snapped);
+  };
+
+  const hoverLeft = hoverMinutes !== null
+    ? (hoverMinutes - DAY_START) * PIXELS_PER_MINUTE
+    : 0;
 
   return (
     <div className="flex items-stretch border-b border-gray-100 last:border-0">
@@ -351,8 +367,11 @@ const DayRow = ({ day, onSessionClick, onAddClick }: DayRowProps) => {
 
       {/* Session area */}
       <div
-        className="relative flex-shrink-0 h-14"
+        ref={rowRef}
+        className="relative flex-shrink-0 h-14 cursor-crosshair"
         style={{ width: rowWidth }}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={() => setHoverMinutes(null)}
       >
         {/* Background grid lines */}
         {Array.from({ length: (DAY_END - DAY_START) / 30 }).map((_, i) => (
@@ -368,17 +387,34 @@ const DayRow = ({ day, onSessionClick, onAddClick }: DayRowProps) => {
           <SessionBlock key={s.scheduleId} session={s} onClick={() => onSessionClick(s)} />
         ))}
 
-        {/* Add button */}
-        {lastEnd < DAY_END && (
-          <button
-            onClick={() => onAddClick(day.dayId, toTimeStr(lastEnd))}
-            className="absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-lamaYellow hover:bg-yellow-300
-              flex items-center justify-center shadow-sm transition-colors z-10"
-            style={{ left: addLeft + 4 }}
-            title={`Add session at ${formatDisplay(toTimeStr(lastEnd))}`}
-          >
-            <Plus size={12} />
-          </button>
+        {/* Hover ghost: time label + "+" button */}
+        {hoverMinutes !== null && (
+          <>
+            {/* Vertical guide line */}
+            <div
+              className="absolute top-0 bottom-0 w-px bg-lamaYellow/60 pointer-events-none z-10"
+              style={{ left: hoverLeft }}
+            />
+            {/* Time tooltip above the row */}
+            <div
+              className="absolute -top-5 -translate-x-1/2 bg-gray-700 text-white text-[10px]
+                px-1.5 py-0.5 rounded pointer-events-none z-20 whitespace-nowrap"
+              style={{ left: hoverLeft }}
+            >
+              {formatDisplay(toTimeStr(hoverMinutes))}
+            </div>
+            {/* "+" button centred on the guide */}
+            <button
+              onClick={() => onAddClick(day.dayId, toTimeStr(hoverMinutes))}
+              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-6 h-6 rounded-full
+                bg-lamaYellow hover:bg-yellow-300 flex items-center justify-center
+                shadow-md ring-2 ring-white transition-colors z-20"
+              style={{ left: hoverLeft }}
+              title={`Add session at ${formatDisplay(toTimeStr(hoverMinutes))}`}
+            >
+              <Plus size={12} />
+            </button>
+          </>
         )}
       </div>
     </div>
@@ -467,60 +503,56 @@ const ScheduleBuilderPage = () => {
     const teacher = MOCK_TEACHERS.find((t) => t.id === data.teacherId)!;
     const room    = MOCK_ROOMS.find((r)    => r.id === data.roomId)!;
 
+    const day = timePlan.days.find((d) => d.dayId === popover.dayId)!;
+    const startMinutes = toMinutes(popover.startTime);
+    const endMinutes   = startMinutes + data.duration;
+
+    // Past-18:00 check
+    if (endMinutes > DAY_END) {
+      return `This block would end at ${formatDisplay(toTimeStr(endMinutes))}, past 18:00. Choose a shorter duration.`;
+    }
+
+    // Overlap check — exclude the session being edited
+    const excludeId =
+      popover.mode === "edit" && popover.sessionIdx !== undefined
+        ? day.sessions[popover.sessionIdx]?.scheduleId
+        : undefined;
+
+    if (hasOverlap(day.sessions, startMinutes, data.duration, excludeId)) {
+      return "This block overlaps an existing session. Pick a different time or remove the conflicting block.";
+    }
+
     setTimePlan((prev) => {
       if (!prev) return prev;
       return {
         ...prev,
-        days: prev.days.map((day) => {
-          if (day.dayId !== popover.dayId) return day;
-
-          let sessions = [...day.sessions];
-
+        days: prev.days.map((d) => {
+          if (d.dayId !== popover.dayId) return d;
+          let sessions = [...d.sessions];
           if (popover.mode === "add") {
             sessions.push({
               scheduleId: uid(),
               timeSlotId: uid(),
-              startTime: popover.startTime,
-              endTime: popover.startTime,
+              startTime:       popover.startTime,
+              endTime:         toTimeStr(endMinutes),
               durationMinutes: data.duration,
               room, teacher, subject,
             });
           } else if (popover.mode === "edit" && popover.sessionIdx !== undefined) {
             sessions[popover.sessionIdx] = {
               ...sessions[popover.sessionIdx],
+              startTime:       popover.startTime,
+              endTime:         toTimeStr(endMinutes),
               durationMinutes: data.duration,
               room, teacher, subject,
             };
           }
-
-          const rechained = rechain(sessions);
-
-          // Overflow check
-          if (rechained.length > 0) {
-            const lastEnd = toMinutes(rechained[rechained.length - 1].endTime);
-            if (lastEnd > DAY_END) {
-              return day; // will be caught below via error return
-            }
-          }
-
-          return { ...day, sessions: rechained };
+          // Keep sorted by start time
+          sessions.sort((a, b) => toMinutes(a.startTime) - toMinutes(b.startTime));
+          return { ...d, sessions };
         }),
       };
     });
-
-    // Check for overflow BEFORE committing (compute inline to validate)
-    const day = timePlan.days.find((d) => d.dayId === popover.dayId)!;
-    let sessions = [...day.sessions];
-    if (popover.mode === "add") {
-      sessions.push({ scheduleId: "x", timeSlotId: "x", startTime: popover.startTime, endTime: popover.startTime, durationMinutes: data.duration, room, teacher, subject });
-    } else if (popover.mode === "edit" && popover.sessionIdx !== undefined) {
-      sessions[popover.sessionIdx] = { ...sessions[popover.sessionIdx], durationMinutes: data.duration, room, teacher, subject };
-    }
-    const rechained = rechain(sessions);
-    const lastEnd = rechained.length > 0 ? toMinutes(rechained[rechained.length - 1].endTime) : DAY_START;
-    if (lastEnd > DAY_END) {
-      return "This schedule would push past 18:00. Reduce duration or remove earlier sessions.";
-    }
 
     setPopover(null);
     setSaved(false);
@@ -536,8 +568,9 @@ const ScheduleBuilderPage = () => {
         ...prev,
         days: prev.days.map((day) => {
           if (day.dayId !== popover.dayId) return day;
+          // Just remove — no rechain; gaps are intentional
           const sessions = day.sessions.filter((_, i) => i !== popover.sessionIdx);
-          return { ...day, sessions: rechain(sessions) };
+          return { ...day, sessions };
         }),
       };
     });
