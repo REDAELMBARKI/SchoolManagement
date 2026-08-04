@@ -354,9 +354,12 @@ const DayRow = ({ day, onSessionClick, onAddClick }: DayRowProps) => {
     setHoverMinutes(overSession ? null : snapped);
   };
 
+  const SLOT_WIDTH = 30 * PIXELS_PER_MINUTE; // width of one 30-min slot in px
   const hoverLeft = hoverMinutes !== null
     ? (hoverMinutes - DAY_START) * PIXELS_PER_MINUTE
     : 0;
+  // Center of the hovered slot (not its left edge)
+  const hoverCenter = hoverLeft + SLOT_WIDTH / 2;
 
   return (
     <div className="flex items-stretch border-b border-gray-100 last:border-0">
@@ -395,21 +398,21 @@ const DayRow = ({ day, onSessionClick, onAddClick }: DayRowProps) => {
               className="absolute top-0 bottom-0 w-px bg-lamaYellow/60 pointer-events-none z-10"
               style={{ left: hoverLeft }}
             />
-            {/* Time tooltip above the row */}
+            {/* Time tooltip — centred over the slot */}
             <div
               className="absolute -top-5 -translate-x-1/2 bg-gray-700 text-white text-[10px]
                 px-1.5 py-0.5 rounded pointer-events-none z-20 whitespace-nowrap"
-              style={{ left: hoverLeft }}
+              style={{ left: hoverCenter }}
             >
               {formatDisplay(toTimeStr(hoverMinutes))}
             </div>
-            {/* "+" button centred on the guide */}
+            {/* "+" button — centred in the slot */}
             <button
               onClick={() => onAddClick(day.dayId, toTimeStr(hoverMinutes))}
               className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-6 h-6 rounded-full
                 bg-lamaYellow hover:bg-yellow-300 flex items-center justify-center
                 shadow-md ring-2 ring-white transition-colors z-20"
-              style={{ left: hoverLeft }}
+              style={{ left: hoverCenter }}
               title={`Add session at ${formatDisplay(toTimeStr(hoverMinutes))}`}
             >
               <Plus size={12} />
