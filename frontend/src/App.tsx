@@ -29,6 +29,7 @@ import IntakeConvertPage from "./pages/list/IntakeConvertPage";
 import TableCreatePage from "./pages/forms/TableCreatePage";
 import TableDeletePage from "./pages/forms/TableDeletePage";
 import TableEditPage from "./pages/forms/TableEditPage";
+import ScheduleBuilderPage from "./pages/ScheduleBuilderPage";
 
 export default function App() {
   return (
@@ -61,6 +62,7 @@ export default function App() {
         <Route path="list/attendance" element={<AttendanceListPage />} />
         <Route path="list/messages" element={<MessagesPage />} />
         <Route path="list/intakes" element={<IntakeListPage />} />
+        <Route path="schedule-builder" element={<ScheduleBuilderPage />} />
       <Route path="list/:table/new" element={<TableCreatePage />} />
       <Route path="list/:table/:id/edit" element={<TableEditPage />} />
       <Route path="list/:table/:id/delete" element={<TableDeletePage />} />

@@ -80,6 +80,12 @@ const menuItems: MenuSection[] = [
       },
       // ────────────────────────────────────────────────────────────────
       {
+        icon: "/lesson.png",
+        label: "Schedule Builder",
+        href: "/schedule-builder",
+        visible: ["admin", "teacher"],
+      },
+      {
         icon: "/subject.png",
         label: "Subjects",
         href: "/list/subjects",
