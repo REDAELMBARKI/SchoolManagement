@@ -1,0 +1,49 @@
+Build an interactive weekly schedule/timeplan builder in React (Tailwind, lucide-react icons), for a school scheduling system. It must work exactly like this spec:
+
+CONTEXT
+- Top of the page: a group selector (dropdown of groups). Nothing else renders until a group is selected.
+- Once a group is picked, fetch GET /api/groups/{groupId}/timeplan, which returns:
+  {
+    "groupId": "guid",
+    "days": [
+      {
+        "dayId": "guid",
+        "dayName": "Monday",
+        "sessions": [
+          {
+            "scheduleId": "guid",
+            "timeSlotId": "guid",
+            "startTime": "08:00:00",
+            "endTime": "09:00:00",
+            "room": { "id": "guid", "name": "Room A" },
+            "teacher": { "id": "guid", "name": "Mr. Amine" },
+            "subject": { "id": "guid", "name": "Math" }
+          }
+        ]
+      }
+    ]
+  }
+  Load this directly into local editable state (flatten into a flat sessions array internally, keyed by dayId).
+
+GRID LAYOUT
+- Left column: fixed, lists days Monday-Saturday, non-scrolling horizontally.
+- Top header: time ruler from 08:00 to 18:00, showing labels on the hour and small tick marks every 30 minutes.
+- Body: one row per day. No <table> tags — use absolutely positioned <div> boxes inside a relatively positioned row container. Box position/width = (startMinute - dayStartMinute) * pixelsPerMinute and durationMinutes * pixelsPerMinute, using one shared PIXELS_PER_MINUTE constant for both the ruler and the boxes so they always line up.
+
+ADDING A SESSION
+- Each day row shows a "+" button positioned right after the last session's end time (or at 08:00 if the day is empty).
+- Clicking "+" opens a popover: title "New block", subtitle showing day + computed start time (read-only, never manually typed).
+- Duration control: segmented buttons in 30-minute increments — 30 min / 1 h / 1 h 30 / 2 h.
+- Then dropdowns: Subject, Teacher, Room, Group (Group is pre-filled/locked to the top-level selected group).
+- Confirm button disabled until all fields are filled.
+- On confirm: push the new session into state, then recompute that entire day's chain — walk all sessions for that day in order, starting cursor at 08:00, setting each session's start = cursor, end = start + duration, cursor = end. This automatically cascades any shift to later sessions.
+
+EDITING / DELETING
+- Clicking an existing box opens the same popover pre-filled, with "Edit block" and a delete option instead of "Add".
+- Changing duration on an existing session triggers the same full-day recompute (shifts every later session in that day automatically). If the shift pushes past 18:00, block the save and show an inline error instead of overflowing.
+- All edits are local/in-memory only until the user explicitly saves.
+
+SUBMIT
+- On save, flatten the nested days->sessions state into: { branchId, schedules: [{ dayId, roomId, teacherId, subjectId, groupId, startTime, endTime }] } and POST it. Backend resolves TimeSlot by exact (startTime,endTime) match, creating one if it doesn't exist, then creates/updates the Schedule referencing it. Do not invent or hardcode a fixed slot catalog on the frontend — all times are computed via chaining, not selected from a preset list.
+
+Show the live nested state and the flattened POST payload as two JSON preview panels below the grid for debugging purposes.

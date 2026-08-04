@@ -25,9 +25,16 @@ import AnnouncementListPage from "./pages/list/AnnouncementListPage";
 import AttendanceListPage from "./pages/list/AttendanceListPage";
 import MessagesPage from "./pages/list/MessagesPage";
 import IntakeListPage from "./pages/list/IntakeListPage";
+import IntakeConvertPage from "./pages/list/IntakeConvertPage";
 import TableCreatePage from "./pages/forms/TableCreatePage";
 import TableDeletePage from "./pages/forms/TableDeletePage";
 import TableEditPage from "./pages/forms/TableEditPage";
+import ScheduleBuilderPage from "./pages/ScheduleBuilderPage";
+import SettingsLayout from "./pages/settings/SettingsLayout";
+import RolesListPage from "./pages/settings/RolesListPage";
+import RoleDetailPage from "./pages/settings/RoleDetailPage";
+import StaffListPage from "./pages/settings/StaffListPage";
+import StaffDetailPage from "./pages/settings/StaffDetailPage";
 
 export default function App() {
   return (
@@ -40,9 +47,15 @@ export default function App() {
         <Route path="teacher" element={<TeacherPage />} />
         <Route path="parent" element={<ParentPage />} />
         <Route path="profile" element={<ProfilePage />} />
-        <Route path="settings" element={<SettingsPage />} />
+        <Route path="settings" element={<SettingsLayout />}>
+          <Route path="roles" element={<RolesListPage />} />
+          <Route path="roles/:roleId" element={<RoleDetailPage />} />
+          <Route path="staff" element={<StaffListPage />} />
+          <Route path="staff/:staffId" element={<StaffDetailPage />} />
+        </Route>
         <Route path="logout" element={<LogoutPage />} />
         <Route path="list/intakes" element={<IntakeListPage />} />
+        <Route path="list/intakes/:id/convert" element={<IntakeConvertPage />} />
         <Route path="list/students" element={<StudentListPage />} />
         <Route path="list/students/:id" element={<SingleStudentPage />} />
         <Route path="list/teachers" element={<TeacherListPage />} />
@@ -59,6 +72,7 @@ export default function App() {
         <Route path="list/attendance" element={<AttendanceListPage />} />
         <Route path="list/messages" element={<MessagesPage />} />
         <Route path="list/intakes" element={<IntakeListPage />} />
+        <Route path="schedule-builder" element={<ScheduleBuilderPage />} />
       <Route path="list/:table/new" element={<TableCreatePage />} />
       <Route path="list/:table/:id/edit" element={<TableEditPage />} />
       <Route path="list/:table/:id/delete" element={<TableDeletePage />} />

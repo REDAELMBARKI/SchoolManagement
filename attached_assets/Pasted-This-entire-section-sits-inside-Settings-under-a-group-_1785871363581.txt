@@ -1,0 +1,28 @@
+This entire section sits inside Settings, under a group called "Staff & Access." It should NOT appear in the main navigation that everyday users (teachers, accountants, etc.) see — it's only visible to admins. Inside "Staff & Access" there are exactly two links:
+
+Roles
+Staff Members
+
+Background idea:
+Every staff member (teacher, accountant, front desk, etc.) is given one or more "roles" — like job titles. Each role comes with a set of permissions attached to it, like "can view grades" or "can edit fees." When someone is given a role, they automatically get everything that role allows. Occasionally, one specific staff member might need one extra ability outside their normal role — this should be treated as a rare, special exception, not the everyday way of granting access.
+
+Screens needed:
+
+1. Roles page (from the "Roles" link)
+A simple list of all roles in the school (Teacher, Accountant, Branch Admin, etc.), showing how many people currently hold each role. Include a clear way to create a new role.
+
+2. Role detail page (clicking into a role from the list above)
+Show a clean grid or checklist of what that role is allowed to do, organized by area (Fees, Grades, Attendance, Timetable, Reports, etc.), using simple categories like "can view" / "can edit" / "can delete." Admins only check/uncheck boxes — never type anything freeform. Should feel like flipping switches, not filling out a form. Also allow renaming or deleting the role from here.
+
+3. Staff Members page (from the "Staff Members" link)
+A searchable list of all staff, showing their name and current role(s) at a glance. Include a way to add a new staff account.
+
+4. Staff member detail page (clicking into one person from the list above)
+Show three clearly separated sections:
+
+Assigned roles — with an easy way to add or remove roles for this person
+Extra permissions — a small, visually distinct section (feels more cautious/rare, not part of the everyday flow) for the occasional case where this one person needs a special ability outside their normal role(s)
+Everything this person can currently do — a plain-language, read-only summary combining their roles and any extra permissions, so an admin never has to guess or piece it together manually
+
+Design tone:
+This is a trust-and-safety-sensitive admin tool used by non-technical school administrators, not developers. It should feel simple, calm, and hard to misuse: clear visual hierarchy, obvious confirmation steps before removing access, plain everyday language throughout (say "permissions" and "access," never technical database terms). Prioritize clarity over density — these are occasional users, not power users living in this screen all day.
