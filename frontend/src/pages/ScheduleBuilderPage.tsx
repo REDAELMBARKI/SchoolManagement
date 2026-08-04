@@ -393,10 +393,11 @@ const DayRow = ({ day, onSessionClick, onAddClick }: DayRowProps) => {
         {/* Hover ghost: time label + "+" button */}
         {hoverMinutes !== null && (
           <>
-            {/* Slot highlight box */}
+            {/* Slot highlight box — fully clickable */}
             <div
-              className="absolute top-1 bottom-1 rounded border-2 border-lamaYellow bg-lamaYellow/10 pointer-events-none z-10"
+              className="absolute top-1 bottom-1 rounded border-2 border-lamaYellow bg-lamaYellow/10 cursor-pointer z-10"
               style={{ left: hoverLeft, width: SLOT_WIDTH }}
+              onClick={() => onAddClick(day.dayId, toTimeStr(hoverMinutes))}
             />
             {/* Time tooltip — centred over the slot */}
             <div
