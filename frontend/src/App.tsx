@@ -30,6 +30,11 @@ import TableCreatePage from "./pages/forms/TableCreatePage";
 import TableDeletePage from "./pages/forms/TableDeletePage";
 import TableEditPage from "./pages/forms/TableEditPage";
 import ScheduleBuilderPage from "./pages/ScheduleBuilderPage";
+import SettingsLayout from "./pages/settings/SettingsLayout";
+import RolesListPage from "./pages/settings/RolesListPage";
+import RoleDetailPage from "./pages/settings/RoleDetailPage";
+import StaffListPage from "./pages/settings/StaffListPage";
+import StaffDetailPage from "./pages/settings/StaffDetailPage";
 
 export default function App() {
   return (
@@ -42,7 +47,12 @@ export default function App() {
         <Route path="teacher" element={<TeacherPage />} />
         <Route path="parent" element={<ParentPage />} />
         <Route path="profile" element={<ProfilePage />} />
-        <Route path="settings" element={<SettingsPage />} />
+        <Route path="settings" element={<SettingsLayout />}>
+          <Route path="roles" element={<RolesListPage />} />
+          <Route path="roles/:roleId" element={<RoleDetailPage />} />
+          <Route path="staff" element={<StaffListPage />} />
+          <Route path="staff/:staffId" element={<StaffDetailPage />} />
+        </Route>
         <Route path="logout" element={<LogoutPage />} />
         <Route path="list/intakes" element={<IntakeListPage />} />
         <Route path="list/intakes/:id/convert" element={<IntakeConvertPage />} />
