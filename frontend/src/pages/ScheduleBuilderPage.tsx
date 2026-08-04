@@ -110,16 +110,22 @@ const uid = () => Math.random().toString(36).slice(2);
 
 // ─── Ruler ───────────────────────────────────────────────────────────────────
 const TimeRuler = () => {
-  const hours = [];
+  const ticks = [];
   for (let m = DAY_START; m <= DAY_END; m += 30) {
     const left = (m - DAY_START) * PIXELS_PER_MINUTE;
     const isHour = m % 60 === 0;
-    hours.push(
+    const h = Math.floor(m / 60).toString().padStart(2, "0");
+    const min = (m % 60).toString().padStart(2, "0");
+    ticks.push(
       <div key={m} className="absolute flex flex-col items-start" style={{ left }}>
-        <span className={`text-[10px] leading-none select-none ${isHour ? "text-gray-500 font-medium" : "text-gray-300"}`}>
-          {isHour ? `${String(m / 60).padStart(2, "0")}:00` : "·"}
+        <span
+          className={`text-[10px] leading-none select-none whitespace-nowrap ${
+            isHour ? "text-gray-500 font-semibold" : "text-gray-400"
+          }`}
+        >
+          {h}:{min}
         </span>
-        <div className={`mt-1 ${isHour ? "h-3 w-px bg-gray-300" : "h-1.5 w-px bg-gray-200"}`} />
+        <div className={`mt-1 ${isHour ? "h-3 w-px bg-gray-300" : "h-2 w-px bg-gray-200"}`} />
       </div>
     );
   }
@@ -128,7 +134,7 @@ const TimeRuler = () => {
       className="relative h-8 flex-shrink-0 border-b border-gray-100"
       style={{ width: (DAY_END - DAY_START) * PIXELS_PER_MINUTE }}
     >
-      {hours}
+      {ticks}
     </div>
   );
 };
