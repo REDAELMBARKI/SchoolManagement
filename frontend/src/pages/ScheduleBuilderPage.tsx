@@ -452,13 +452,78 @@ const ScheduleBuilderPage = () => {
   };
   const [popover, setPopover] = useState<PopoverState | null>(null);
 
+  // ── Fake seeded schedules (replace with real API response) ──────────────────
+  const SEEDED: Record<string, TimePlan> = {
+    g1: {
+      groupId: "g1",
+      days: [
+        {
+          dayId: "g1-day-1", dayName: "Monday",
+          sessions: [
+            { scheduleId: "g1-s1", timeSlotId: "g1-ts1", startTime: "08:00:00", endTime: "09:00:00", durationMinutes: 60, room: { id: "r1", name: "Room 101" }, teacher: { id: "t1", name: "Mr. Amine" },  subject: { id: "s1", name: "Mathematics" } },
+            { scheduleId: "g1-s2", timeSlotId: "g1-ts2", startTime: "10:00:00", endTime: "11:00:00", durationMinutes: 60, room: { id: "r3", name: "Room A"   }, teacher: { id: "t2", name: "Ms. Sara"   },  subject: { id: "s2", name: "English"     } },
+          ],
+        },
+        {
+          dayId: "g1-day-2", dayName: "Tuesday",
+          sessions: [
+            { scheduleId: "g1-s3", timeSlotId: "g1-ts3", startTime: "09:00:00", endTime: "10:30:00", durationMinutes: 90, room: { id: "r4", name: "Lab 1"    }, teacher: { id: "t3", name: "Mr. Karim"  },  subject: { id: "s3", name: "Science"     } },
+            { scheduleId: "g1-s4", timeSlotId: "g1-ts4", startTime: "13:00:00", endTime: "14:00:00", durationMinutes: 60, room: { id: "r1", name: "Room 101" }, teacher: { id: "t4", name: "Ms. Nadia"  },  subject: { id: "s4", name: "History"     } },
+          ],
+        },
+        {
+          dayId: "g1-day-3", dayName: "Wednesday",
+          sessions: [
+            { scheduleId: "g1-s5", timeSlotId: "g1-ts5", startTime: "08:00:00", endTime: "09:00:00", durationMinutes: 60, room: { id: "r2", name: "Room 102" }, teacher: { id: "t1", name: "Mr. Amine"  },  subject: { id: "s5", name: "Geography"   } },
+          ],
+        },
+        { dayId: "g1-day-4", dayName: "Thursday",  sessions: [] },
+        {
+          dayId: "g1-day-5", dayName: "Friday",
+          sessions: [
+            { scheduleId: "g1-s6", timeSlotId: "g1-ts6", startTime: "16:00:00", endTime: "17:00:00", durationMinutes: 60, room: { id: "r3", name: "Room A"   }, teacher: { id: "t2", name: "Ms. Sara"   },  subject: { id: "s1", name: "Mathematics" } },
+          ],
+        },
+        { dayId: "g1-day-6", dayName: "Saturday", sessions: [] },
+      ],
+    },
+    g2: {
+      groupId: "g2",
+      days: [
+        {
+          dayId: "g2-day-1", dayName: "Monday",
+          sessions: [
+            { scheduleId: "g2-s1", timeSlotId: "g2-ts1", startTime: "09:00:00", endTime: "10:00:00", durationMinutes: 60, room: { id: "r2", name: "Room 102" }, teacher: { id: "t2", name: "Ms. Sara"   }, subject: { id: "s2", name: "English"   } },
+            { scheduleId: "g2-s2", timeSlotId: "g2-ts2", startTime: "11:00:00", endTime: "12:30:00", durationMinutes: 90, room: { id: "r4", name: "Lab 1"    }, teacher: { id: "t3", name: "Mr. Karim"  }, subject: { id: "s3", name: "Science"   } },
+          ],
+        },
+        { dayId: "g2-day-2", dayName: "Tuesday",   sessions: [] },
+        {
+          dayId: "g2-day-3", dayName: "Wednesday",
+          sessions: [
+            { scheduleId: "g2-s3", timeSlotId: "g2-ts3", startTime: "08:00:00", endTime: "09:00:00", durationMinutes: 60, room: { id: "r1", name: "Room 101" }, teacher: { id: "t4", name: "Ms. Nadia"  }, subject: { id: "s4", name: "History"   } },
+            { scheduleId: "g2-s4", timeSlotId: "g2-ts4", startTime: "14:00:00", endTime: "15:00:00", durationMinutes: 60, room: { id: "r3", name: "Room A"   }, teacher: { id: "t1", name: "Mr. Amine"  }, subject: { id: "s1", name: "Mathematics"} },
+          ],
+        },
+        {
+          dayId: "g2-day-4", dayName: "Thursday",
+          sessions: [
+            { scheduleId: "g2-s5", timeSlotId: "g2-ts5", startTime: "10:00:00", endTime: "11:00:00", durationMinutes: 60, room: { id: "r2", name: "Room 102" }, teacher: { id: "t2", name: "Ms. Sara"   }, subject: { id: "s2", name: "English"   } },
+          ],
+        },
+        { dayId: "g2-day-5", dayName: "Friday",    sessions: [] },
+        { dayId: "g2-day-6", dayName: "Saturday",  sessions: [] },
+      ],
+    },
+  };
+
   // ── Load timeplan when group is selected ────────────────────────────────────
   const loadGroup = async (groupId: string) => {
     setLoading(true);
     setSaved(false);
     // Simulate API call — replace with: fetch(`/api/groups/${groupId}/timeplan`)
     await new Promise((r) => setTimeout(r, 400));
-    const plan: TimePlan = {
+    const plan: TimePlan = SEEDED[groupId] ?? {
       groupId,
       days: DAYS.map((name, i) => ({
         dayId: `day-${i + 1}`,
