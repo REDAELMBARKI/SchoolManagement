@@ -537,8 +537,8 @@ const ScheduleBuilderPage = () => {
 
   const handleGroupChange = (id: string) => {
     setSelectedGroupId(id);
+    setTimePlan(null); // clear stale data immediately so old grid never shows during load
     if (id) loadGroup(id);
-    else setTimePlan(null);
   };
 
   // ── Open popover for add ─────────────────────────────────────────────────
@@ -738,10 +738,39 @@ const ScheduleBuilderPage = () => {
         </div>
       )}
 
-      {/* ── Loading ──────────────────────────────────────────────────────── */}
+      {/* ── Loading skeleton ─────────────────────────────────────────────── */}
       {selectedGroupId && loading && (
-        <div className="bg-white rounded-md p-16 flex items-center justify-center">
-          <div className="w-7 h-7 border-2 border-lamaSky border-t-transparent rounded-full animate-spin" />
+        <div className="bg-white rounded-md p-4 overflow-hidden animate-pulse">
+          {/* Fake ruler */}
+          <div className="flex mb-3 pl-24 gap-2">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <div key={i} className="h-3 rounded bg-gray-100 flex-1" />
+            ))}
+          </div>
+          {/* Fake day rows */}
+          {DAYS.map((day) => (
+            <div key={day} className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
+              {/* Day label */}
+              <div className="w-24 flex-shrink-0">
+                <div className="h-3 w-16 rounded bg-gray-100" />
+              </div>
+              {/* Random-width fake blocks */}
+              <div className="flex-1 h-10 rounded bg-gray-50 relative overflow-hidden flex items-center gap-2 px-2">
+                {Array.from({ length: Math.floor(Math.random() * 2) + 1 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-7 rounded bg-gray-200"
+                    style={{ width: `${60 + i * 40}px` }}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+          {/* Spinner + label centred below */}
+          <div className="flex items-center justify-center gap-2 pt-6 pb-2">
+            <div className="w-4 h-4 border-2 border-lamaSky border-t-transparent rounded-full animate-spin" />
+            <span className="text-xs text-gray-400">Loading schedule…</span>
+          </div>
         </div>
       )}
 
