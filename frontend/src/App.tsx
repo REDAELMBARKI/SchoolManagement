@@ -51,12 +51,10 @@ export default function App() {
         <Route path="profile" element={<ProfilePage />} />
         <Route path="settings">
           <Route index element={<SettingsHubPage />} />
-          <Route element={<SettingsLayout />}>
-            <Route path="roles" element={<RolesListPage />} />
-            <Route path="roles/:roleId" element={<RoleDetailPage />} />
-            <Route path="staff" element={<StaffListPage />} />
-            <Route path="staff/:staffId" element={<StaffDetailPage />} />
-          </Route>
+          <Route path="roles" element={<RolesListPage />} />
+          <Route path="roles/:roleId" element={<RoleDetailPage />} />
+          <Route path="staff" element={<StaffListPage />} />
+          <Route path="staff/:staffId" element={<StaffDetailPage />} />
         </Route>
         <Route path="logout" element={<LogoutPage />} />
         <Route path="intakes" element={<IntakesHubPage />} />
