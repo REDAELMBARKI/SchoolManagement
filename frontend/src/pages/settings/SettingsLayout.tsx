@@ -2,6 +2,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { ShieldCheck, Users } from "lucide-react";
 import { role } from "@/lib/data";
 
+
 const groups = [
   {
     label: "Staff & Access",
@@ -16,9 +17,6 @@ const groups = [
 export default function SettingsLayout() {
   const location = useLocation();
   const isAdmin = role === "admin";
-
-  // Default landing — just show the welcome card if at /settings exactly
-  const atRoot = location.pathname === "/settings";
 
   return (
     <div className="flex gap-0 m-4 mt-0 min-h-[calc(100vh-8rem)]">
@@ -57,21 +55,7 @@ export default function SettingsLayout() {
 
       {/* ── Right content ─────────────────────────────────────────────────── */}
       <main className="flex-1 bg-white rounded-r-md overflow-hidden">
-        {atRoot ? (
-          <div className="flex flex-col items-center justify-center h-full gap-3 text-center p-12">
-            <div className="w-14 h-14 rounded-full bg-lamaSkyLight flex items-center justify-center">
-              <ShieldCheck size={24} className="text-sky-500" />
-            </div>
-            <p className="text-gray-600 font-medium text-sm">Settings</p>
-            <p className="text-gray-400 text-xs max-w-xs">
-              {isAdmin
-                ? "Choose a section from the left to manage roles and staff access."
-                : "You don't have access to any settings sections."}
-            </p>
-          </div>
-        ) : (
-          <Outlet />
-        )}
+        <Outlet />
       </main>
     </div>
   );
