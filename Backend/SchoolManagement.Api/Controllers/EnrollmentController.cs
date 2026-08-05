@@ -1,13 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using SchoolManagement.Application.Academic.Dtos.Commands;
 using SchoolManagement.Application.Core.Dtos.Commands;
-using SchoolManagement.Application.Common.Dtos.Commands;
-using SchoolManagement.Application.Academic.Dtos.Requests;
 using SchoolManagement.Application.Core.Dtos.Requests;
-using SchoolManagement.Application.Common.Dtos.Requests;
-using SchoolManagement.Application.Academic.Interfaces.Services;
 using SchoolManagement.Application.Core.Interfaces.Services;
-using SchoolManagement.Application.Common.Interfaces.Services;
 using SchoolManagement.Domain.Common.Exceptions;
 
 namespace SchoolManagement.Api.Controllers;
@@ -62,9 +56,8 @@ public class EnrollmentController : ControllerBase
                 LevelId = dto.LevelId,
                 SubjectId = dto.SubjectId,
                 Notes = dto.Notes,
-                PreferedScheduleId = dto.PreferedScheduleId,
                 StudentId = dto.StudentId,
-                GroupId = dto.GroupId ?? Guid.Empty
+                PreferedGroupId = dto.PreferedGroupId ?? Guid.Empty
             };
             var enrollment = await _enrollmentService.CreateAsync(command);
             return CreatedAtAction(nameof(GetById), new { id = enrollment.Id }, enrollment);
@@ -102,12 +95,12 @@ public class EnrollmentController : ControllerBase
         {
             var command = new UpdateEnrollmentCommand
             {
-                PreferedScheduleId = dto.PreferedScheduleId,
+            
                 LevelId = dto.LevelId,
                 StudentId = dto.StudentId,
                 SubjectId = dto.SubjectId,
                 Notes = dto.Notes,
-                GroupId = dto.GroupId
+                PreferedGroupId = dto.PreferedGroupId
             };
             await _enrollmentService.UpdateAsync(id, command);
             return NoContent();
@@ -299,8 +292,7 @@ public class EnrollmentController : ControllerBase
                 StudentId = studentId,
                 SubjectId = dto.SubjectId,
                 LevelId = dto.LevelId,
-                GroupId = dto.GroupId,
-                PreferredScheduleId = dto.PreferredScheduleId,
+                PreferedGroupId = dto.PreferedGroupId,
                 PlanId = dto.PlanId,
                 Notes = dto.Notes,
                 PaymentData = dto.PaymentData,

@@ -1,7 +1,5 @@
 using SchoolManagement.Application.Common.Interfaces;
 using SchoolManagement.Application.Common.Interfaces.Services;
-using SchoolManagement.Application.Core.Dtos.Commands;
-using SchoolManagement.Application.Core.Dtos.Responses;
 using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;

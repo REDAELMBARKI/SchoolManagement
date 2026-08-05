@@ -63,7 +63,7 @@ public class StudentRegistrationService
         {
             StudentId = createdStudent.Id,
             SubjectId = request.EnrollmentRegReq.SubjectId,
-            PreferedGroupId = request.EnrollmentRegReq.PreferredGroupId ?? Guid.Empty,
+            PreferedGroupId = request.EnrollmentRegReq.PreferedGroupId ?? Guid.Empty,
             LevelId = request.EnrollmentRegReq.LevelId,
             PlanId = request.EnrollmentRegReq.PlanId,
             BranchId = _currentUserContext.BranchId,

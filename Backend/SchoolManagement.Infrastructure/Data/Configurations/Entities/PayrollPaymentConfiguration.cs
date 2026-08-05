@@ -64,9 +64,6 @@ public class PayrollPaymentConfiguration : IEntityTypeConfiguration<PayrollPayme
             .IsRequired(false)
             .HasMaxLength(500);
 
-        builder.Property(p => p.CurrencyCode)
-            .IsRequired()
-            .HasMaxLength(10);
 
         // Relationship: many payroll payments → one branch
         builder.HasOne(p => p.Branch)

@@ -1,12 +1,8 @@
-using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Common.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SchoolManagement.Domain.Common.ValueObjects
 {
-    public  class Address : ValueObject
+    public class Address : ValueObject
     {
         public string Street { get; }
         public string City { get; }

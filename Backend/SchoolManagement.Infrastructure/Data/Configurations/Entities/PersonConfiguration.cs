@@ -1,8 +1,5 @@
-using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Common.Entities;
 
 namespace SchoolManagement.Infrastructure.Data.Configurations.Entities;
@@ -11,7 +8,7 @@ public class PersonConfiguration : IEntityTypeConfiguration<Person>
 {
     public void Configure(EntityTypeBuilder<Person> entityTypeBuilder)
     {
-   
+
         entityTypeBuilder.UseTpcMappingStrategy();
         // Shared Person property validations
         entityTypeBuilder.Property(p => p.FirstName)
@@ -26,7 +23,7 @@ public class PersonConfiguration : IEntityTypeConfiguration<Person>
             .IsRequired()
             .HasMaxLength(100);
 
-    
+
 
         entityTypeBuilder.Property(p => p.GenderId)
             .IsRequired(false);

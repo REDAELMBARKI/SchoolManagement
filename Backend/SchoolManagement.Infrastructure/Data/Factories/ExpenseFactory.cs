@@ -1,6 +1,5 @@
 using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Core.Enums;
-using SchoolManagement.Infrastructure.Data;
 
 namespace SchoolManagement.Infrastructure.Data.Factories;
 

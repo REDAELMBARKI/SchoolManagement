@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Core.Dtos.Commands;
 using SchoolManagement.Application.Core.Dtos.Requests;
-using SchoolManagement.Domain.Common.Exceptions;
 using SchoolManagement.Application.Core.Interfaces.Services;
+using SchoolManagement.Domain.Common.Exceptions;
 namespace SchoolManagement.Api.Controllers;
 
 [ApiController]
@@ -10,7 +10,7 @@ namespace SchoolManagement.Api.Controllers;
 public class StudentController : ControllerBase
 {
     private readonly IStudentService _studentService;
-  
+
     public StudentController(IStudentService studentService)
     {
         _studentService = studentService;

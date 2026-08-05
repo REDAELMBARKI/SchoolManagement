@@ -23,6 +23,6 @@ public class EnrollmentRequestDto
     
     public string? Notes { get; set; }
 
-    public Guid? PreferredGroupId { get; set; }
+    public Guid? PreferedGroupId { get; set; }
 
 }

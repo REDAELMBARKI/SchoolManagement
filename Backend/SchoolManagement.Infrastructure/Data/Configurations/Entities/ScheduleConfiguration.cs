@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Entities;
 
 namespace SchoolManagement.Infrastructure.Data.Configurations.Entities;
 
@@ -31,7 +29,7 @@ public class ScheduleConfiguration : IEntityTypeConfiguration<Schedule>
         entityTypeBuilder.HasIndex(s => s.BranchId);
         entityTypeBuilder.HasIndex(s => s.RoomId);
 
-       // ralshioships 
+        // ralshioships 
         entityTypeBuilder.HasOne(sc => sc.Branch)
             .WithMany()
             .HasForeignKey(sc => sc.BranchId)
@@ -47,7 +45,7 @@ public class ScheduleConfiguration : IEntityTypeConfiguration<Schedule>
             .HasForeignKey(sc => sc.SubjectId)
             .OnDelete(DeleteBehavior.Restrict);
 
-            
+
         entityTypeBuilder.HasOne(sc => sc.Room)
             .WithMany()
             .HasForeignKey(sc => sc.RoomId)
@@ -67,6 +65,6 @@ public class ScheduleConfiguration : IEntityTypeConfiguration<Schedule>
             .WithMany()
             .HasForeignKey(sc => sc.DayId)
             .OnDelete(DeleteBehavior.Restrict);
-    
+
     }
 }

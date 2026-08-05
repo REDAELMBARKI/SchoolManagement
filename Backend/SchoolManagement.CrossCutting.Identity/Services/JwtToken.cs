@@ -3,8 +3,6 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Common.Entities;
 
 namespace SchoolManagement.Application.Services;

@@ -1,15 +1,5 @@
 using FluentValidation;
-using SchoolManagement.Application.Academic.Dtos.Requests;
 using SchoolManagement.Application.Core.Dtos.Requests;
-using SchoolManagement.Application.Common.Dtos.Requests;
-using SchoolManagement.Domain.Academic.Interfaces;
-using SchoolManagement.Domain.Core.Interfaces;
-using SchoolManagement.Domain.Common.Interfaces;
-using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Entities;
-using DtoLeadSourceType = SchoolManagement.Application.Dtos.Requests.LeadSourceType;
-using SchoolManagement.Application.Academic.Interfaces.Queries;
 using SchoolManagement.Application.Core.Interfaces.Queries;
 using SchoolManagement.Application.Common.Interfaces.Queries;
 using SchoolManagement.Application.Core.Strategies;

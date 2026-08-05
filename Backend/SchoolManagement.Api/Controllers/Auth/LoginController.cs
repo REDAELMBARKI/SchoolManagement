@@ -1,11 +1,7 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
-using SchoolManagement.Application.Academic.Services;
-using SchoolManagement.Application.Core.Services;
-using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
+using SchoolManagement.Application.Services;
 using SchoolManagement.Domain.Common.Entities;
 
 namespace SchoolManagement.Api.Auth.Controllers;

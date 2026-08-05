@@ -1,11 +1,8 @@
 
 using FluentValidation;
-using SchoolManagement.Application.Academic.Dtos.Requests;
 using SchoolManagement.Application.Core.Dtos.Requests;
-using SchoolManagement.Application.Common.Dtos.Requests;
 using SchoolManagement.Application.Academic.Interfaces.Queries;
 using SchoolManagement.Application.Core.Interfaces.Queries;
-using SchoolManagement.Application.Common.Interfaces.Queries;
 
 namespace SchoolManagement.Application.Core.Validators;
 
@@ -28,10 +25,7 @@ public class EnrollmentValidator : AbstractValidator<EnrollmentRequestDto>
             .MustAsync(async (subjectId, ct) => await subjectQueryService.IsExistsAsync(subjectId))
             .WithMessage("Selected subject does not exist.");
 
-        RuleFor(e => e.PreferedScheduleId)
-            .MustAsync(async (scheduleId, ct) => scheduleId.HasValue && await scheduleQueryService.IsExistsAsync(scheduleId.Value))
-            .WithMessage("Selected schedule does not exist.");
-
+   
 
         RuleFor(e => e.StudentId)
             .MustAsync(async (studentId, ct) => await studentQueryService.IsExistsAsync(studentId))
@@ -56,14 +50,14 @@ public class EnrollmentValidator : AbstractValidator<EnrollmentRequestDto>
             .When(e => e.PlanId != Guid.Empty);
 
 
-        RuleFor(e => e.GroupId)
+        RuleFor(e => e.PreferedGroupId)
             .MustAsync(async (groupId, ct) =>
             {
                 if (!groupId.HasValue || groupId.Value == Guid.Empty) return true;
                 return await groupQueryService.IsExistsAsync(groupId.Value);
             })
             .WithMessage("Selected group does not exist.")
-            .When(e => e.GroupId.HasValue && e.GroupId.Value != Guid.Empty);
+            .When(e => e.PreferedGroupId.HasValue && e.PreferedGroupId.Value != Guid.Empty);
 
         // Basic LevelId non-empty validation (since no ILevelQueryService exists yet)
         RuleFor(e => e.LevelId)
@@ -71,15 +65,6 @@ public class EnrollmentValidator : AbstractValidator<EnrollmentRequestDto>
             .WithMessage("Level must be selected.");
 
 
-        // check if grroupIId is for the thr prefered schedule
-        When(e => e.GroupId.HasValue && e.PreferedScheduleId.HasValue, () =>
-        {
-            RuleFor(e => e)
-              .MustAsync(async (e , ct) =>
-              {
-                  var group = await groupQueryService.GetByIdAsync(e.GroupId!.Value);
-                  return e.PreferedScheduleId == group!.Schedule.Id;
-              });
-        });
+ 
     }
 }

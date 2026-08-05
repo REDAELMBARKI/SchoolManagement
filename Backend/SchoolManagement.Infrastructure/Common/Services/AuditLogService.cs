@@ -1,13 +1,9 @@
-using System.Security.Claims;
-using System.Text.Json;
 using Microsoft.AspNetCore.Http;
-using SchoolManagement.Application.Academic.Interfaces.Services;
-using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Application.Common.Interfaces.Services;
-using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Infrastructure.Data;
+using System.Security.Claims;
+using System.Text.Json;
 
 namespace SchoolManagement.Infrastructure.Common.Services;
 

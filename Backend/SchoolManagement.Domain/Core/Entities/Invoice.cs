@@ -175,7 +175,8 @@ public class Invoice : AggregateRoot
     }
 
     public void CancelInvoice(string reason)
-    {        if (string.IsNullOrWhiteSpace(reason))
+    {
+        if (string.IsNullOrWhiteSpace(reason))
             throw new DomainException("Cancellation reason is required.");
 
         if (Status == InvoiceStatus.Cancelled)
@@ -196,7 +197,7 @@ public class Invoice : AggregateRoot
     }
 
     public void RecalculateStatus()
-    {        
+    {
         if (Status == InvoiceStatus.Cancelled)
             return;
 

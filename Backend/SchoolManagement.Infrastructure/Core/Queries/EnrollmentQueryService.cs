@@ -1,16 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Application.Academic.Dtos.Responses;
 using SchoolManagement.Application.Core.Dtos.Responses;
-using SchoolManagement.Application.Common.Dtos.Responses;
-using SchoolManagement.Application.Academic.Mappers;
-using SchoolManagement.Application.Core.Mappers;
-using SchoolManagement.Application.Common.Mappers;
-using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Application.Academic.Interfaces.Queries;
 using SchoolManagement.Application.Core.Interfaces.Queries;
-using SchoolManagement.Application.Common.Interfaces.Queries;
-using SchoolManagement.Infrastructure.Data;
+using SchoolManagement.Application.Core.Mappers;
+using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Core.Enums;
+using SchoolManagement.Infrastructure.Data;
 
 namespace SchoolManagement.Infrastructure.Core.Queries;
 
@@ -74,5 +68,17 @@ public class EnrollmentQueryService : IEnrollmentQueryService
             .AnyAsync(e => e.StudentId == studentId
                         && e.SubjectId == subjectId
                         && e.Status == EnrollmentStatus.Active);
+    }
+
+    public async Task<List<Enrollment>> GetByStudentIdAsync(Guid studentId)
+    {
+        return await _context.Enrollments.Where(e => e.StudentId == studentId)
+            .Include(e => e.Subject)
+            .Include(e => e.Group)
+            .Include(e => e.Branch)
+            .Include(e => e.Payments)
+            .Include(e => e.EnrollmentPlans)
+                .ThenInclude(ep => ep.Plan)
+            .ToListAsync();
     }
 }

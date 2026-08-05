@@ -1,25 +1,22 @@
 
-using SchoolManagement.Infrastructure.Data.Factories;
 using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Entities;
-using SchoolManagement.Infrastructure.Data ;
-namespace  SchoolManagement.Infrastructure.Data.Seeders ; 
+using SchoolManagement.Infrastructure.Data.Factories;
+namespace SchoolManagement.Infrastructure.Data.Seeders;
 
 public class LevelSeeder : Seeder
 {
-    private readonly   LevelFactory _factory;
+    private readonly LevelFactory _factory;
 
     public LevelSeeder(AppDbContext context) : base(context)
     {
-            _factory = new   LevelFactory(context);
+        _factory = new LevelFactory(context);
 
-    } 
+    }
 
     public override async Task RunAsync()
     {
-       List<Level> Levels = await _factory.MakeMany(10);
-       await Context.Levels.AddRangeAsync(Levels);
-       await Context.SaveChangesAsync() ;
+        List<Level> Levels = await _factory.MakeMany(10);
+        await Context.Levels.AddRangeAsync(Levels);
+        await Context.SaveChangesAsync();
     }
 }

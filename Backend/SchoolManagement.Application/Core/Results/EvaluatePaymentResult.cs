@@ -1,8 +1,3 @@
-using SchoolManagement.Domain.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace SchoolManagement.Application.Core.Results
 {
     public record EvaluatePaymentPlanResult

@@ -12,11 +12,11 @@ public class EnrollmentGroupTransferredDomainEvent : INotification
     public DateTime TransferredAt { get; }
 
     public EnrollmentGroupTransferredDomainEvent(
-        Guid enrollmentId, 
-        Guid studentId, 
-        Guid oldGroupId, 
-        Guid newGroupId, 
-        string reason, 
+        Guid enrollmentId,
+        Guid studentId,
+        Guid oldGroupId,
+        Guid newGroupId,
+        string reason,
         DateTime transferredAt)
     {
         EnrollmentId = enrollmentId;

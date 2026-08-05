@@ -1,6 +1,3 @@
-using SchoolManagement.Application.Core.Dtos.Commands;
-using SchoolManagement.Application.Core.Dtos.Responses;
-
 namespace SchoolManagement.Application.Core.Interfaces.Services;
 
 public interface IRefundService

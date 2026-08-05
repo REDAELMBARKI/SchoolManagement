@@ -1,6 +1,5 @@
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
-using System.Collections.ObjectModel;
 
 namespace SchoolManagement.Domain.Core.Entities;
 

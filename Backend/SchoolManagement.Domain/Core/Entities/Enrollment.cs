@@ -348,7 +348,7 @@ public class Enrollment : AggregateRoot
         var oldGroupId = GroupId;
         GroupId = newGroupId;
         Notes = $"Transferred from group {oldGroupId} to {newGroupId}. Reason: {reason}";
-        
+
         AddDomainEvent(new EnrollmentGroupTransferredDomainEvent(Id, StudentId, oldGroupId, newGroupId, reason, DateTime.UtcNow));
     }
 

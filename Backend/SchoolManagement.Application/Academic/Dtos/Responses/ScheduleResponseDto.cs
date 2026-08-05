@@ -10,7 +10,7 @@ public class ScheduleResponseDto
     public Guid TimeSlotId { get; set; }
     public Guid GroupId { get; set; }
     public Guid SubjectId { get; set; }
-    
+
     public BranchResponseDto? Branch { get; set; }
     public TeacherResponseDto? Teacher { get; set; }
     public RoomResponseDto? Room { get; set; }
@@ -25,11 +25,6 @@ public class GroupedScheduleDto
     public List<DayScheduleDto> Days { get; set; } = new List<DayScheduleDto>();
 }
 
-public class DayScheduleDto
-{
-    public string DayName { get; set; } = string.Empty;
-    public List<TimeSlotScheduleDto> TimeSlots { get; set; } = new List<TimeSlotScheduleDto>();
-}
 
 public class TimeSlotScheduleDto
 {

@@ -1,8 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Entities;
-using SchoolManagement.Infrastructure.Data;
 using Slugify;
 
 namespace SchoolManagement.Infrastructure.Data.Factories;
@@ -22,8 +19,8 @@ public class TeacherFactory : Factory<Teacher>
         var lastName = faker.Name.LastName();
         var email = faker.Random.Bool() ? faker.Internet.Email(firstName, lastName) : null;
         var phone = faker.Phone.PhoneNumber();
-        var dateOfBirth = faker.Random.Bool() 
-            ? DateOnly.FromDateTime(faker.Date.Past(30, DateTime.Now.AddYears(-18))) 
+        var dateOfBirth = faker.Random.Bool()
+            ? DateOnly.FromDateTime(faker.Date.Past(30, DateTime.Now.AddYears(-18)))
             : (DateOnly?)null;
         var hireDate = faker.Date.Past(10);
         var salary = faker.Finance.Amount(3000, 15000);

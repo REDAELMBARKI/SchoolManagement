@@ -2,31 +2,17 @@ using Bogus;
 using FluentAssertions;
 using MediatR;
 using Moq;
-using SchoolManagement.Application.Academic.Dtos.Commands;
-using SchoolManagement.Application.Core.Dtos.Commands;
-using SchoolManagement.Application.Academic.Dtos.Requests;
-using SchoolManagement.Application.Core.Dtos.Requests;
-using SchoolManagement.Application.Common.Dtos.Requests;
-using SchoolManagement.Application.Academic.Dtos.Responses;
-using SchoolManagement.Application.Core.Dtos.Responses;
-using SchoolManagement.Application.Common.Dtos.Responses;
 using SchoolManagement.Application.Common.Interfaces;
-using SchoolManagement.Application.Academic.Interfaces.Services;
-using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Application.Common.Interfaces.Services;
-using SchoolManagement.Application.Core.Services;
-using SchoolManagement.Domain.Core.DomainEvents;
-using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Entities;
-using SchoolManagement.Domain.Common.Exceptions;
-using SchoolManagement.Application.Academic.Interfaces.Queries;
+using SchoolManagement.Application.Core.Dtos.Commands;
+using SchoolManagement.Application.Core.Dtos.Responses;
 using SchoolManagement.Application.Core.Interfaces.Queries;
-using SchoolManagement.Application.Common.Interfaces.Queries;
-using SchoolManagement.Domain.Academic.Interfaces;
+using SchoolManagement.Application.Core.Interfaces.Services;
+using SchoolManagement.Application.Core.Services;
+using SchoolManagement.Domain.Common.Exceptions;
+using SchoolManagement.Domain.Core.DomainEvents;
+using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Core.Interfaces;
-using SchoolManagement.Domain.Common.Interfaces;
-using SchoolManagement.Infrastructure.Data;
 using Xunit;
 
 namespace SchoolManagement.Tests.UnitTests.Students
@@ -51,7 +37,7 @@ namespace SchoolManagement.Tests.UnitTests.Students
             _currentUserContextMock = new Mock<ICurrentUserContext>();
 
             _faker = new Faker();
-            _sut = new StudentService(_studentRepoMock.Object, _studentQueryMock.Object, _mediatorMock.Object, _auditLogServiceMock.Object , _currentUserContextMock.Object);
+            _sut = new StudentService(_studentRepoMock.Object, _studentQueryMock.Object, _mediatorMock.Object, _auditLogServiceMock.Object, _currentUserContextMock.Object);
             _studentCommand = new StudentCommand
             {
                 IntakeId = Guid.NewGuid(),
@@ -152,7 +138,7 @@ namespace SchoolManagement.Tests.UnitTests.Students
         [Fact]
         public async Task CreateAsync_SkipsEmailCheck_AndDoesNotThrow_WhenEmailIsNullOrWhitespace()
         {
-            var cmd = CopyCommand(_studentCommand); 
+            var cmd = CopyCommand(_studentCommand);
             cmd.Email = "   ";
             _studentQueryMock.Setup(q => q.HasDuplicateByPhoneAsync(cmd.Phone, null))
                 .ReturnsAsync(false);
@@ -204,7 +190,7 @@ namespace SchoolManagement.Tests.UnitTests.Students
             order.Should().ContainInOrder("phone", "email", "namedob", "slug");
         }
 
-       
+
         // ──────────────────────────── ENTITY VALID STATE (Create) ────────────────────────────
 
         [Fact]

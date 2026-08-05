@@ -1,4 +1,3 @@
-using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Common.Enums;
 using SchoolManagement.Domain.Common.Exceptions;
 
@@ -38,7 +37,7 @@ public class Media : AggregateRoot
         {
             throw new DomainException("Size cannot be negative.");
         }
-      
+
         if (ownerId == Guid.Empty)
         {
             throw new DomainException("Owner ID must not be empty.");

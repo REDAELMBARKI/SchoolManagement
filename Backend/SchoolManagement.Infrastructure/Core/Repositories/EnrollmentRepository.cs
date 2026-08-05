@@ -1,10 +1,7 @@
 using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Exceptions;
-using SchoolManagement.Domain.Academic.Interfaces;
 using SchoolManagement.Domain.Core.Interfaces;
-using SchoolManagement.Domain.Common.Interfaces;
-using SchoolManagement.Infrastructure.Data;
 using SchoolManagement.Infrastructure.Common.Repositories;
+using SchoolManagement.Infrastructure.Data;
 
 namespace SchoolManagement.Infrastructure.Core.Repositories;
 
@@ -13,6 +10,6 @@ public class EnrollmentRepository : Repository<Enrollment>, IEnrollmentRepositor
     public EnrollmentRepository(AppDbContext context) : base(context)
     {
     }
-    
- 
+
+
 }

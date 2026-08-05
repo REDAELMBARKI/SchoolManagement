@@ -1,23 +1,8 @@
-
-
-
-using System.Security;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.FileProviders;
-using SchoolManagement.Application.Academic.Dtos.Commands;
 using SchoolManagement.Application.Core.Dtos.Commands;
-using SchoolManagement.Application.Common.Dtos.Commands;
-using SchoolManagement.Application.Academic.Dtos.Requests;
 using SchoolManagement.Application.Core.Dtos.Requests;
-using SchoolManagement.Application.Common.Dtos.Requests;
-using SchoolManagement.Application.Academic.Services;
-using SchoolManagement.Application.Core.Services;
-using SchoolManagement.Domain.Common.Exceptions;
-using SchoolManagement.Application.Academic.Interfaces.Services;
 using SchoolManagement.Application.Core.Interfaces.Services;
-using SchoolManagement.Application.Common.Interfaces.Services;
+using SchoolManagement.Domain.Common.Exceptions;
 
 
 namespace SchoolManagement.Api.Controllers;
@@ -53,20 +38,21 @@ public class IntakeController : ControllerBase
     {
         try
         {
-           var intake = await _intakeService.GetIntakeByIdAsync(id);
-           return Ok(intake);
-            
-        }catch(NotFoundException)
+            var intake = await _intakeService.GetIntakeByIdAsync(id);
+            return Ok(intake);
+
+        }
+        catch (NotFoundException)
         {
             return NotFound();
         }
         catch (Exception ex)
         {
             return Problem(
-                statusCode : 500 ,
-                title : "fetch error" ,
-                detail : ex.Message
-            ) ;
+                statusCode: 500,
+                title: "fetch error",
+                detail: ex.Message
+            );
         }
     }
 
@@ -139,17 +125,18 @@ public class IntakeController : ControllerBase
             };
             await _intakeService.UpdateAsync(id, command);
             return NoContent();
-        }catch(NotFoundException)
+        }
+        catch (NotFoundException)
         {
             return NotFound();
         }
         catch (Exception ex)
         {
             return Problem(
-                statusCode : 500 ,
-                title : "update error" ,
-                detail : ex.Message
-            ) ;
+                statusCode: 500,
+                title: "update error",
+                detail: ex.Message
+            );
         }
     }
 
@@ -166,16 +153,17 @@ public class IntakeController : ControllerBase
         {
             await _intakeService.DeleteIntakeAsync(id);
             return NoContent();
-        }catch(NotFoundException)
+        }
+        catch (NotFoundException)
         {
-            return NotFound() ;
+            return NotFound();
         }
         catch (Exception)
         {
             return Problem(
-             statusCode : 500 ,
-             title : "Delete Error" ,
-             detail : "Failed to delete intake"
+             statusCode: 500,
+             title: "Delete Error",
+             detail: "Failed to delete intake"
             );
         }
     }

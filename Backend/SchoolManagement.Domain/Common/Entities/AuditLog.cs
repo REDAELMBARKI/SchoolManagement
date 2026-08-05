@@ -1,5 +1,3 @@
-using SchoolManagement.Domain.Common;
-
 namespace SchoolManagement.Domain.Common.Entities;
 
 public class AuditLog : BaseEntity

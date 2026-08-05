@@ -1,11 +1,12 @@
 using SchoolManagement.Infrastructure.Data.Factories;
 namespace SchoolManagement.Infrastructure.Data.Seeders;
-using SchoolManagement.Infrastructure.Data ;
+
+using SchoolManagement.Infrastructure.Data;
 public class EnrollmentSeeder : Seeder
 {
     private readonly EnrollmentFactory _factory;
 
-    public EnrollmentSeeder(AppDbContext context) : base(context) 
+    public EnrollmentSeeder(AppDbContext context) : base(context)
     {
         _factory = new EnrollmentFactory(context);
     }

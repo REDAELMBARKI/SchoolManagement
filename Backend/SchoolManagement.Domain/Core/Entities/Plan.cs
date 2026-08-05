@@ -20,7 +20,7 @@ public class Plan : AggregateRoot
 
     public decimal Amount => BaseAmount - (DiscountPercent.HasValue ? (BaseAmount * (DiscountPercent.Value / 100)) : 0m);
 
-    public static Plan Create(string name, int durationMonths, int remainingAmountDueDays , decimal baseAmount, Guid branchId, decimal? discountPercent = null, bool isActive = true)
+    public static Plan Create(string name, int durationMonths, int remainingAmountDueDays, decimal baseAmount, Guid branchId, decimal? discountPercent = null, bool isActive = true)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new DomainException("Plan name cannot be empty.");

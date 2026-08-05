@@ -97,6 +97,17 @@ public class Commission : AggregateRoot
         BlockReason = reason;
     }
 
+
+    public void Approve()
+    {
+        if (Status == CommissionStatus.Paid)
+            throw new DomainException("Cannot approve a commission that has already been paid. Salary cutoff has passed.");
+        if (Status == CommissionStatus.Approved)
+            throw new DomainException("Commission is already approved.");
+        Status = CommissionStatus.Approved;
+        BlockReason = null; // Clear block reason if it was previously blocked
+    }
+
     /// <summary>
     /// Called by the salary day lockout job. Marks as Paid.
     /// Only Approved commissions become Paid — Blocked ones stay Blocked.

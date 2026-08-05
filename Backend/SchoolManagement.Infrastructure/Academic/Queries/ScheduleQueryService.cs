@@ -1,16 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Application.Academic.Dtos.Responses;
-using SchoolManagement.Application.Core.Dtos.Responses;
-using SchoolManagement.Application.Common.Dtos.Responses;
-using SchoolManagement.Application.Academic.Mappers;
-using SchoolManagement.Application.Core.Mappers;
-using SchoolManagement.Application.Common.Mappers;
-using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Application.Academic.Interfaces.Queries;
-using SchoolManagement.Application.Core.Interfaces.Queries;
-using SchoolManagement.Application.Common.Interfaces.Queries;
+using SchoolManagement.Application.Academic.Mappers;
+using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Infrastructure.Data;
 
 namespace SchoolManagement.Infrastructure.Academic.Queries;
@@ -72,6 +64,9 @@ public class ScheduleQueryService : IScheduleQueryService
         return await _context.Schedules
             .Include(s => s.TimeSlot)
             .Include(s => s.Day)
+            .Include(s => s.Room)
+            .Include(s => s.Teacher)
+            .Include(s => s.Subject)
             .Where(s => s.GroupId == groupId && EF.Property<DateTime?>(s, "DeletedAt") == null)
             .ToListAsync();
     }

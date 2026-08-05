@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SchoolManagement.Domain.Common.Enums
+﻿namespace SchoolManagement.Domain.Common.Enums
 {
     public enum MediaCollection
     {
@@ -11,5 +7,7 @@ namespace SchoolManagement.Domain.Common.Enums
         Document,
         Photo,
         Video,
+
+        Unknown
     }
 }

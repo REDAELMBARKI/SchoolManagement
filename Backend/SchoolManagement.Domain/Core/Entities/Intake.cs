@@ -1,7 +1,3 @@
-
-
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
@@ -9,35 +5,36 @@ using SchoolManagement.Domain.Common.ValueObjects;
 using SchoolManagement.Domain.Core.Enums;
 
 namespace SchoolManagement.Domain.Core.Entities;
+
 public class Intake : Person
 {
     public Email? Email { get; private set; } = null!;
-    public string? Phone {get;private set;} = string.Empty;
+    public string? Phone { get; private set; } = string.Empty;
     public DateOnly? DateOfBirth { get; private set; }
 
     public DateTime IntakeDate { get; private set; }
-    public IntakeStatus Status {get;private set;} 
-    public DateTime? FollowUpDate { get; private set; } 
-    public string? Notes { get; private set; }   
+    public IntakeStatus Status { get; private set; }
+    public DateTime? FollowUpDate { get; private set; }
+    public string? Notes { get; private set; }
     //fk
-    public Guid? CommercialAgentId { get; private set; } 
+    public Guid? CommercialAgentId { get; private set; }
     public Guid? LeadSourceId { get; private set; }
     public Guid SubjectId { get; private set; }
-    public Guid BranchId {get;private set;}
+    public Guid BranchId { get; private set; }
     public bool IsIndependent { get; private set; } = false;
     public decimal TotalFees { get; private set; }
     public decimal AmountPaid { get; private set; }
     // navigation
     public virtual LeadSource? LeadSource { get; private set; }
     public virtual CommercialAgent? CommercialAgent { get; private set; }
-    public virtual Subject Subject {get;private set;} = null!;
-    public virtual Branch Branch {get;private set;} = null!;
-  
+    public virtual Subject Subject { get; private set; } = null!;
+    public virtual Branch Branch { get; private set; } = null!;
+
     public virtual ICollection<Student> Students { get; private set; } = new List<Student>();
-    
+
     public bool HasStudents => Students.Any();
 
-    public static Intake Register(string firstName, string lastName, string slug  ,  Guid? genderId, string? email, string? phone, DateOnly? dateOfBirth, DateTime intakeDate, IntakeStatus status, DateTime? followUpDate, string? notes, Guid? commercialAgentId, Guid? leadSourceId, Guid subjectId, Guid branchId, bool isIndependent, decimal totalFees, decimal amountPaid)
+    public static Intake Register(string firstName, string lastName, string slug, Guid? genderId, string? email, string? phone, DateOnly? dateOfBirth, DateTime intakeDate, IntakeStatus status, DateTime? followUpDate, string? notes, Guid? commercialAgentId, Guid? leadSourceId, Guid subjectId, Guid branchId, bool isIndependent, decimal totalFees, decimal amountPaid)
     {
         if (subjectId == Guid.Empty)
         {
@@ -73,8 +70,8 @@ public class Intake : Person
             TotalFees = totalFees,
             AmountPaid = amountPaid
         };
-        
-        intake.RegisterPerson(firstName, lastName, slug  , genderId);
+
+        intake.RegisterPerson(firstName, lastName, slug, genderId);
         return intake;
     }
 
@@ -188,7 +185,7 @@ public class Intake : Person
         }
         AmountPaid = amountPaid;
     }
-    
+
 
 
 }

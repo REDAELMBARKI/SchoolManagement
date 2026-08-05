@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Entities;
 
 namespace SchoolManagement.Infrastructure.Data.Configurations.Entities;
 
@@ -25,7 +23,7 @@ public class TeacherConfiguration : IEntityTypeConfiguration<Teacher>
         // Explicitly set auto-increment Id for TPC
         entityTypeBuilder.Property(t => t.Id)
             .ValueGeneratedOnAdd();
-                
+
         // Table mapping for Teacher entity (TPC inherited from Employee)
         entityTypeBuilder.ToTable("Teachers", tb =>
         {
@@ -36,9 +34,9 @@ public class TeacherConfiguration : IEntityTypeConfiguration<Teacher>
         entityTypeBuilder.Property(t => t.Specialization)
             .IsRequired()
             .HasMaxLength(100);
-            
+
         // Index for Teacher-specific property
         entityTypeBuilder.HasIndex(t => t.Specialization);
-      
+
     }
 }

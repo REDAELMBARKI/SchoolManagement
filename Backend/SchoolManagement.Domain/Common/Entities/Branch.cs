@@ -1,4 +1,3 @@
-using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Common.Exceptions;
 using SchoolManagement.Domain.Core.Entities;
 

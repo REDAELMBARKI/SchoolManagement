@@ -8,8 +8,6 @@ public class UpdateEnrollmentRequestDto
     [Required] 
     public Guid Id { get; set; }
 
-    [Required]
-    public Guid PreferedScheduleId { get; set; }
 
     [Required]
     public Guid LevelId { get; set; }
@@ -22,7 +20,7 @@ public class UpdateEnrollmentRequestDto
 
     public string? Notes { get; set; }
 
-    public Guid GroupId { get; set; }
+    public Guid PreferedGroupId { get; set; }
 
     public Guid? PlanId { get; set; }
 }

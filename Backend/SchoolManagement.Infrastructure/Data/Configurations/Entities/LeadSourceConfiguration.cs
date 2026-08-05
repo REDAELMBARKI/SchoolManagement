@@ -1,22 +1,20 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Entities;
 
 namespace SchoolManagement.Infrastructure.Data.Configurations.Entities;
 
-public class LeadSourceConfiguration: IEntityTypeConfiguration<LeadSource>
+public class LeadSourceConfiguration : IEntityTypeConfiguration<LeadSource>
 {
-     public  void Configure(EntityTypeBuilder<LeadSource> builder)
-     {
-            builder.HasDiscriminator<string>("LeadSourceType")
-            .HasValue<AdLeadSource>("Ad")
-            .HasValue<OpcLeadSource>("Opc");
+    public void Configure(EntityTypeBuilder<LeadSource> builder)
+    {
+        builder.HasDiscriminator<string>("LeadSourceType")
+        .HasValue<AdLeadSource>("Ad")
+        .HasValue<OpcLeadSource>("Opc");
 
-            builder
-            .HasOne(ls => ls.Branch)
-            .WithMany()
-            .HasForeignKey(ls => ls.BranchId);
+        builder
+        .HasOne(ls => ls.Branch)
+        .WithMany()
+        .HasForeignKey(ls => ls.BranchId);
     }
 }

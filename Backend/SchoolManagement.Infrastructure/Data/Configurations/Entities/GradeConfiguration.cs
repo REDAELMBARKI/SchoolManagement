@@ -1,10 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Entities;
 
 namespace SchoolManagement.Infrastructure.Data.Configurations.Entities;
+
 public class GradeConfiguration : IEntityTypeConfiguration<Grade>
 {
     public void Configure(EntityTypeBuilder<Grade> entityTypeBuilder)

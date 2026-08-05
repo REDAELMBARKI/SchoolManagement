@@ -1,31 +1,22 @@
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using SchoolManagement.Infrastructure.Data;
-using SchoolManagement.Infrastructure.Data.Seeders;
-using SchoolManagement.Infrastructure.Data.Factories;
-using Serilog;
-using AutoMapper;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using SchoolManagement.Infrastructure.Data.Configurations.Extensions;
-using SchoolManagement.Application.Core.Services;
-using SchoolManagement.Application.Options;
+using Hangfire;
+using Microsoft.EntityFrameworkCore;
+using SchoolManagement.Application.Common.Interfaces;
+using SchoolManagement.Application.Common.Interfaces.Services;
+using SchoolManagement.Application.Core.Interfaces.Queries;
+using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Application.Core.Services;
 using SchoolManagement.Application.Core.Validators;
-using SchoolManagement.Infrastructure.Academic.Repositories;
-using SchoolManagement.Infrastructure.Core.Repositories;
-using SchoolManagement.Infrastructure.Common.Repositories;
-using SchoolManagement.Application.Common.Interfaces;
-using SchoolManagement.Application.Academic.Interfaces.Services;
-using SchoolManagement.Application.Core.Interfaces.Services;
-using SchoolManagement.Application.Common.Interfaces.Services;
-using SchoolManagement.Infrastructure.Common.Services;
+using SchoolManagement.Application.Options;
 using SchoolManagement.Domain.Core.Interfaces;
-using SchoolManagement.Application.Core.Interfaces.Queries;
+using SchoolManagement.Infrastructure.Common.Services;
 using SchoolManagement.Infrastructure.Core.Queries;
-using Hangfire;
+using SchoolManagement.Infrastructure.Core.Repositories;
+using SchoolManagement.Infrastructure.Data;
+using SchoolManagement.Infrastructure.Data.Configurations.Extensions;
+using SchoolManagement.Infrastructure.Data.Seeders;
+using Serilog;
 using System.Text.Json.Serialization;
 
 Log.Logger = new LoggerConfiguration()
@@ -38,14 +29,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 // auto mapper 
-builder.Services.AddAutoMapper(cfg => { }  , 
-typeof(Program).Assembly) ;
+builder.Services.AddAutoMapper(cfg => { },
+typeof(Program).Assembly);
 // configure context 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ; 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseSqlServer(connectionString)
                 .UseLazyLoadingProxies()
-) ; 
+);
 
 // Add FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
@@ -59,7 +50,7 @@ builder.Services.AddFluentValidationClientsideAdapters();
 
 
 // add hangfire 
-builder.Services.AddHangfire(config => 
+builder.Services.AddHangfire(config =>
   config.UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
@@ -89,19 +80,25 @@ builder.Services.Configure<SchoolManagement.Application.Common.Settings.MediaSto
 // Di registration 
 builder.Services.Scan(scan => scan
     .FromAssemblies(typeof(Program).Assembly, typeof(StudentService).Assembly, typeof(CurrentUserContext).Assembly)
-    .AddClasses(c => 
+    .AddClasses(c =>
           c.InNamespaces("SchoolManagement.Infrastructure.Repositories",
-                         "SchoolManagement.Application.Services" ,
-                         "SchoolManagement.Application.Mappers" ,
+                         "SchoolManagement.Application.Services",
+                         "SchoolManagement.Application.Academic.Services",
+                         "SchoolManagement.Application.Core.Services",
+                         "SchoolManagement.Application.Common.Services",
+                         "SchoolManagement.Application.Mappers",
                          "SchoolManagement.Infrastructure.Services",
-                         "SchoolManagement.Infrastructure.Data.Factories" ,
+                         "SchoolManagement.Infrastructure.Data.Factories",
                          "SchoolManagement.Infrastructure.Data.Seeders",
-                         "SchoolManagement.Domain.Interfaces" ,
+                         "SchoolManagement.Domain.Interfaces",
                          "SchoolManagement.Application.Dtos",
-                         "SchoolManagement.Infrastructure.Queries"
+                          "SchoolManagement.Infrastructure.Queries",
+                         "SchoolManagement.Infrastructure.Academic.Queries",
+                         "SchoolManagement.Infrastructure.Core.Queries",
+                         "SchoolManagement.Infrastructure.Common.Queries"
                          ))
-    .AsSelf()                  
-    .AsMatchingInterface()     
+    .AsSelf()
+    .AsMatchingInterface()
     .WithScopedLifetime());
 
 builder.Services.AddScoped<ITransaction, EfTransaction>();
@@ -143,14 +140,14 @@ using (var scope = app.Services.CreateScope())
 {
     try
     {
-        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>() ; 
-        context.Database.Migrate() ;
-        Console.WriteLine("server runs succesfully") ; 
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        context.Database.Migrate();
+        Console.WriteLine("server runs succesfully");
     }
     catch (Exception error)
     {
-         Console.WriteLine($"Database connection failed: {error.Message}");
-        
+        Console.WriteLine($"Database connection failed: {error.Message}");
+
     }
 }
 
@@ -158,7 +155,7 @@ using (var scope = app.Services.CreateScope())
 using (var scope = app.Services.CreateScope())
 {
     var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
-    await seeder.Seed() ;
+    await seeder.Seed();
 }
 
 

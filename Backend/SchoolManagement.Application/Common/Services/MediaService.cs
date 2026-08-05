@@ -28,15 +28,18 @@ public class MediaService : IMediaService
     private readonly MediaStorageValidator _validator;
     private readonly ICurrentUserContext _currentUserContext;
     private readonly IAuditLogService _auditLogService;
+    private readonly IDomainUserRepository _domainUserRepository;
 
     public MediaService(
         IMediaRepository repository,
         IStudentRepository studentRepository,
+        IDomainUserRepository domainUserRepository ,
         MediaStorageValidator validator,
         ICurrentUserContext currentUserContext,
         IAuditLogService auditLogService)
     {
         _repository = repository;
+        _domainUserRepository = domainUserRepository;
         _studentRepository = studentRepository;
         _validator = validator;
         _currentUserContext = currentUserContext;
@@ -129,7 +132,7 @@ public class MediaService : IMediaService
                 break;
 
             case OwnerType.User:
-                var user = await _userRepository.GetByIdAsync(ownerId);
+                var user = await _domainUserRepository.GetByIdAsync(ownerId);
                 if (user == null)
                     throw new NotFoundException($"User with ID {ownerId} not found.");
                 break;

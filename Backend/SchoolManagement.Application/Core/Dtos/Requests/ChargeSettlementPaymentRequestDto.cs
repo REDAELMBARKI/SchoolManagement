@@ -14,6 +14,9 @@ public class ChargeSettlementPaymentRequestDto
     [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than zero.")]
     public decimal Amount { get; set; }
 
+
+    public DateTime? PaidAt { get; set; } = DateTime.UtcNow;
+
     public decimal? TransferFees { get; set; }
     public PaymentMethod Method { get; set; }
     public string? ExternalReferenceCode { get; set; }

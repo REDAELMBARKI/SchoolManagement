@@ -1,8 +1,5 @@
-using Bogus;
-using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Common.Entities;
-using SchoolManagement.Infrastructure.Data;
+using SchoolManagement.Domain.Core.Entities;
 using Slugify;
 
 namespace SchoolManagement.Infrastructure.Data.Factories;
@@ -14,11 +11,11 @@ public class UserFactory : Factory<DomainUser>
     }
 
     protected override Task<DomainUser> Make()
-    {   
+    {
         var genders = Context.Genders.Select(g => g.Id).ToList();
         var firstName = faker.Name.FirstName();
         var lastName = faker.Name.LastName();
-       
+
         return Task.FromResult(DomainUser.Register(
             firstName: firstName,
             lastName: lastName,
@@ -28,7 +25,7 @@ public class UserFactory : Factory<DomainUser>
     }
 
     public Task<Opc> MakeOpc()
-    { 
+    {
         var branchIds = Context.Branches.Select(b => b.Id).ToList();
         var firstName = faker.Name.FirstName();
         var lastName = faker.Name.LastName();
@@ -53,7 +50,7 @@ public class UserFactory : Factory<DomainUser>
             branchId: branchId
         ));
     }
-  
+
     public Task<CommercialAgent> MakeCA()
     {
         var branchIds = Context.Branches.Select(b => b.Id).ToList();

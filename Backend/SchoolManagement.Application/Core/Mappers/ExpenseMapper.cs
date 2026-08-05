@@ -1,5 +1,3 @@
-using SchoolManagement.Application.Core.Dtos.Commands;
-using SchoolManagement.Application.Core.Dtos.Responses;
 using SchoolManagement.Domain.Core.Entities;
 
 namespace SchoolManagement.Application.Core.Mappers;

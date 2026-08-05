@@ -1,28 +1,24 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace SchoolManagement.Domain.Common;
 
 public abstract class ValueObject
 {
-        protected abstract IEnumerable<object> GetEqualityComponents();         
-        public override bool Equals(object obj)
+    protected abstract IEnumerable<object> GetEqualityComponents();
+    public override bool Equals(object obj)
+    {
+        if (obj == null || obj.GetType() != GetType())
         {
-            if (obj == null || obj.GetType() != GetType())
-            {
-                return false;
-            }
-
-            var other = (ValueObject) obj;
-            return other.GetHashCode() == GetHashCode();
+            return false;
         }
 
-        public override int GetHashCode()
-        {
-            return GetEqualityComponents()
-                   .Select(x => x?.GetHashCode() ?? 0 ) 
-                   .Aggregate((x,y) => x ^ y);
-        }
+        var other = (ValueObject)obj;
+        return other.GetHashCode() == GetHashCode();
+    }
+
+    public override int GetHashCode()
+    {
+        return GetEqualityComponents()
+               .Select(x => x?.GetHashCode() ?? 0)
+               .Aggregate((x, y) => x ^ y);
+    }
 
 }

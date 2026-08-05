@@ -1,12 +1,10 @@
 using SchoolManagement.Application.Common.Interfaces;
 using SchoolManagement.Application.Common.Interfaces.Services;
 using SchoolManagement.Application.Core.Dtos.Requests;
-using SchoolManagement.Application.Core.Dtos.Responses;
 using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Core.Interfaces;
-using SchoolManagement.Domain.Utils;
 
 namespace SchoolManagement.Application.Core.Services;
 
@@ -48,7 +46,7 @@ public class StudentResponsableService : IStudentResponsableService
             email: request.Email,
             phone: request.Phone,
             relationship: request.Relationship,
-            branchId: _currentUserContext.BranchId!.Value
+            branchId: _currentUserContext.BranchId
         );
 
         var createdResponsable = await _responsableRepository.AddAsync(responsable);

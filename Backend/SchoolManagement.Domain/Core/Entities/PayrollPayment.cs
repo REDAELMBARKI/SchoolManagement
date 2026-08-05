@@ -1,4 +1,3 @@
-using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
@@ -23,7 +22,7 @@ public class PayrollPayment : AggregateRoot
     public Guid BranchId { get; private set; }
     public Guid ProcessedByStaffId { get; private set; }
     public string? Notes { get; private set; }
-    
+
 
     // Navigation
     public virtual Branch Branch { get; private set; } = null!;

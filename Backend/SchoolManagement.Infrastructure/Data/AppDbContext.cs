@@ -1,20 +1,18 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
+using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Infrastructure.Data.Configurations.Entities;
-using System.Linq;
 namespace SchoolManagement.Infrastructure.Data;
 
-public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string> 
+public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-  
+
     // ── Lookup ──
     public DbSet<Gender> Genders { get; set; }
     public DbSet<LeadSource> LeadSources { get; set; }
@@ -29,7 +27,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
     public DbSet<Branch> Branches { get; set; }
 
     // ── People ──
- 
+
     public DbSet<DomainUser> DomainUsers { get; set; }
     public DbSet<Teacher> Teachers { get; set; }
     public DbSet<StudentResponsable> StudentResponsables { get; set; }
@@ -44,7 +42,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
     public DbSet<Room> Rooms { get; set; }
 
     // ── Academic ──
-     public DbSet<Group> Groups { get; set; }
+    public DbSet<Group> Groups { get; set; }
 
 
     // ── Schedules ──
@@ -66,7 +64,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
     // expenses any bills but not salaries
     // </summary>
     public DbSet<Expense> Expenses { get; set; }
-   
+
     // <summary> 
     // only emplyee salaries payrolls
     // </summary>
@@ -87,7 +85,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
         this.ApplySoftDeleteFilter(modelBuilder);
     }
 
- 
+
 
     private void ApplySoftDeleteFilter(ModelBuilder modelBuilder)
     {
@@ -95,12 +93,14 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
     }
 
 
-    private  void IgnoreEntities(ModelBuilder  modelBuilder){
-           modelBuilder.Ignore<BaseEntity>();
+    private void IgnoreEntities(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Ignore<BaseEntity>();
     }
 
 
-    private void ApplyEntityConfigurations(ModelBuilder modelBuilder){
+    private void ApplyEntityConfigurations(ModelBuilder modelBuilder)
+    {
         modelBuilder.ApplyConfiguration(new PersonConfiguration());
         modelBuilder.ApplyConfiguration(new EmployeeConfigurations());
         modelBuilder.ApplyConfiguration(new UserConfiguration());
@@ -127,5 +127,5 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
         modelBuilder.ApplyConfiguration(new ExpenseConfiguration());
     }
 
- 
+
 }

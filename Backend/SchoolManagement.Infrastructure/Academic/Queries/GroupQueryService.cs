@@ -1,19 +1,9 @@
-
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Application.Academic.Dtos.Responses;
-using SchoolManagement.Application.Core.Dtos.Responses;
-using SchoolManagement.Application.Common.Dtos.Responses;
-using SchoolManagement.Application.Academic.Mappers;
-using SchoolManagement.Application.Core.Mappers;
-using SchoolManagement.Application.Common.Mappers;
-using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Entities;
-using SchoolManagement.Domain.Enums;
 using SchoolManagement.Application.Academic.Interfaces.Queries;
-using SchoolManagement.Application.Core.Interfaces.Queries;
-using SchoolManagement.Application.Common.Interfaces.Queries;
+using SchoolManagement.Application.Academic.Mappers;
+using SchoolManagement.Domain.Academic.Entities;
+using SchoolManagement.Domain.Core.Enums;
 using SchoolManagement.Infrastructure.Data;
 
 namespace SchoolManagement.Infrastructure.Academic.Queries;
@@ -41,7 +31,7 @@ public class GroupQueryService : IGroupQueryService
         return await _context.Groups
             .Include(g => g.Level)
             .Include(g => g.Subject)
-            .Include(g => g.Schedule)
+            .Include(g => g.Schedules)
             .Include(g => g.Teachers)
             .Include(g => g.Enrollments)
             .FirstOrDefaultAsync(g => g.Id == id);
@@ -69,7 +59,7 @@ public class GroupQueryService : IGroupQueryService
     {
         return await _context.Groups
                     .Include(g => g.Enrollments)
-                    .Include(g => g.Schedule)
+                    .Include(g => g.Schedules)
                     .Where(g => g.LevelId == levelId)
                     .Where(g => g.SubjectId == subjectId)
                     .Where(g => g.BranchId == branchId)

@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Common.Entities;
-using SchoolManagement.Infrastructure.Data;
+using SchoolManagement.Domain.Common.Enums;
 
 namespace SchoolManagement.Infrastructure.Data.Factories;
 
@@ -21,25 +19,20 @@ public class MediaFactory : Factory<Media>
 
         var mediaTypes = Enum.GetValues<MediaType>();
         var collections = Enum.GetValues<MediaCollection>();
-        var ownerTypes = new[] { "Student", "Teacher", "User", "Branch" };
+        var ownerTypes = new[] { OwnerType.Student , OwnerType.Teacher  };
         var storageProviders = new[] { "Local", "S3", "AzureBlob" };
 
         var ownerType = faker.PickRandom(ownerTypes);
         Guid? ownerId = null;
         switch (ownerType)
         {
-            case "Student":
+            case OwnerType.Student :
                 ownerId = students.Any() ? faker.PickRandom(students) : Guid.Empty;
                 break;
-            case "Teacher":
+            case OwnerType.Teacher:
                 ownerId = teachers.Any() ? faker.PickRandom(teachers) : Guid.Empty;
                 break;
-            case "User":
-                ownerId = users.Any() ? faker.PickRandom(users) : Guid.Empty;
-                break;
-            case "Branch":
-                ownerId = branches.Any() ? faker.PickRandom(branches) : Guid.Empty;
-                break;
+           
         }
 
         var branchId = branches.Any() ? faker.PickRandom(branches) : Guid.Empty;

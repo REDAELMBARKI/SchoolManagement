@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 using SchoolManagement.Domain.Common;
 
 using SchoolManagement.Domain.Common.Entities;
@@ -12,7 +10,7 @@ namespace SchoolManagement.Domain.Academic.Entities;
 public class Schedule : AggregateRoot
 
 {
-    
+
 
     public Guid BranchId { get; private set; }
 
@@ -214,8 +212,7 @@ public class Day : BaseEntity
 {
 
     public string Name { get; private set; } = string.Empty;
-
-
+    public object OrderIndex { get; set; }
 
     private Day() { }
 

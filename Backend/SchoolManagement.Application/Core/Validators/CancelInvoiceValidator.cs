@@ -1,7 +1,4 @@
 using FluentValidation;
-using SchoolManagement.Application.Academic.Dtos.Commands;
-using SchoolManagement.Application.Core.Dtos.Commands;
-using SchoolManagement.Application.Common.Dtos.Commands;
 
 namespace SchoolManagement.Application.Core.Validators;
 

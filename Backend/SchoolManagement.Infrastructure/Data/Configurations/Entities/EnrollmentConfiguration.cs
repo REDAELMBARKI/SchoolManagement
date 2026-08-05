@@ -31,7 +31,7 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
         entityTypeBuilder.HasIndex(e => e.BranchId);
 
         // relationships
-      
+
         entityTypeBuilder.HasOne(e => e.Student)
             .WithMany(s => s.Enrollments)
             .HasForeignKey(e => e.StudentId)
@@ -39,18 +39,18 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
 
         entityTypeBuilder
         .HasOne(e => e.Subject)
-        .WithMany(s =>  s.Enrollments)
+        .WithMany(s => s.Enrollments)
         .HasForeignKey(e => e.SubjectId);
 
         entityTypeBuilder
         .HasOne(e => e.Branch)
-        .WithMany(b =>  b.Enrollments)
+        .WithMany(b => b.Enrollments)
         .HasForeignKey(e => e.BranchId)
          .OnDelete(DeleteBehavior.Restrict);
 
         entityTypeBuilder
         .HasOne(e => e.Group)
-        .WithMany(g =>  g.Enrollments)
+        .WithMany(g => g.Enrollments)
         .HasForeignKey(e => e.GroupId)
          .OnDelete(DeleteBehavior.Restrict);
     }

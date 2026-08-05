@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Infrastructure.Data.Factories;
-using SchoolManagement.Infrastructure.Data ;
 namespace SchoolManagement.Infrastructure.Data.Seeders;
 
 public class UserSeeder : Seeder
@@ -8,7 +7,7 @@ public class UserSeeder : Seeder
     private readonly UserFactory _userFactory;
 
     public UserSeeder(AppDbContext context) : base(context)
-    {  
+    {
         _userFactory = new UserFactory(context);
     }
 
@@ -26,5 +25,5 @@ public class UserSeeder : Seeder
         await Context.SaveChangesAsync();
     }
 
-    
+
 }

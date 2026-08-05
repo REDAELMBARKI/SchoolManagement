@@ -1,18 +1,17 @@
 using Bogus;
-using Microsoft.VisualBasic;
-using SchoolManagement.Infrastructure.Data ; 
-namespace SchoolManagement.Infrastructure.Data.Factories; 
-public abstract class Factory<T> where T : class 
-{  
+namespace SchoolManagement.Infrastructure.Data.Factories;
+
+public abstract class Factory<T> where T : class
+{
     protected AppDbContext _context;
     public Factory(AppDbContext context)
     {
-        _context = context ;
+        _context = context;
     }
-    protected readonly Faker faker = new Faker() ; 
-    protected abstract  Task<T> Make() ; 
+    protected readonly Faker faker = new Faker();
+    protected abstract Task<T> Make();
 
-    public async  Task<List<T>> MakeMany(int count)
+    public async Task<List<T>> MakeMany(int count)
     {
         var results = new List<T>();
         for (int i = 0; i < count; i++)
@@ -21,7 +20,7 @@ public abstract class Factory<T> where T : class
             results.Add(item);
         }
         return results;
-    } 
+    }
 
 
     protected string GenerateSlug(params string[] values)
@@ -30,6 +29,6 @@ public abstract class Factory<T> where T : class
         return slug;
     }
 
-    protected AppDbContext Context => _context ;
-     
+    protected AppDbContext Context => _context;
+
 }

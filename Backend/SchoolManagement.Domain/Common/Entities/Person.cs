@@ -1,6 +1,4 @@
-using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Common.Exceptions;
-using SchoolManagement.Domain.Common.Utils;
 
 namespace SchoolManagement.Domain.Common.Entities;
 
@@ -12,7 +10,7 @@ public abstract class Person : AggregateRoot
     public Guid? GenderId { get; protected set; }
     public virtual Gender? Gender { get; protected set; }
 
-    protected void RegisterPerson(string firstName, string lastName, string slug ,  Guid? genderId)
+    protected void RegisterPerson(string firstName, string lastName, string slug, Guid? genderId)
     {
         if (string.IsNullOrWhiteSpace(firstName))
         {

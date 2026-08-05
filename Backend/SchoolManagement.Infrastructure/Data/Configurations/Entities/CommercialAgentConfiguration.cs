@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Entities;
 
 namespace SchoolManagement.Infrastructure.Data.Configurations.Entities;
 
@@ -24,7 +22,7 @@ public class CommercialAgentConfiguration : IEntityTypeConfiguration<CommercialA
         // Explicitly set auto-increment Id for TPC
         entityTypeBuilder.Property(c => c.Id)
             .ValueGeneratedOnAdd();
-                
+
         // Table mapping for CommercialAgent entity (TPC inherited from Employee)
         entityTypeBuilder.ToTable("CommercialAgents");
 

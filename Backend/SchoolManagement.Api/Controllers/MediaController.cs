@@ -1,7 +1,6 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Common.Interfaces.Services;
-using SchoolManagement.Application.Common.Dtos.Responses;
-using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Enums;
 using SchoolManagement.Domain.Common.Exceptions;
 
@@ -70,4 +69,4 @@ public class MediaController : ControllerBase
     }
 }
 
- 
+

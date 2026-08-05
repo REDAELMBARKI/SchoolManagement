@@ -1,17 +1,16 @@
 using SchoolManagement.Infrastructure.Data.Factories;
 namespace SchoolManagement.Infrastructure.Data.Seeders;
-using SchoolManagement.Infrastructure.Data ;
-using SchoolManagement.Infrastructure.Academic.Repositories;
+
 using SchoolManagement.Infrastructure.Core.Repositories;
-using SchoolManagement.Infrastructure.Common.Repositories;
+using SchoolManagement.Infrastructure.Data;
 
 public class IntakeSeeder : Seeder
 {
     private readonly IntakeFactory _factory;
 
-    public IntakeSeeder(AppDbContext context , IntakeRepository _repo) : base(context)
+    public IntakeSeeder(AppDbContext context, IntakeRepository _repo) : base(context)
     {
-        _factory = new IntakeFactory(context  , _repo);
+        _factory = new IntakeFactory(context, _repo);
     }
 
     public override async Task RunAsync()

@@ -1,5 +1,4 @@
 using SchoolManagement.Infrastructure.Data.Factories;
-using SchoolManagement.Infrastructure.Data ;
 namespace SchoolManagement.Infrastructure.Data.Seeders;
 
 public class PlatformSeeder : Seeder

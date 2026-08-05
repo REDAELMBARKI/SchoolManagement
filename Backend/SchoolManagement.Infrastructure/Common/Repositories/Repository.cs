@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Common.Exceptions;
 using SchoolManagement.Domain.Common.Interfaces;
@@ -31,7 +30,7 @@ public abstract class Repository<T> : IRepository<T> where T : AggregateRoot
     }
 
     public virtual async Task<T> UpdateAsync(T entity)
-    { 
+    {
         var existing = await GetByIdAsync(entity.Id);
         if (existing == null)
             throw new NotFoundException($"No {typeof(T).Name} found with id {entity.Id}");
@@ -57,9 +56,9 @@ public abstract class Repository<T> : IRepository<T> where T : AggregateRoot
     }
 
 
-    public  Task SaveChangesAsync(CancellationToken ct = default )
+    public Task SaveChangesAsync(CancellationToken ct = default)
     {
         return _context.SaveChangesAsync(ct);
     }
- 
+
 }

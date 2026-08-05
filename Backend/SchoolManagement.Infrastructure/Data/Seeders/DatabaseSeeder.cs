@@ -1,15 +1,7 @@
-
-
-using System.Threading.Tasks;
-using SchoolManagement.Infrastructure.Data.Factories;
- using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Entities; 
- using SchoolManagement.Infrastructure.Data; 
- using SchoolManagement.Infrastructure.Academic.Repositories;
+using SchoolManagement.Infrastructure.Academic.Repositories;
 using SchoolManagement.Infrastructure.Core.Repositories;
-using SchoolManagement.Infrastructure.Common.Repositories;
-  namespace SchoolManagement.Infrastructure.Data.Seeders;
+using SchoolManagement.Infrastructure.Data.Factories;
+namespace SchoolManagement.Infrastructure.Data.Seeders;
 
 public class DatabaseSeeder
 {
@@ -35,17 +27,17 @@ public class DatabaseSeeder
 
     public async Task Seed()
     {
-        await new BranchSeeder(_context , _branchFactory).RunAsync();           
-        await new GenderSeeder(_context).RunAsync();          
-        await new PlatformSeeder(_context).RunAsync();        
-        await new SubjectSeeder(_context , _subjectRepo).RunAsync();    
+        await new BranchSeeder(_context, _branchFactory).RunAsync();
+        await new GenderSeeder(_context).RunAsync();
+        await new PlatformSeeder(_context).RunAsync();
+        await new SubjectSeeder(_context, _subjectRepo).RunAsync();
         await new DaySeeder(_context).RunAsync();
         await new TimeSlotSeeder(_context).RunAsync();
-        await new UserSeeder(_context).RunAsync();     
-        await new AdSeeder(_context).RunAsync();               
+        await new UserSeeder(_context).RunAsync();
+        await new AdSeeder(_context).RunAsync();
         // LeadSource seeder must run after Branches, Ads, and Opcs are seeded       
-        await new LeadSourceSeeder(_context).RunAsync();       
-        await new IntakeSeeder(_context , _intakeRepo).RunAsync();
+        await new LeadSourceSeeder(_context).RunAsync();
+        await new IntakeSeeder(_context, _intakeRepo).RunAsync();
         // await new LevelSeeder(_context).RunAsync();    
         // await new SessionSeeder(_context).RunAsync();   
         // await new GroupSeeder(_context).RunAsync();    
@@ -55,8 +47,8 @@ public class DatabaseSeeder
         // await new ModuleSeeder(_context).RunAsync();   
         // await new RoomSeeder(_context).RunAsync();     
         // await new GradeSeeder(_context).RunAsync();     
-        
-  }
 
-  
+    }
+
+
 }

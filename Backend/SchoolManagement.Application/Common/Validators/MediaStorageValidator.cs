@@ -1,8 +1,8 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using SchoolManagement.Application.Common.Settings;
 using SchoolManagement.Domain.Common.Enums;
-using SchoolManagement.Domain.Common.Exceptions;
 using SchoolManagement.Domain.Common.Interfaces;
 
 namespace SchoolManagement.Application.Common.Validators;
@@ -30,7 +30,7 @@ public class MediaStorageValidator
     /// <param name="file">The uploaded file to validate</param>
     /// <param name="mediaType">The type of media (Photo, Video, Document, etc.)</param>
     /// <exception cref="ValidationException">Thrown when validation fails</exception>
-    
+
     public void ValidateFile(IFormFile file, MediaType mediaType)
     {
         if (file == null || file.Length == 0)
@@ -39,7 +39,7 @@ public class MediaStorageValidator
         // 1. Validate file extension
         var extension = Path.GetExtension(file.FileName).ToLower();
         var allowedExtensions = _settings.GetAllowedExtensions(mediaType);
-        
+
         if (!allowedExtensions.Contains(extension))
         {
             throw new ValidationException(
@@ -50,7 +50,7 @@ public class MediaStorageValidator
         // 2. Validate MIME type
         var mimeType = file.ContentType.ToLower();
         var allowedMimeTypes = _settings.GetAllowedMimeTypes(mediaType);
-        
+
         if (!allowedMimeTypes.Contains(mimeType))
         {
             throw new ValidationException(
@@ -60,12 +60,12 @@ public class MediaStorageValidator
 
         // 3. Validate file size
         var maxFileSize = _settings.GetMaxFileSize(mediaType);
-        
+
         if (file.Length > maxFileSize)
         {
             var maxSizeMB = maxFileSize / (1024.0 * 1024.0);
             var fileSizeMB = file.Length / (1024.0 * 1024.0);
-            
+
             throw new ValidationException(
                 $"File size ({fileSizeMB:F2} MB) exceeds maximum allowed size " +
                 $"({maxSizeMB:F2} MB) for {mediaType}.");
@@ -93,7 +93,7 @@ public class MediaStorageValidator
             var usedGB = totalUsed / (1024.0 * 1024.0 * 1024.0);
             var quotaGB = quotaBytes / (1024.0 * 1024.0 * 1024.0);
             var newFileMB = newFileSize / (1024.0 * 1024.0);
-            
+
             throw new ValidationException(
                 $"Branch storage quota exceeded. " +
                 $"Current usage: {usedGB:F2} GB, " +

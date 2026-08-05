@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Mvc.Formatters;
+using SchoolManagement.Domain.Common.Enums;
+using MediaType = SchoolManagement.Domain.Common.Enums.MediaType;
 
-using SchoolManagement.Domain.Entities ;
 namespace SchoolManagement.Application.Common.Dtos.Responses;
 
 public class MediaResponseDto

@@ -1,9 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using SchoolManagement.Application.Common.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Text;
 
 namespace SchoolManagement.Infrastructure.Data
 {
@@ -11,9 +8,10 @@ namespace SchoolManagement.Infrastructure.Data
     {
         public IHttpContextAccessor _httpContext;
         public Guid BranchId { get; }
-        public Guid NameIdentifier {  get; }
+        public Guid NameIdentifier { get; }
 
-        public CurrentUserContext(IHttpContextAccessor httpContext) {
+        public CurrentUserContext(IHttpContextAccessor httpContext)
+        {
             _httpContext = httpContext;
             var userIdString = GetNameIdentifier();
             var branchIdString = GetBranchId();
@@ -40,7 +38,8 @@ namespace SchoolManagement.Infrastructure.Data
             return userId;
         }
 
-        private Guid GetBranchId() {
+        private Guid GetBranchId()
+        {
 
             var branchIdString = _httpContext.HttpContext?.User.FindFirstValue("BranchId");
 

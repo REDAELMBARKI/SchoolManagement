@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Entities;
 
 namespace SchoolManagement.Infrastructure.Data.Configurations.Entities;
 
@@ -10,8 +8,8 @@ public class IntakeConfiguration : IEntityTypeConfiguration<Intake>
 {
     public void Configure(EntityTypeBuilder<Intake> entityTypeBuilder)
     {
-        
- 
+
+
         // Check constraints for business rules
         entityTypeBuilder.ToTable("Intakes", tb =>
         {
@@ -24,12 +22,12 @@ public class IntakeConfiguration : IEntityTypeConfiguration<Intake>
         // Email Value object is optional for Intakes
         entityTypeBuilder.OwnsOne(i => i.Email, email =>
         {
-           email.Property(e => e.Value)
-           .HasColumnName("Email")
-           .HasMaxLength(255)
-           .IsRequired(false);
+            email.Property(e => e.Value)
+            .HasColumnName("Email")
+            .HasMaxLength(255)
+            .IsRequired(false);
 
-           email.HasIndex(e => e.Value).IsUnique();
+            email.HasIndex(e => e.Value).IsUnique();
         });
 
 
@@ -55,7 +53,7 @@ public class IntakeConfiguration : IEntityTypeConfiguration<Intake>
             .IsRequired()
             .HasConversion<string>();
 
-    
+
         // Notes validation
         entityTypeBuilder.Property(i => i.Notes)
             .HasMaxLength(300);
@@ -82,43 +80,43 @@ public class IntakeConfiguration : IEntityTypeConfiguration<Intake>
         entityTypeBuilder.HasIndex(i => i.IntakeDate);
         entityTypeBuilder.HasIndex(i => i.Status);
 
-        
+
         // relationships
-            // Intake → Subject relationship (FIXED: Use Restrict to avoid cascade cycles)
+        // Intake → Subject relationship (FIXED: Use Restrict to avoid cascade cycles)
 
 
-            entityTypeBuilder
-            .HasOne(i => i.Gender)
-            .WithMany()
-            .HasForeignKey(i => i.GenderId)
-            .OnDelete(DeleteBehavior.Restrict);
+        entityTypeBuilder
+        .HasOne(i => i.Gender)
+        .WithMany()
+        .HasForeignKey(i => i.GenderId)
+        .OnDelete(DeleteBehavior.Restrict);
 
-            entityTypeBuilder
-            .HasOne(i => i.LeadSource)
-            .WithMany(ls => ls.Intakes)
-            .HasForeignKey(i => i.LeadSourceId)
-            .OnDelete(DeleteBehavior.Restrict);
+        entityTypeBuilder
+        .HasOne(i => i.LeadSource)
+        .WithMany(ls => ls.Intakes)
+        .HasForeignKey(i => i.LeadSourceId)
+        .OnDelete(DeleteBehavior.Restrict);
 
-            //  intake -> branch , branch -> intakes
+        //  intake -> branch , branch -> intakes
 
-            entityTypeBuilder
-            .HasOne(i => i.Branch)
-            .WithMany()
-            .HasForeignKey(i => i.BranchId) 
-            .OnDelete(DeleteBehavior.Restrict);
-
-
-             entityTypeBuilder
-            .HasOne(i => i.Subject)
-            .WithMany()
-            .HasForeignKey(i => i.SubjectId) 
-            .OnDelete(DeleteBehavior.Restrict);
+        entityTypeBuilder
+        .HasOne(i => i.Branch)
+        .WithMany()
+        .HasForeignKey(i => i.BranchId)
+        .OnDelete(DeleteBehavior.Restrict);
 
 
-             entityTypeBuilder
-            .HasOne(i => i.CommercialAgent)
-            .WithMany()
-            .HasForeignKey(i => i.CommercialAgentId)
-            .OnDelete(DeleteBehavior.Restrict);
+        entityTypeBuilder
+       .HasOne(i => i.Subject)
+       .WithMany()
+       .HasForeignKey(i => i.SubjectId)
+       .OnDelete(DeleteBehavior.Restrict);
+
+
+        entityTypeBuilder
+       .HasOne(i => i.CommercialAgent)
+       .WithMany()
+       .HasForeignKey(i => i.CommercialAgentId)
+       .OnDelete(DeleteBehavior.Restrict);
     }
 }

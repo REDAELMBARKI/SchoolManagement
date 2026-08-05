@@ -23,12 +23,7 @@ public class EnrollStudentInAdditionalGroupRequestDto
     /// <summary>
     /// Optional: Specific group to enroll in. If null, system will auto-select best group.
     /// </summary>
-    public Guid? GroupId { get; set; }
-
-    /// <summary>
-    /// Optional: Preferred schedule for group selection
-    /// </summary>
-    public Guid? PreferredScheduleId { get; set; }
+    public Guid? PreferedGroupId { get; set; }
 
     /// <summary>
     /// Optional: Payment plan to apply

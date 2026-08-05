@@ -1,8 +1,6 @@
 using FluentAssertions;
 using Moq;
-using SchoolManagement.Application.Academic.Interfaces.Queries;
 using SchoolManagement.Application.Core.Interfaces.Queries;
-using SchoolManagement.Application.Common.Interfaces.Queries;
 using SchoolManagement.Domain.Common.Utils;
 using Xunit;
 

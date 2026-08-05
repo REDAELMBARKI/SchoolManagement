@@ -2,8 +2,6 @@ using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using SchoolManagement.Application.Academic.Interfaces.Services;
-using SchoolManagement.Application.Common.Interfaces.Services;
 using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Application.Options;
 
@@ -43,7 +41,7 @@ public static class HangfireJobsExtensions
         // Salary lockout — runs on the configured day/hour from appsettings.
         // Flips all Approved commissions for the current month to Paid.
         // Blocked ones stay Blocked. After this nothing changes.
-        var salaryDay  = commissionSettings.SalaryDayOfMonth;
+        var salaryDay = commissionSettings.SalaryDayOfMonth;
         var salaryHour = commissionSettings.SalaryLockoutHour;
         var salaryCron = $"0 {salaryHour} {salaryDay} * *";
 

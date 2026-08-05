@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Entities;
 
 namespace SchoolManagement.Infrastructure.Data.Configurations.Entities;
 
@@ -23,7 +21,7 @@ public class OpcConfiguration : IEntityTypeConfiguration<Opc>
         // Explicitly set auto-increment Id for TPC
         entityTypeBuilder.Property(o => o.Id)
             .ValueGeneratedOnAdd();
-                
+
         // Table mapping for Opc entity (TPC inherited from Employee)
         entityTypeBuilder.ToTable("Opcs");
     }

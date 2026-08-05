@@ -1,6 +1,3 @@
-
-using Slugify;
-
 namespace SchoolManagement.Domain.Common.Utils;
 
 public class CustomSluger

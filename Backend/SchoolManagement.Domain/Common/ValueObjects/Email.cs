@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Common.Exceptions;
 
 namespace SchoolManagement.Domain.Common.ValueObjects;
@@ -22,4 +18,4 @@ public class Email : ValueObject
     {
         yield return Value;
     }
-} 
+}

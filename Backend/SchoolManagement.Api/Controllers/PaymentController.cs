@@ -42,12 +42,10 @@ public class PaymentController : ControllerBase
         {
             var command = new RegistrationPaymentCommand
             {
-                EnrollmentId = dto.EnrollmentId,
-                InvoiceId = dto.InvoiceId,
-                Amount = dto.Amount,
+                Amount = dto.AmountPaid,
                 TransferFees = dto.TransferFees,
                 Method = dto.Method,
-                PaidAt = dto.PaidAt,
+                PaidAt = dto.PaidAt ?? DateTime.UtcNow,
                 ExternalReferenceCode = dto.ExternalReferenceCode,
                 MethodDetailsJson = dto.MethodDetailsJson ?? "{}"
             };
@@ -71,7 +69,7 @@ public class PaymentController : ControllerBase
                 Amount = dto.Amount,
                 TransferFees = dto.TransferFees,
                 Method = dto.Method,
-                PaidAt = dto.PaidAt,
+                PaidAt = dto.PaidAt ?? DateTime.UtcNow,
                 ExternalReferenceCode = dto.ExternalReferenceCode,
                 MethodDetailsJson = dto.MethodDetailsJson ?? "{}"
             };

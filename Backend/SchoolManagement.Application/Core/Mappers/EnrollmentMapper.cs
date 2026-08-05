@@ -1,11 +1,4 @@
-using SchoolManagement.Application.Academic.Dtos.Commands;
-using SchoolManagement.Application.Core.Dtos.Commands;
-using SchoolManagement.Application.Common.Dtos.Commands;
-using SchoolManagement.Application.Academic.Dtos.Responses;
-using SchoolManagement.Application.Core.Dtos.Responses;
-using SchoolManagement.Application.Common.Dtos.Responses;
 using SchoolManagement.Domain.Core.Entities;
-using System.Linq;
 
 namespace SchoolManagement.Application.Core.Mappers;
 
@@ -17,7 +10,7 @@ public static class EnrollmentMapper
             branchId : command.BranchId, 
             studentId: command.StudentId,
             subjectId: command.SubjectId,
-            groupId: command.GroupId,
+            groupId: command.PreferedGroupId!.Value,
             planId: command.PlanId,
             enrolledAt: command.EnrolledAt,
             status: command.Status,

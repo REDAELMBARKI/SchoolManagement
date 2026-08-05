@@ -1,14 +1,7 @@
 using MediatR;
 using SchoolManagement.Domain.Core.DomainEvents;
-using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Entities;
-using SchoolManagement.Domain.Academic.Interfaces;
 using SchoolManagement.Domain.Core.Interfaces;
-using SchoolManagement.Domain.Common.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SchoolManagement.Application.Core.EventsHandlers
 {

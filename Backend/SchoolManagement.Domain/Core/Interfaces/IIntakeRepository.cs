@@ -1,7 +1,5 @@
-using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Interfaces;
+using SchoolManagement.Domain.Core.Entities;
 
 namespace SchoolManagement.Domain.Core.Interfaces;
 

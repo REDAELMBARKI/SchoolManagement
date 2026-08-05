@@ -1,8 +1,5 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using SchoolManagement.Application.Common.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SchoolManagement.Infrastructure.Data
 {
@@ -10,7 +7,7 @@ namespace SchoolManagement.Infrastructure.Data
     {
 
         AppDbContext _appDbContext;
-        IDbContextTransaction? _transaction; 
+        IDbContextTransaction? _transaction;
 
         public EfTransaction(AppDbContext appDbContext)
         {

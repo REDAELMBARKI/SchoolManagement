@@ -1,9 +1,3 @@
-using SchoolManagement.Application.Academic.Dtos.Commands;
-using SchoolManagement.Application.Core.Dtos.Commands;
-using SchoolManagement.Application.Academic.Dtos.Responses;
-using SchoolManagement.Application.Core.Dtos.Responses;
-using SchoolManagement.Application.Common.Dtos.Responses;
-
 namespace SchoolManagement.Application.Core.Interfaces.Services;
 
 public interface IStudentService
