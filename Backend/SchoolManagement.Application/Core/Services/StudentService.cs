@@ -2,7 +2,6 @@ using MediatR;
 using SchoolManagement.Application.Common.Interfaces;
 using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Application.Common.Interfaces.Services;
-using SchoolManagement.Domain.Core.DomainEvents;
 using SchoolManagement.Domain.Common.Exceptions;
 using SchoolManagement.Application.Core.Mappers;
 using SchoolManagement.Domain.Core.Entities;
@@ -68,8 +67,6 @@ public class StudentService : IStudentService
             entityId: createdStudent.Id,
             branchId: _currentUserContext.BranchId,
             newValues: CreateAuditSnapshot(createdStudent));
-        
-        await _mediator.Publish(new StudentCreatedDomainEvent(createdStudent.Id));
         
         return StudentMapper.ToResponse(createdStudent);
     }

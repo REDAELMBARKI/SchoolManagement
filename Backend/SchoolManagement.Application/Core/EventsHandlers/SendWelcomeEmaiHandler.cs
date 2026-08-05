@@ -1,3 +1,7 @@
+// DEPRECATED: Use EnrollmentCreatedDomainEvent instead
+// This handler was for NewStudentAssignedDomainEvent which has been removed
+
+/*
 using MediatR;
 using SchoolManagement.Domain.Core.DomainEvents;
 using SchoolManagement.Domain.Core.Entities;
@@ -21,4 +25,5 @@ namespace SchoolManagement.Application.Core.EventsHandlers;
            // mail server later 
         }
 }
+*/
 

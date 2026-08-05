@@ -1,5 +1,6 @@
 using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Common.Exceptions;
+using SchoolManagement.Domain.Core.DomainEvents;
 using SchoolManagement.Domain.Core.Enums;
 
 namespace SchoolManagement.Domain.Core.Entities;
@@ -48,7 +49,7 @@ public class Payment : AggregateRoot
         if (string.IsNullOrWhiteSpace(methodDetailsJson))
             throw new DomainException("Method details JSON cannot be empty.");
 
-        return new Payment
+        var payment = new Payment
         {
             EnrollmentId = enrollmentId,
             InvoiceId = invoiceId,
@@ -62,6 +63,20 @@ public class Payment : AggregateRoot
             ExternalReferenceCode = externalReferenceCode,
             MethodDetailsJson = methodDetailsJson,
         };
+
+        // Raise domain event when payment is received (Paid status and linked to invoice)
+        if (status == PaymentStatus.Paid && invoiceId.HasValue)
+        {
+            payment.AddDomainEvent(new PaymentReceivedDomainEvent(
+                payment.Id,
+                invoiceId.Value,
+                enrollmentId,
+                amount,
+                paidAt
+            ));
+        }
+
+        return payment;
     }
 
     public void UpdateInvoiceId(Guid? invoiceId)

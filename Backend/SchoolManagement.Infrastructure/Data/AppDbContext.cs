@@ -64,6 +64,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
     // expenses any bills but not salaries
     // </summary>
     public DbSet<Expense> Expenses { get; set; }
+    public DbSet<WhatsAppMessage> WhatsAppMessages { get; set; }
 
     // <summary> 
     // only emplyee salaries payrolls
@@ -125,6 +126,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
         modelBuilder.ApplyConfiguration(new RefundConfiguration());
         modelBuilder.ApplyConfiguration(new PayrollPaymentConfiguration());
         modelBuilder.ApplyConfiguration(new ExpenseConfiguration());
+        modelBuilder.ApplyConfiguration(new WhatsAppMessageConfiguration());
     }
 
 

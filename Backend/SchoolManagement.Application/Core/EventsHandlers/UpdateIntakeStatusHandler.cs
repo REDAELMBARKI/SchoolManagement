@@ -1,3 +1,8 @@
+// DEPRECATED: Use EnrollmentCreatedDomainEvent instead
+// This handler was for NewStudentAssignedDomainEvent which has been removed
+// TODO: Move this logic to listen to EnrollmentCreatedDomainEvent
+
+/*
 using MediatR;
 using SchoolManagement.Domain.Core.DomainEvents;
 using SchoolManagement.Domain.Core.Entities;
@@ -25,3 +30,4 @@ namespace SchoolManagement.Application.Core.EventsHandlers
 
     }
 }
+*/

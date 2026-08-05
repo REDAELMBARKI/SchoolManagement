@@ -62,6 +62,15 @@ public class Invoice : AggregateRoot
         };
 
         invoice.RecalculateStatus();
+        
+        // Raise domain event - handler will fetch invoice details including TotalAmount
+        invoice.AddDomainEvent(new InvoiceCreatedDomainEvent(
+            invoice.Id,
+            enrollmentId,
+            branchId,
+            dueDate
+        ));
+        
         return invoice;
     }
 

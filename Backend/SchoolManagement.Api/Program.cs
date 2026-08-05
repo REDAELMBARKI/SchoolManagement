@@ -112,6 +112,8 @@ builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
 builder.Services.AddScoped<IExpenseQueryService, ExpenseQueryService>();
 builder.Services.AddScoped<SchoolManagement.Application.Common.Validators.MediaStorageValidator>();
+builder.Services.AddScoped<IWhatsAppMessageRepository, WhatsAppMessageRepository>();
+builder.Services.AddScoped<IWhatsAppService, WhatsAppService>();
 
 // end Di registration
 

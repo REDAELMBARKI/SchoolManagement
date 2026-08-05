@@ -1,12 +1,47 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
-const express = require('express');
+const sql = require('mssql');
 require('dotenv').config();
 
-const app = express();
-app.use(express.json());
+// ==================== DATABASE CONFIGURATION ====================
+const dbConfig = {
+    server: process.env.DB_SERVER || 'localhost',
+    database: process.env.DB_NAME || 'SchoolManagementDB',
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    port: parseInt(process.env.DB_PORT || '1433'),
+    options: {
+        encrypt: process.env.DB_ENCRYPT === 'true',
+        trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE === 'true',
+        enableArithAbort: true
+    },
+    pool: {
+        max: 10,
+        min: 0,
+        idleTimeoutMillis: 30000
+    }
+};
 
-// WhatsApp Client with session persistence
+let pool = null;
+let isReady = false;
+let isProcessing = false;
+
+const POLL_INTERVAL = parseInt(process.env.POLL_INTERVAL_MS || '10000');
+const BATCH_SIZE = parseInt(process.env.BATCH_SIZE || '50');
+
+// ==================== DATABASE CONNECTION ====================
+async function connectDatabase() {
+    try {
+        pool = await sql.connect(dbConfig);
+        console.log('✅ Connected to SQL Server database');
+        return true;
+    } catch (error) {
+        console.error('❌ Database connection failed:', error.message);
+        return false;
+    }
+}
+
+// ==================== WHATSAPP CLIENT SETUP ====================
 const client = new Client({
     authStrategy: new LocalAuth({
         dataPath: process.env.SESSION_PATH || './whatsapp-session'
@@ -25,352 +60,386 @@ const client = new Client({
     }
 });
 
-let isReady = false;
-let qrCodeData = null;
-
-// QR Code generation event
+// QR Code generation
 client.on('qr', (qr) => {
     console.log('\n📱 WhatsApp QR Code Generated!');
     console.log('Scan this QR code with your WhatsApp mobile app:\n');
     qrcode.generate(qr, { small: true });
-    qrCodeData = qr;
-    console.log('\n✨ Or visit: http://localhost:' + (process.env.PORT || 3001) + '/qr to see QR code\n');
+    console.log('\n⚠️  Worker paused until WhatsApp is connected\n');
 });
 
-// Client ready event
+// Client ready
 client.on('ready', () => {
     console.log('✅ WhatsApp client is ready!');
+    console.log('📱 Phone: ' + client.info.wid.user);
+    console.log('👤 Name: ' + client.info.pushname);
     isReady = true;
-    qrCodeData = null;
 });
 
-// Authentication success
 client.on('authenticated', () => {
     console.log('✅ WhatsApp authenticated successfully!');
 });
 
-// Authentication failure
 client.on('auth_failure', (msg) => {
     console.error('❌ Authentication failed:', msg);
     isReady = false;
 });
 
-// Client disconnected
 client.on('disconnected', (reason) => {
-    console.log('⚠️  WhatsApp client disconnected:', reason);
+    console.log('⚠️  WhatsApp disconnected:', reason);
+    console.log('📱 Phone may be offline - messages will be queued and retried');
     isReady = false;
-    qrCodeData = null;
 });
 
-// Message received event
-client.on('message', async (message) => {
-    console.log('📨 Message received:', message.from, '-', message.body);
-    
-    // Auto-reply example (optional)
-    // if (message.body.toLowerCase() === 'ping') {
-    //     message.reply('pong');
-    // }
-});
-
-// Initialize WhatsApp client
-client.initialize();
-
-// ==================== REST API ENDPOINTS ====================
-
-// Health check
-app.get('/health', (req, res) => {
-    res.json({
-        status: 'running',
-        whatsappReady: isReady,
-        timestamp: new Date().toISOString()
-    });
-});
-
-// Get QR Code (for web display)
-app.get('/qr', (req, res) => {
-    if (qrCodeData) {
-        res.send(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>WhatsApp QR Code</title>
-                <style>
-                    body { 
-                        font-family: Arial; 
-                        text-align: center; 
-                        padding: 50px;
-                        background: #f0f0f0;
-                    }
-                    .container {
-                        background: white;
-                        padding: 30px;
-                        border-radius: 10px;
-                        display: inline-block;
-                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                    }
-                    h1 { color: #25D366; }
-                    img { margin: 20px 0; }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <h1>📱 WhatsApp QR Code</h1>
-                    <p>Scan this QR code with WhatsApp on your phone</p>
-                    <p><strong>Open WhatsApp → Settings → Linked Devices → Link a Device</strong></p>
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrCodeData)}" alt="QR Code" />
-                    <p><small>Refresh this page if QR code expires</small></p>
-                </div>
-            </body>
-            </html>
-        `);
-    } else if (isReady) {
-        res.send(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>WhatsApp Connected</title>
-                <style>
-                    body { 
-                        font-family: Arial; 
-                        text-align: center; 
-                        padding: 50px;
-                        background: #f0f0f0;
-                    }
-                    .container {
-                        background: white;
-                        padding: 30px;
-                        border-radius: 10px;
-                        display: inline-block;
-                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                    }
-                    h1 { color: #25D366; }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <h1>✅ WhatsApp Connected!</h1>
-                    <p>Your WhatsApp is ready to send messages</p>
-                </div>
-            </body>
-            </html>
-        `);
-    } else {
-        res.send(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>WhatsApp Status</title>
-                <meta http-equiv="refresh" content="5">
-                <style>
-                    body { 
-                        font-family: Arial; 
-                        text-align: center; 
-                        padding: 50px;
-                        background: #f0f0f0;
-                    }
-                    .container {
-                        background: white;
-                        padding: 30px;
-                        border-radius: 10px;
-                        display: inline-block;
-                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                    }
-                    h1 { color: #FFA500; }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <h1>⏳ Initializing WhatsApp...</h1>
-                    <p>Please wait while we generate the QR code</p>
-                    <p><small>This page will auto-refresh</small></p>
-                </div>
-            </body>
-            </html>
-        `);
-    }
-});
-
-// Send message to a single number
-app.post('/send', async (req, res) => {
-    try {
-        if (!isReady) {
-            return res.status(503).json({ 
-                success: false, 
-                error: 'WhatsApp client not ready. Please scan QR code first.' 
-            });
-        }
-
-        const { phone, message } = req.body;
-
-        if (!phone || !message) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'Phone number and message are required' 
-            });
-        }
-
-        // Format phone number (remove spaces, dashes, add country code if needed)
-        let formattedPhone = phone.replace(/[^\d]/g, '');
-        
-        // If doesn't start with country code, assume Morocco (+212)
-        if (!formattedPhone.startsWith('212') && !formattedPhone.startsWith('1')) {
-            formattedPhone = '212' + formattedPhone;
-        }
-
-        const chatId = formattedPhone + '@c.us';
-
-        // Send message
-        await client.sendMessage(chatId, message);
-
-        console.log(`✅ Message sent to ${phone}: ${message}`);
-
-        res.json({
-            success: true,
-            phone: formattedPhone,
-            message: 'Message sent successfully',
-            timestamp: new Date().toISOString()
-        });
-
-    } catch (error) {
-        console.error('❌ Error sending message:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: error.message 
-        });
-    }
-});
-
-// Send bulk messages
-app.post('/send-bulk', async (req, res) => {
-    try {
-        if (!isReady) {
-            return res.status(503).json({ 
-                success: false, 
-                error: 'WhatsApp client not ready. Please scan QR code first.' 
-            });
-        }
-
-        const { recipients, message } = req.body;
-
-        if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'Recipients array is required' 
-            });
-        }
-
-        if (!message) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'Message is required' 
-            });
-        }
-
-        const results = [];
-
-        for (const phone of recipients) {
-            try {
-                let formattedPhone = phone.replace(/[^\d]/g, '');
-                
-                if (!formattedPhone.startsWith('212') && !formattedPhone.startsWith('1')) {
-                    formattedPhone = '212' + formattedPhone;
-                }
-
-                const chatId = formattedPhone + '@c.us';
-                await client.sendMessage(chatId, message);
-
-                results.push({
-                    phone: formattedPhone,
-                    success: true
-                });
-
-                console.log(`✅ Bulk message sent to ${phone}`);
-
-                // Delay between messages to avoid spam detection
-                await new Promise(resolve => setTimeout(resolve, 2000));
-
-            } catch (error) {
-                results.push({
-                    phone: phone,
-                    success: false,
-                    error: error.message
-                });
-                console.error(`❌ Failed to send to ${phone}:`, error.message);
-            }
-        }
-
-        const successCount = results.filter(r => r.success).length;
-        const failedCount = results.filter(r => !r.success).length;
-
-        res.json({
-            success: true,
-            total: recipients.length,
-            sent: successCount,
-            failed: failedCount,
-            results: results,
-            timestamp: new Date().toISOString()
-        });
-
-    } catch (error) {
-        console.error('❌ Error in bulk send:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: error.message 
-        });
-    }
-});
-
-// Get connection status
-app.get('/status', async (req, res) => {
-    try {
-        if (!isReady) {
-            return res.json({
-                connected: false,
-                message: 'WhatsApp not connected. Scan QR code at /qr'
-            });
-        }
-
-        const info = client.info;
-        res.json({
-            connected: true,
-            phone: info.wid.user,
-            name: info.pushname,
-            platform: info.platform,
-            message: 'WhatsApp connected and ready'
-        });
-    } catch (error) {
-        res.status(500).json({
-            connected: false,
-            error: error.message
-        });
-    }
-});
-
-// Logout/disconnect
-app.post('/logout', async (req, res) => {
-    try {
-        await client.logout();
+client.on('change_state', (state) => {
+    console.log('📱 WhatsApp state changed:', state);
+    if (state !== 'CONNECTED') {
+        console.log('⚠️  Phone not in CONNECTED state - will pause processing');
         isReady = false;
-        qrCodeData = null;
-        res.json({
-            success: true,
-            message: 'Logged out successfully'
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
+    } else {
+        console.log('✅ Phone reconnected - resuming processing');
+        isReady = true;
     }
 });
 
-// Start Express server
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-    console.log('\n🚀 WhatsApp Messenger Server Started!');
-    console.log(`📡 Server running on: http://localhost:${PORT}`);
-    console.log(`📱 View QR Code at: http://localhost:${PORT}/qr`);
-    console.log(`🔍 Health Check: http://localhost:${PORT}/health`);
-    console.log(`📊 Status Check: http://localhost:${PORT}/status`);
-    console.log('\n⏳ Initializing WhatsApp client...\n');
+// ==================== DATABASE QUERIES ====================
+async function getPendingMessages() {
+    try {
+        const result = await pool.request()
+            .input('batchSize', sql.Int, BATCH_SIZE)
+            .query(`
+                SELECT TOP (@batchSize) 
+                    Id, PhoneNumber, Message, MessageType, 
+                    EntityType, EntityId, RetryCount, ScheduledFor
+                FROM WhatsAppMessages
+                WHERE Status = 0 -- Pending
+                  AND ScheduledFor <= GETUTCDATE()
+                ORDER BY ScheduledFor ASC
+            `);
+        
+        return result.recordset;
+    } catch (error) {
+        console.error('❌ Error fetching pending messages:', error.message);
+        return [];
+    }
+}
+
+async function markAsProcessing(messageId) {
+    try {
+        await pool.request()
+            .input('messageId', sql.UniqueIdentifier, messageId)
+            .query(`
+                UPDATE WhatsAppMessages
+                SET Status = 1, -- Processing
+                    UpdatedAt = GETUTCDATE()
+                WHERE Id = @messageId
+            `);
+    } catch (error) {
+        console.error('❌ Error marking as processing:', error.message);
+    }
+}
+
+async function markAsSent(messageId, whatsAppMessageId) {
+    try {
+        await pool.request()
+            .input('messageId', sql.UniqueIdentifier, messageId)
+            .input('whatsAppMessageId', sql.NVarChar, whatsAppMessageId)
+            .query(`
+                UPDATE WhatsAppMessages
+                SET Status = 2, -- Sent
+                    SentAt = GETUTCDATE(),
+                    WhatsAppMessageId = @whatsAppMessageId,
+                    ErrorMessage = NULL,
+                    UpdatedAt = GETUTCDATE()
+                WHERE Id = @messageId
+            `);
+    } catch (error) {
+        console.error('❌ Error marking as sent:', error.message);
+    }
+}
+
+async function markAsFailed(messageId, errorMessage) {
+    try {
+        await pool.request()
+            .input('messageId', sql.UniqueIdentifier, messageId)
+            .input('errorMessage', sql.NVarChar, errorMessage.substring(0, 1000))
+            .query(`
+                UPDATE WhatsAppMessages
+                SET Status = 3, -- Failed
+                    FailedAt = GETUTCDATE(),
+                    ErrorMessage = @errorMessage,
+                    RetryCount = RetryCount + 1,
+                    UpdatedAt = GETUTCDATE()
+                WHERE Id = @messageId
+            `);
+    } catch (error) {
+        console.error('❌ Error marking as failed:', error.message);
+    }
+}
+
+// ==================== MESSAGE SENDING LOGIC ====================
+async function sendWhatsAppMessage(message) {
+    const { Id, PhoneNumber, Message, RetryCount } = message;
+
+    try {
+        // Mark as processing
+        await markAsProcessing(Id);
+
+        // Check if WhatsApp is actually connected before attempting send
+        if (!isReady) {
+            throw new Error('WhatsApp client not ready - phone may be disconnected');
+        }
+
+        // Check if client is still authenticated
+        const state = await client.getState();
+        if (state !== 'CONNECTED') {
+            throw new Error(`WhatsApp state is ${state} (not CONNECTED)`);
+        }
+
+        // Format phone number for WhatsApp (phone@c.us)
+        const chatId = PhoneNumber + '@c.us';
+
+        // Send message with timeout
+        const sentMessage = await Promise.race([
+            client.sendMessage(chatId, Message),
+            new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Send timeout - phone may be offline')), 30000)
+            )
+        ]);
+
+        // Mark as sent with WhatsApp message ID
+        await markAsSent(Id, sentMessage.id.id);
+
+        console.log(`✅ Message sent to ${PhoneNumber} (ID: ${Id})`);
+        return true;
+
+    } catch (error) {
+        console.error(`❌ Failed to send to ${PhoneNumber}:`, error.message);
+
+        // Categorize error for better retry logic
+        let errorMessage = error.message;
+        let shouldRetry = true;
+        
+        // Phone offline (WiFi dead but phone on)
+        if (error.message.includes('Phone not connected') || 
+            error.message.includes('phone is not connected') ||
+            error.message.includes('not ready')) {
+            errorMessage = 'PHONE_OFFLINE: ' + error.message;
+            console.log(`⚠️  Phone offline (WiFi dead) - will retry (attempt ${RetryCount + 1}/5)`);
+            shouldRetry = true;
+        } 
+        // Phone dead/rebooting (session closed)
+        else if (error.message.includes('Evaluation failed') || 
+                 error.message.includes('Session closed') ||
+                 error.message.includes('Protocol error') ||
+                 error.message.includes('Target closed') ||
+                 error.message.includes('browser has disconnected') ||
+                 error.message.includes('state is')) {
+            errorMessage = 'PHONE_DEAD: ' + error.message;
+            console.log(`⚠️  Phone dead/rebooting - will retry (attempt ${RetryCount + 1}/5)`);
+            shouldRetry = true;
+        }
+        // Send timeout (likely phone offline)
+        else if (error.message.includes('timeout')) {
+            errorMessage = 'TIMEOUT: ' + error.message;
+            console.log(`⚠️  Send timeout - phone may be offline - will retry (attempt ${RetryCount + 1}/5)`);
+            shouldRetry = true;
+        }
+        // Invalid WhatsApp number (permanent failure)
+        else if (error.message.includes('Number not registered') ||
+                 error.message.includes('is not a WhatsApp user')) {
+            errorMessage = 'INVALID_NUMBER: ' + error.message;
+            console.log(`❌ Invalid WhatsApp number: ${PhoneNumber} - will NOT retry`);
+            shouldRetry = false;
+        }
+        // Message too long (permanent failure)
+        else if (error.message.includes('too long')) {
+            errorMessage = 'MESSAGE_TOO_LONG: ' + error.message;
+            console.log(`❌ Message too long - will NOT retry`);
+            shouldRetry = false;
+        }
+        // Unknown error (retry anyway)
+        else {
+            errorMessage = 'UNKNOWN_ERROR: ' + error.message;
+            console.log(`⚠️  Unknown error - will retry (attempt ${RetryCount + 1}/5)`);
+            shouldRetry = true;
+        }
+
+        // Mark as failed
+        await markAsFailed(Id, errorMessage);
+
+        // If permanent failure (invalid number, too long), mark retry count as max
+        if (!shouldRetry && RetryCount < 5) {
+            await markMaxRetriesReached(Id);
+        }
+
+        return false;
+    }
+}
+
+async function markMaxRetriesReached(messageId) {
+    try {
+        await pool.request()
+            .input('messageId', sql.UniqueIdentifier, messageId)
+            .query(`
+                UPDATE WhatsAppMessages
+                SET RetryCount = 5
+                WHERE Id = @messageId
+            `);
+    } catch (error) {
+        console.error('❌ Error marking max retries:', error.message);
+    }
+}
+
+// ==================== QUEUE PROCESSOR ====================
+async function processQueue() {
+    if (isProcessing) {
+        console.log('⏭️  Skipping - already processing batch');
+        return;
+    }
+
+    if (!isReady) {
+        console.log('⏸️  WhatsApp not ready - waiting for connection (phone may be offline)');
+        return;
+    }
+
+    // Double-check connection state before processing
+    try {
+        const state = await client.getState();
+        if (state !== 'CONNECTED') {
+            console.log(`⏸️  WhatsApp state is ${state} (not CONNECTED) - skipping batch`);
+            isReady = false;
+            return;
+        }
+    } catch (error) {
+        console.log(`⏸️  Cannot get WhatsApp state: ${error.message} - skipping batch`);
+        isReady = false;
+        return;
+    }
+
+    isProcessing = true;
+
+    try {
+        const messages = await getPendingMessages();
+
+        if (messages.length === 0) {
+            console.log('✨ No pending messages');
+            return;
+        }
+
+        console.log(`\n📦 Processing batch: ${messages.length} messages`);
+
+        let successCount = 0;
+        let failCount = 0;
+
+        for (const message of messages) {
+            // Re-check connection before each message
+            try {
+                const state = await client.getState();
+                if (state !== 'CONNECTED') {
+                    console.log(`⚠️  Phone disconnected during batch - stopping`);
+                    isReady = false;
+                    break;
+                }
+            } catch (stateError) {
+                console.log(`⚠️  Cannot check phone state - stopping batch`);
+                isReady = false;
+                break;
+            }
+
+            const success = await sendWhatsAppMessage(message);
+            
+            if (success) {
+                successCount++;
+            } else {
+                failCount++;
+            }
+
+            // Delay between messages to avoid spam detection
+            await delay(2000);
+        }
+
+        console.log(`📊 Batch complete: ✅ ${successCount} sent, ❌ ${failCount} failed\n`);
+
+    } catch (error) {
+        console.error('❌ Error processing queue:', error.message);
+        console.error('Stack trace:', error.stack);
+        
+        // If critical error, mark worker as not ready
+        if (error.message.includes('Protocol error') || 
+            error.message.includes('Session closed') ||
+            error.message.includes('Target closed')) {
+            console.log('⚠️  Critical error detected - marking worker as not ready');
+            isReady = false;
+        }
+    } finally {
+        isProcessing = false;
+    }
+}
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// ==================== STARTUP ====================
+async function start() {
+    console.log('\n🚀 WhatsApp Queue Worker Starting...\n');
+
+    // Connect to database
+    const dbConnected = await connectDatabase();
+    if (!dbConnected) {
+        console.error('❌ Failed to connect to database. Exiting...');
+        process.exit(1);
+    }
+
+    // Initialize WhatsApp client
+    client.initialize();
+
+    // Wait for WhatsApp to be ready
+    await waitForWhatsApp();
+
+    // Start polling queue
+    console.log(`\n🔄 Starting queue processor (polling every ${POLL_INTERVAL}ms)`);
+    console.log(`📦 Batch size: ${BATCH_SIZE} messages\n`);
+
+    setInterval(async () => {
+        await processQueue();
+    }, POLL_INTERVAL);
+
+    // Initial run
+    await processQueue();
+}
+
+function waitForWhatsApp() {
+    return new Promise((resolve) => {
+        if (isReady) {
+            resolve();
+        } else {
+            client.once('ready', () => {
+                resolve();
+            });
+        }
+    });
+}
+
+// ==================== GRACEFUL SHUTDOWN ====================
+process.on('SIGINT', async () => {
+    console.log('\n\n⚠️  Shutting down gracefully...');
+    
+    if (pool) {
+        await pool.close();
+        console.log('✅ Database connection closed');
+    }
+    
+    await client.destroy();
+    console.log('✅ WhatsApp client disconnected');
+    
+    console.log('👋 Goodbye!\n');
+    process.exit(0);
+});
+
+// Start the worker
+start().catch(error => {
+    console.error('❌ Fatal error:', error);
+    process.exit(1);
 });
