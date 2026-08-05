@@ -30,6 +30,8 @@ import TableCreatePage from "./pages/forms/TableCreatePage";
 import TableDeletePage from "./pages/forms/TableDeletePage";
 import TableEditPage from "./pages/forms/TableEditPage";
 import ScheduleBuilderPage from "./pages/ScheduleBuilderPage";
+import IntakesHubPage from "./pages/IntakesHubPage";
+import SettingsHubPage from "./pages/settings/SettingsHubPage";
 import SettingsLayout from "./pages/settings/SettingsLayout";
 import RolesListPage from "./pages/settings/RolesListPage";
 import RoleDetailPage from "./pages/settings/RoleDetailPage";
@@ -47,13 +49,15 @@ export default function App() {
         <Route path="teacher" element={<TeacherPage />} />
         <Route path="parent" element={<ParentPage />} />
         <Route path="profile" element={<ProfilePage />} />
-        <Route path="settings" element={<SettingsLayout />}>
+        <Route path="settings">
+          <Route index element={<SettingsHubPage />} />
           <Route path="roles" element={<RolesListPage />} />
           <Route path="roles/:roleId" element={<RoleDetailPage />} />
           <Route path="staff" element={<StaffListPage />} />
           <Route path="staff/:staffId" element={<StaffDetailPage />} />
         </Route>
         <Route path="logout" element={<LogoutPage />} />
+        <Route path="intakes" element={<IntakesHubPage />} />
         <Route path="list/intakes" element={<IntakeListPage />} />
         <Route path="list/intakes/:id/convert" element={<IntakeConvertPage />} />
         <Route path="list/students" element={<StudentListPage />} />
@@ -71,7 +75,6 @@ export default function App() {
         <Route path="list/announcements" element={<AnnouncementListPage />} />
         <Route path="list/attendance" element={<AttendanceListPage />} />
         <Route path="list/messages" element={<MessagesPage />} />
-        <Route path="list/intakes" element={<IntakeListPage />} />
         <Route path="schedule-builder" element={<ScheduleBuilderPage />} />
       <Route path="list/:table/new" element={<TableCreatePage />} />
       <Route path="list/:table/:id/edit" element={<TableEditPage />} />
