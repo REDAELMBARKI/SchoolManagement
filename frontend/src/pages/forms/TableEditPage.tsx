@@ -105,19 +105,32 @@ export default function TableEditPage() {
   } else if (normalized.formTable === "intake") {
     const intakeId = Number(id);
     const i = intakesData.find((x) => x.id === intakeId);
-    
-    formData = i ? {
-      id: i.id,
-      firstName: i.firstName,
-      lastName: i.lastName,
-      email: i.email,
-      phone: i.phone,
-      dateOfBirth: i.dateOfBirth,
-      gender: i.gender,
-      leadSourceId: i.leadSourceId,
-      opcId: i.opcId,
-      intakeDate: i.intakeDate,
-    } : null;
+
+    // Map every field that IntakeForm's Zod schema / defaultValues consumes.
+    // Field names must match the IntakeSchema keys exactly.
+    formData = i
+      ? {
+          id: i.id,
+          firstName: i.firstName,
+          lastName: i.lastName,
+          email: i.email ?? "",
+          phone: i.phone ?? "",
+          dateOfBirth: i.dateOfBirth ?? "",
+          genderId: i.genderId ?? "",
+          subjectId: i.subjectId ?? "",
+          branchId: i.branchId ?? "",
+          intakeDate: i.intakeDate,
+          status: i.status ?? "New",
+          followUpDate: i.followUpDate ?? "",
+          notes: i.notes ?? "",
+          isIndependent: i.isIndependent ?? false,
+          leadSourceType: (i.leadSourceType as "Opc" | "Ad" | "") ?? "",
+          leadSourceId: i.leadSourceId ?? "",
+          commercialAgentId: i.commercialAgentId ?? "",
+          totalFees: i.totalFees ?? 0,
+          amountPaid: i.amountPaid ?? 0,
+        }
+      : null;
   }
 
   if (!formData) {
