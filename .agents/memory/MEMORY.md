@@ -1,0 +1,1 @@
+- [Imported project setup](imported-project-setup.md) — the Replit-visible React app and its dependencies live under `frontend/`.

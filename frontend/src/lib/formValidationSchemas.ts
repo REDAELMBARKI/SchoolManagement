@@ -236,10 +236,11 @@ export type PaymentMethodType = (typeof PAYMENT_METHODS)[number];
 export const RELATIONSHIP_TYPES = [
   "Father",
   "Mother",
-  "Brother",
-  "Sister",
   "Guardian",
-  "Tutor",
+  "Grandfather",
+  "Grandmother",
+  "Uncle",
+  "Aunt",
   "Other",
 ] as const;
 

@@ -12,50 +12,53 @@ import {
 } from "@/lib/formValidationSchemas";
 import type { FieldError } from "react-hook-form";
 
-// ── Mock FK data (replace with real API calls in Task #2) ─────────────────────
+// ── Mock FK data ───────────────────────────────────────────────────────────────
+// These UUIDs intentionally mirror the shape of the Guid foreign keys expected
+// by the API. Replace these arrays with query hooks when the API endpoints are
+// connected; the form contract does not need to change.
 
 const MOCK_LEVELS = [
-  { id: "lvl-1", name: "Beginner" },
-  { id: "lvl-2", name: "Elementary" },
-  { id: "lvl-3", name: "Pre-Intermediate" },
-  { id: "lvl-4", name: "Intermediate" },
-  { id: "lvl-5", name: "Upper-Intermediate" },
-  { id: "lvl-6", name: "Advanced" },
+  { id: "7b5df1a2-1c8b-4a91-9a52-1e5f3d4b7001", name: "Beginner", detail: "A1 · Foundations" },
+  { id: "7b5df1a2-1c8b-4a91-9a52-1e5f3d4b7002", name: "Elementary", detail: "A2 · Everyday communication" },
+  { id: "7b5df1a2-1c8b-4a91-9a52-1e5f3d4b7003", name: "Pre-Intermediate", detail: "B1 · Core fluency" },
+  { id: "7b5df1a2-1c8b-4a91-9a52-1e5f3d4b7004", name: "Intermediate", detail: "B1+ · Confident conversation" },
+  { id: "7b5df1a2-1c8b-4a91-9a52-1e5f3d4b7005", name: "Upper-Intermediate", detail: "B2 · Academic and professional" },
+  { id: "7b5df1a2-1c8b-4a91-9a52-1e5f3d4b7006", name: "Advanced", detail: "C1 · Precision and mastery" },
 ];
 
 const MOCK_SUBJECTS = [
-  { id: "sub-1", name: "English" },
-  { id: "sub-2", name: "Mathematics" },
-  { id: "sub-3", name: "Physics" },
-  { id: "sub-4", name: "Chemistry" },
-  { id: "sub-5", name: "French" },
+  { id: "1d2e3f40-5a6b-47c8-9d0e-1f2a3b4c5001", name: "English", detail: "Language · 12 groups" },
+  { id: "1d2e3f40-5a6b-47c8-9d0e-1f2a3b4c5002", name: "Mathematics", detail: "Sciences · 8 groups" },
+  { id: "1d2e3f40-5a6b-47c8-9d0e-1f2a3b4c5003", name: "Physics", detail: "Sciences · 5 groups" },
+  { id: "1d2e3f40-5a6b-47c8-9d0e-1f2a3b4c5004", name: "Chemistry", detail: "Sciences · 4 groups" },
+  { id: "1d2e3f40-5a6b-47c8-9d0e-1f2a3b4c5005", name: "French", detail: "Language · 6 groups" },
 ];
 
 const MOCK_PLANS = [
-  { id: "plan-1", name: "Monthly — 3,000 DA / month" },
-  { id: "plan-2", name: "Quarterly — 8,400 DA / 3 months" },
-  { id: "plan-3", name: "Annual — 30,000 DA / year" },
-  { id: "plan-4", name: "Intensive — 12,000 DA (accelerated)" },
+  { id: "2e3f4051-6a7b-48c9-0d1e-2f3a4b5c6001", name: "Monthly", price: "3,000 DA / month" },
+  { id: "2e3f4051-6a7b-48c9-0d1e-2f3a4b5c6002", name: "Quarterly", price: "8,400 DA / 3 months" },
+  { id: "2e3f4051-6a7b-48c9-0d1e-2f3a4b5c6003", name: "Annual", price: "30,000 DA / year" },
+  { id: "2e3f4051-6a7b-48c9-0d1e-2f3a4b5c6004", name: "Intensive", price: "12,000 DA · accelerated" },
 ];
 
 const MOCK_GROUPS = [
-  { id: "grp-1", name: "Group A — Morning  08:00–10:00" },
-  { id: "grp-2", name: "Group B — Afternoon  14:00–16:00" },
-  { id: "grp-3", name: "Group C — Evening  18:00–20:00" },
-  { id: "grp-4", name: "Group D — Weekend  09:00–12:00" },
+  { id: "3f405162-7a8b-49d0-1e2f-3a4b5c6d7001", name: "Group A", time: "Morning · 08:00–10:00" },
+  { id: "3f405162-7a8b-49d0-1e2f-3a4b5c6d7002", name: "Group B", time: "Afternoon · 14:00–16:00" },
+  { id: "3f405162-7a8b-49d0-1e2f-3a4b5c6d7003", name: "Group C", time: "Evening · 18:00–20:00" },
+  { id: "3f405162-7a8b-49d0-1e2f-3a4b5c6d7004", name: "Group D", time: "Weekend · 09:00–12:00" },
 ];
 
 const MOCK_GENDERS = [
-  { id: "gender-1", name: "Male" },
-  { id: "gender-2", name: "Female" },
+  { id: "4a516273-8b9c-40e1-2f3a-4b5c6d7e8001", name: "Male" },
+  { id: "4a516273-8b9c-40e1-2f3a-4b5c6d7e8002", name: "Female" },
 ];
 
 const MOCK_INTAKES = [
-  { id: "intake-1", label: "John Doe — English · Jan 2026" },
-  { id: "intake-2", label: "Jane Smith — Mathematics · Feb 2026" },
-  { id: "intake-3", label: "Michael Johnson — Physics · Mar 2026" },
-  { id: "intake-4", label: "Emily Brown — English · Apr 2026" },
-  { id: "intake-6", label: "Amira Benali — Mathematics · Jun 2026" },
+  { id: "5b627384-9cad-41f2-3a4b-5c6d7e8f9001", label: "John Doe", detail: "English · January 2026" },
+  { id: "5b627384-9cad-41f2-3a4b-5c6d7e8f9002", label: "Jane Smith", detail: "Mathematics · February 2026" },
+  { id: "5b627384-9cad-41f2-3a4b-5c6d7e8f9003", label: "Michael Johnson", detail: "Physics · March 2026" },
+  { id: "5b627384-9cad-41f2-3a4b-5c6d7e8f9004", label: "Emily Brown", detail: "English · April 2026" },
+  { id: "5b627384-9cad-41f2-3a4b-5c6d7e8f9005", label: "Amira Benali", detail: "Mathematics · June 2026" },
 ];
 
 // ── Payment method metadata ───────────────────────────────────────────────────
@@ -170,9 +173,14 @@ export default function StudentRegistrationPage() {
   } = useForm<StudentRegistrationSchema>({
     resolver: zodResolver(studentRegistrationSchema),
     defaultValues: {
-      student: { registrationMode: "direct" },
-      payment:  { method: "Cash" },
+      student: { registrationMode: "direct", email: "", genderId: "", intakeId: "" },
+      enrollment: { subjectId: "", planId: "", preferedGroupId: "", notes: "" },
+      payment:  { method: "Cash", amountPaid: undefined, transferFees: undefined, paidAt: "" },
       hasGuardian: false,
+      responsable: {
+        firstName: "", lastName: "", email: "", phone: "", relationship: "", genderId: "",
+      },
+      periodStart: "", periodEnd: "", invoiceDueDate: "", chargeDueDate: "",
     },
   });
 
@@ -200,6 +208,8 @@ export default function StudentRegistrationPage() {
       },
       enrollmentRegReq: {
         // StudentId will be assigned by the backend after student creation.
+        // The service creates the student before enrollment; this sentinel
+        // keeps the preview payload explicit until the API flow is connected.
         studentId:       "00000000-0000-0000-0000-000000000000",
         levelId:         data.student.levelId,
         subjectId:       data.enrollment.subjectId,
@@ -230,12 +240,12 @@ export default function StudentRegistrationPage() {
       chargeDueDate:  data.chargeDueDate  || null,
     };
 
-    // TODO (Task #2): POST /api/students/register
+    // Preview-only until the registration endpoint is connected.
     console.log("Student registration payload:", dto);
     await new Promise((r) => setTimeout(r, 700));
 
     setSubmitting(false);
-    toast.success("Student registered successfully!");
+    toast.success("Registration payload ready — API connection pending.");
   });
 
   // Cast nested errors to FieldError to satisfy InputField's prop type.
@@ -245,26 +255,39 @@ export default function StudentRegistrationPage() {
   const re  = errors.responsable as any;
 
   return (
-    <div className="flex flex-col gap-4 m-4 mt-0">
+    <div
+      className="min-h-full flex flex-col gap-5 p-4 md:p-6 xl:p-8 mt-0"
+      style={{
+        backgroundColor: "#fbf8f2",
+        backgroundImage:
+          "radial-gradient(#e9dfcf 0.7px, transparent 0.7px), linear-gradient(135deg, rgba(255,255,255,.55), rgba(245,238,225,.5))",
+        backgroundSize: "12px 12px, 100% 100%",
+      }}
+    >
 
       {/* ── Page header ─────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-lamaSky flex items-center justify-center flex-shrink-0">
+          <div className="w-11 h-11 rounded-2xl bg-[#e4f5fa] border border-[#c6e9f3] flex items-center justify-center flex-shrink-0 shadow-sm">
             <img src="/student.png" alt="" width={20} height={20} />
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-gray-800 leading-tight">
+            <div className="flex items-center gap-2">
+              <span className="uppercase tracking-[0.16em] text-[10px] font-bold text-[#9b8d78]">Admissions</span>
+              <span className="h-1 w-1 rounded-full bg-[#d7c4a8]" />
+              <span className="text-[10px] text-[#aa9d8a]">New record</span>
+            </div>
+            <h1 className="text-2xl font-semibold text-[#3f4548] leading-tight">
               New Student Registration
             </h1>
-            <p className="text-xs text-gray-400">
-              Complete all required sections to enrol a new student
+            <p className="text-xs text-[#948a7c] mt-1">
+              Capture the student, enrollment, payment and guardian details in one place.
             </p>
           </div>
         </div>
         <Link
           to="/list/students"
-          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+          className="self-start sm:self-auto flex items-center gap-1.5 text-xs font-medium text-[#8f8577] hover:text-[#4f5e62] transition-colors rounded-lg px-3 py-2 hover:bg-white/70"
         >
           <img src="/close.png" alt="" width={11} height={11} />
           Cancel
@@ -274,7 +297,7 @@ export default function StudentRegistrationPage() {
       <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
 
         {/* ══ SECTION 1 — Student Information ══════════════════════════════ */}
-        <SectionCard accent="border-lamaSky">
+        <SectionCard accent="border-[#9ddced]">
           <SectionHeader
             n={1}
             icon="student"
@@ -405,7 +428,7 @@ export default function StudentRegistrationPage() {
         </SectionCard>
 
         {/* ══ SECTION 2 — Enrollment ════════════════════════════════════════ */}
-        <SectionCard accent="border-lamaPurple">
+        <SectionCard accent="border-[#c6c4f4]">
           <SectionHeader
             n={2}
             icon="subject"
@@ -469,7 +492,7 @@ export default function StudentRegistrationPage() {
         </SectionCard>
 
         {/* ══ SECTION 3 — Payment ══════════════════════════════════════════ */}
-        <SectionCard accent="border-lamaYellow">
+        <SectionCard accent="border-[#e9d47b]">
           <SectionHeader
             n={3}
             icon="finance"
@@ -565,7 +588,7 @@ export default function StudentRegistrationPage() {
         </SectionCard>
 
         {/* ══ SECTION 4 — Guardian (optional) ══════════════════════════════ */}
-        <SectionCard accent={hasGuardian ? "border-lamaPurple" : "border-gray-200"}>
+        <SectionCard accent={hasGuardian ? "border-[#c6c4f4]" : "border-[#e5ddd0]"}>
           {/* Section header + toggle in same row */}
           <div className="flex items-center justify-between mb-5">
             <SectionHeader
@@ -651,7 +674,7 @@ export default function StudentRegistrationPage() {
         </SectionCard>
 
         {/* ══ SECTION 5 — Registration Dates (optional) ════════════════════ */}
-        <SectionCard accent="border-gray-200">
+        <SectionCard accent="border-[#e5ddd0]">
           <SectionHeader
             n={5}
             icon="calendar"

@@ -10,6 +10,7 @@ import SettingsPage from "./pages/SettingsPage";
 import LogoutPage from "./pages/LogoutPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import StudentListPage from "./pages/list/StudentListPage";
+import StudentRegistrationPage from "./pages/list/StudentRegistrationPage";
 import SingleStudentPage from "./pages/list/SingleStudentPage";
 import TeacherListPage from "./pages/list/TeacherListPage";
 import SingleTeacherPage from "./pages/list/SingleTeacherPage";
@@ -61,6 +62,7 @@ export default function App() {
         <Route path="list/intakes" element={<IntakeListPage />} />
         <Route path="list/intakes/:id/convert" element={<IntakeConvertPage />} />
         <Route path="list/students" element={<StudentListPage />} />
+         <Route path="list/students/new" element={<StudentRegistrationPage />} />
         <Route path="list/students/:id" element={<SingleStudentPage />} />
         <Route path="list/teachers" element={<TeacherListPage />} />
         <Route path="list/teachers/:id" element={<SingleTeacherPage />} />
