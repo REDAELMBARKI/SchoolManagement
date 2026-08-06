@@ -258,9 +258,6 @@ export const studentRegistrationSchema = z
       dateOfBirth: z.string().min(1, "Date of birth is required"),
       genderId:  z.string().optional().or(z.literal("")),
       levelId:   z.string().min(1, "Level is required"),
-      /** "direct" → IsDirectRegistration=true; "intake" → IntakeId must be set */
-      registrationMode: z.enum(["direct", "intake"]),
-      intakeId:  z.string().optional().or(z.literal("")),
     }),
 
     // ── EnrollmentRequestDto ───────────────────────────────────────────────
@@ -300,14 +297,6 @@ export const studentRegistrationSchema = z
     chargeDueDate:  z.string().optional().or(z.literal("")),
   })
   .superRefine((data, ctx) => {
-    // IntakeId required when mode is "intake"
-    if (data.student.registrationMode === "intake" && !data.student.intakeId) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Please select an intake",
-        path: ["student", "intakeId"],
-      });
-    }
     // External reference code required for bank/credit/check payments
     if (
       REF_CODE_REQUIRED.includes(data.payment.method) &&

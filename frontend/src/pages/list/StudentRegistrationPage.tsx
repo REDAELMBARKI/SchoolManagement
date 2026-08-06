@@ -1,9 +1,11 @@
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import InputField from "@/components/InputField";
+import ObjectSelect from "@/components/ui/ObjectSelect";
+import PrimitiveSelect from "@/components/ui/PrimitiveSelect";
 import {
   studentRegistrationSchema,
   StudentRegistrationSchema,
@@ -18,47 +20,41 @@ import type { FieldError } from "react-hook-form";
 // connected; the form contract does not need to change.
 
 const MOCK_LEVELS = [
-  { id: "7b5df1a2-1c8b-4a91-9a52-1e5f3d4b7001", name: "Beginner", detail: "A1 · Foundations" },
-  { id: "7b5df1a2-1c8b-4a91-9a52-1e5f3d4b7002", name: "Elementary", detail: "A2 · Everyday communication" },
-  { id: "7b5df1a2-1c8b-4a91-9a52-1e5f3d4b7003", name: "Pre-Intermediate", detail: "B1 · Core fluency" },
-  { id: "7b5df1a2-1c8b-4a91-9a52-1e5f3d4b7004", name: "Intermediate", detail: "B1+ · Confident conversation" },
-  { id: "7b5df1a2-1c8b-4a91-9a52-1e5f3d4b7005", name: "Upper-Intermediate", detail: "B2 · Academic and professional" },
-  { id: "7b5df1a2-1c8b-4a91-9a52-1e5f3d4b7006", name: "Advanced", detail: "C1 · Precision and mastery" },
+  { key: "7b5df1a2-1c8b-4a91-9a52-1e5f3d4b7001", value: "Beginner · A1 Foundations" },
+  { key: "7b5df1a2-1c8b-4a91-9a52-1e5f3d4b7002", value: "Elementary · A2 Everyday communication" },
+  { key: "7b5df1a2-1c8b-4a91-9a52-1e5f3d4b7003", value: "Pre-Intermediate · B1 Core fluency" },
+  { key: "7b5df1a2-1c8b-4a91-9a52-1e5f3d4b7004", value: "Intermediate · B1+ Confident conversation" },
+  { key: "7b5df1a2-1c8b-4a91-9a52-1e5f3d4b7005", value: "Upper-Intermediate · B2 Academic and professional" },
+  { key: "7b5df1a2-1c8b-4a91-9a52-1e5f3d4b7006", value: "Advanced · C1 Precision and mastery" },
 ];
 
 const MOCK_SUBJECTS = [
-  { id: "1d2e3f40-5a6b-47c8-9d0e-1f2a3b4c5001", name: "English", detail: "Language · 12 groups" },
-  { id: "1d2e3f40-5a6b-47c8-9d0e-1f2a3b4c5002", name: "Mathematics", detail: "Sciences · 8 groups" },
-  { id: "1d2e3f40-5a6b-47c8-9d0e-1f2a3b4c5003", name: "Physics", detail: "Sciences · 5 groups" },
-  { id: "1d2e3f40-5a6b-47c8-9d0e-1f2a3b4c5004", name: "Chemistry", detail: "Sciences · 4 groups" },
-  { id: "1d2e3f40-5a6b-47c8-9d0e-1f2a3b4c5005", name: "French", detail: "Language · 6 groups" },
+  { key: "1d2e3f40-5a6b-47c8-9d0e-1f2a3b4c5001", value: "English · Language · 12 groups" },
+  { key: "1d2e3f40-5a6b-47c8-9d0e-1f2a3b4c5002", value: "Mathematics · Sciences · 8 groups" },
+  { key: "1d2e3f40-5a6b-47c8-9d0e-1f2a3b4c5003", value: "Physics · Sciences · 5 groups" },
+  { key: "1d2e3f40-5a6b-47c8-9d0e-1f2a3b4c5004", value: "Chemistry · Sciences · 4 groups" },
+  { key: "1d2e3f40-5a6b-47c8-9d0e-1f2a3b4c5005", value: "French · Language · 6 groups" },
 ];
 
 const MOCK_PLANS = [
-  { id: "2e3f4051-6a7b-48c9-0d1e-2f3a4b5c6001", name: "Monthly", price: "3,000 DA / month" },
-  { id: "2e3f4051-6a7b-48c9-0d1e-2f3a4b5c6002", name: "Quarterly", price: "8,400 DA / 3 months" },
-  { id: "2e3f4051-6a7b-48c9-0d1e-2f3a4b5c6003", name: "Annual", price: "30,000 DA / year" },
-  { id: "2e3f4051-6a7b-48c9-0d1e-2f3a4b5c6004", name: "Intensive", price: "12,000 DA · accelerated" },
+  { key: "2e3f4051-6a7b-48c9-0d1e-2f3a4b5c6001", value: "Monthly · 3,000 DA / month" },
+  { key: "2e3f4051-6a7b-48c9-0d1e-2f3a4b5c6002", value: "Quarterly · 8,400 DA / 3 months" },
+  { key: "2e3f4051-6a7b-48c9-0d1e-2f3a4b5c6003", value: "Annual · 30,000 DA / year" },
+  { key: "2e3f4051-6a7b-48c9-0d1e-2f3a4b5c6004", value: "Intensive · 12,000 DA accelerated" },
 ];
 
 const MOCK_GROUPS = [
-  { id: "3f405162-7a8b-49d0-1e2f-3a4b5c6d7001", name: "Group A", time: "Morning · 08:00–10:00" },
-  { id: "3f405162-7a8b-49d0-1e2f-3a4b5c6d7002", name: "Group B", time: "Afternoon · 14:00–16:00" },
-  { id: "3f405162-7a8b-49d0-1e2f-3a4b5c6d7003", name: "Group C", time: "Evening · 18:00–20:00" },
-  { id: "3f405162-7a8b-49d0-1e2f-3a4b5c6d7004", name: "Group D", time: "Weekend · 09:00–12:00" },
+  { key: "", value: "No group preference" },
+  { key: "3f405162-7a8b-49d0-1e2f-3a4b5c6d7001", value: "Group A · Morning · 08:00–10:00" },
+  { key: "3f405162-7a8b-49d0-1e2f-3a4b5c6d7002", value: "Group B · Afternoon · 14:00–16:00" },
+  { key: "3f405162-7a8b-49d0-1e2f-3a4b5c6d7003", value: "Group C · Evening · 18:00–20:00" },
+  { key: "3f405162-7a8b-49d0-1e2f-3a4b5c6d7004", value: "Group D · Weekend · 09:00–12:00" },
 ];
 
 const MOCK_GENDERS = [
-  { id: "4a516273-8b9c-40e1-2f3a-4b5c6d7e8001", name: "Male" },
-  { id: "4a516273-8b9c-40e1-2f3a-4b5c6d7e8002", name: "Female" },
-];
-
-const MOCK_INTAKES = [
-  { id: "5b627384-9cad-41f2-3a4b-5c6d7e8f9001", label: "John Doe", detail: "English · January 2026" },
-  { id: "5b627384-9cad-41f2-3a4b-5c6d7e8f9002", label: "Jane Smith", detail: "Mathematics · February 2026" },
-  { id: "5b627384-9cad-41f2-3a4b-5c6d7e8f9003", label: "Michael Johnson", detail: "Physics · March 2026" },
-  { id: "5b627384-9cad-41f2-3a4b-5c6d7e8f9004", label: "Emily Brown", detail: "English · April 2026" },
-  { id: "5b627384-9cad-41f2-3a4b-5c6d7e8f9005", label: "Amira Benali", detail: "Mathematics · June 2026" },
+  { key: "", value: "Not specified" },
+  { key: "4a516273-8b9c-40e1-2f3a-4b5c6d7e8001", value: "Male" },
+  { key: "4a516273-8b9c-40e1-2f3a-4b5c6d7e8002", value: "Female" },
 ];
 
 // ── Payment method metadata ───────────────────────────────────────────────────
@@ -73,7 +69,7 @@ const METHOD_META: Record<string, { label: string; icon: string; note: string }>
 
 const REF_REQUIRED = ["CreditCard", "BankTransfer", "Check"];
 
-// ── Shared sub-components ─────────────────────────────────────────────────────
+// ── Shared layout sub-components ───────────────────────────────────────────────
 
 /** Section card with a colored left accent stripe. */
 function SectionCard({
@@ -122,49 +118,13 @@ function SectionHeader({
   );
 }
 
-/** Reusable select wrapper that matches InputField's visual style. */
-function SelectField({
-  label,
-  name,
-  register,
-  error,
-  children,
-  widthClass = "w-full md:w-1/4",
-  required,
-}: {
-  label: string;
-  name: string;
-  register: any;
-  error?: FieldError;
-  children: React.ReactNode;
-  widthClass?: string;
-  required?: boolean;
-}) {
-  return (
-    <div className={`flex flex-col gap-2 ${widthClass}`}>
-      <label className="text-xs text-gray-500">
-        {label}
-        {required && <span className="text-red-400 ml-0.5">*</span>}
-      </label>
-      <select
-        {...register(name)}
-        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full bg-white focus:outline-none focus:ring-lamaSky"
-      >
-        {children}
-      </select>
-      {error?.message && (
-        <p className="text-xs text-red-400">{error.message}</p>
-      )}
-    </div>
-  );
-}
-
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function StudentRegistrationPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const {
+    control,
     register,
     handleSubmit,
     watch,
@@ -173,7 +133,7 @@ export default function StudentRegistrationPage() {
   } = useForm<StudentRegistrationSchema>({
     resolver: zodResolver(studentRegistrationSchema),
     defaultValues: {
-      student: { registrationMode: "direct", email: "", genderId: "", intakeId: "" },
+      student: { email: "", genderId: "" },
       enrollment: { subjectId: "", planId: "", preferedGroupId: "", notes: "" },
       payment:  { method: "Cash", amountPaid: undefined, transferFees: undefined, paidAt: "" },
       hasGuardian: false,
@@ -184,7 +144,6 @@ export default function StudentRegistrationPage() {
     },
   });
 
-  const registrationMode = watch("student.registrationMode");
   const paymentMethod    = watch("payment.method");
   const hasGuardian      = watch("hasGuardian");
 
@@ -201,10 +160,7 @@ export default function StudentRegistrationPage() {
         dateOfBirth: data.student.dateOfBirth,
         genderId:  data.student.genderId || null,
         levelId:   data.student.levelId,
-        isDirectRegistration: data.student.registrationMode === "direct",
-        intakeId:  data.student.registrationMode === "intake"
-          ? data.student.intakeId || null
-          : null,
+        isDirectRegistration: true,
       },
       enrollmentRegReq: {
         // StudentId will be assigned by the backend after student creation.
@@ -302,68 +258,9 @@ export default function StudentRegistrationPage() {
             n={1}
             icon="student"
             title="Student Information"
-            subtitle="Personal details, identity and registration type"
+            subtitle="Personal details and identity"
             bubble="bg-lamaSky"
           />
-
-          {/* Registration mode toggle */}
-          <div className="flex flex-col gap-2 mb-5">
-            <label className="text-xs text-gray-500 font-medium">
-              Registration Type <span className="text-red-400">*</span>
-            </label>
-            <div className="flex gap-2 flex-wrap">
-              {(["direct", "intake"] as const).map((mode) => (
-                <button
-                  key={mode}
-                  type="button"
-                  onClick={() => {
-                    setValue("student.registrationMode", mode);
-                    if (mode === "direct") setValue("student.intakeId", "");
-                  }}
-                  className={`flex items-center gap-2 py-2 px-4 rounded-lg text-sm font-medium border-2 transition-all ${
-                    registrationMode === mode
-                      ? "bg-lamaSkyLight border-lamaSky text-gray-700"
-                      : "bg-white border-gray-200 text-gray-400 hover:border-gray-300"
-                  }`}
-                >
-                  <img
-                    src={mode === "direct" ? "/create.png" : "/student.png"}
-                    alt=""
-                    width={14}
-                    height={14}
-                    className={registrationMode === mode ? "opacity-70" : "opacity-30"}
-                  />
-                  {mode === "direct" ? "Direct Registration" : "Convert from Intake"}
-                </button>
-              ))}
-            </div>
-            <p className="text-[11px] text-gray-400">
-              {registrationMode === "direct"
-                ? "Student will be created without a prior intake record."
-                : "Link this registration to an existing intake enquiry."}
-            </p>
-          </div>
-
-          {/* Intake select — only when mode = intake */}
-          {registrationMode === "intake" && (
-            <div className="mb-5 flex flex-wrap gap-4">
-              <SelectField
-                label="Linked Intake"
-                name="student.intakeId"
-                register={register}
-                error={se?.intakeId}
-                widthClass="w-full md:w-1/2"
-                required
-              >
-                <option value="">— Select an intake —</option>
-                {MOCK_INTAKES.map((i) => (
-                  <option key={i.id} value={i.id}>
-                    {i.label}
-                  </option>
-                ))}
-              </SelectField>
-            </div>
-          )}
 
           {/* Personal fields */}
           <div className="flex flex-wrap gap-4">
@@ -401,29 +298,40 @@ export default function StudentRegistrationPage() {
               register={register}
               error={se?.dateOfBirth}
             />
-            <SelectField
-              label="Gender"
+            <Controller
               name="student.genderId"
-              register={register}
-              error={se?.genderId}
-            >
-              <option value="">— Not specified —</option>
-              {MOCK_GENDERS.map((g) => (
-                <option key={g.id} value={g.id}>{g.name}</option>
-              ))}
-            </SelectField>
-            <SelectField
-              label="Level"
+              control={control}
+              render={({ field, fieldState }) => (
+                <ObjectSelect
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  label="Gender"
+                  options={MOCK_GENDERS}
+                  isMulty={false}
+                  placeholder="Not specified"
+                  error={fieldState.error?.message}
+                  className="w-full md:w-1/4"
+                />
+              )}
+            />
+            <Controller
               name="student.levelId"
-              register={register}
-              error={se?.levelId}
-              required
-            >
-              <option value="">— Select level —</option>
-              {MOCK_LEVELS.map((l) => (
-                <option key={l.id} value={l.id}>{l.name}</option>
-              ))}
-            </SelectField>
+              control={control}
+              render={({ field, fieldState }) => (
+                <ObjectSelect
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  label="Level *"
+                  options={MOCK_LEVELS}
+                  isMulty={false}
+                  placeholder="Select level"
+                  error={fieldState.error?.message}
+                  className="w-full md:w-1/4"
+                />
+              )}
+            />
           </div>
         </SectionCard>
 
@@ -437,43 +345,59 @@ export default function StudentRegistrationPage() {
             bubble="bg-lamaPurple"
           />
           <div className="flex flex-wrap gap-4">
-            <SelectField
-              label="Subject"
+            <Controller
               name="enrollment.subjectId"
-              register={register}
-              error={ee?.subjectId}
-              required
-            >
-              <option value="">— Select subject —</option>
-              {MOCK_SUBJECTS.map((s) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </SelectField>
+              control={control}
+              render={({ field, fieldState }) => (
+                <ObjectSelect
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  label="Subject *"
+                  options={MOCK_SUBJECTS}
+                  isMulty={false}
+                  placeholder="Select subject"
+                  error={fieldState.error?.message}
+                  className="w-full md:w-1/4"
+                />
+              )}
+            />
 
-            <SelectField
-              label="Pricing Plan"
+            <Controller
               name="enrollment.planId"
-              register={register}
-              error={ee?.planId}
-              required
-            >
-              <option value="">— Select plan —</option>
-              {MOCK_PLANS.map((p) => (
-                <option key={p.id} value={p.id}>{p.name}</option>
-              ))}
-            </SelectField>
+              control={control}
+              render={({ field, fieldState }) => (
+                <ObjectSelect
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  label="Pricing Plan *"
+                  options={MOCK_PLANS}
+                  isMulty={false}
+                  placeholder="Select plan"
+                  error={fieldState.error?.message}
+                  className="w-full md:w-1/4"
+                />
+              )}
+            />
 
-            <SelectField
-              label="Preferred Group"
+            <Controller
               name="enrollment.preferedGroupId"
-              register={register}
-              error={ee?.preferedGroupId}
-            >
-              <option value="">— No preference —</option>
-              {MOCK_GROUPS.map((g) => (
-                <option key={g.id} value={g.id}>{g.name}</option>
-              ))}
-            </SelectField>
+              control={control}
+              render={({ field, fieldState }) => (
+                <ObjectSelect
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  label="Preferred Group"
+                  options={MOCK_GROUPS}
+                  isMulty={false}
+                  placeholder="No group preference"
+                  error={fieldState.error?.message}
+                  className="w-full md:w-1/4"
+                />
+              )}
+            />
 
             {/* Notes — wider */}
             <div className="flex flex-col gap-2 w-full md:w-3/4">
@@ -643,28 +567,40 @@ export default function StudentRegistrationPage() {
                 register={register}
                 error={re?.email}
               />
-              <SelectField
-                label="Relationship"
+              <Controller
                 name="responsable.relationship"
-                register={register}
-                error={re?.relationship}
-                required
-              >
-                <option value="">— Select relationship —</option>
-                {RELATIONSHIP_TYPES.map((r) => (
-                  <option key={r} value={r}>{r}</option>
-                ))}
-              </SelectField>
-              <SelectField
-                label="Gender"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <PrimitiveSelect
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    label="Relationship *"
+                    options={RELATIONSHIP_TYPES}
+                    isMulty={false}
+                    placeholder="Select relationship"
+                    error={fieldState.error?.message}
+                    className="w-full md:w-1/4"
+                  />
+                )}
+              />
+              <Controller
                 name="responsable.genderId"
-                register={register}
-              >
-                <option value="">— Not specified —</option>
-                {MOCK_GENDERS.map((g) => (
-                  <option key={g.id} value={g.id}>{g.name}</option>
-                ))}
-              </SelectField>
+                control={control}
+                render={({ field, fieldState }) => (
+                  <ObjectSelect
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    label="Gender"
+                    options={MOCK_GENDERS}
+                    isMulty={false}
+                    placeholder="Not specified"
+                    error={fieldState.error?.message}
+                    className="w-full md:w-1/4"
+                  />
+                )}
+              />
             </div>
           ) : (
             <p className="text-xs text-gray-400 italic">
