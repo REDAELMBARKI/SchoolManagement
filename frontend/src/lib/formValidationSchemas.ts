@@ -220,3 +220,115 @@ export const examSchema = z.object({
 });
 
 export type ExamSchema = z.infer<typeof examSchema>;
+
+// ── Student Registration ──────────────────────────────────────────────────────
+// Mirrors StudentRegistrationRequestDto + sub-DTOs from the backend.
+
+export const PAYMENT_METHODS = [
+  "Cash",
+  "CreditCard",
+  "DebitCard",
+  "BankTransfer",
+  "Check",
+] as const;
+export type PaymentMethodType = (typeof PAYMENT_METHODS)[number];
+
+export const RELATIONSHIP_TYPES = [
+  "Father",
+  "Mother",
+  "Brother",
+  "Sister",
+  "Guardian",
+  "Tutor",
+  "Other",
+] as const;
+
+/** Methods that require an external reference code (matches backend validator). */
+const REF_CODE_REQUIRED: string[] = ["CreditCard", "BankTransfer", "Check"];
+
+export const studentRegistrationSchema = z
+  .object({
+    // ── StudentRequestDto ──────────────────────────────────────────────────
+    student: z.object({
+      firstName: z.string().min(3, "At least 3 characters").max(50),
+      lastName:  z.string().min(3, "At least 3 characters").max(50),
+      email:     z.string().email("Invalid email").max(255).optional().or(z.literal("")),
+      phone:     z.string().min(1, "Phone is required").max(20),
+      dateOfBirth: z.string().min(1, "Date of birth is required"),
+      genderId:  z.string().optional().or(z.literal("")),
+      levelId:   z.string().min(1, "Level is required"),
+      /** "direct" → IsDirectRegistration=true; "intake" → IntakeId must be set */
+      registrationMode: z.enum(["direct", "intake"]),
+      intakeId:  z.string().optional().or(z.literal("")),
+    }),
+
+    // ── EnrollmentRequestDto ───────────────────────────────────────────────
+    enrollment: z.object({
+      subjectId:        z.string().min(1, "Subject is required"),
+      planId:           z.string().min(1, "Plan is required"),
+      preferedGroupId:  z.string().optional().or(z.literal("")),
+      notes:            z.string().optional().or(z.literal("")),
+    }),
+
+    // ── RegistrationPaymentRequestDto ──────────────────────────────────────
+    payment: z.object({
+      amountPaid:    z.coerce.number().gt(0, "Amount must be greater than zero"),
+      transferFees:  z.coerce.number().min(0, "Cannot be negative").optional(),
+      paidAt:        z.string().optional().or(z.literal("")),
+      method:        z.enum(PAYMENT_METHODS, {
+        errorMap: () => ({ message: "Select a payment method" }),
+      }),
+      externalReferenceCode: z.string().optional().or(z.literal("")),
+    }),
+
+    // ── StudentResponsableRequestDto (optional) ────────────────────────────
+    hasGuardian: z.boolean(),
+    responsable: z.object({
+      firstName:    z.string().optional().or(z.literal("")),
+      lastName:     z.string().optional().or(z.literal("")),
+      email:        z.string().optional().or(z.literal("")),
+      phone:        z.string().optional().or(z.literal("")),
+      relationship: z.string().optional().or(z.literal("")),
+      genderId:     z.string().optional().or(z.literal("")),
+    }),
+
+    // ── Top-level dates ────────────────────────────────────────────────────
+    periodStart:    z.string().optional().or(z.literal("")),
+    periodEnd:      z.string().optional().or(z.literal("")),
+    invoiceDueDate: z.string().optional().or(z.literal("")),
+    chargeDueDate:  z.string().optional().or(z.literal("")),
+  })
+  .superRefine((data, ctx) => {
+    // IntakeId required when mode is "intake"
+    if (data.student.registrationMode === "intake" && !data.student.intakeId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please select an intake",
+        path: ["student", "intakeId"],
+      });
+    }
+    // External reference code required for bank/credit/check payments
+    if (
+      REF_CODE_REQUIRED.includes(data.payment.method) &&
+      !data.payment.externalReferenceCode
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Reference code is required for this payment method",
+        path: ["payment", "externalReferenceCode"],
+      });
+    }
+    // Guardian fields required when hasGuardian is true
+    if (data.hasGuardian) {
+      if (!data.responsable.firstName || data.responsable.firstName.length < 3)
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "At least 3 characters", path: ["responsable", "firstName"] });
+      if (!data.responsable.lastName || data.responsable.lastName.length < 3)
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "At least 3 characters", path: ["responsable", "lastName"] });
+      if (!data.responsable.phone)
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Phone is required", path: ["responsable", "phone"] });
+      if (!data.responsable.relationship)
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Relationship is required", path: ["responsable", "relationship"] });
+    }
+  });
+
+export type StudentRegistrationSchema = z.infer<typeof studentRegistrationSchema>;
