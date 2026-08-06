@@ -6,8 +6,3 @@ public class LeadSourceRequestDto
     public Guid SourceId { get; set; }
 }
 
-public enum LeadSourceType
-{
-    Opc,
-    Ad
-}

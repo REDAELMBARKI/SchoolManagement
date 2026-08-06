@@ -1,7 +1,5 @@
-using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Application.Common.Interfaces.Queries;
+using SchoolManagement.Domain.Core.Entities;
 
 namespace SchoolManagement.Application.Core.Interfaces.Queries;
 

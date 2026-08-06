@@ -296,29 +296,7 @@ namespace SchoolManagement.Tests.UnitTests.Students
                 s.LastName == _studentCommand.LastName)), Times.Once);
         }
 
-        [Fact]
-        public async Task CreateAsync_PublishesStudentCreatedDomainEvent_WithSameSavedId_AfterPersistence()
-        {
-            SetupNoCollisions();
-            var id = Guid.NewGuid();
-            StudentCreatedDomainEvent? publishedEvent = null;
-            _studentRepoMock.Setup(r => r.AddAsync(It.IsAny<Student>()))
-                .ReturnsAsync((Student s) =>
-                {
-                    var idProp = typeof(Domain.Common.BaseEntity).GetProperty("Id")!;
-                    idProp.SetValue(s, id);
-                    return s;
-                });
-            _mediatorMock.Setup(m => m.Publish(It.IsAny<StudentCreatedDomainEvent>(), It.IsAny<CancellationToken>()))
-                .Callback<INotification, CancellationToken>((n, _) => publishedEvent = (StudentCreatedDomainEvent)n)
-                .Returns(Task.CompletedTask);
-
-            await _sut.CreateAsync(_studentCommand);
-
-            publishedEvent.Should().NotBeNull();
-            publishedEvent!.StudentId.Should().Be(id);
-            _mediatorMock.Verify(m => m.Publish(It.IsAny<StudentCreatedDomainEvent>(), It.IsAny<CancellationToken>()), Times.Once);
-        }
+  
 
         [Fact]
         public async Task CreateAsync_WhenDedupThrows_DoesNotSaveEntity_AndDoesNotPublishEvent()

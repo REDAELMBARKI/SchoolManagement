@@ -19,7 +19,7 @@ public class AdQueryService : IAdQueryService
         return await _context.Ads
             .Include(a => a.Platform)
             .Include(a => a.Branch)
-            .Where(a => EF.Property<DateTime?>(a, "DeletedAt") == null)
+            .OrderBy(a => a.Name)
             .ToListAsync();
     }
 
@@ -28,14 +28,12 @@ public class AdQueryService : IAdQueryService
         return await _context.Ads
             .Include(a => a.Platform)
             .Include(a => a.Branch)
-            .Where(a => EF.Property<DateTime?>(a, "DeletedAt") == null)
             .FirstOrDefaultAsync(a => a.Id == id);
     }
 
     public async Task<bool> IsExistsAsync(Guid id)
     {
         return await _context.Ads
-            .Where(a => EF.Property<DateTime?>(a, "DeletedAt") == null)
             .AnyAsync(a => a.Id == id);
     }
 }

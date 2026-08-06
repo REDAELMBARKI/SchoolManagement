@@ -6,7 +6,5 @@ namespace SchoolManagement.Infrastructure.Common.Repositories;
 
 public class GenderRepository : Repository<Gender>, IGenderRepository
 {
-    public GenderRepository(AppDbContext context) : base(context)
-    {
-    }
+    public GenderRepository(AppDbContext context) : base(context) { }
 }

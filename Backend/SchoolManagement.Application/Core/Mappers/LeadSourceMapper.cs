@@ -1,41 +1,50 @@
+using SchoolManagement.Application.Core.Dtos.Commands;
+using SchoolManagement.Application.Core.Dtos.Responses;
 using SchoolManagement.Domain.Core.Entities;
 
 namespace SchoolManagement.Application.Core.Mappers;
 
 public static class LeadSourceMapper
 {
-    public static LeadSource? ToDomain(LeadSourceResponseDto dto, Guid branchId)
+    public static AdLeadSource ToDomain(AdLeadSourceCommand command)
     {
-        return dto switch
-        {
-            AdResponseDto => AdLeadSource.Create(branchId: branchId, adId: dto.Id),
-            OpcResponseDto => OpcLeadSource.Create(branchId: branchId, opcId: dto.Id),
-            _ => null
-        };
+        return AdLeadSource.Create(
+            branchId: command.BranchId,
+            adId: command.AdId
+        );
     }
 
-    public static LeadSourceResponseDto? MapLeadSource(LeadSource leadSource)
+    public static OpcLeadSource ToDomain(OpcLeadSourceCommand command)
     {
-        if (leadSource is AdLeadSource adLeadSource)
-        {
-            return new AdResponseDto
-            {
-                Id = adLeadSource.AdId,
-                PlatFormName = adLeadSource.Ad.Platform.Name,
-                Type = nameof(Ad)
-            };
-        }
+        return OpcLeadSource.Create(
+            branchId: command.BranchId,
+            opcId: command.OpcId
+        );
+    }
 
-        if (leadSource is OpcLeadSource opcLeadSource)
+    public static LeadSourceResponseDto ToResponse(LeadSource leadSource)
+    {
+        return leadSource switch
         {
-            return new OpcResponseDto
+            AdLeadSource adLead => new LeadSourceResponseDto
             {
-                Id = opcLeadSource.OpcId,
-                FullName = opcLeadSource.Opc.FirstName + " " + opcLeadSource.Opc.LastName,
-                Type = nameof(Opc)
-            };
-        }
-
-        return null;
+                Id = adLead.Id,
+                BranchId = adLead.BranchId,
+                Type = "Ad",
+                AdId = adLead.AdId,
+                OpcId = null,
+                CreatedAt = adLead.CreatedAt
+            },
+            OpcLeadSource opcLead => new LeadSourceResponseDto
+            {
+                Id = opcLead.Id,
+                BranchId = opcLead.BranchId,
+                Type = "Opc",
+                AdId = null,
+                OpcId = opcLead.OpcId,
+                CreatedAt = opcLead.CreatedAt
+            },
+            _ => throw new InvalidOperationException($"Unknown LeadSource type: {leadSource.GetType().Name}")
+        };
     }
 }

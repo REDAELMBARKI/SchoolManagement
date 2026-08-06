@@ -5,6 +5,7 @@ using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Core.Entities;
+using SchoolManagement.Infrastructure.Common.Configurations;
 using SchoolManagement.Infrastructure.Data.Configurations.Entities;
 namespace SchoolManagement.Infrastructure.Data;
 

@@ -1,29 +1,27 @@
-using SchoolManagement.Application.Academic.Dtos.Requests;
-using SchoolManagement.Application.Core.Dtos.Requests;
-using SchoolManagement.Application.Common.Dtos.Requests;
-using SchoolManagement.Application.Academic.Dtos.Responses;
-using SchoolManagement.Application.Core.Dtos.Responses;
+using SchoolManagement.Application.Common.Dtos.Commands;
 using SchoolManagement.Application.Common.Dtos.Responses;
-using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Common.Entities;
 
 namespace SchoolManagement.Application.Common.Mappers;
 
 public static class GenderMapper
 {
-    public static Gender ToDomain(GenderRequestDto dto)
+    public static Gender ToDomain(GenderCommand command)
     {
-        return Gender.Create(name: dto.Name, slug: dto.Slug);
+        return Gender.Create(
+            name: command.Name,
+            slug: command.Slug
+        );
     }
 
     public static GenderResponseDto ToResponse(Gender gender)
     {
         return new GenderResponseDto
-        {  
+        {
             Id = gender.Id,
+            Name = gender.Name,
             Slug = gender.Slug,
-            Name = gender.Name 
+            CreatedAt = gender.CreatedAt
         };
     }
 }

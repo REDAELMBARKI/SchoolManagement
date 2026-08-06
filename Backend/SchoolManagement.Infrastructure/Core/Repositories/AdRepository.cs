@@ -7,7 +7,5 @@ namespace SchoolManagement.Infrastructure.Core.Repositories;
 
 public class AdRepository : Repository<Ad>, IAdRepository
 {
-    public AdRepository(AppDbContext context) : base(context)
-    {
-    }
+    public AdRepository(AppDbContext context) : base(context) { }
 }

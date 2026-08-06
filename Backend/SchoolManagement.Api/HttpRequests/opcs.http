@@ -1,0 +1,76 @@
+@baseUrl = https://localhost:7107
+@opcId = {{createOpc.response.body.$.id}}
+@branchId = 00000000-0000-0000-0000-000000000001
+@genderId = 00000000-0000-0000-0000-000000000001
+
+### Get all OPCs
+GET {{baseUrl}}/api/opcs
+Content-Type: application/json
+
+###
+
+### Get OPC by ID
+GET {{baseUrl}}/api/opcs/{{opcId}}
+Content-Type: application/json
+
+###
+
+### Create a new OPC
+# @name createOpc
+POST {{baseUrl}}/api/opcs
+Content-Type: application/json
+
+{
+  "firstName": "Ahmed",
+  "lastName": "Benali",
+  "slug": "ahmed-benali",
+  "genderId": "{{genderId}}",
+  "email": "ahmed.benali@school.ma",
+  "phone": "+212612345678",
+  "dateOfBirth": "1990-05-15",
+  "hireDate": "2024-01-01",
+  "salary": 5000.00
+}
+
+###
+
+### Create another OPC
+POST {{baseUrl}}/api/opcs
+Content-Type: application/json
+
+{
+  "firstName": "Fatima",
+  "lastName": "Zahra",
+  "slug": "fatima-zahra",
+  "genderId": "{{genderId}}",
+  "email": "fatima.zahra@school.ma",
+  "phone": "+212698765432",
+  "dateOfBirth": "1992-08-20",
+  "hireDate": "2024-02-01",
+  "salary": 4500.00
+}
+
+###
+
+### Update OPC
+PUT {{baseUrl}}/api/opcs/{{opcId}}
+Content-Type: application/json
+
+{
+  "firstName": "Ahmed",
+  "lastName": "Benali",
+  "slug": "ahmed-benali-senior",
+  "genderId": "{{genderId}}",
+  "email": "ahmed.benali@school.ma",
+  "phone": "+212612345678",
+  "dateOfBirth": "1990-05-15",
+  "hireDate": "2024-01-01",
+  "salary": 5500.00,
+  "branchId": "{{branchId}}"
+}
+
+###
+
+### Delete OPC
+DELETE {{baseUrl}}/api/opcs/{{opcId}}
+Content-Type: application/json

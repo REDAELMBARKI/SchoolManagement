@@ -1,27 +1,27 @@
-using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Application.Common.Interfaces;
+using SchoolManagement.Application.Common.Interfaces.Queries;
 using SchoolManagement.Application.Common.Interfaces.Services;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
 using SchoolManagement.Domain.Common.Interfaces;
-using SchoolManagement.Infrastructure.Data;
 
 namespace SchoolManagement.Application.Common.Services;
 
 public class WhatsAppService : IWhatsAppService
 {
     private readonly IWhatsAppMessageRepository _repository;
+    private readonly IWhatsAppMessageQueryService _queryService;
     private readonly ICurrentUserContext _currentUserContext;
-    private readonly AppDbContext _context;
 
     public WhatsAppService(
         IWhatsAppMessageRepository repository,
-        ICurrentUserContext currentUserContext,
-        AppDbContext context)
+        IWhatsAppMessageQueryService queryService,
+        ICurrentUserContext currentUserContext
+        )
     {
         _repository = repository;
+        _queryService = queryService;
         _currentUserContext = currentUserContext;
-        _context = context;
     }
 
     public async Task<Guid> QueueMessageAsync(
@@ -88,10 +88,7 @@ public class WhatsAppService : IWhatsAppService
 
     public async Task<List<WhatsAppMessage>> GetMessagesForEntityAsync(string entityType, Guid entityId)
     {
-        return await _context.WhatsAppMessages
-            .Where(m => m.EntityType == entityType && m.EntityId == entityId)
-            .OrderByDescending(m => m.CreatedAt)
-            .ToListAsync();
+        return await _queryService.GetMessagesByEntityAsync(entityType, entityId);
     }
 
     public async Task RetryFailedMessageAsync(Guid messageId)

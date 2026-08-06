@@ -81,20 +81,24 @@ public static class IntakeMapper
 
         if (intake.LeadSource is OpcLeadSource opcLeadSource)
         {
-            response.LeadSource = new OpcResponseDto
+            response.LeadSource = new LeadSourceResponseDto
             {
                 Id = opcLeadSource.Id,
+                BranchId = opcLeadSource.BranchId,
                 Type = "Opc",
-                FullName = opcLeadSource.Opc != null ? $"{opcLeadSource.Opc.FirstName} {opcLeadSource.Opc.LastName}" : string.Empty
+                CreatedAt = opcLeadSource.CreatedAt,
+                OpcId = opcLeadSource.OpcId
             };
         }
         else if (intake.LeadSource is AdLeadSource adLeadSource)
         {
-            response.LeadSource = new AdResponseDto
+            response.LeadSource = new LeadSourceResponseDto
             {
                 Id = adLeadSource.Id,
+                BranchId = adLeadSource.BranchId,
                 Type = "Ad",
-                PlatFormName = adLeadSource.Ad?.Platform?.Name ?? string.Empty
+                CreatedAt = adLeadSource.CreatedAt,
+                AdId = adLeadSource.AdId
             };
         }
 

@@ -67,7 +67,6 @@ public class WhatsAppController : ControllerBase
             message.Status,
             message.MessageType,
             message.SentAt,
-            message.FailedAt,
             message.ErrorMessage,
             message.RetryCount,
             message.CreatedAt
@@ -89,7 +88,6 @@ public class WhatsAppController : ControllerBase
             m.Status,
             m.MessageType,
             m.SentAt,
-            m.FailedAt,
             m.ErrorMessage,
             m.RetryCount,
             m.CreatedAt

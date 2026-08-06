@@ -112,8 +112,25 @@ builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
 builder.Services.AddScoped<IExpenseQueryService, ExpenseQueryService>();
 builder.Services.AddScoped<SchoolManagement.Application.Common.Validators.MediaStorageValidator>();
-builder.Services.AddScoped<IWhatsAppMessageRepository, WhatsAppMessageRepository>();
-builder.Services.AddScoped<IWhatsAppService, WhatsAppService>();
+
+// WhatsApp Message Service
+builder.Services.AddScoped<SchoolManagement.Domain.Common.Interfaces.IWhatsAppMessageRepository, SchoolManagement.Infrastructure.Common.Repositories.WhatsAppMessageRepository>();
+builder.Services.AddScoped<IWhatsAppService, SchoolManagement.Application.Common.Services.WhatsAppService>();
+builder.Services.AddScoped<SchoolManagement.Application.Common.Interfaces.Queries.IWhatsAppMessageQueryService, SchoolManagement.Infrastructure.Common.Queries.WhatsAppMessageQueryService>();
+
+// Gender, Opc, Ad, LeadSource - Fixed anti-pattern controllers
+builder.Services.AddScoped<SchoolManagement.Domain.Common.Interfaces.IGenderRepository, SchoolManagement.Infrastructure.Common.Repositories.GenderRepository>();
+builder.Services.AddScoped<SchoolManagement.Application.Common.Interfaces.Services.IGenderService, SchoolManagement.Application.Common.Services.GenderService>();
+builder.Services.AddScoped<SchoolManagement.Application.Common.Interfaces.Queries.IGenderQueryService, SchoolManagement.Infrastructure.Common.Queries.GenderQueryService>();
+builder.Services.AddScoped<IOpcRepository, OpcRepository>();
+builder.Services.AddScoped<IOpcService, OpcService>();
+builder.Services.AddScoped<IOpcQueryService, OpcQueryService>();
+builder.Services.AddScoped<IAdRepository, AdRepository>();
+builder.Services.AddScoped<IAdService, AdService>();
+builder.Services.AddScoped<IAdQueryService, AdQueryService>();
+builder.Services.AddScoped<ILeadSourceRepository, LeadSourceRepository>();
+builder.Services.AddScoped<ILeadSourceService, LeadSourceService>();
+builder.Services.AddScoped<ILeadSourceQueryService, LeadSourceQueryService>();
 
 // end Di registration
 

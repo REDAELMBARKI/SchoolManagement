@@ -7,7 +7,5 @@ namespace SchoolManagement.Infrastructure.Core.Repositories;
 
 public class OpcRepository : Repository<Opc>, IOpcRepository
 {
-    public OpcRepository(AppDbContext context) : base(context)
-    {
-    }
+    public OpcRepository(AppDbContext context) : base(context) { }
 }

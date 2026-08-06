@@ -65,7 +65,7 @@ public class Payment : AggregateRoot
         };
 
         // Raise domain event when payment is received (Paid status and linked to invoice)
-        if (status == PaymentStatus.Paid && invoiceId.HasValue)
+        if (status == PaymentStatus.Completed && invoiceId.HasValue)
         {
             payment.AddDomainEvent(new PaymentReceivedDomainEvent(
                 payment.Id,

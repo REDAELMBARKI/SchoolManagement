@@ -1,0 +1,52 @@
+@baseUrl = https://localhost:7107
+@genderId = {{createGender.response.body.$.id}}
+
+### Get all genders
+GET {{baseUrl}}/api/genders
+Content-Type: application/json
+
+###
+
+### Get gender by ID
+GET {{baseUrl}}/api/genders/{{genderId}}
+Content-Type: application/json
+
+###
+
+### Create a new gender
+# @name createGender
+POST {{baseUrl}}/api/genders
+Content-Type: application/json
+
+{
+  "name": "Male",
+  "slug": "male"
+}
+
+###
+
+### Create another gender
+POST {{baseUrl}}/api/genders
+Content-Type: application/json
+
+{
+  "name": "Female",
+  "slug": "female"
+}
+
+###
+
+### Update gender
+PUT {{baseUrl}}/api/genders/{{genderId}}
+Content-Type: application/json
+
+{
+  "name": "Male Updated",
+  "slug": "male-updated"
+}
+
+###
+
+### Delete gender
+DELETE {{baseUrl}}/api/genders/{{genderId}}
+Content-Type: application/json

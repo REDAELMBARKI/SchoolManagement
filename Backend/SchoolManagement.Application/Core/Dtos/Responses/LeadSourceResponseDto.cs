@@ -1,28 +1,13 @@
-using System;
-using System.Text.Json.Serialization;
-
 namespace SchoolManagement.Application.Core.Dtos.Responses;
 
-
-[JsonPolymorphic]
-[JsonDerivedType(typeof(AdResponseDto), "Ad")]
-[JsonDerivedType(typeof(OpcResponseDto), "Opc")]
-
-public abstract class  LeadSourceResponseDto 
-{ 
-
+public class LeadSourceResponseDto
+{
     public Guid Id { get; set; }
-    public string Type { get; set; } = string.Empty;
-
-}
-
-
-public class OpcResponseDto : LeadSourceResponseDto 
-{
-    public string FullName { get ; set; } = string.Empty;
-}
-
-public class AdResponseDto : LeadSourceResponseDto 
-{
-    public string PlatFormName { get ; set; } = string.Empty ;
+    public Guid BranchId { get; set; }
+    public string Type { get; set; } = string.Empty; // "Ad" or "Opc"
+    public DateTime CreatedAt { get; set; }
+    
+    // Only one of these will be populated based on Type
+    public Guid? AdId { get; set; }
+    public Guid? OpcId { get; set; }
 }

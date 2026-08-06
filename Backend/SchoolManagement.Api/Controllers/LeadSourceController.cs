@@ -1,49 +1,84 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Infrastructure.Data;
+using SchoolManagement.Application.Core.Dtos.Commands;
+using SchoolManagement.Application.Core.Dtos.Requests;
+using SchoolManagement.Application.Core.Interfaces.Services;
+using SchoolManagement.Domain.Common.Exceptions;
 
 namespace SchoolManagement.Api.Controllers;
-
-
 
 [ApiController]
 [Route("api/lead-sources")]
 public class LeadSourceController : ControllerBase
 {
-    private readonly AppDbContext _context;
-    public LeadSourceController(AppDbContext context)
+    private readonly ILeadSourceService _service;
+
+    public LeadSourceController(ILeadSourceService service)
     {
-        _context = context;
+        _service = service;
     }
 
+    /// <summary>Get all lead sources (Ad and Opc based).</summary>
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        //   var leadSources = await _context.LeadSources.ToListAsync();
-        var leadSources = await _context.LeadSources.ToListAsync();
+        var leadSources = await _service.GetAllAsync();
         return Ok(leadSources);
     }
 
+    /// <summary>Get a single lead source by ID.</summary>
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var result = await _service.GetByIdAsync(id);
+        if (result == null) return NotFound();
+        return Ok(result);
+    }
 
+    /// <summary>Create a new Ad-based lead source.</summary>
+    [HttpPost("ad")]
+    public async Task<IActionResult> CreateAdLeadSource([FromBody] AdLeadSourceRequestDto dto)
+    {
+        try
+        {
+            var command = new AdLeadSourceCommand
+            {
+                AdId = dto.AdId
+            };
+            var result = await _service.CreateAdLeadSourceAsync(command);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+        }
+        catch (DomainException ex) { return BadRequest(ex.Message); }
+        catch (Exception ex) { return Problem(detail: ex.Message, statusCode: 500); }
+    }
 
-    //[HttpPost]
-    //public async Task<IActionResult> AddLeadSource()
-    //{  
-    //    var leadSources = new List<LeadSource>
-    //    {
-    //        new AdLeadSource {  
-    //              AdId =  1 , 
-    //              BeId = 1 ,
-    //          },
-    //          new LeadSource
-    //          {
-    //              AdId = 2 ,
-    //              OpcId = 2
+    /// <summary>Create a new Opc-based lead source.</summary>
+    [HttpPost("opc")]
+    public async Task<IActionResult> CreateOpcLeadSource([FromBody] OpcLeadSourceRequestDto dto)
+    {
+        try
+        {
+            var command = new OpcLeadSourceCommand
+            {
+                OpcId = dto.OpcId
+            };
+            var result = await _service.CreateOpcLeadSourceAsync(command);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+        }
+        catch (DomainException ex) { return BadRequest(ex.Message); }
+        catch (Exception ex) { return Problem(detail: ex.Message, statusCode: 500); }
+    }
 
-    //          }
-    //    };    
-    //    await _context.LeadSources.AddRangeAsync(leadSources);
-    //    await _context.SaveChangesAsync();
-    //    return Ok(leadSources); 
-    //}
+    /// <summary>Delete a lead source.</summary>
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        try
+        {
+            await _service.DeleteAsync(id);
+            return NoContent();
+        }
+        catch (NotFoundException) { return NotFound(); }
+        catch (DomainException ex) { return BadRequest(ex.Message); }
+        catch (Exception ex) { return Problem(detail: ex.Message, statusCode: 500); }
+    }
 }
