@@ -31,6 +31,7 @@ public class AuditLogService : IAuditLogService
         object? oldValues = null,
         object? newValues = null,
         string? message = null,
+        object? additionalData = null,
         CancellationToken cancellationToken = default)
     {
         if (branchId == Guid.Empty)
@@ -48,7 +49,9 @@ public class AuditLogService : IAuditLogService
             newValues: Serialize(newValues),
             changedBy: changedBy,
             branchId: branchId,
-            message: message);
+            message: message,
+            additionalData: Serialize(additionalData)
+            );
 
         await _context.AuditLogs.AddAsync(auditLog, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);

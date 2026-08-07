@@ -76,10 +76,9 @@ public class EnrollmentService : IEnrollmentService
             // 1. Prevent duplicate enrollments in same subject
             await EnsureNoDuplicateActiveEnrollmentAsync(command.StudentId, command.SubjectId);
 
-            var availableGroups = await _groupQueryService.GetAvailableGroupsByLevelSubjectBranch(
+            var availableGroups = await _groupQueryService.GetAvailableGroupsByLevelSubject(
                 levelId: command.LevelId,
-                subjectId: command.SubjectId,
-                branchId: command.BranchId);
+                subjectId: command.SubjectId);
             
             // 2. Choose a group that doesn't conflict with other enrollment schedules 
             var selectedGroup = EvaluateStudentGroup(availableGroups, command.PreferedGroupId);
@@ -149,10 +148,9 @@ public class EnrollmentService : IEnrollmentService
 
             if (isGroupChanging)
             {
-                var availableGroups = await _groupQueryService.GetAvailableGroupsByLevelSubjectBranch(
+                var availableGroups = await _groupQueryService.GetAvailableGroupsByLevelSubject(
                     levelId: command.LevelId,
-                    subjectId: command.SubjectId,
-                    branchId: command.BranchId);
+                    subjectId: command.SubjectId);
 
                 var selectedGroup = EvaluateStudentGroup(availableGroups, command.PreferedGroupId);
                 if (!selectedGroup.HasAvailableSpace())
@@ -428,11 +426,10 @@ public class EnrollmentService : IEnrollmentService
             // 2. Prevent duplicate enrollment in same subject
             await EnsureNoDuplicateActiveEnrollmentAsync(studentId, command.SubjectId);
 
-            // 3. Load available groups for this level/subject/branch
-            var availableGroups = await _groupQueryService.GetAvailableGroupsByLevelSubjectBranch(
+            // 3. Load available groups for this level/subject
+            var availableGroups = await _groupQueryService.GetAvailableGroupsByLevelSubject(
                 levelId: command.LevelId,
-                subjectId: command.SubjectId,
-                branchId: branchId);
+                subjectId: command.SubjectId);
 
             // 4. Select best group (reuse existing logic)
             var selectedGroup = EvaluateStudentGroup(availableGroups, command.PreferedGroupId);

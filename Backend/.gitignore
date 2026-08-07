@@ -33,3 +33,7 @@ fix-*.ps1
 
 # Build logs
 build.log
+
+
+**/obj/
+**/bin/

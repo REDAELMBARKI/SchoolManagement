@@ -2,14 +2,26 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
+using SchoolManagement.Application.Academic.Interfaces.Queries;
+using SchoolManagement.Application.Academic.Interfaces.Services;
+using SchoolManagement.Application.Academic.Services;
 using SchoolManagement.Application.Common.Interfaces;
+using SchoolManagement.Application.Common.Interfaces.Queries;
 using SchoolManagement.Application.Common.Interfaces.Services;
+using SchoolManagement.Application.Common.Services;
+using SchoolManagement.Application.Common.Validators;
 using SchoolManagement.Application.Core.Interfaces.Queries;
 using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Application.Core.Services;
 using SchoolManagement.Application.Core.Validators;
 using SchoolManagement.Application.Options;
+using SchoolManagement.Domain.Academic.Interfaces;
+using SchoolManagement.Domain.Common.Interfaces;
 using SchoolManagement.Domain.Core.Interfaces;
+using SchoolManagement.Infrastructure.Academic.Queries;
+using SchoolManagement.Infrastructure.Academic.Repositories;
+using SchoolManagement.Infrastructure.Common.Queries;
+using SchoolManagement.Infrastructure.Common.Repositories;
 using SchoolManagement.Infrastructure.Common.Services;
 using SchoolManagement.Infrastructure.Core.Queries;
 using SchoolManagement.Infrastructure.Core.Repositories;
@@ -105,23 +117,26 @@ builder.Services.AddScoped<ITransaction, EfTransaction>();
 builder.Services.AddScoped<ICurrentUserContext, CurrentUserContext>();
 builder.Services.AddScoped<IAuditLogService, AuditLogService>();
 builder.Services.AddScoped<ICommissionRepository, CommissionRepository>();
+builder.Services.AddScoped<ICommissionTierRepository, CommissionTierRepository>();
+builder.Services.AddScoped<ICommissionQueryService, CommissionQueryService>();
 builder.Services.AddScoped<ICommissionService, CommissionService>();
+builder.Services.AddScoped<ICommissionTierService, CommissionTierService>();
 builder.Services.AddScoped<IRefundRepository, RefundRepository>();
 builder.Services.AddScoped<IRefundService, RefundService>();
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
 builder.Services.AddScoped<IExpenseQueryService, ExpenseQueryService>();
-builder.Services.AddScoped<SchoolManagement.Application.Common.Validators.MediaStorageValidator>();
+builder.Services.AddScoped<MediaStorageValidator>();
 
 // WhatsApp Message Service
-builder.Services.AddScoped<SchoolManagement.Domain.Common.Interfaces.IWhatsAppMessageRepository, SchoolManagement.Infrastructure.Common.Repositories.WhatsAppMessageRepository>();
-builder.Services.AddScoped<IWhatsAppService, SchoolManagement.Application.Common.Services.WhatsAppService>();
-builder.Services.AddScoped<SchoolManagement.Application.Common.Interfaces.Queries.IWhatsAppMessageQueryService, SchoolManagement.Infrastructure.Common.Queries.WhatsAppMessageQueryService>();
+builder.Services.AddScoped<IWhatsAppMessageRepository, WhatsAppMessageRepository>();
+builder.Services.AddScoped<IWhatsAppService, WhatsAppService>();
+builder.Services.AddScoped<IWhatsAppMessageQueryService, WhatsAppMessageQueryService>();
 
 // Gender, Opc, Ad, LeadSource - Fixed anti-pattern controllers
-builder.Services.AddScoped<SchoolManagement.Domain.Common.Interfaces.IGenderRepository, SchoolManagement.Infrastructure.Common.Repositories.GenderRepository>();
-builder.Services.AddScoped<SchoolManagement.Application.Common.Interfaces.Services.IGenderService, SchoolManagement.Application.Common.Services.GenderService>();
-builder.Services.AddScoped<SchoolManagement.Application.Common.Interfaces.Queries.IGenderQueryService, SchoolManagement.Infrastructure.Common.Queries.GenderQueryService>();
+builder.Services.AddScoped<IGenderRepository, GenderRepository>();
+builder.Services.AddScoped<IGenderService, GenderService>();
+builder.Services.AddScoped<IGenderQueryService, GenderQueryService>();
 builder.Services.AddScoped<IOpcRepository, OpcRepository>();
 builder.Services.AddScoped<IOpcService, OpcService>();
 builder.Services.AddScoped<IOpcQueryService, OpcQueryService>();
@@ -131,6 +146,35 @@ builder.Services.AddScoped<IAdQueryService, AdQueryService>();
 builder.Services.AddScoped<ILeadSourceRepository, LeadSourceRepository>();
 builder.Services.AddScoped<ILeadSourceService, LeadSourceService>();
 builder.Services.AddScoped<ILeadSourceQueryService, LeadSourceQueryService>();
+
+// Academic Management (Subject, Level, Room, Teacher, Absence, Grade)
+builder.Services.AddScoped<ISubjectService, SubjectService>();
+builder.Services.AddScoped<ILevelRepository, LevelRepository>();
+builder.Services.AddScoped<ILevelQueryService, LevelQueryService>();
+builder.Services.AddScoped<ILevelService, LevelService>();
+builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
+builder.Services.AddScoped<ITeacherQueryService, TeacherQueryService>();
+builder.Services.AddScoped<ITeacherService, TeacherService>();
+builder.Services.AddScoped<IAbsenceRepository, AbsenceRepository>();
+builder.Services.AddScoped<IAbsenceQueryService, AbsenceQueryService>();
+builder.Services.AddScoped<IAbsenceService, AbsenceService>();
+builder.Services.AddScoped<IGradeRepository, GradeRepository>();
+builder.Services.AddScoped<IGradeQueryService, GradeQueryService>();
+builder.Services.AddScoped<IGradeService, GradeService>();
+
+// Financial Management (Plan, CommercialAgent, PayrollPayment)
+builder.Services.AddScoped<IPlanRepository, PlanRepository>();
+builder.Services.AddScoped<IPlanService, PlanService>();
+builder.Services.AddScoped<IPayrollPaymentQueryService, PayrollPaymentQueryService>();
+builder.Services.AddScoped<IPayrollPaymentService, PayrollPaymentService>();
+builder.Services.AddScoped<ICommercialAgentService, CommercialAgentService>();
+
+// Common Management (Branch, Platform)
+builder.Services.AddScoped<IBranchQueryService, BranchQueryService>();
+builder.Services.AddScoped<IBranchService, BranchService>();
+builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
+builder.Services.AddScoped<IPlatformService, PlatformService>();
 
 // end Di registration
 

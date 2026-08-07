@@ -5,7 +5,6 @@ using SchoolManagement.Application.Academic.Mappers;
 using SchoolManagement.Application.Common.Interfaces;
 using SchoolManagement.Application.Common.Interfaces.Queries;
 using SchoolManagement.Application.Common.Interfaces.Services;
-using SchoolManagement.Application.Core.Interfaces.Queries;
 using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Academic.Interfaces;
 using SchoolManagement.Domain.Common.Entities;
@@ -90,8 +89,15 @@ public class ScheduleService : IScheduleService
                     entityName: nameof(Schedule),
                     entityId: schedule.Id,
                     branchId: branchId,
-                    newValues: new { schedule.GroupId, schedule.DayId, schedule.TimeSlotId, 
-                                    schedule.RoomId, schedule.TeacherId, schedule.SubjectId });
+                    newValues: new
+                    {
+                        schedule.GroupId,
+                        schedule.DayId,
+                        schedule.TimeSlotId,
+                        schedule.RoomId,
+                        schedule.TeacherId,
+                        schedule.SubjectId
+                    });
             }
 
             await _transaction.CommitTransactionAsync();
@@ -109,7 +115,7 @@ public class ScheduleService : IScheduleService
         var schedules = await _scheduleQueryService.GetSchedulesByGroupIdAsync(groupId);
 
         var groupedByDay = schedules
-            .GroupBy(s => s.Day.Name )
+            .GroupBy(s => s.Day.Name)
             .OrderBy(g => g.Key)
             .Select(dayGroup => new DayScheduleDto
             {
@@ -124,8 +130,11 @@ public class ScheduleService : IScheduleService
                         StartTime = s.TimeSlot.StartTime,
                         EndTime = s.TimeSlot.EndTime,
                         Room = new RoomInfoDto { Id = s.Room.Id, Name = s.Room.Name },
-                        Teacher = new TeacherInfoDto { Id = s.Teacher.Id, 
-                                   Name = $"{s.Teacher.FirstName} {s.Teacher.LastName}" },
+                        Teacher = new TeacherInfoDto
+                        {
+                            Id = s.Teacher.Id,
+                            Name = $"{s.Teacher.FirstName} {s.Teacher.LastName}"
+                        },
                         Subject = new SubjectInfoDto { Id = s.Subject.Id, Name = s.Subject.Name }
                     })
                     .ToList()
@@ -156,8 +165,14 @@ public class ScheduleService : IScheduleService
             await ValidateNoRoomConflictAsync(request.RoomId, request.DayId, request.StartTime, request.EndTime, scheduleId);
             await ValidateNoTeacherConflictAsync(request.TeacherId, request.DayId, request.StartTime, request.EndTime, scheduleId);
 
-            var oldValues = new { schedule.DayId, schedule.TimeSlotId, schedule.RoomId, 
-                                 schedule.TeacherId, schedule.SubjectId };
+            var oldValues = new
+            {
+                schedule.DayId,
+                schedule.TimeSlotId,
+                schedule.RoomId,
+                schedule.TeacherId,
+                schedule.SubjectId
+            };
 
             // Update using domain methods
             schedule.UpdateDayId(request.DayId);
@@ -174,8 +189,14 @@ public class ScheduleService : IScheduleService
                 entityId: schedule.Id,
                 branchId: branchId,
                 oldValues: oldValues,
-                newValues: new { schedule.DayId, schedule.TimeSlotId, schedule.RoomId, 
-                                schedule.TeacherId, schedule.SubjectId });
+                newValues: new
+                {
+                    schedule.DayId,
+                    schedule.TimeSlotId,
+                    schedule.RoomId,
+                    schedule.TeacherId,
+                    schedule.SubjectId
+                });
 
             await _transaction.CommitTransactionAsync();
             return true;
@@ -207,8 +228,15 @@ public class ScheduleService : IScheduleService
                 entityName: nameof(Schedule),
                 entityId: scheduleId,
                 branchId: branchId,
-                oldValues: new { schedule.GroupId, schedule.DayId, schedule.TimeSlotId, 
-                                schedule.RoomId, schedule.TeacherId, schedule.SubjectId });
+                oldValues: new
+                {
+                    schedule.GroupId,
+                    schedule.DayId,
+                    schedule.TimeSlotId,
+                    schedule.RoomId,
+                    schedule.TeacherId,
+                    schedule.SubjectId
+                });
 
             await _transaction.CommitTransactionAsync();
             return true;

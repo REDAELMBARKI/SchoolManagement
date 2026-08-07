@@ -1,14 +1,11 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace SchoolManagement.Application.Academic.Dtos.Responses;
 
 public class SubjectResponseDto
 {
     public Guid Id { get; set; }
-    
     public string Name { get; set; } = string.Empty;
-    
     public string Slug { get; set; } = string.Empty;
-    
-
+    public string? Description { get; set; }
+    public Guid BranchId { get; set; }
+    public DateTime CreatedAt { get; set; }
 }

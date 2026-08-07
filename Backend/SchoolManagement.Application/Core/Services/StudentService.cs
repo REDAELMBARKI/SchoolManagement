@@ -8,6 +8,7 @@ using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Core.Interfaces;
 using SchoolManagement.Application.Core.Interfaces.Queries;
+using SchoolManagement.Application.Core.Dtos.Requests;
 
 namespace SchoolManagement.Application.Core.Services;
 
@@ -18,19 +19,22 @@ public class StudentService : IStudentService
     private readonly IMediator _mediator;
     private readonly IAuditLogService _auditLogService;
     private readonly ICurrentUserContext _currentUserContext;
+    private readonly IStudentResponsableRepository _responsableRepository;
 
     public StudentService(
         IStudentRepository repository,
         IStudentQueryService query,
         IMediator mediator,
         IAuditLogService auditLogService,
-        ICurrentUserContext currentUserContext)
+        ICurrentUserContext currentUserContext,
+        IStudentResponsableRepository responsableRepository)
     {
         _repository = repository;
         _query = query;
         _mediator = mediator;
         _auditLogService = auditLogService;
         _currentUserContext = currentUserContext;
+        _responsableRepository = responsableRepository;
     }
 
     public async Task<List<StudentResponseDto>> GetAllAsync()
@@ -154,5 +158,166 @@ public class StudentService : IStudentService
             student.BranchId,
             student.Slug
         };
+    }
+
+    public async Task<StudentResponseDto> TransferBranchAsync(Guid studentId, TransferBranchCommand command)
+    {
+        var student = await _repository.GetByIdAsync(studentId);
+        if (student == null)
+        {
+            throw new NotFoundException($"No student found with id {studentId}");
+        }
+
+        if (string.IsNullOrWhiteSpace(command.Reason))
+        {
+            throw new DomainException("Transfer reason is required.");
+        }
+
+        if (command.NewBranchId == Guid.Empty)
+        {
+            throw new DomainException("New branch ID must not be empty.");
+        }
+
+        if (student.BranchId == command.NewBranchId)
+        {
+            throw new DomainException("Student is already in this branch.");
+        }
+
+        var oldBranchId = student.BranchId;
+        var oldValues = CreateAuditSnapshot(student);
+
+        student.UpdateBranchId(command.NewBranchId);
+        var updated = await _repository.UpdateAsync(student);
+
+        await _auditLogService.StoreAsync(
+            action: "TransferBranch",
+            entityName: nameof(Student),
+            entityId: updated.Id,
+            branchId: _currentUserContext.BranchId,
+            oldValues: oldValues,
+            newValues: CreateAuditSnapshot(updated),
+            additionalInfo: new
+            {
+                OldBranchId = oldBranchId,
+                NewBranchId = command.NewBranchId,
+                Reason = command.Reason
+            });
+
+        return StudentMapper.ToResponse(updated);
+    }
+
+    public async Task<List<StudentResponsableResponseDto>> GetParentsByStudentIdAsync(Guid studentId)
+    {
+        var student = await _repository.GetByIdAsync(studentId);
+        if (student == null)
+        {
+            throw new NotFoundException($"No student found with id {studentId}");
+        }
+
+        return student.StudentResponsables
+            .Select(sr => new StudentResponsableResponseDto
+            {
+                Id = sr.Id,
+                FirstName = sr.FirstName,
+                LastName = sr.LastName,
+                Email = sr.Email,
+                Phone = sr.Phone,
+                Relationship = sr.Relationship.ToString()
+            })
+            .ToList();
+    }
+
+    public async Task<StudentResponsableResponseDto> AddParentToStudentAsync(Guid studentId, StudentResponsableRequestDto request)
+    {
+        var student = await _repository.GetByIdAsync(studentId);
+        if (student == null)
+        {
+            throw new NotFoundException($"No student found with id {studentId}");
+        }
+
+        // Generate slug for parent/guardian
+        var responsableSlug = await CustomSluger.Slug(
+            slug => _responsableRepository.IsExistsBySlugAsync(slug),
+            $"{request.FirstName}-{request.LastName}"
+        );
+
+        // Create StudentResponsable entity
+        var responsable = StudentResponsable.Register(
+            firstName: request.FirstName,
+            lastName: request.LastName,
+            slug: responsableSlug,
+            genderId: request.GenderId,
+            email: request.Email,
+            phone: request.Phone,
+            relationship: request.Relationship,
+            branchId: _currentUserContext.BranchId
+        );
+
+        var createdResponsable = await _responsableRepository.AddAsync(responsable);
+
+        // Link parent to student
+        student.StudentResponsables.Add(createdResponsable);
+        await _repository.UpdateAsync(student);
+
+        // Audit log
+        await _auditLogService.StoreAsync(
+            action: "AddParent",
+            entityName: nameof(StudentResponsable),
+            entityId: createdResponsable.Id,
+            branchId: _currentUserContext.BranchId,
+            newValues: new
+            {
+                createdResponsable.Id,
+                createdResponsable.FirstName,
+                createdResponsable.LastName,
+                createdResponsable.Email,
+                createdResponsable.Phone,
+                createdResponsable.Relationship,
+                LinkedStudentId = studentId
+            });
+
+        return new StudentResponsableResponseDto
+        {
+            Id = createdResponsable.Id,
+            FirstName = createdResponsable.FirstName,
+            LastName = createdResponsable.LastName,
+            Email = createdResponsable.Email,
+            Phone = createdResponsable.Phone,
+            Relationship = createdResponsable.Relationship.ToString()
+        };
+    }
+
+    public async Task RemoveParentFromStudentAsync(Guid studentId, Guid parentId)
+    {
+        var student = await _repository.GetByIdAsync(studentId);
+        if (student == null)
+        {
+            throw new NotFoundException($"No student found with id {studentId}");
+        }
+
+        var parent = student.StudentResponsables.FirstOrDefault(sr => sr.Id == parentId);
+        if (parent == null)
+        {
+            throw new NotFoundException($"No parent found with id {parentId} for student {studentId}");
+        }
+
+        student.StudentResponsables.Remove(parent);
+        await _repository.UpdateAsync(student);
+
+        await _auditLogService.StoreAsync(
+            action: "RemoveParent",
+            entityName: nameof(StudentResponsable),
+            entityId: parentId,
+            branchId: _currentUserContext.BranchId,
+            oldValues: new
+            {
+                parent.Id,
+                parent.FirstName,
+                parent.LastName,
+                parent.Email,
+                parent.Phone,
+                parent.Relationship,
+                UnlinkedStudentId = studentId
+            });
     }
 }

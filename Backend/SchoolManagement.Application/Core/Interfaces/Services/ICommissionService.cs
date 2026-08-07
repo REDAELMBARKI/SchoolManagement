@@ -37,4 +37,8 @@ public interface ICommissionService
 
     Task<List<CommissionResponseDto>> GetByEarnerAsync(Guid earnerId, EarnerType earnerType);
     Task<List<CommissionResponseDto>> GetByPeriodAsync(int year, int month);
+    Task<CommissionResponseDto> GetByIdAsync(Guid id);
+    Task<List<CommissionResponseDto>> GetAllAsync();
+    Task<CommissionResponseDto> ApproveAsync(Guid id);
+    Task<CommissionResponseDto> MarkAsPaidAsync(Guid id);
 }

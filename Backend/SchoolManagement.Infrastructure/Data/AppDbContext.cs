@@ -72,6 +72,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
     // </summary>
     public DbSet<PayrollPayment> PayrollPayments { get; set; }
     public DbSet<Commission> Commissions { get; set; }
+    public DbSet<CommissionTier> CommissionTiers { get; set; }
     public DbSet<Refund> Refunds { get; set; }
     public DbSet<AuditLog> AuditLogs { get; set; }
 

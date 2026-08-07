@@ -1,0 +1,18 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace SchoolManagement.Application.Academic.Dtos.Commands;
+
+public class UpdateRoomCommand
+{
+    [Required, MinLength(2), MaxLength(100)]
+    public string Name { get; set; } = string.Empty;
+
+    [Range(1, 500)]
+    public int Capacity { get; set; }
+
+    [MaxLength(50)]
+    public string? Floor { get; set; }
+
+    [MaxLength(500)]
+    public string? Description { get; set; }
+}

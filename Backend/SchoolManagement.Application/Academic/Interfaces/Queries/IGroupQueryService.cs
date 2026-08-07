@@ -11,6 +11,6 @@ namespace SchoolManagement.Application.Academic.Interfaces.Queries;
 public interface IGroupQueryService : IEntityQuery<Group>
 {
     Task<List<GroupResponseDto>> GetAllResponsesAsync();
-    Task<List<Group>> GetAvailableGroupsByLevelSubjectBranch(Guid levelId, Guid subjectId, Guid branchId);
+    Task<List<Group>> GetAvailableGroupsByLevelSubject(Guid levelId, Guid subjectId);
     Task<GroupResponseDto?> GetResponseByIdAsync(Guid id);
 }

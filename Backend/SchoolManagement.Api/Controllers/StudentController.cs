@@ -129,4 +129,107 @@ public class StudentController : ControllerBase
             );
         }
     }
+
+    [HttpPost("{id}/transfer-branch")]
+    public async Task<IActionResult> TransferBranch(Guid id, [FromBody] TransferBranchRequestDto dto)
+    {
+        try
+        {
+            var command = new TransferBranchCommand
+            {
+                StudentId = id,
+                NewBranchId = dto.NewBranchId,
+                Reason = dto.Reason
+            };
+
+            var student = await _studentService.TransferBranchAsync(id, command);
+            return Ok(student);
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (DomainException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return Problem(
+                statusCode: 500,
+                title: "Transfer branch error",
+                detail: ex.Message
+            );
+        }
+    }
+
+    [HttpGet("{id}/parents")]
+    public async Task<IActionResult> GetParents(Guid id)
+    {
+        try
+        {
+            var parents = await _studentService.GetParentsByStudentIdAsync(id);
+            return Ok(parents);
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return Problem(
+                statusCode: 500,
+                title: "Fetch parents error",
+                detail: ex.Message
+            );
+        }
+    }
+
+    [HttpPost("{id}/parents")]
+    public async Task<IActionResult> AddParent(Guid id, [FromBody] StudentResponsableRequestDto dto)
+    {
+        try
+        {
+            var parent = await _studentService.AddParentToStudentAsync(id, dto);
+            return CreatedAtAction(nameof(GetParents), new { id }, parent);
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (DomainException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return Problem(
+                statusCode: 500,
+                title: "Add parent error",
+                detail: ex.Message
+            );
+        }
+    }
+
+    [HttpDelete("{id}/parents/{parentId}")]
+    public async Task<IActionResult> RemoveParent(Guid id, Guid parentId)
+    {
+        try
+        {
+            await _studentService.RemoveParentFromStudentAsync(id, parentId);
+            return NoContent();
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return Problem(
+                statusCode: 500,
+                title: "Remove parent error",
+                detail: ex.Message
+            );
+        }
+    }
 }

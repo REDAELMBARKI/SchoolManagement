@@ -11,7 +11,7 @@ public class AuditLog : BaseEntity
     public string? ChangedBy { get; private set; }
     public DateTime ChangedAt { get; private set; }
     public Guid BranchId { get; private set; }
-
+    public string? AdditionalData { get; private set; } // JSON for any additional data
     public virtual Branch Branch { get; private set; } = null!;
 
     private AuditLog() { }
@@ -24,6 +24,7 @@ public class AuditLog : BaseEntity
         string? newValues,
         string? changedBy,
         Guid branchId,
+        string? additionalData,
         string? message = null)
     {
         return new AuditLog
@@ -32,6 +33,7 @@ public class AuditLog : BaseEntity
             EntityId = entityId,
             Action = action,
             Message = message,
+            AdditionalData = additionalData,    
             OldValues = oldValues,
             NewValues = newValues,
             ChangedBy = changedBy,

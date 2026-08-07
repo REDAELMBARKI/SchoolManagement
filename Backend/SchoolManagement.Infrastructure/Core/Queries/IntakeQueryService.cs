@@ -83,20 +83,6 @@ public class IntakeQueryService : IIntakeQueryService
         return intakes.Select(IntakeMapper.ToResponse).ToList();
     }
 
-    public async Task<List<IntakeResponseDto>> GetIntakesByBranchAsync(Guid branchId)
-    {
-        var intakes = await _context.Intakes
-            .Where(i => i.BranchId == branchId)
-            .Include(i => i.Gender)
-            .Include(i => i.LeadSource)
-            .Include(i => i.Subject)
-            .Include(i => i.CommercialAgent)
-            .Include(i => i.Branch)
-            .Include(i => i.Students)
-            .ToListAsync();
-        return intakes.Select(IntakeMapper.ToResponse).ToList();
-    }
-
     public async Task<List<IntakeResponseDto>> GetIntakesByDateRangeAsync(DateTime startDate, DateTime endDate)
     {
         var intakes = await _context.Intakes
