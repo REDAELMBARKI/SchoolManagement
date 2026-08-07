@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import InputField from "@/components/InputField";
 import DatePicker from "@/components/ui/DatePicker";
+import DateTimePicker from "@/components/ui/DateTimePicker";
 import ObjectSelect from "@/components/ui/ObjectSelect";
 import PrimitiveSelect from "@/components/ui/PrimitiveSelect";
 import {
@@ -498,12 +499,18 @@ export default function StudentRegistrationPage() {
               error={pe?.transferFees}
               inputProps={{ min: 0, step: "0.01", placeholder: "0.00" }}
             />
-            <InputField
-              label="Payment Date & Time"
-              type="datetime-local"
+            <Controller
               name="payment.paidAt"
-              register={register}
-              error={pe?.paidAt}
+              control={control}
+              render={({ field, fieldState }) => (
+                <DateTimePicker
+                  label="Payment Date & Time"
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  error={fieldState.error?.message}
+                />
+              )}
             />
             {/* Reference code — conditional on method */}
             {REF_REQUIRED.includes(paymentMethod) && (
