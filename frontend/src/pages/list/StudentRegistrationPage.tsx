@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import InputField from "@/components/InputField";
+import DatePicker from "@/components/ui/DatePicker";
 import ObjectSelect from "@/components/ui/ObjectSelect";
 import PrimitiveSelect from "@/components/ui/PrimitiveSelect";
 import {
@@ -12,7 +13,6 @@ import {
   PAYMENT_METHODS,
   RELATIONSHIP_TYPES,
 } from "@/lib/formValidationSchemas";
-import type { FieldError } from "react-hook-form";
 
 // ── Mock FK data ───────────────────────────────────────────────────────────────
 // These UUIDs intentionally mirror the shape of the Guid foreign keys expected
@@ -291,12 +291,19 @@ export default function StudentRegistrationPage() {
               error={se?.email}
               inputProps={{ placeholder: "student@example.com" }}
             />
-            <InputField
-              label="Date of Birth *"
-              type="date"
+            <Controller
               name="student.dateOfBirth"
-              register={register}
-              error={se?.dateOfBirth}
+              control={control}
+              render={({ field, fieldState }) => (
+                <DatePicker
+                  label="Date of Birth"
+                  required
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  error={fieldState.error?.message}
+                />
+              )}
             />
             <Controller
               name="student.genderId"
@@ -619,33 +626,57 @@ export default function StudentRegistrationPage() {
             bubble="bg-gray-100"
           />
           <div className="flex flex-wrap gap-4">
-            <InputField
-              label="Period Start"
-              type="date"
+            <Controller
               name="periodStart"
-              register={register}
-              error={errors.periodStart as FieldError | undefined}
+              control={control}
+              render={({ field, fieldState }) => (
+                <DatePicker
+                  label="Period Start"
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  error={fieldState.error?.message}
+                />
+              )}
             />
-            <InputField
-              label="Period End"
-              type="date"
+            <Controller
               name="periodEnd"
-              register={register}
-              error={errors.periodEnd as FieldError | undefined}
+              control={control}
+              render={({ field, fieldState }) => (
+                <DatePicker
+                  label="Period End"
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  error={fieldState.error?.message}
+                />
+              )}
             />
-            <InputField
-              label="Invoice Due Date"
-              type="date"
+            <Controller
               name="invoiceDueDate"
-              register={register}
-              error={errors.invoiceDueDate as FieldError | undefined}
+              control={control}
+              render={({ field, fieldState }) => (
+                <DatePicker
+                  label="Invoice Due Date"
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  error={fieldState.error?.message}
+                />
+              )}
             />
-            <InputField
-              label="Charge Due Date"
-              type="date"
+            <Controller
               name="chargeDueDate"
-              register={register}
-              error={errors.chargeDueDate as FieldError | undefined}
+              control={control}
+              render={({ field, fieldState }) => (
+                <DatePicker
+                  label="Charge Due Date"
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  error={fieldState.error?.message}
+                />
+              )}
             />
           </div>
         </SectionCard>
