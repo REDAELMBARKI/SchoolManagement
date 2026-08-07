@@ -10,9 +10,11 @@ nextTasks.md
 *.userosscache
 *.sln.docstates
 
-# Build results
-bin/
-obj/
+# Build results - ALL projects
+**/bin/
+**/obj/
+[Bb]in/
+[Oo]bj/
 *.dll
 *.exe
 *.pdb
@@ -22,6 +24,9 @@ packages/
 *.nupkg
 *.nuget.props
 *.nuget.targets
+project.lock.json
+project.fragment.lock.json
+artifacts/
 
 # Logs and temp files
 *.log
@@ -33,7 +38,3 @@ fix-*.ps1
 
 # Build logs
 build.log
-
-
-**/obj/
-**/bin/
