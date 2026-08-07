@@ -329,4 +329,28 @@ public class EnrollmentController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Check schedule conflicts before enrollment or group transfer
+    /// </summary>
+    [HttpGet("check-conflicts")]
+    public async Task<IActionResult> CheckScheduleConflicts(
+        [FromQuery] Guid studentId,
+        [FromQuery] Guid groupId,
+        [FromQuery] Guid? excludeEnrollmentId = null)
+    {
+        try
+        {
+            var result = await _enrollmentService.CheckScheduleConflictsAsync(studentId, groupId, excludeEnrollmentId);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return Problem(
+                statusCode: 500,
+                title: "Conflict check error",
+                detail: ex.Message
+            );
+        }
+    }
+
 }

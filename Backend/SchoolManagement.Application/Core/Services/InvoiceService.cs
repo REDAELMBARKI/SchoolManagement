@@ -20,6 +20,7 @@ public class InvoiceService : IInvoiceService
     private readonly IEnrollmentQueryService _enrollmentQuery;
     private readonly IEnrollmentRepository _enrollmentRepository;
     private readonly IStudentRepository _studentRepository;
+    private readonly IPaymentRepository _paymentRepository;
     private readonly IAuditLogService _auditLogService;
     private readonly ICurrentUserContext _currentUserContext;
     private readonly ILogger<InvoiceService> _logger;
@@ -31,6 +32,7 @@ public class InvoiceService : IInvoiceService
         IEnrollmentQueryService enrollmentQuery,
         IEnrollmentRepository enrollmentRepository,
         IStudentRepository studentRepository,
+        IPaymentRepository paymentRepository,
         IAuditLogService auditLogService,
         ICurrentUserContext currentUserContext,
         ILogger<InvoiceService> logger,
@@ -41,11 +43,14 @@ public class InvoiceService : IInvoiceService
         _enrollmentQuery = enrollmentQuery;
         _enrollmentRepository = enrollmentRepository;
         _studentRepository = studentRepository;
+        _paymentRepository = paymentRepository;
         _auditLogService = auditLogService;
         _currentUserContext = currentUserContext;
         _logger = logger;
         _billingOptions = billingOptions.Value;
     }
+
+#region cruds 
 
     public async Task<List<InvoiceResponseDto>> GetAllAsync()
     {
@@ -99,6 +104,27 @@ public class InvoiceService : IInvoiceService
 
         return InvoiceMapper.ToResponse(updated);
     }
+
+
+     public async Task DeleteAsync(Guid id)
+    {
+        var existing = await _repository.GetByIdAsync(id);
+        await _repository.DeleteAsync(id);
+
+        if (existing != null)
+        {
+            await _auditLogService.StoreAsync(
+                action: AuditLog.DeleteAction(),
+                entityName: nameof(Invoice),
+                entityId: existing.Id,
+                branchId: _currentUserContext.BranchId,
+                oldValues: CreateAuditSnapshot(existing));
+        }
+    }
+
+#endregion cruds
+
+
 
     public async Task<InvoiceResponseDto> WaiveInvoiceAsync(Guid id, WaiveInvoiceCommand command)
     {
@@ -180,21 +206,8 @@ public class InvoiceService : IInvoiceService
         return InvoiceMapper.ToResponse(updated);
     }
 
-    public async Task DeleteAsync(Guid id)
-    {
-        var existing = await _repository.GetByIdAsync(id);
-        await _repository.DeleteAsync(id);
+   
 
-        if (existing != null)
-        {
-            await _auditLogService.StoreAsync(
-                action: AuditLog.DeleteAction(),
-                entityName: nameof(Invoice),
-                entityId: existing.Id,
-                branchId: _currentUserContext.BranchId,
-                oldValues: CreateAuditSnapshot(existing));
-        }
-    }
 
     public async Task ProcessPastDueInvoicesAsync()
     {
@@ -324,5 +337,69 @@ public class InvoiceService : IInvoiceService
                 invoice.Charge.Status
             }
         };
+    }
+
+
+    public async Task<PaymentResponseDto> RecordPaymentAsync(RecordInvoicePaymentCommand command)
+    {
+        var invoice = await _repository.GetByIdAsync(command.InvoiceId)
+            ?? throw new NotFoundException($"Invoice {command.InvoiceId} not found");
+
+        if (invoice.Status == Domain.Core.Enums.InvoiceStatus.Cancelled)
+            throw new DomainException("Cannot record payment for a cancelled invoice");
+
+        // Populate command context (computed attributes)
+        command.ReceivedByStaffId = _currentUserContext.NameIdentifier;
+        command.BranchId = invoice.BranchId;
+
+        // Create payment record
+        var payment = Payment.Create(
+            enrollmentId: invoice.EnrollmentId,
+            amount: command.Amount,
+            status: Domain.Core.Enums.PaymentStatus.Completed,
+            paidAt: command.PaidAt,
+            branchId: command.BranchId,
+            receivedByStaffId: command.ReceivedByStaffId,
+            invoiceId: command.InvoiceId,
+            transferFees: command.TransferFees,
+            method: command.Method,
+            externalReferenceCode: command.ExternalReferenceCode,
+            methodDetailsJson: command.MethodDetailsJson
+        );
+
+        // Apply payment to invoice (updates invoice.PaidAmount and status)
+        var result = invoice.AddPayment(command.Amount);
+
+        // Save payment and updated invoice
+        await _paymentRepository.AddAsync(payment);
+        await _repository.UpdateAsync(invoice);
+
+        // Audit log
+        await _auditLogService.StoreAsync(
+            action: AuditLog.CreateAction(),
+            entityName: nameof(Payment),
+            entityId: payment.Id,
+            branchId: command.BranchId,
+            newValues: new
+            {
+                payment.Id,
+                payment.Amount,
+                payment.Method,
+                payment.InvoiceId,
+                payment.EnrollmentId,
+                payment.PaidAt,
+                payment.ReceivedByStaffId
+            },
+            message: $"Payment of {command.Amount:C} recorded for invoice {command.InvoiceId}");
+
+        // If there was overpayment, it's handled by domain event (InvoiceOverpaymentDomainEvent)
+        if (result.OverpaymentAmount > 0)
+        {
+            _logger.LogInformation(
+                "Overpayment of {OverpaymentAmount:C} recorded for invoice {InvoiceId}. Applied: {AppliedAmount:C}",
+                result.OverpaymentAmount, command.InvoiceId, result.AppliedAmount);
+        }
+
+        return PaymentMapper.ToResponse(payment);
     }
 }

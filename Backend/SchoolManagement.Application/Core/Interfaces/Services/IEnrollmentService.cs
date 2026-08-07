@@ -20,4 +20,10 @@ public interface IEnrollmentService
     /// <param name="command">Enrollment details with payment options</param>
     /// <returns>The created enrollment</returns>
     Task<EnrollmentResponseDto> EnrollStudentInAdditionalGroupAsync(Guid studentId, EnrollStudentInAdditionalGroupCommand command);
+    
+    /// <summary>
+    /// Checks for schedule conflicts before enrollment or group transfer.
+    /// Returns conflict details instead of throwing exceptions.
+    /// </summary>
+    Task<ScheduleConflictResponseDto> CheckScheduleConflictsAsync(Guid studentId, Guid groupId, Guid? excludeEnrollmentId = null);
 }

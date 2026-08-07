@@ -565,12 +565,41 @@ public class EnrollmentService : IEnrollmentService
 
     private async Task ValidateNoScheduleConflictsAsync(Guid studentId, Guid currentEnrollmentId, Guid newGroupId)
     {
+        var conflictCheck = await CheckScheduleConflictsAsync(studentId, newGroupId, currentEnrollmentId);
+        
+        if (conflictCheck.HasConflict)
+        {
+            var firstConflict = conflictCheck.Conflicts.First();
+            throw new DomainException(
+                $"Schedule conflict detected: Student has another class on {firstConflict.DayName} " +
+                $"from {firstConflict.ExistingTimeSlot}.");
+        }
+    }
+
+    public async Task<ScheduleConflictResponseDto> CheckScheduleConflictsAsync(
+        Guid studentId, 
+        Guid groupId, 
+        Guid? excludeEnrollmentId = null)
+    {
+        var response = new ScheduleConflictResponseDto
+        {
+            HasConflict = false,
+            Conflicts = new List<ConflictDetailDto>()
+        };
+
         // Get all active enrollments for this student (excluding current one)
         var studentEnrollments = await _queryService.GetByStudentIdAsync(studentId);
         var activeEnrollments = studentEnrollments
-            .Where(e => e.Id != currentEnrollmentId && 
-                       e.Status == EnrollmentStatus.Active)
+            .Where(e => e.Status == EnrollmentStatus.Active)
             .ToList();
+
+        // Exclude enrollment if specified (for update scenarios)
+        if (excludeEnrollmentId.HasValue)
+        {
+            activeEnrollments = activeEnrollments
+                .Where(e => e.Id != excludeEnrollmentId.Value)
+                .ToList();
+        }
 
         // Get all schedule sessions for existing enrollments
         var existingSchedules = new List<Schedule>();
@@ -581,7 +610,7 @@ public class EnrollmentService : IEnrollmentService
         }
 
         // Get all schedule sessions for new group
-        var newGroupSchedules = await _scheduleQueryService.GetSchedulesByGroupIdAsync(newGroupId);
+        var newGroupSchedules = await _scheduleQueryService.GetSchedulesByGroupIdAsync(groupId);
 
         // Check for conflicts
         foreach (var newSchedule in newGroupSchedules)
@@ -591,17 +620,29 @@ public class EnrollmentService : IEnrollmentService
                 // Same day?
                 if (newSchedule.DayId == existingSchedule.DayId)
                 {
-                    // Time overlap? (StartTime < existing.EndTime AND EndTime > existing.StartTime)
+                    // Time overlap?
                     if (newSchedule.TimeSlot.StartTime < existingSchedule.TimeSlot.EndTime &&
                         newSchedule.TimeSlot.EndTime > existingSchedule.TimeSlot.StartTime)
                     {
-                        throw new DomainException(
-                            $"Schedule conflict detected: Student has another class on {existingSchedule.Day.Name} " +
-                            $"from {existingSchedule.TimeSlot.StartTime:HH:mm} to {existingSchedule.TimeSlot.EndTime:HH:mm}.");
+                        var conflictingEnrollment = activeEnrollments
+                            .First(e => e.GroupId == existingSchedule.GroupId);
+
+                        response.HasConflict = true;
+                        response.Conflicts.Add(new ConflictDetailDto
+                        {
+                            DayName = existingSchedule.Day.Name,
+                            ExistingTimeSlot = $"{existingSchedule.TimeSlot.StartTime:HH:mm} - {existingSchedule.TimeSlot.EndTime:HH:mm}",
+                            NewTimeSlot = $"{newSchedule.TimeSlot.StartTime:HH:mm} - {newSchedule.TimeSlot.EndTime:HH:mm}",
+                            ExistingSubjectName = existingSchedule.Subject?.Name ?? conflictingEnrollment.Subject?.Name ?? "Unknown",
+                            NewSubjectName = newSchedule.Subject?.Name ?? "Unknown",
+                            ConflictingEnrollmentId = conflictingEnrollment.Id
+                        });
                     }
                 }
             }
         }
+
+        return response;
     }
 
     private static object CreateAuditSnapshot(Enrollment enrollment)

@@ -256,12 +256,12 @@ public class ScheduleService : IScheduleService
         if (excludeScheduleId.HasValue)
             existingSchedules = existingSchedules.Where(s => s.Id != excludeScheduleId.Value).ToList();
 
-        var conflicts = new List<ConflictDetailDto>();
+        var conflicts = new List<ResourceConflictDetailDto>();
         foreach (var schedule in existingSchedules)
         {
             if (HasTimeOverlap(startTime, endTime, schedule.TimeSlot.StartTime, schedule.TimeSlot.EndTime))
             {
-                conflicts.Add(new ConflictDetailDto
+                conflicts.Add(new ResourceConflictDetailDto
                 {
                     ScheduleId = schedule.Id,
                     StartTime = schedule.TimeSlot.StartTime,
@@ -293,12 +293,12 @@ public class ScheduleService : IScheduleService
         if (excludeScheduleId.HasValue)
             existingSchedules = existingSchedules.Where(s => s.Id != excludeScheduleId.Value).ToList();
 
-        var conflicts = new List<ConflictDetailDto>();
+        var conflicts = new List<ResourceConflictDetailDto>();
         foreach (var schedule in existingSchedules)
         {
             if (HasTimeOverlap(startTime, endTime, schedule.TimeSlot.StartTime, schedule.TimeSlot.EndTime))
             {
-                conflicts.Add(new ConflictDetailDto
+                conflicts.Add(new ResourceConflictDetailDto
                 {
                     ScheduleId = schedule.Id,
                     StartTime = schedule.TimeSlot.StartTime,

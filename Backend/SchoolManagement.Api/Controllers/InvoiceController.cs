@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Core.Dtos.Commands;
+using SchoolManagement.Application.Core.Dtos.Requests;
 using SchoolManagement.Application.Core.Interfaces.Services;
+using SchoolManagement.Domain.Common.Exceptions;
 
 namespace SchoolManagement.Api.Controllers;
 
@@ -65,5 +67,46 @@ public class InvoiceController : ControllerBase
         command.InvoiceId = id;
         var result = await _invoiceService.CancelInvoiceAsync(id, command);
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Record payment for a specific invoice
+    /// </summary>
+    [HttpPost("{id:guid}/payments")]
+    public async Task<IActionResult> RecordPayment(Guid id, [FromBody] RecordInvoicePaymentRequestDto dto)
+    {
+        try
+        {
+            // Map RequestDto to Command with InvoiceId from route
+            var command = new RecordInvoicePaymentCommand
+            {
+                InvoiceId = id,
+                Amount = dto.Amount,
+                Method = dto.Method,
+                PaidAt = dto.PaidAt,
+                TransferFees = dto.TransferFees,
+                ExternalReferenceCode = dto.ExternalReferenceCode,
+                MethodDetailsJson = dto.MethodDetailsJson
+            };
+
+            var result = await _invoiceService.RecordPaymentAsync(command);
+            return Ok(result);
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (DomainException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return Problem(
+                statusCode: 500,
+                title: "Payment recording error",
+                detail: ex.Message
+            );
+        }
     }
 }

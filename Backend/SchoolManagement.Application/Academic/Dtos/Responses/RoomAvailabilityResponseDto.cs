@@ -10,10 +10,10 @@ public class RoomAvailabilityResponseDto
     public string DayName { get; set; } = string.Empty;
     public TimeOnly RequestedStartTime { get; set; }
     public TimeOnly RequestedEndTime { get; set; }
-    public List<ConflictDetailDto> Conflicts { get; set; } = new();
+    public List<ResourceConflictDetailDto> Conflicts { get; set; } = new();
 }
 
-public class ConflictDetailDto
+public class ResourceConflictDetailDto
 {
     public Guid ScheduleId { get; set; }
     public TimeOnly StartTime { get; set; }
