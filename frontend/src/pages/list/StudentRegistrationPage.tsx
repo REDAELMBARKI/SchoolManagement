@@ -1,7 +1,7 @@
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import InputField from "@/components/InputField";
 import DatePicker from "@/components/ui/DatePicker";
@@ -76,14 +76,19 @@ const REF_REQUIRED = ["CreditCard", "BankTransfer", "Check"];
 function SectionCard({
   children,
   accent = "border-gray-200",
+  id,
 }: {
   children: React.ReactNode;
   accent?: string;
+  id?: string;
 }) {
   return (
-    <div className={`bg-white rounded-xl border-l-4 ${accent} shadow-sm p-5`}>
+    <section
+      id={id}
+      className={`scroll-mt-6 bg-white rounded-xl border-l-4 ${accent} shadow-sm p-5`}
+    >
       {children}
-    </div>
+    </section>
   );
 }
 
@@ -119,10 +124,88 @@ function SectionHeader({
   );
 }
 
+const REGISTRATION_STEPS = [
+  { id: "registration-student", number: "01", title: "Student" },
+  { id: "registration-enrollment", number: "02", title: "Enrollment" },
+  { id: "registration-payment", number: "03", title: "Payment" },
+  { id: "registration-guardian", number: "04", title: "Guardian", optional: true },
+  { id: "registration-dates", number: "05", title: "Dates", optional: true },
+];
+
+function RegistrationStepRail({ activeStep }: { activeStep: string }) {
+  const scrollToStep = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
+  return (
+    <aside className="hidden md:block">
+      <nav
+        aria-label="Registration sections"
+        className="sticky top-6 max-h-[calc(100vh-48px)] overflow-y-auto pr-2"
+      >
+        <div className="relative py-1">
+          <div className="absolute bottom-5 left-[11px] top-5 w-px bg-[#d9dce0]" aria-hidden="true" />
+          <ol className="relative flex flex-col gap-7">
+            {REGISTRATION_STEPS.map((step) => {
+              const active = activeStep === step.id;
+
+              return (
+                <li key={step.id}>
+                  <button
+                    type="button"
+                    onClick={() => scrollToStep(step.id)}
+                    aria-current={active ? "step" : undefined}
+                    className="group flex w-full items-start gap-3 text-left"
+                  >
+                    <span
+                      className={`relative z-10 mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[10px] transition-colors ${
+                        active
+                          ? "border-[#355a9b] bg-[#355a9b] text-white shadow-sm"
+                          : "border-[#d9dce0] bg-white text-[#a6abb3] group-hover:border-[#9aa4b5] group-hover:text-[#6f7784]"
+                      }`}
+                    >
+                      <span className="sr-only">{active ? "Current section: " : ""}</span>
+                    </span>
+                    <span className="min-w-0 pt-0.5">
+                      <span
+                        className={`block font-mono text-[11px] tracking-[0.12em] ${
+                          active ? "text-[#52698f]" : "text-[#a8adb5]"
+                        }`}
+                      >
+                        §{step.number}
+                      </span>
+                      <span
+                        className={`mt-1 block text-[15px] leading-none transition-colors ${
+                          active
+                            ? "font-medium text-[#20252c]"
+                            : "text-[#626a75] group-hover:text-[#303741]"
+                        }`}
+                      >
+                        {step.title}
+                        {step.optional && (
+                          <span className="ml-1 text-[11px] text-[#9da3ab]">optional</span>
+                        )}
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      </nav>
+    </aside>
+  );
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function StudentRegistrationPage() {
   const [submitting, setSubmitting] = useState(false);
+  const [activeStep, setActiveStep] = useState(REGISTRATION_STEPS[0].id);
 
   const {
     control,
@@ -213,6 +296,29 @@ export default function StudentRegistrationPage() {
   const pe  = errors.payment    as any;
   const re  = errors.responsable as any;
 
+  useEffect(() => {
+    const sections = REGISTRATION_STEPS.map((step) => document.getElementById(step.id))
+      .filter((section): section is HTMLElement => Boolean(section));
+
+    if (!sections.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleSections = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((first, second) => first.boundingClientRect.top - second.boundingClientRect.top);
+
+        if (visibleSections[0]) {
+          setActiveStep(visibleSections[0].target.id);
+        }
+      },
+      { rootMargin: "-18% 0px -62% 0px", threshold: [0, 0.15, 0.5] },
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div
       className="min-h-full flex flex-col gap-5 p-4 md:p-6 xl:p-8 mt-0"
@@ -253,10 +359,13 @@ export default function StudentRegistrationPage() {
         </Link>
       </div>
 
-      <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-[180px_minmax(0,1fr)] xl:grid-cols-[210px_minmax(0,1fr)]">
+        <RegistrationStepRail activeStep={activeStep} />
+
+        <form onSubmit={onSubmit} className="flex min-w-0 flex-col gap-4" noValidate>
 
         {/* ══ SECTION 1 — Student Information ══════════════════════════════ */}
-        <SectionCard accent="border-[#9ddced]">
+        <SectionCard id="registration-student" accent="border-[#9ddced]">
           <SectionHeader
             n={1}
             icon="student"
@@ -346,7 +455,7 @@ export default function StudentRegistrationPage() {
         </SectionCard>
 
         {/* ══ SECTION 2 — Enrollment ════════════════════════════════════════ */}
-        <SectionCard accent="border-[#c6c4f4]">
+        <SectionCard id="registration-enrollment" accent="border-[#c6c4f4]">
           <SectionHeader
             n={2}
             icon="subject"
@@ -426,7 +535,7 @@ export default function StudentRegistrationPage() {
         </SectionCard>
 
         {/* ══ SECTION 3 — Payment ══════════════════════════════════════════ */}
-        <SectionCard accent="border-[#e9d47b]">
+        <SectionCard id="registration-payment" accent="border-[#e9d47b]">
           <SectionHeader
             n={3}
             icon="finance"
@@ -541,7 +650,10 @@ export default function StudentRegistrationPage() {
         </SectionCard>
 
         {/* ══ SECTION 4 — Guardian (optional) ══════════════════════════════ */}
-        <SectionCard accent={hasGuardian ? "border-[#c6c4f4]" : "border-[#e5ddd0]"}>
+        <SectionCard
+          id="registration-guardian"
+          accent={hasGuardian ? "border-[#c6c4f4]" : "border-[#e5ddd0]"}
+        >
           {/* Section header + toggle in same row */}
           <div className="flex items-center justify-between mb-5">
             <SectionHeader
@@ -639,7 +751,7 @@ export default function StudentRegistrationPage() {
         </SectionCard>
 
         {/* ══ SECTION 5 — Registration Dates (optional) ════════════════════ */}
-        <SectionCard accent="border-[#e5ddd0]">
+        <SectionCard id="registration-dates" accent="border-[#e5ddd0]">
           <SectionHeader
             n={5}
             icon="calendar"
@@ -730,7 +842,8 @@ export default function StudentRegistrationPage() {
             )}
           </button>
         </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }
