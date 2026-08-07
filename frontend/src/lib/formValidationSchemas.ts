@@ -272,7 +272,8 @@ export const studentRegistrationSchema = z
     payment: z.object({
       amountPaid:    z.coerce.number().gt(0, "Amount must be greater than zero"),
       transferFees:  z.coerce.number().min(0, "Cannot be negative").optional(),
-      paidAt:        z.string().optional().or(z.literal("")),
+      paymentDate:   z.string().optional().or(z.literal("")),
+      paymentTime:   z.string().optional().or(z.literal("")),
       method:        z.enum(PAYMENT_METHODS, {
         errorMap: () => ({ message: "Select a payment method" }),
       }),
@@ -297,6 +298,25 @@ export const studentRegistrationSchema = z
     chargeDueDate:  z.string().optional().or(z.literal("")),
   })
   .superRefine((data, ctx) => {
+    const hasPaymentDate = Boolean(data.payment.paymentDate);
+    const hasPaymentTime = Boolean(data.payment.paymentTime);
+
+    if (hasPaymentDate && !hasPaymentTime) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Payment time is required when a payment date is set",
+        path: ["payment", "paymentTime"],
+      });
+    }
+
+    if (hasPaymentTime && !hasPaymentDate) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Payment date is required when a payment time is set",
+        path: ["payment", "paymentDate"],
+      });
+    }
+
     // External reference code required for bank/credit/check payments
     if (
       REF_CODE_REQUIRED.includes(data.payment.method) &&

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import InputField from "@/components/InputField";
 import DatePicker from "@/components/ui/DatePicker";
-import DateTimePicker from "@/components/ui/DateTimePicker";
+import TimePicker from "@/components/ui/TimePicker";
 import ObjectSelect from "@/components/ui/ObjectSelect";
 import PrimitiveSelect from "@/components/ui/PrimitiveSelect";
 import {
@@ -136,7 +136,7 @@ export default function StudentRegistrationPage() {
     defaultValues: {
       student: { email: "", genderId: "" },
       enrollment: { subjectId: "", planId: "", preferedGroupId: "", notes: "" },
-      payment:  { method: "Cash", amountPaid: undefined, transferFees: undefined, paidAt: "" },
+      payment:  { method: "Cash", amountPaid: undefined, transferFees: undefined, paymentDate: "", paymentTime: "" },
       hasGuardian: false,
       responsable: {
         firstName: "", lastName: "", email: "", phone: "", relationship: "", genderId: "",
@@ -177,7 +177,9 @@ export default function StudentRegistrationPage() {
       paymentRegReq: {
         amountPaid:            data.payment.amountPaid,
         transferFees:          data.payment.transferFees ?? null,
-        paidAt:                data.payment.paidAt        || null,
+        paidAt:                data.payment.paymentDate && data.payment.paymentTime
+          ? `${data.payment.paymentDate}T${data.payment.paymentTime}`
+          : null,
         method:                data.payment.method,
         externalReferenceCode: data.payment.externalReferenceCode || null,
       },
@@ -500,11 +502,24 @@ export default function StudentRegistrationPage() {
               inputProps={{ min: 0, step: "0.01", placeholder: "0.00" }}
             />
             <Controller
-              name="payment.paidAt"
+              name="payment.paymentDate"
               control={control}
               render={({ field, fieldState }) => (
-                <DateTimePicker
-                  label="Payment Date & Time"
+                <DatePicker
+                  label="Payment Date"
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  error={fieldState.error?.message}
+                />
+              )}
+            />
+            <Controller
+              name="payment.paymentTime"
+              control={control}
+              render={({ field, fieldState }) => (
+                <TimePicker
+                  label="Payment Time"
                   value={field.value}
                   onChange={field.onChange}
                   onBlur={field.onBlur}
