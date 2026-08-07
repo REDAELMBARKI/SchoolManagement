@@ -1,7 +1,7 @@
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import InputField from "@/components/InputField";
 import DatePicker from "@/components/ui/DatePicker";
@@ -132,14 +132,13 @@ const REGISTRATION_STEPS = [
   { id: "registration-dates", number: "05", title: "Dates", optional: true },
 ];
 
-function RegistrationStepRail({ activeStep }: { activeStep: string }) {
-  const scrollToStep = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  };
-
+function RegistrationStepRail({
+  activeStep,
+  onSelect,
+}: {
+  activeStep: string;
+  onSelect: (id: string) => void;
+}) {
   return (
     <aside className="hidden md:block">
       <nav
@@ -156,7 +155,7 @@ function RegistrationStepRail({ activeStep }: { activeStep: string }) {
                 <li key={step.id}>
                   <button
                     type="button"
-                    onClick={() => scrollToStep(step.id)}
+                    onClick={() => onSelect(step.id)}
                     aria-current={active ? "step" : undefined}
                     className="group flex w-full items-start gap-3 text-left"
                   >
@@ -211,6 +210,7 @@ export default function StudentRegistrationPage() {
     control,
     register,
     handleSubmit,
+    trigger,
     watch,
     setValue,
     formState: { errors },
@@ -296,28 +296,31 @@ export default function StudentRegistrationPage() {
   const pe  = errors.payment    as any;
   const re  = errors.responsable as any;
 
-  useEffect(() => {
-    const sections = REGISTRATION_STEPS.map((step) => document.getElementById(step.id))
-      .filter((section): section is HTMLElement => Boolean(section));
+  const activeStepIndex = REGISTRATION_STEPS.findIndex((step) => step.id === activeStep);
+  const currentStep = REGISTRATION_STEPS[activeStepIndex] ?? REGISTRATION_STEPS[0];
 
-    if (!sections.length) return;
+  const handleContinue = async () => {
+    const validationTarget =
+      currentStep.id === "registration-student"
+        ? "student"
+        : currentStep.id === "registration-enrollment"
+          ? "enrollment"
+          : currentStep.id === "registration-payment"
+            ? "payment"
+            : currentStep.id === "registration-guardian" && hasGuardian
+              ? "responsable"
+              : undefined;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleSections = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((first, second) => first.boundingClientRect.top - second.boundingClientRect.top);
+    if (validationTarget && !(await trigger(validationTarget as any))) return;
 
-        if (visibleSections[0]) {
-          setActiveStep(visibleSections[0].target.id);
-        }
-      },
-      { rootMargin: "-18% 0px -62% 0px", threshold: [0, 0.15, 0.5] },
-    );
+    const nextStep = REGISTRATION_STEPS[activeStepIndex + 1];
+    if (nextStep) setActiveStep(nextStep.id);
+  };
 
-    sections.forEach((section) => observer.observe(section));
-    return () => observer.disconnect();
-  }, []);
+  const handleBack = () => {
+    const previousStep = REGISTRATION_STEPS[activeStepIndex - 1];
+    if (previousStep) setActiveStep(previousStep.id);
+  };
 
   return (
     <div
@@ -360,11 +363,12 @@ export default function StudentRegistrationPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-[180px_minmax(0,1fr)] xl:grid-cols-[210px_minmax(0,1fr)]">
-        <RegistrationStepRail activeStep={activeStep} />
+        <RegistrationStepRail activeStep={activeStep} onSelect={setActiveStep} />
 
         <form onSubmit={onSubmit} className="flex min-w-0 flex-col gap-4" noValidate>
 
         {/* ══ SECTION 1 — Student Information ══════════════════════════════ */}
+        {activeStep === "registration-student" && (
         <SectionCard id="registration-student" accent="border-[#9ddced]">
           <SectionHeader
             n={1}
@@ -453,8 +457,10 @@ export default function StudentRegistrationPage() {
             />
           </div>
         </SectionCard>
+        )}
 
         {/* ══ SECTION 2 — Enrollment ════════════════════════════════════════ */}
+        {activeStep === "registration-enrollment" && (
         <SectionCard id="registration-enrollment" accent="border-[#c6c4f4]">
           <SectionHeader
             n={2}
@@ -533,8 +539,10 @@ export default function StudentRegistrationPage() {
             </div>
           </div>
         </SectionCard>
+        )}
 
         {/* ══ SECTION 3 — Payment ══════════════════════════════════════════ */}
+        {activeStep === "registration-payment" && (
         <SectionCard id="registration-payment" accent="border-[#e9d47b]">
           <SectionHeader
             n={3}
@@ -648,8 +656,10 @@ export default function StudentRegistrationPage() {
             )}
           </div>
         </SectionCard>
+        )}
 
         {/* ══ SECTION 4 — Guardian (optional) ══════════════════════════════ */}
+        {activeStep === "registration-guardian" && (
         <SectionCard
           id="registration-guardian"
           accent={hasGuardian ? "border-[#c6c4f4]" : "border-[#e5ddd0]"}
@@ -749,8 +759,10 @@ export default function StudentRegistrationPage() {
             </p>
           )}
         </SectionCard>
+        )}
 
         {/* ══ SECTION 5 — Registration Dates (optional) ════════════════════ */}
+        {activeStep === "registration-dates" && (
         <SectionCard id="registration-dates" accent="border-[#e5ddd0]">
           <SectionHeader
             n={5}
@@ -814,33 +826,53 @@ export default function StudentRegistrationPage() {
             />
           </div>
         </SectionCard>
+        )}
 
-        {/* ── Submit row ──────────────────────────────────────────────────── */}
-        <div className="flex items-center justify-between pb-2">
-          <Link
-            to="/list/students"
-            className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            ← Back to Students
-          </Link>
+        <div className="flex items-center justify-between border-t border-[#e8e1d7] pt-4">
+          {activeStepIndex === 0 ? (
+            <Link
+              to="/list/students"
+              className="text-sm text-gray-400 transition-colors hover:text-gray-600"
+            >
+              ← Back to Students
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={handleBack}
+              className="rounded-lg px-3 py-2 text-sm text-gray-500 transition-colors hover:bg-white/70 hover:text-gray-800"
+            >
+              ← Back
+            </button>
+          )}
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="flex items-center gap-2 bg-lamaSky hover:bg-sky-200 text-gray-700 font-semibold py-2.5 px-7 rounded-lg text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {submitting ? (
-              <>
-                <div className="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
-                Registering…
-              </>
-            ) : (
-              <>
-                <img src="/create.png" alt="" width={14} height={14} />
-                Register Student
-              </>
-            )}
-          </button>
+          {activeStepIndex === REGISTRATION_STEPS.length - 1 ? (
+            <button
+              type="submit"
+              disabled={submitting}
+              className="flex items-center gap-2 rounded-lg bg-lamaSky px-7 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-sky-200 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {submitting ? (
+                <>
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-500 border-t-transparent" />
+                  Registering…
+                </>
+              ) : (
+                <>
+                  <img src="/create.png" alt="" width={14} height={14} />
+                  Register Student
+                </>
+              )}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleContinue}
+              className="rounded-lg bg-lamaSky px-7 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-sky-200"
+            >
+              Continue →
+            </button>
+          )}
         </div>
         </form>
       </div>
