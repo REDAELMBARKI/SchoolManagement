@@ -55,14 +55,13 @@ public class GroupQueryService : IGroupQueryService
         return group == null ? null : GroupMapper.ToResponse(group);
     }
 
-    public async Task<List<Group>> GetAvailableGroupsByLevelSubjectBranch(Guid levelId, Guid subjectId, Guid branchId)
+    public async Task<List<Group>> GetAvailableGroupsByLevelSubject(Guid levelId, Guid subjectId)
     {
         return await _context.Groups
                     .Include(g => g.Enrollments)
                     .Include(g => g.Schedules)
                     .Where(g => g.LevelId == levelId)
                     .Where(g => g.SubjectId == subjectId)
-                    .Where(g => g.BranchId == branchId)
                     .Where(g => g.Capacity > g.Enrollments.Count(e => e.Status == EnrollmentStatus.Active))
                     .ToListAsync();
     }

@@ -57,4 +57,75 @@ public class CommissionController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+
+    /// <summary>
+    /// Approve a previously blocked commission.
+    /// Only allowed before the salary lockout date.
+    /// </summary>
+    [HttpPost("{id}/approve")]
+    public async Task<IActionResult> Approve(Guid id)
+    {
+        try
+        {
+            var result = await _commissionService.ApproveAsync(id);
+            return Ok(result);
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
+        catch (DomainException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Mark a commission as paid (manual override).
+    /// Typically handled by automated salary lockout job.
+    /// </summary>
+    [HttpPost("{id}/mark-paid")]
+    public async Task<IActionResult> MarkAsPaid(Guid id)
+    {
+        try
+        {
+            var result = await _commissionService.MarkAsPaidAsync(id);
+            return Ok(result);
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
+        catch (DomainException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Get a specific commission by ID.
+    /// </summary>
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        try
+        {
+            var result = await _commissionService.GetByIdAsync(id);
+            return Ok(result);
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
+    /// <summary>
+    /// Get all commissions (admin view).
+    /// </summary>
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var result = await _commissionService.GetAllAsync();
+        return Ok(result);
+    }
 }

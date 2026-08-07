@@ -10,5 +10,6 @@ public interface IAuditLogService
         object? oldValues = null,
         object? newValues = null,
         string? message = null,
+        object? additionalInfo = null,
         CancellationToken cancellationToken = default);
 }

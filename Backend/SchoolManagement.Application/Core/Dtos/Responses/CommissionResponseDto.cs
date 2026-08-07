@@ -11,13 +11,14 @@ public class CommissionResponseDto
     public DateOnly PeriodMonth { get; set; }
     public CommissionStatus Status { get; set; }
 
+    // Optional FK to CommissionTier (required for Agent, null for OPC)
+    public Guid? CommissionTierId { get; set; }
+
     // OPC only
     public Guid? SourceEnrollmentId { get; set; }
 
-    // Agent only
+    // Agent only - sales count snapshot
     public int? SalesCountAtCalculation { get; set; }
-    public int? AppliedTierMin { get; set; }
-    public int? AppliedTierMax { get; set; }
 
     public DateTime CreatedAt { get; set; }
 }

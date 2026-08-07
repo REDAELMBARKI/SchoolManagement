@@ -32,6 +32,15 @@ public class CommissionConfiguration : IEntityTypeConfiguration<Commission>
             .HasMaxLength(20)
             .HasConversion<string>();
 
+        // FK to CommissionTier (optional, required for Agent, null for OPC)
+        builder.Property(c => c.CommissionTierId)
+            .IsRequired(false);
+
+        builder.HasOne(c => c.CommissionTier)
+            .WithMany()
+            .HasForeignKey(c => c.CommissionTierId)
+            .OnDelete(DeleteBehavior.Restrict); // Prevent tier deletion if commissions reference it
+
         // OPC fields
         builder.Property(c => c.SourceEnrollmentId)
             .IsRequired(false);
@@ -40,10 +49,8 @@ public class CommissionConfiguration : IEntityTypeConfiguration<Commission>
         builder.Property(c => c.SalesCountAtCalculation)
             .IsRequired(false);
 
-        builder.Property(c => c.AppliedTierMin)
-            .IsRequired(false);
-
-        builder.Property(c => c.AppliedTierMax)
+        builder.Property(c => c.BlockReason)
+            .HasMaxLength(500)
             .IsRequired(false);
 
         // Indexes
@@ -51,5 +58,6 @@ public class CommissionConfiguration : IEntityTypeConfiguration<Commission>
         builder.HasIndex(c => c.PeriodMonth);
         builder.HasIndex(c => new { c.EarnerId, c.PeriodMonth });
         builder.HasIndex(c => c.SourceEnrollmentId);
+        builder.HasIndex(c => c.CommissionTierId); // Index for FK lookups
     }
 }

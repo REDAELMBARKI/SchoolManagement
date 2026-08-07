@@ -19,22 +19,23 @@ public class BranchQueryService : IBranchQueryService
     public async Task<List<Branch>> GetAllAsync()
     {
         return await _context.Branches
-            .Where(b => EF.Property<DateTime?>(b, "DeletedAt") == null)
+            .AsNoTracking()
+            .Where(b => b.DeletedAt == null)
             .ToListAsync();
     }
 
     public async Task<Branch?> GetByIdAsync(Guid id)
     {
         return await _context.Branches
-            .Where(b => EF.Property<DateTime?>(b, "DeletedAt") == null)
-            .FirstOrDefaultAsync(b => b.Id == id);
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.Id == id && b.DeletedAt == null);
     }
 
     public async Task<bool> IsExistsAsync(Guid id)
     {
         return await _context.Branches
-            .Where(b => EF.Property<DateTime?>(b, "DeletedAt") == null)
-            .AnyAsync(b => b.Id == id);
+            .AsNoTracking()
+            .AnyAsync(b => b.Id == id && b.DeletedAt == null);
     }
 
     public async Task<List<BranchResponseDto>> GetAllResponsesAsync()
@@ -47,5 +48,27 @@ public class BranchQueryService : IBranchQueryService
     {
         var branch = await GetByIdAsync(id);
         return branch == null ? null : BranchMapper.ToResponse(branch);
+    }
+
+    public async Task<Branch?> GetByNameAsync(string name)
+    {
+        return await _context.Branches
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.Name == name && b.DeletedAt == null);
+    }
+
+    public async Task<Branch?> GetBySlugAsync(string slug)
+    {
+        return await _context.Branches
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.Slug == slug && b.DeletedAt == null);
+    }
+
+    public async Task<List<Branch>> GetByCityAsync(string city)
+    {
+        return await _context.Branches
+            .AsNoTracking()
+            .Where(b => b.City == city && b.DeletedAt == null)
+            .ToListAsync();
     }
 }

@@ -24,6 +24,9 @@ namespace SchoolManagement.Tests.UnitTests.Students
         private readonly Mock<IMediator> _mediatorMock;
         private readonly Mock<IAuditLogService> _auditLogServiceMock;
         private readonly Mock<ICurrentUserContext> _currentUserContextMock;
+
+        private readonly Mock<IStudentResponsableRepository> _responsableRepositoryMock;
+
         private readonly Faker _faker;
         private readonly StudentCommand _studentCommand;
         private readonly IStudentService _sut;
@@ -35,9 +38,10 @@ namespace SchoolManagement.Tests.UnitTests.Students
             _mediatorMock = new Mock<IMediator>();
             _auditLogServiceMock = new Mock<IAuditLogService>();
             _currentUserContextMock = new Mock<ICurrentUserContext>();
+            _responsableRepositoryMock = new Mock<IStudentResponsableRepository>();
 
             _faker = new Faker();
-            _sut = new StudentService(_studentRepoMock.Object, _studentQueryMock.Object, _mediatorMock.Object, _auditLogServiceMock.Object, _currentUserContextMock.Object);
+            _sut = new StudentService(_studentRepoMock.Object, _studentQueryMock.Object, _mediatorMock.Object, _auditLogServiceMock.Object, _currentUserContextMock.Object , _responsableRepositoryMock.Object);
             _studentCommand = new StudentCommand
             {
                 IntakeId = Guid.NewGuid(),

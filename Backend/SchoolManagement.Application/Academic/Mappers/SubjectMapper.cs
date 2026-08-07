@@ -1,23 +1,18 @@
 using SchoolManagement.Application.Academic.Dtos.Commands;
-using SchoolManagement.Application.Core.Dtos.Commands;
 using SchoolManagement.Application.Academic.Dtos.Responses;
-using SchoolManagement.Application.Core.Dtos.Responses;
-using SchoolManagement.Application.Common.Dtos.Responses;
 using SchoolManagement.Domain.Academic.Entities;
-using SchoolManagement.Domain.Core.Entities;
-using SchoolManagement.Domain.Common.Entities;
 
 namespace SchoolManagement.Application.Academic.Mappers;
 
 public static class SubjectMapper
 {
-    public static Subject ToDomain(SubjectCommand command)
+    public static Subject ToDomain(SubjectCommand command, Guid branchId)
     {
         return Subject.Create(
             name: command.Name,
             slug: command.Slug,
             description: command.Description,
-            branchId: command.BranchId
+            branchId: branchId
         );
     }
 
@@ -26,8 +21,11 @@ public static class SubjectMapper
         return new SubjectResponseDto
         {
             Id = subject.Id,
-            Slug = subject.Slug,
             Name = subject.Name,
+            Slug = subject.Slug,
+            Description = subject.Description,
+            BranchId = subject.BranchId,
+            CreatedAt = subject.CreatedAt
         };
     }
 }

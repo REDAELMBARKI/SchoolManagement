@@ -21,8 +21,7 @@ public class CommercialAgentQueryService : ICommercialAgentQueryService
         return await _context.CommercialAgents
             .Include(ca => ca.Gender)
             .Include(ca => ca.Branch)
-            .Where(ca => EF.Property<DateTime?>(ca, "DeletedAt") == null)
-            .ToListAsync();
+                        .ToListAsync();
     }
 
     public async Task<CommercialAgent?> GetByIdAsync(Guid id)
@@ -30,15 +29,13 @@ public class CommercialAgentQueryService : ICommercialAgentQueryService
         return await _context.CommercialAgents
             .Include(ca => ca.Gender)
             .Include(ca => ca.Branch)
-            .Where(ca => EF.Property<DateTime?>(ca, "DeletedAt") == null)
-            .FirstOrDefaultAsync(ca => ca.Id == id);
+                        .FirstOrDefaultAsync(ca => ca.Id == id);
     }
 
     public async Task<bool> IsExistsAsync(Guid id)
     {
         return await _context.CommercialAgents
-            .Where(ca => EF.Property<DateTime?>(ca, "DeletedAt") == null)
-            .AnyAsync(ca => ca.Id == id);
+                        .AnyAsync(ca => ca.Id == id);
     }
 
     public async Task<List<CommercialAgentResponseDto>> GetAllResponsesAsync()

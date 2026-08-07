@@ -93,7 +93,7 @@ public static class EnrollmentMapper
                     BaseAmount = ep.Plan.BaseAmount,
                     DiscountPercent = ep.Plan.DiscountPercent,
                     IsActive = ep.Plan.IsActive,
-                    RemainingAmountDueDate = ep.Plan.RemainingAmountDueDays,
+                    RemainingAmountDueDays = ep.Plan.RemainingAmountDueDays,
                     BranchId = ep.Plan.BranchId
                 } : null
             }).ToList() ?? new List<EnrollmentPlanResponseDto>()
