@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Common.Dtos.Commands;
+using SchoolManagement.Application.Common.Dtos.Requests;
 using SchoolManagement.Application.Common.Interfaces.Services;
 using SchoolManagement.Domain.Common.Exceptions;
 
@@ -17,10 +18,19 @@ public class BranchController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] BranchCommand command)
+    public async Task<IActionResult> Create([FromBody] CreateBranchRequestDto request)
     {
         try
         {
+            var command = new BranchCommand
+            {
+                Name = request.Name,
+                Slug = request.Slug,
+                City = request.City,
+                Address = request.Address,
+                Phone = request.Phone
+            };
+
             var result = await _service.CreateAsync(command);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
@@ -31,10 +41,18 @@ public class BranchController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateBranchCommand command)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateBranchRequestDto request)
     {
         try
         {
+            var command = new UpdateBranchCommand
+            {
+                Name = request.Name,
+                City = request.City,
+                Address = request.Address,
+                Phone = request.Phone
+            };
+
             var result = await _service.UpdateAsync(id, command);
             return Ok(result);
         }

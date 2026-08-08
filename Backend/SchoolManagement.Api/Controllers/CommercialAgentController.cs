@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Core.Dtos.Commands;
+using SchoolManagement.Application.Core.Dtos.Requests;
 using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Domain.Common.Exceptions;
 
@@ -17,10 +18,23 @@ public class CommercialAgentController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CommercialAgentCommand command)
+    public async Task<IActionResult> Create([FromBody] CreateCommercialAgentRequestDto request)
     {
         try
         {
+            var command = new CommercialAgentCommand
+            {
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Slug = request.Slug,
+                GenderId = request.GenderId,
+                Email = request.Email,
+                Phone = request.Phone,
+                DateOfBirth = request.DateOfBirth,
+                HireDate = request.HireDate,
+                Salary = request.Salary
+            };
+
             var result = await _service.CreateAsync(command);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
@@ -31,10 +45,19 @@ public class CommercialAgentController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCommercialAgentCommand command)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCommercialAgentRequestDto request)
     {
         try
         {
+            var command = new UpdateCommercialAgentCommand
+            {
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Email = request.Email,
+                Phone = request.Phone,
+                Salary = request.Salary
+            };
+
             var result = await _service.UpdateAsync(id, command);
             return Ok(result);
         }

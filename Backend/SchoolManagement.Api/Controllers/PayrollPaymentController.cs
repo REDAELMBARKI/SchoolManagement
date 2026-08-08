@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Core.Dtos.Commands;
+using SchoolManagement.Application.Core.Dtos.Requests;
 using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Domain.Common.Exceptions;
 
@@ -70,10 +71,21 @@ public class PayrollPaymentController : ControllerBase
     /// Create a new payroll payment (pending status).
     /// </summary>
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] PayrollPaymentCommand command)
+    public async Task<IActionResult> Create([FromBody] CreatePayrollPaymentRequestDto request)
     {
         try
         {
+            var command = new PayrollPaymentCommand
+            {
+                EmployeeId = request.EmployeeId,
+                GrossAmount = request.GrossAmount,
+                Bonus = request.Bonus,
+                Deductions = request.Deductions,
+                PayPeriodMonth = request.PayPeriodMonth,
+                PayPeriodYear = request.PayPeriodYear,
+                Notes = request.Notes
+            };
+
             var payroll = await _payrollService.CreateAsync(command);
             return CreatedAtAction(nameof(GetById), new { id = payroll.Id }, payroll);
         }
@@ -87,10 +99,16 @@ public class PayrollPaymentController : ControllerBase
     /// Mark a payroll payment as paid.
     /// </summary>
     [HttpPost("{id}/mark-paid")]
-    public async Task<IActionResult> MarkAsPaid(Guid id, [FromBody] MarkPayrollPaidCommand command)
+    public async Task<IActionResult> MarkAsPaid(Guid id, [FromBody] MarkPayrollPaidRequestDto request)
     {
         try
         {
+            var command = new MarkPayrollPaidCommand
+            {
+                PaymentMethod = request.PaymentMethod,
+                ReferenceCode = request.ReferenceCode
+            };
+
             var payroll = await _payrollService.MarkAsPaidAsync(id, command);
             return Ok(payroll);
         }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Core.Dtos.Commands;
+using SchoolManagement.Application.Core.Dtos.Requests;
 using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Domain.Common.Exceptions;
 
@@ -17,10 +18,18 @@ public class CommissionTierController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CommissionTierCommand command)
+    public async Task<IActionResult> Create([FromBody] CreateCommissionTierRequestDto request)
     {
         try
         {
+            var command = new CommissionTierCommand
+            {
+                MinSalesCount = request.MinSalesCount,
+                MaxSalesCount = request.MaxSalesCount,
+                Amount = request.Amount,
+                DisplayOrder = request.DisplayOrder
+            };
+
             var result = await _service.CreateAsync(command);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
@@ -31,10 +40,18 @@ public class CommissionTierController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCommissionTierCommand command)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCommissionTierRequestDto request)
     {
         try
         {
+            var command = new UpdateCommissionTierCommand
+            {
+                MinSalesCount = request.MinSalesCount,
+                MaxSalesCount = request.MaxSalesCount,
+                Amount = request.Amount,
+                DisplayOrder = request.DisplayOrder
+            };
+
             var result = await _service.UpdateAsync(id, command);
             return Ok(result);
         }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Academic.Dtos.Commands;
+using SchoolManagement.Application.Academic.Dtos.Requests;
 using SchoolManagement.Application.Academic.Interfaces.Services;
 using SchoolManagement.Domain.Common.Exceptions;
 
@@ -17,10 +18,20 @@ public class AbsenceController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] AbsenceCommand command)
+    public async Task<IActionResult> Create([FromBody] CreateAbsenceRequestDto request)
     {
         try
         {
+            var command = new AbsenceCommand
+            {
+                StudentId = request.StudentId,
+                ScheduleId = request.ScheduleId,
+                Date = request.Date,
+                Status = request.Status,
+                IsJustified = request.IsJustified,
+                Reason = request.Reason
+            };
+
             var result = await _service.CreateAsync(command);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
@@ -31,10 +42,17 @@ public class AbsenceController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateAbsenceCommand command)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateAbsenceRequestDto request)
     {
         try
         {
+            var command = new UpdateAbsenceCommand
+            {
+                Status = request.Status,
+                IsJustified = request.IsJustified,
+                Reason = request.Reason
+            };
+
             var result = await _service.UpdateAsync(id, command);
             return Ok(result);
         }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Academic.Dtos.Commands;
+using SchoolManagement.Application.Academic.Dtos.Requests;
 using SchoolManagement.Application.Academic.Interfaces.Services;
 using SchoolManagement.Domain.Common.Exceptions;
 
@@ -17,10 +18,21 @@ public class GradeController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] GradeCommand command)
+    public async Task<IActionResult> Create([FromBody] CreateGradeRequestDto request)
     {
         try
         {
+            var command = new GradeCommand
+            {
+                EvaluationType = request.EvaluationType,
+                Score = request.Score,
+                MaxScore = request.MaxScore,
+                EvaluationDate = request.EvaluationDate,
+                Comment = request.Comment,
+                StudentId = request.StudentId,
+                GroupTeacherId = request.GroupTeacherId
+            };
+
             var result = await _service.CreateAsync(command);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
@@ -31,10 +43,18 @@ public class GradeController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateGradeCommand command)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateGradeRequestDto request)
     {
         try
         {
+            var command = new UpdateGradeCommand
+            {
+                EvaluationType = request.EvaluationType,
+                Score = request.Score,
+                MaxScore = request.MaxScore,
+                Comment = request.Comment
+            };
+
             var result = await _service.UpdateAsync(id, command);
             return Ok(result);
         }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Academic.Dtos.Commands;
+using SchoolManagement.Application.Academic.Dtos.Requests;
 using SchoolManagement.Application.Academic.Interfaces.Services;
 using SchoolManagement.Domain.Common.Exceptions;
 
@@ -38,10 +39,16 @@ public class LevelController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] LevelCommand command)
+    public async Task<IActionResult> Create([FromBody] CreateLevelRequestDto request)
     {
         try
         {
+            var command = new LevelCommand
+            {
+                Name = request.Name,
+                Order = request.Order
+            };
+
             var level = await _levelService.CreateAsync(command);
             return CreatedAtAction(nameof(GetById), new { id = level.Id }, level);
         }
@@ -52,10 +59,16 @@ public class LevelController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateLevelCommand command)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateLevelRequestDto request)
     {
         try
         {
+            var command = new UpdateLevelCommand
+            {
+                Name = request.Name,
+                Order = request.Order
+            };
+
             var level = await _levelService.UpdateAsync(id, command);
             return Ok(level);
         }

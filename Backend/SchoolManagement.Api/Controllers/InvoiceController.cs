@@ -33,15 +33,31 @@ public class InvoiceController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] InvoiceCommand command)
+    public async Task<IActionResult> Create([FromBody] CreateInvoiceRequestDto request)
     {
+        var command = new InvoiceCommand
+        {
+            EnrollmentId = request.EnrollmentId,
+            PeriodStart = request.PeriodStart,
+            PeriodEnd = request.PeriodEnd,
+            DueDate = request.DueDate,
+            Charge = request.Charge
+        };
+
         var result = await _invoiceService.CreateAsync(command);
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateInvoiceCommand command)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateInvoiceRequestDto request)
     {
+        var command = new UpdateInvoiceCommand
+        {
+            PeriodStart = request.PeriodStart,
+            PeriodEnd = request.PeriodEnd,
+            DueDate = request.DueDate
+        };
+
         var result = await _invoiceService.UpdateAsync(id, command);
         return Ok(result);
     }
@@ -54,17 +70,28 @@ public class InvoiceController : ControllerBase
     }
 
     [HttpPost("{id:guid}/waive")]
-    public async Task<IActionResult> Waive(Guid id, [FromBody] WaiveInvoiceCommand command)
+    public async Task<IActionResult> Waive(Guid id, [FromBody] WaiveInvoiceRequestDto request)
     {
-        command.InvoiceId = id;
+        var command = new WaiveInvoiceCommand
+        {
+            InvoiceId = id,
+            WaivedAmount = request.WaivedAmount,
+            Reason = request.Reason
+        };
+
         var result = await _invoiceService.WaiveInvoiceAsync(id, command);
         return Ok(result);
     }
 
     [HttpPost("{id:guid}/cancel")]
-    public async Task<IActionResult> Cancel(Guid id, [FromBody] CancelInvoiceCommand command)
+    public async Task<IActionResult> Cancel(Guid id, [FromBody] CancelInvoiceRequestDto request)
     {
-        command.InvoiceId = id;
+        var command = new CancelInvoiceCommand
+        {
+            InvoiceId = id,
+            Reason = request.Reason
+        };
+
         var result = await _invoiceService.CancelInvoiceAsync(id, command);
         return Ok(result);
     }

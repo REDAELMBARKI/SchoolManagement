@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Core.Dtos.Commands;
+using SchoolManagement.Application.Core.Dtos.Requests;
 using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Domain.Common.Exceptions;
 
@@ -57,10 +58,20 @@ public class PlanController : ControllerBase
     /// Create a new payment plan.
     /// </summary>
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] PlanCommand command)
+    public async Task<IActionResult> Create([FromBody] CreatePlanRequestDto request)
     {
         try
         {
+            var command = new PlanCommand
+            {
+                Name = request.Name,
+                DurationMonths = request.DurationMonths,
+                BaseAmount = request.BaseAmount,
+                DiscountPercent = request.DiscountPercent,
+                IsActive = request.IsActive,
+                RemainingAmountDueDays = request.RemainingAmountDueDays
+            };
+
             var plan = await _planService.CreateAsync(command);
             return CreatedAtAction(nameof(GetById), new { id = plan.Id }, plan);
         }
@@ -74,10 +85,20 @@ public class PlanController : ControllerBase
     /// Update an existing payment plan.
     /// </summary>
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdatePlanCommand command)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdatePlanRequestDto request)
     {
         try
         {
+            var command = new UpdatePlanCommand
+            {
+                Name = request.Name,
+                DurationMonths = request.DurationMonths,
+                BaseAmount = request.BaseAmount,
+                DiscountPercent = request.DiscountPercent,
+                IsActive = request.IsActive,
+                RemainingAmountDueDays = request.RemainingAmountDueDays
+            };
+
             var plan = await _planService.UpdateAsync(id, command);
             return Ok(plan);
         }
