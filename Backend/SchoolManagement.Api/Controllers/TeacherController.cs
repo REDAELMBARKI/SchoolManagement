@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Academic.Dtos.Commands;
+using SchoolManagement.Application.Academic.Dtos.Requests;
 using SchoolManagement.Application.Academic.Interfaces.Services;
 using SchoolManagement.Domain.Common.Exceptions;
 
@@ -17,10 +18,22 @@ public class TeacherController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] TeacherCommand command)
+    public async Task<IActionResult> Create([FromBody] TeacherRequestDto request)
     {
         try
         {
+            var command = new TeacherCommand
+            {
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                GenderId = request.GenderId,
+                Email = request.Email,
+                Phone = request.Phone,
+                DateOfBirth = request.DateOfBirth,
+                HireDate = request.HireDate,
+                Salary = request.Salary,
+                Specialization = request.Specialization
+            };
             var result = await _service.CreateAsync(command);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
@@ -31,10 +44,22 @@ public class TeacherController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateTeacherCommand command)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateTeacherRequestDto request)
     {
         try
         {
+            var command = new UpdateTeacherCommand
+            {
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                GenderId = request.GenderId,
+                Email = request.Email,
+                Phone = request.Phone,
+                DateOfBirth = request.DateOfBirth,
+                HireDate = request.HireDate,
+                Salary = request.Salary,
+                Specialization = request.Specialization
+            };
             var result = await _service.UpdateAsync(id, command);
             return Ok(result);
         }

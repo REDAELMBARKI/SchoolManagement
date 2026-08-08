@@ -93,6 +93,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
     private void ApplySoftDeleteFilter(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Person>().HasQueryFilter(e => e.DeletedAt == null);
+       
     }
 
 

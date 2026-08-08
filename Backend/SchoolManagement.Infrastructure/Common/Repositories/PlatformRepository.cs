@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Interfaces;
 using SchoolManagement.Infrastructure.Data;
@@ -15,4 +16,14 @@ public class PlatformRepository : Repository<Platform>, IPlatformRepository
     {
         return await Query().ToListAsync();
     }
+
+      public async Task<bool> ExistsBySlugAsync(string slug)
+    {
+        return await _context.Set<Platform>()
+            .AnyAsync(p => p.Slug == slug && p.DeletedAt == null);
+    }
+
+
 }
+
+  

@@ -20,6 +20,7 @@ using SchoolManagement.Application.Academic.Interfaces.Queries;
 using SchoolManagement.Application.Core.Interfaces.Queries;
 using SchoolManagement.Application.Common.Interfaces.Queries;
 using SchoolManagement.Application.Common.Interfaces;
+using SchoolManagement.Domain.Common.Utils;
 
 namespace SchoolManagement.Application.Academic.Services;
 
@@ -48,6 +49,13 @@ public class GroupService : IGroupService
         if (branchId == Guid.Empty)
             throw new DomainException("Branch context is missing.");
         command.BranchId = branchId;
+
+        // Generate unique slug from Name + Period
+        var baseSlug = $"{command.Name}-{command.Period}".ToLowerInvariant().Replace(" ", "-");
+        command.Slug = await CustomSluger.Slug(
+            async (slug) => await _repository.ExistsBySlugAsync(slug),
+            baseSlug
+        );
 
         Group entity = GroupMapper.ToDomain(command);
         var newEntity = await _repository.AddAsync(entity);
@@ -83,6 +91,17 @@ public class GroupService : IGroupService
         if (existing is null) throw new NotFoundException($"Group with id {id} not found");
 
         var oldValues = CreateAuditSnapshot(existing);
+
+        // Generate unique slug if name or period changed
+        if (existing.Name != command.Name || existing.Period != command.Period)
+        {
+            var baseSlug = $"{command.Name}-{command.Period}".ToLowerInvariant().Replace(" ", "-");
+            command.Slug = await CustomSluger.Slug(
+                async (slug) => await _repository.ExistsBySlugAsync(slug),
+                baseSlug
+            );
+            existing.UpdateSlug(command.Slug);
+        }
 
         existing.UpdateName(command.Name);
         existing.UpdateCapacity(command.Capacity);
@@ -128,6 +147,7 @@ public class GroupService : IGroupService
         {
             group.Id,
             group.Name,
+            group.Slug,
             group.Capacity,
             group.Period,
             group.LevelId,

@@ -25,7 +25,6 @@ public class BranchController : ControllerBase
             var command = new BranchCommand
             {
                 Name = request.Name,
-                Slug = request.Slug,
                 City = request.City,
                 Address = request.Address,
                 Phone = request.Phone

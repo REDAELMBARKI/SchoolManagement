@@ -1,6 +1,9 @@
 using SchoolManagement.Application.Common.Interfaces;
 using SchoolManagement.Application.Common.Interfaces.Services;
+using SchoolManagement.Application.Core.Dtos.Commands;
+using SchoolManagement.Application.Core.Dtos.Responses;
 using SchoolManagement.Application.Core.Interfaces.Services;
+using SchoolManagement.Application.Core.Mappers;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
 using SchoolManagement.Domain.Core.Entities;
@@ -61,12 +64,7 @@ public class RefundService : IRefundService
                     $"Refund amount ({command.Amount:C}) exceeds the refundable balance ({refundable:C}).");
 
             // Create the refund record
-            var refund = Refund.Create(
-                paymentId: paymentId,
-                amount: command.Amount,
-                reason: command.Reason,
-                refundedByStaffId: command.RefundedByStaffId,
-                branchId: command.BranchId);
+            var refund = RefundMapper.ToDomain(command, paymentId);
 
             await _repository.AddAsync(refund);
 
@@ -97,7 +95,7 @@ public class RefundService : IRefundService
 
             await _transaction.CommitTransactionAsync();
 
-            return ToResponse(refund);
+            return RefundMapper.ToResponse(refund);
         }
         catch
         {
@@ -109,22 +107,10 @@ public class RefundService : IRefundService
     public async Task<List<RefundResponseDto>> GetByPaymentIdAsync(Guid paymentId)
     {
         var refunds = await _repository.GetByPaymentIdAsync(paymentId);
-        return refunds.Select(ToResponse).ToList();
+        return refunds.Select(RefundMapper.ToResponse).ToList();
     }
 
     // ── Helpers ──────────────────────────────────────────────────
-
-    private static RefundResponseDto ToResponse(Refund r) => new()
-    {
-        Id = r.Id,
-        PaymentId = r.PaymentId,
-        Amount = r.Amount,
-        Reason = r.Reason,
-        RefundedAt = r.RefundedAt,
-        RefundedByStaffId = r.RefundedByStaffId,
-        BranchId = r.BranchId,
-        CreatedAt = r.CreatedAt
-    };
 
     private static object CreateSnapshot(Refund r) => new
     {

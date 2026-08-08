@@ -26,7 +26,6 @@ public class CommercialAgentController : ControllerBase
             {
                 FirstName = request.FirstName,
                 LastName = request.LastName,
-                Slug = request.Slug,
                 GenderId = request.GenderId,
                 Email = request.Email,
                 Phone = request.Phone,

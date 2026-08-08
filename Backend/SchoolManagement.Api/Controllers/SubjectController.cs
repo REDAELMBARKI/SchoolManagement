@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Academic.Dtos.Commands;
+using SchoolManagement.Application.Academic.Dtos.Requests;
 using SchoolManagement.Application.Academic.Interfaces.Services;
 using SchoolManagement.Domain.Common.Exceptions;
 
@@ -38,10 +39,15 @@ public class SubjectController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] SubjectCommand command)
+    public async Task<IActionResult> Create([FromBody] SubjectRequestDto request)
     {
         try
         {
+            var command = new SubjectCommand
+            {
+                Name = request.Name,
+                Description = request.Description
+            };
             var subject = await _subjectService.CreateAsync(command);
             return CreatedAtAction(nameof(GetById), new { id = subject.Id }, subject);
         }
@@ -52,10 +58,15 @@ public class SubjectController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateSubjectCommand command)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateSubjectRequestDto request)
     {
         try
         {
+            var command = new UpdateSubjectCommand
+            {
+                Name = request.Name,
+                Description = request.Description
+            };
             var subject = await _subjectService.UpdateAsync(id, command);
             return Ok(subject);
         }

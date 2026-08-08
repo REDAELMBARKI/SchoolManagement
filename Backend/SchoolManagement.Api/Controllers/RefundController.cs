@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Core.Dtos.Commands;
+using SchoolManagement.Application.Core.Dtos.Requests;
 using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Domain.Common.Exceptions;
 
@@ -21,10 +22,15 @@ public class RefundController : ControllerBase
     /// Reduces the linked invoice's PaidAmount and recalculates status.
     /// </summary>
     [HttpPost("payment/{paymentId}")]
-    public async Task<IActionResult> RefundPayment(Guid paymentId, [FromBody] RefundCommand command)
+    public async Task<IActionResult> RefundPayment(Guid paymentId, [FromBody] RefundRequestDto request)
     {
         try
         {
+            var command = new RefundCommand
+            {
+                Amount = request.Amount,
+                Reason = request.Reason
+            };
             var result = await _refundService.RefundPaymentAsync(paymentId, command);
             return Ok(result);
         }

@@ -87,10 +87,15 @@ public class PaymentController : ControllerBase
     /// Partial refunds are supported; multiple refunds on the same payment are allowed.
     /// </summary>
     [HttpPost("{id}/refund")]
-    public async Task<IActionResult> Refund(Guid id, [FromBody] RefundCommand command)
+    public async Task<IActionResult> Refund(Guid id, [FromBody] RefundRequestDto request)
     {
         try
         {
+            var command = new RefundCommand
+            {
+                Amount = request.Amount,
+                Reason = request.Reason
+            };
             var result = await _refundService.RefundPaymentAsync(id, command);
             return Ok(result);
         }

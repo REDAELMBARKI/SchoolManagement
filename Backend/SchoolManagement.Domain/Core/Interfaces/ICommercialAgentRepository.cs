@@ -5,4 +5,5 @@ namespace SchoolManagement.Domain.Core.Interfaces;
 
 public interface ICommercialAgentRepository : IRepository<CommercialAgent>
 {
+    Task<bool> ExistsBySlugAsync(string slug);
 }

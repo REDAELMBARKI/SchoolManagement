@@ -6,6 +6,7 @@ using SchoolManagement.Application.Common.Mappers;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
 using SchoolManagement.Domain.Common.Interfaces;
+using SchoolManagement.Domain.Common.Utils;
 
 namespace SchoolManagement.Application.Common.Services;
 
@@ -27,6 +28,14 @@ public class PlatformService : IPlatformService
 
     public async Task<PlatformResponseDto> CreateAsync(PlatformCommand command)
     {
+        // Generate unique slug from Name
+        var baseSlug = command.Name.ToLowerInvariant().Replace(" ", "-");
+        string slug = await CustomSluger.Slug(
+            async (slug) => await _repository.ExistsBySlugAsync(slug),
+            baseSlug
+        );
+        command.Slug = slug;
+
         var platform = PlatformMapper.ToDomain(command);
 
         await _repository.AddAsync(platform);
@@ -51,8 +60,18 @@ public class PlatformService : IPlatformService
 
         var oldValues = CreateAuditSnapshot(platform);
 
+        // Generate unique slug if name changed
+        if (platform.Name != command.Name)
+        {
+            var baseSlug = command.Name.ToLowerInvariant().Replace(" ", "-");
+            command.Slug = await CustomSluger.Slug(
+                async (slug) => await _repository.ExistsBySlugAsync(slug),
+                baseSlug
+            );
+            platform.UpdateSlug(command.Slug);
+        }
+
         platform.UpdateName(command.Name);
-        platform.UpdateSlug(command.Slug);
 
         await _repository.UpdateAsync(platform);
 

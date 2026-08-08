@@ -7,6 +7,7 @@ using SchoolManagement.Application.Common.Mappers;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
 using SchoolManagement.Domain.Common.Interfaces;
+using SchoolManagement.Domain.Common.Utils;
 
 namespace SchoolManagement.Application.Common.Services;
 
@@ -44,6 +45,13 @@ public class GenderService : IGenderService
 
     public async Task<GenderResponseDto> CreateAsync(GenderCommand command)
     {
+        // Generate unique slug from Name
+        var baseSlug = command.Name.ToLowerInvariant().Replace(" ", "-");
+        command.Slug = await CustomSluger.Slug(
+            async (slug) => await _repository.ExistsBySlugAsync(slug),
+            baseSlug
+        );
+
         var gender = GenderMapper.ToDomain(command);
         var created = await _repository.AddAsync(gender);
 
@@ -65,8 +73,18 @@ public class GenderService : IGenderService
 
         var oldValues = CreateAuditSnapshot(existing);
 
+        // Generate unique slug if name changed
+        if (existing.Name != command.Name)
+        {
+            var baseSlug = command.Name.ToLowerInvariant().Replace(" ", "-");
+            command.Slug = await CustomSluger.Slug(
+                async (slug) => await _repository.ExistsBySlugAsync(slug),
+                baseSlug
+            );
+            existing.UpdateSlug(command.Slug);
+        }
+
         existing.UpdateName(command.Name);
-        existing.UpdateSlug(command.Slug);
 
         var updated = await _repository.UpdateAsync(existing);
 

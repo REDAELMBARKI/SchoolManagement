@@ -9,6 +9,7 @@ namespace SchoolManagement.Domain.Academic.Entities;
 public class Group : AggregateRoot
 {
     public string Name { get; private set; } = string.Empty;
+    public string Slug { get; private set; } = string.Empty;
     public int Capacity { get; private set; } = 15;
     public byte[] RowVersion { get; private set; } = Array.Empty<byte>();
     // Morning / Afternoon / Evening / Weekend
@@ -29,11 +30,15 @@ public class Group : AggregateRoot
 
     private Group() { } // For EF Core
 
-    public static Group Create(string name, int capacity, string period, Guid branchId, Guid levelId, Guid subjectId)
+    public static Group Create(string name, string slug, int capacity, string period, Guid branchId, Guid levelId, Guid subjectId)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
             throw new DomainException("Group name cannot be empty.");
+        }
+        if (string.IsNullOrWhiteSpace(slug))
+        {
+            throw new DomainException("Group slug cannot be empty.");
         }
         if (capacity <= 0)
         {
@@ -59,6 +64,7 @@ public class Group : AggregateRoot
         return new Group
         {
             Name = name,
+            Slug = slug,
             Capacity = capacity,
             Period = period,
             BranchId = branchId,
@@ -75,6 +81,15 @@ public class Group : AggregateRoot
             throw new DomainException("Group name cannot be empty.");
         }
         Name = name;
+    }
+
+    public void UpdateSlug(string slug)
+    {
+        if (string.IsNullOrWhiteSpace(slug))
+        {
+            throw new DomainException("Group slug cannot be empty.");
+        }
+        Slug = slug;
     }
 
     public void UpdateCapacity(int capacity)

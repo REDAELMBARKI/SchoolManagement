@@ -7,6 +7,7 @@ using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Application.Core.Mappers;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
+using SchoolManagement.Domain.Common.Utils;
 using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Core.Interfaces;
 
@@ -52,6 +53,13 @@ public class AdService : IAdService
 
         command.BranchId = branchId;
 
+        // Generate unique slug from Name + PlatformId
+        var baseSlug = $"{command.Name}-{command.PlatformId}".ToLowerInvariant().Replace(" ", "-");
+        command.Slug = await CustomSluger.Slug(
+            async (slug) => await _repository.ExistsBySlugAsync(slug),
+            baseSlug
+        );
+
         var ad = AdMapper.ToDomain(command);
         var created = await _repository.AddAsync(ad);
 
@@ -77,8 +85,18 @@ public class AdService : IAdService
 
         var oldValues = CreateAuditSnapshot(existing);
 
+        // Generate unique slug if name or platform changed
+        if (existing.Name != command.Name || existing.PlatformId != command.PlatformId)
+        {
+            var baseSlug = $"{command.Name}-{command.PlatformId}".ToLowerInvariant().Replace(" ", "-");
+            command.Slug = await CustomSluger.Slug(
+                async (slug) => await _repository.ExistsBySlugAsync(slug),
+                baseSlug
+            );
+            existing.UpdateSlug(command.Slug);
+        }
+
         existing.UpdateName(command.Name);
-        existing.UpdateSlug(command.Slug);
         existing.UpdatePlatformId(command.PlatformId);
         existing.UpdateBranchId(command.BranchId);
 

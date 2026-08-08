@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Common.Dtos.Commands;
+using SchoolManagement.Application.Common.Dtos.Requests;
 using SchoolManagement.Application.Common.Interfaces.Services;
 using SchoolManagement.Domain.Common.Exceptions;
 
@@ -17,10 +18,14 @@ public class PlatformController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] PlatformCommand command)
+    public async Task<IActionResult> Create([FromBody] PlatformRequestDto request)
     {
         try
         {
+            var command = new PlatformCommand
+            {
+                Name = request.Name
+            };
             var result = await _service.CreateAsync(command);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
@@ -31,10 +36,14 @@ public class PlatformController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdatePlatformCommand command)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdatePlatformRequestDto request)
     {
         try
         {
+            var command = new UpdatePlatformCommand
+            {
+                Name = request.Name
+            };
             var result = await _service.UpdateAsync(id, command);
             return Ok(result);
         }

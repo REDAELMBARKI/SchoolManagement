@@ -15,6 +15,7 @@ public static class GroupMapper
     {
         Id = group.Id,
         Name = group.Name,
+        Slug = group.Slug,
         Capacity = group.Capacity,
         Period = group.Period,
         Level = new LevelResponseDto
@@ -45,6 +46,7 @@ public static class GroupMapper
     {
         return Group.Create(
             name: command.Name,
+            slug: command.Slug,
             capacity: command.Capacity,
             period: command.Period,
             branchId: command.BranchId,

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Academic.Dtos.Commands;
+using SchoolManagement.Application.Academic.Dtos.Requests;
 using SchoolManagement.Application.Academic.Interfaces.Services;
 using SchoolManagement.Domain.Common.Exceptions;
 
@@ -38,10 +39,17 @@ public class RoomController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] RoomCommand command)
+    public async Task<IActionResult> Create([FromBody] RoomRequestDto request)
     {
         try
         {
+            var command = new RoomCommand
+            {
+                Name = request.Name,
+                Capacity = request.Capacity,
+                Floor = request.Floor,
+                Description = request.Description
+            };
             var room = await _roomService.CreateAsync(command);
             return CreatedAtAction(nameof(GetById), new { id = room.Id }, room);
         }
@@ -52,10 +60,17 @@ public class RoomController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateRoomCommand command)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateRoomRequestDto request)
     {
         try
         {
+            var command = new UpdateRoomCommand
+            {
+                Name = request.Name,
+                Capacity = request.Capacity,
+                Floor = request.Floor,
+                Description = request.Description
+            };
             var room = await _roomService.UpdateAsync(id, command);
             return Ok(room);
         }

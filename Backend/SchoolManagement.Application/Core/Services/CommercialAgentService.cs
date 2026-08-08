@@ -7,6 +7,7 @@ using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Application.Core.Mappers;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
+using SchoolManagement.Domain.Common.Utils;
 using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Core.Interfaces;
 
@@ -33,6 +34,13 @@ public class CommercialAgentService : ICommercialAgentService
 
     public async Task<CommercialAgentResponseDto> CreateAsync(CommercialAgentCommand command)
     {
+        // Generate unique slug from FirstName + LastName + Phone
+        var baseSlug = $"{command.FirstName}-{command.LastName}-{command.Phone}".ToLowerInvariant().Replace(" ", "-");
+        command.Slug = await CustomSluger.Slug(
+            async (slug) => await _repository.ExistsBySlugAsync(slug),
+            baseSlug
+        );
+
         var agent = CommercialAgentMapper.ToDomain(command);
 
         await _repository.AddAsync(agent);
@@ -56,6 +64,17 @@ public class CommercialAgentService : ICommercialAgentService
         }
 
         var oldValues = CreateAuditSnapshot(agent);
+
+        // Generate unique slug if name or phone changed
+        if (agent.FirstName != command.FirstName || agent.LastName != command.LastName || agent.Phone != command.Phone)
+        {
+            var baseSlug = $"{command.FirstName}-{command.LastName}-{command.Phone}".ToLowerInvariant().Replace(" ", "-");
+            command.Slug = await CustomSluger.Slug(
+                async (slug) => await _repository.ExistsBySlugAsync(slug),
+                baseSlug
+            );
+            agent.UpdateSlug(command.Slug);
+        }
 
         // Replace non-existing UpdatePersonalInfo with existing methods
         agent.UpdateFirstName(command.FirstName);

@@ -5,4 +5,5 @@ namespace SchoolManagement.Domain.Core.Interfaces;
 
 public interface IAdRepository : IRepository<Ad>
 {
+    Task<bool> ExistsBySlugAsync(string slug);
 }

@@ -5,4 +5,5 @@ namespace SchoolManagement.Domain.Common.Interfaces;
 
 public interface IGenderRepository : IRepository<Gender>
 {
+    Task<bool> ExistsBySlugAsync(string slug);
 }

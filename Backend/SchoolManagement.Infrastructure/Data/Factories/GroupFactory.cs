@@ -16,6 +16,7 @@ public class GroupFactory : Factory<Group>
 
         var group = Group.Create(
                 name: faker.Lorem.Letter(1).ToUpper() + faker.Random.Int(1, 9),  // e.g. "A3", "B7"
+                slug : faker.Lorem.Letter(1).ToUpper() + faker.Random.Int(1, 9),
                 capacity: faker.Random.Int(10, 60),
                 period: faker.PickRandom("Morning", "Afternoon", "Evening", "Weekend"),
                 branchId: faker.PickRandom(branches),

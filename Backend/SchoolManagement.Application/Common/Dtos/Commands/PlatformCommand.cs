@@ -1,8 +1,8 @@
 namespace SchoolManagement.Application.Common.Dtos.Commands;
 
-public record PlatformCommand
+public class PlatformCommand
 {
-    public string Name { get; init; } = string.Empty;
-    public string Slug { get; init; } = string.Empty;
-    public Guid BranchId { get; init; }
+    public string Name { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
+    public Guid BranchId { get; set; }
 }

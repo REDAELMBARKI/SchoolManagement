@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Academic.Interfaces;
 using SchoolManagement.Infrastructure.Common.Repositories;
@@ -11,4 +12,9 @@ public class GroupRepository : Repository<Group>, IGroupRepository
     {
     }
 
+    public async Task<bool> ExistsBySlugAsync(string slug)
+    {
+        return await _context.Set<Group>()
+            .AnyAsync(g => g.Slug == slug);
+    }
 }

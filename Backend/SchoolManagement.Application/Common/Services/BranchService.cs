@@ -7,6 +7,7 @@ using SchoolManagement.Application.Common.Mappers;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
 using SchoolManagement.Domain.Common.Interfaces;
+using SchoolManagement.Domain.Common.Utils;
 
 namespace SchoolManagement.Application.Common.Services;
 
@@ -31,6 +32,13 @@ public class BranchService : IBranchService
 
     public async Task<BranchResponseDto> CreateAsync(BranchCommand command)
     {
+        // Generate unique slug from name + city
+        var baseSlug = $"{command.Name}-{command.City}".ToLowerInvariant().Replace(" ", "-");
+        command.Slug = await CustomSluger.Slug(
+            async (slug) => await _repository.ExistsBySlugAsync(slug),
+            baseSlug
+        );
+
         var branch = BranchMapper.ToDomain(command);
 
         await _repository.AddAsync(branch);
@@ -55,6 +63,17 @@ public class BranchService : IBranchService
         }
 
         var oldValues = CreateAuditSnapshot(branch);
+
+        // Generate unique slug if name or city changed
+        if (branch.Name != command.Name || branch.City != command.City)
+        {
+            var baseSlug = $"{command.Name}-{command.City}".ToLowerInvariant().Replace(" ", "-");
+            command.Slug = await CustomSluger.Slug(
+                async (slug) => await _repository.ExistsBySlugAsync(slug),
+                baseSlug
+            );
+            branch.UpdateSlug(command.Slug);
+        }
 
         branch.UpdateName(command.Name);
         branch.UpdateCity(command.City);

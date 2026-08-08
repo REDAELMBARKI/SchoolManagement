@@ -8,6 +8,7 @@ using SchoolManagement.Application.Common.Interfaces.Services;
 using SchoolManagement.Domain.Academic.Interfaces;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
+using SchoolManagement.Domain.Common.Utils;
 
 namespace SchoolManagement.Application.Academic.Services;
 
@@ -49,6 +50,13 @@ public class SubjectService : ISubjectService
 
     public async Task<SubjectResponseDto> CreateAsync(SubjectCommand command)
     {
+        // Generate unique slug from Name
+        var baseSlug = command.Name.ToLowerInvariant().Replace(" ", "-");
+        command.Slug = await CustomSluger.Slug(
+            async (slug) => await _repository.ExistsBySlugAsync(slug),
+            baseSlug
+        );
+
         var subject = SubjectMapper.ToDomain(command, _currentUserContext.BranchId);
         
         // Use repository for tracking operations
@@ -74,6 +82,17 @@ public class SubjectService : ISubjectService
         }
 
         var oldValues = CreateAuditSnapshot(subject);
+
+        // Generate unique slug if name changed
+        if (subject.Name != command.Name)
+        {
+            var baseSlug = command.Name.ToLowerInvariant().Replace(" ", "-");
+            command.Slug = await CustomSluger.Slug(
+                async (slug) => await _repository.ExistsBySlugAsync(slug),
+                baseSlug
+            );
+            subject.UpdateSlug(command.Slug);
+        }
 
         subject.UpdateName(command.Name);
         subject.UpdateDescription(command.Description);

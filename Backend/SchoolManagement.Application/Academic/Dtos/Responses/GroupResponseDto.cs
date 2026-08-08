@@ -4,6 +4,7 @@ public class GroupResponseDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
     public int Capacity { get; set; } = 15;
     public string Period { get; set; } = string.Empty; // Morning / Afternoon / Evening / Weekend
     public LevelResponseDto? Level { get; set; }

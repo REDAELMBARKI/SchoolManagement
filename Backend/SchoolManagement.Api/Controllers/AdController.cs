@@ -43,7 +43,6 @@ public class AdController : ControllerBase
             var command = new AdCommand
             {
                 Name = dto.Name,
-                Slug = dto.Slug,
                 PlatformId = dto.PlatformId
             };
             var result = await _service.CreateAsync(command);
@@ -62,7 +61,6 @@ public class AdController : ControllerBase
             var command = new UpdateAdCommand
             {
                 Name = dto.Name,
-                Slug = dto.Slug,
                 PlatformId = dto.PlatformId,
                 BranchId = dto.BranchId
             };
