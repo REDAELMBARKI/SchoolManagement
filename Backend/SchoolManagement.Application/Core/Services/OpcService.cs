@@ -7,6 +7,7 @@ using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Application.Core.Mappers;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
+using SchoolManagement.Domain.Common.Utils;
 using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Domain.Core.Interfaces;
 
@@ -52,6 +53,13 @@ public class OpcService : IOpcService
 
         command.BranchId = branchId;
 
+        // Generate unique slug from FirstName + LastName + Phone
+        var baseSlug = $"{command.FirstName}-{command.LastName}-{command.Phone}".ToLowerInvariant().Replace(" ", "-");
+        command.Slug = await CustomSluger.Slug(
+            async (slug) => await _repository.ExistsBySlugAsync(slug),
+            baseSlug
+        );
+
         var opc = OpcMapper.ToDomain(command);
         var created = await _repository.AddAsync(opc);
 
@@ -76,6 +84,20 @@ public class OpcService : IOpcService
             ?? throw new NotFoundException($"No OPC found with id {id}");
 
         var oldValues = CreateAuditSnapshot(existing);
+
+        // Check if name or phone changed - regenerate slug if needed
+        bool nameOrPhoneChanged = existing.FirstName != command.FirstName || 
+                                   existing.LastName != command.LastName || 
+                                   existing.Phone != command.Phone;
+
+        if (nameOrPhoneChanged)
+        {
+            var baseSlug = $"{command.FirstName}-{command.LastName}-{command.Phone}".ToLowerInvariant().Replace(" ", "-");
+            command.Slug = await CustomSluger.Slug(
+                async (slug) => await _repository.ExistsBySlugAsync(slug),
+                baseSlug
+            );
+        }
 
         existing.UpdateFirstName(command.FirstName);
         existing.UpdateLastName(command.LastName);

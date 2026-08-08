@@ -9,6 +9,7 @@ using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Academic.Interfaces;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
+using SchoolManagement.Domain.Common.Utils;
 
 namespace SchoolManagement.Application.Academic.Services;
 
@@ -33,6 +34,13 @@ public class TeacherService : ITeacherService
 
     public async Task<TeacherResponseDto> CreateAsync(TeacherCommand command)
     {
+        // Generate unique slug from FirstName + LastName + Phone
+        var baseSlug = $"{command.FirstName}-{command.LastName}-{command.Phone}".ToLowerInvariant().Replace(" ", "-");
+        command.Slug = await CustomSluger.Slug(
+            async (slug) => await _repository.ExistsBySlugAsync(slug),
+            baseSlug
+        );
+
         var teacher = TeacherMapper.ToDomain(command);
 
         // Use repository for tracking operations
@@ -57,6 +65,21 @@ public class TeacherService : ITeacherService
         }
 
         var oldValues = CreateAuditSnapshot(teacher);
+
+        // Check if name or phone changed - regenerate slug if needed
+        bool nameOrPhoneChanged = teacher.FirstName != command.FirstName || 
+                                   teacher.LastName != command.LastName || 
+                                   teacher.Phone != command.Phone;
+
+        if (nameOrPhoneChanged)
+        {
+            var baseSlug = $"{command.FirstName}-{command.LastName}-{command.Phone}".ToLowerInvariant().Replace(" ", "-");
+            command.Slug = await CustomSluger.Slug(
+                async (slug) => await _repository.ExistsBySlugAsync(slug),
+                baseSlug
+            );
+            teacher.UpdateSlug(command.Slug);
+        }
 
         // Replace nonexistent UpdatePersonalInfo with existing methods
         teacher.UpdateFirstName(command.FirstName);

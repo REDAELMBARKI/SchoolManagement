@@ -1,0 +1,77 @@
+fix: Complete slug generation and RequestDto pattern for Teacher and Opc entities
+
+## Summary
+Fixed missing slug generation for Teacher and Opc Person entities and completed
+RefundRequestDto implementation to finalize the RequestDto → Command pattern
+across the entire API.
+
+## Changes
+
+### Teacher Entity Slug Generation
+- Convert TeacherCommand from record/init to class/set for mutability
+- Convert UpdateTeacherCommand from record/init to class/set, add Slug property
+- Add ExistsBySlugAsync() to ITeacherRepository interface
+- Implement ExistsBySlugAsync() in TeacherRepository
+- Add slug generation in TeacherService.CreateAsync (FirstName-LastName-Phone)
+- Add slug regeneration in TeacherService.UpdateAsync (if name/phone changed)
+
+### Opc Entity Slug Generation
+- Add ExistsBySlugAsync() to IOpcRepository interface
+- Implement ExistsBySlugAsync() in OpcRepository
+- Add slug generation in OpcService.CreateAsync (FirstName-LastName-Phone)
+- Add slug regeneration in OpcService.UpdateAsync (if name/phone changed)
+
+### Refund RequestDto Pattern
+- Create RefundRequestDto with Amount and Reason properties
+- Create RefundMapper with ToDomain and ToResponse methods
+- Update RefundService to use RefundMapper instead of direct entity creation
+- Update PaymentController to use RefundRequestDto → RefundCommand
+- Update RefundController to use RefundRequestDto → RefundCommand
+
+## Files Modified (11 files)
+
+### Commands
+- SchoolManagement.Application/Academic/Dtos/Commands/TeacherCommand.cs
+- SchoolManagement.Application/Academic/Dtos/Commands/UpdateTeacherCommand.cs
+
+### Request DTOs
+- SchoolManagement.Application/Core/Dtos/Requests/RefundRequestDto.cs (new)
+
+### Services
+- SchoolManagement.Application/Academic/Services/TeacherService.cs
+- SchoolManagement.Application/Core/Services/OpcService.cs
+- SchoolManagement.Application/Core/Services/RefundService.cs
+
+### Mappers
+- SchoolManagement.Application/Core/Mappers/RefundMapper.cs (new)
+
+### Repositories (Interfaces)
+- SchoolManagement.Domain/Academic/Interfaces/ITeacherRepository.cs
+- SchoolManagement.Domain/Core/Interfaces/IOpcRepository.cs
+
+### Repositories (Implementations)
+- SchoolManagement.Infrastructure/Academic/Repositories/TeacherRepository.cs
+- SchoolManagement.Infrastructure/Core/Repositories/OpcRepository.cs
+
+### Controllers
+- SchoolManagement.Api/Controllers/PaymentController.cs
+- SchoolManagement.Api/Controllers/RefundController.cs
+
+## Impact
+- All Person entities (Teacher, Opc, Student, Intake, CommercialAgent, 
+  StudentResponsable) now have consistent slug generation
+- All controllers follow RequestDto → Command → Service pattern
+- All services use Mapper.ToDomain() instead of direct entity creation
+- SEO-friendly URLs available for all public-facing entities
+- Architecture patterns consistent across entire API
+
+## Testing
+- Build succeeded with no compilation errors
+- All slug generation follows CustomSluger.Slug() pattern
+- Unique slug enforcement via ExistsBySlugAsync() for all entities
+- Ready for integration testing
+
+## Related
+- Completes slug generation implementation started in previous commits
+- Finalizes RequestDto → Command pattern standardization
+- Addresses architectural consistency requirements

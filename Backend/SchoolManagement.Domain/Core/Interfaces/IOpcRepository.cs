@@ -5,4 +5,5 @@ namespace SchoolManagement.Domain.Core.Interfaces;
 
 public interface IOpcRepository : IRepository<Opc>
 {
+    Task<bool> ExistsBySlugAsync(string slug);
 }

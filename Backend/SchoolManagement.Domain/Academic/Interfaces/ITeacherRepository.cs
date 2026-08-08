@@ -5,4 +5,5 @@ namespace SchoolManagement.Domain.Academic.Interfaces;
 
 public interface ITeacherRepository : IRepository<Teacher>
 {
+    Task<bool> ExistsBySlugAsync(string slug);
 }

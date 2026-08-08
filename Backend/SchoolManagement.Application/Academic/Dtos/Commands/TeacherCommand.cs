@@ -1,16 +1,16 @@
 namespace SchoolManagement.Application.Academic.Dtos.Commands;
 
-public record TeacherCommand
+public class TeacherCommand
 {
-    public string FirstName { get; init; } = string.Empty;
-    public string LastName { get; init; } = string.Empty;
-    public string Slug { get; init; } = string.Empty;
-    public Guid? GenderId { get; init; }
-    public string? Email { get; init; }
-    public string Phone { get; init; } = string.Empty;
-    public DateOnly? DateOfBirth { get; init; }
-    public DateTime HireDate { get; init; }
-    public decimal Salary { get; init; }
-    public Guid BranchId { get; init; }
-    public string Specialization { get; init; } = string.Empty;
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
+    public Guid? GenderId { get; set; }
+    public string? Email { get; set; }
+    public string Phone { get; set; } = string.Empty;
+    public DateOnly? DateOfBirth { get; set; }
+    public DateTime HireDate { get; set; }
+    public decimal Salary { get; set; }
+    public Guid BranchId { get; set; }
+    public string Specialization { get; set; } = string.Empty;
 }

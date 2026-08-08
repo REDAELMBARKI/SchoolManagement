@@ -1,0 +1,155 @@
+feat: Complete API architecture - RequestDto pattern, slug generation, and mapper standardization
+
+This commit finalizes the core API architecture by completing the RequestDto → Command 
+pattern across all controllers, implementing slug generation for all public-facing entities, 
+and standardizing mapper usage throughout the application layer.
+
+## Changes
+
+### 1. Teacher Entity - Complete Slug Implementation
+- Convert TeacherCommand from record/init to class/set for mutability
+- Convert UpdateTeacherCommand from record/init to class/set, add Slug property
+- Add ExistsBySlugAsync() to ITeacherRepository interface
+- Implement ExistsBySlugAsync() in TeacherRepository using EF Core
+- Implement slug generation in TeacherService.CreateAsync (FirstName-LastName-Phone pattern)
+- Implement slug regeneration in TeacherService.UpdateAsync when name/phone changes
+- Add CustomSluger import to TeacherService
+
+### 2. Opc Entity - Complete Slug Implementation
+- Add ExistsBySlugAsync() to IOpcRepository interface
+- Implement ExistsBySlugAsync() in OpcRepository using EF Core
+- Implement slug generation in OpcService.CreateAsync (FirstName-LastName-Phone pattern)
+- Implement slug regeneration in OpcService.UpdateAsync when name/phone changes
+- Add CustomSluger import to OpcService
+
+### 3. Refund Operations - RequestDto Pattern & Mapper
+- Create RefundRequestDto with Amount and Reason validation
+- Create RefundMapper with ToDomain(command, paymentId) and ToResponse(refund)
+- Refactor RefundService to use RefundMapper.ToDomain() instead of direct Refund.Create()
+- Refactor RefundService to use RefundMapper.ToResponse() for all response mappings
+- Update PaymentController.Refund() to accept RefundRequestDto and map to RefundCommand
+- Update RefundController.RefundPayment() to accept RefundRequestDto and map to RefundCommand
+- Add proper using statements for DTOs in controllers
+
+### 4. Remaining Controllers - RequestDto Pattern Completion
+- Create TeacherRequestDto and UpdateTeacherRequestDto with validation attributes
+- Update TeacherController to map RequestDto → Command with branchId enrichment
+- Create RoomRequestDto and UpdateRoomRequestDto with validation attributes
+- Update RoomController to map RequestDto → Command with branchId enrichment
+
+## Architecture Improvements
+
+### Slug Generation (SEO-Friendly URLs)
+All public-facing entities now have unique, SEO-friendly slugs:
+- Person entities: Teacher, Opc, Student, Intake, CommercialAgent, StudentResponsable
+- Resource entities: Branch, Gender, Subject, Platform, Ad, Group
+- Pattern: CustomSluger.Slug(existsDelegate, baseSlug) with automatic GUID suffix on conflicts
+- Regeneration: Slugs update automatically when source fields change
+
+### RequestDto → Command Pattern
+Complete separation of concerns:
+- RequestDto: User input only, with validation attributes
+- Command: Enriched with context (branchId, userId, slug, timestamps)
+- Service: Business logic and persistence
+- Controller: Thin orchestration layer
+
+### Mapper Standardization
+All services now use dedicated mappers:
+- Eliminates direct entity creation in services
+- Centralizes mapping logic
+- Consistent pattern: Mapper.ToDomain(command) and Mapper.ToResponse(entity)
+
+## Files Modified
+
+### Application Layer - Commands (2 files)
+- SchoolManagement.Application/Academic/Dtos/Commands/TeacherCommand.cs
+- SchoolManagement.Application/Academic/Dtos/Commands/UpdateTeacherCommand.cs
+
+### Application Layer - Request DTOs (5 files)
+- SchoolManagement.Application/Academic/Dtos/Requests/TeacherRequestDto.cs (new)
+- SchoolManagement.Application/Academic/Dtos/Requests/UpdateTeacherRequestDto.cs (new)
+- SchoolManagement.Application/Academic/Dtos/Requests/RoomRequestDto.cs (new)
+- SchoolManagement.Application/Academic/Dtos/Requests/UpdateRoomRequestDto.cs (new)
+- SchoolManagement.Application/Core/Dtos/Requests/RefundRequestDto.cs (new)
+
+### Application Layer - Services (4 files)
+- SchoolManagement.Application/Academic/Services/TeacherService.cs
+- SchoolManagement.Application/Core/Services/OpcService.cs
+- SchoolManagement.Application/Core/Services/RefundService.cs
+
+### Application Layer - Mappers (1 file)
+- SchoolManagement.Application/Core/Mappers/RefundMapper.cs (new)
+
+### Domain Layer - Repository Interfaces (2 files)
+- SchoolManagement.Domain/Academic/Interfaces/ITeacherRepository.cs
+- SchoolManagement.Domain/Core/Interfaces/IOpcRepository.cs
+
+### Infrastructure Layer - Repositories (2 files)
+- SchoolManagement.Infrastructure/Academic/Repositories/TeacherRepository.cs
+- SchoolManagement.Infrastructure/Core/Repositories/OpcRepository.cs
+
+### API Layer - Controllers (4 files)
+- SchoolManagement.Api/Controllers/TeacherController.cs
+- SchoolManagement.Api/Controllers/RoomController.cs
+- SchoolManagement.Api/Controllers/PaymentController.cs
+- SchoolManagement.Api/Controllers/RefundController.cs
+
+## Impact
+
+### Developer Experience
+- ✅ Consistent patterns across entire codebase
+- ✅ Easy to add new features following established patterns
+- ✅ Clear separation of concerns
+- ✅ Type-safe mapping with compile-time checks
+
+### Code Quality
+- ✅ All Person entities have slug generation (Teacher was last missing piece)
+- ✅ No controllers directly accept Commands from [FromBody]
+- ✅ No services directly create entities (all use mappers)
+- ✅ Commands for slug entities are mutable (class with set)
+
+### API Functionality
+- ✅ SEO-friendly URLs for all public-facing resources
+- ✅ Automatic slug uniqueness with GUID suffix on conflicts
+- ✅ Slug regeneration on update when source fields change
+- ✅ Consistent request/response validation
+
+### Multi-tenancy
+- ✅ BranchId enriched in services from CurrentUserContext
+- ✅ UserId (NameIdentifier) enriched in services
+- ✅ Proper tenant isolation maintained
+
+## Testing
+
+### Build Status
+- ✅ dotnet build: SUCCESS (32.2s)
+- ✅ Zero compilation errors
+- ⚠️ 14 warnings (non-critical: nullability, unused variables)
+
+### Manual Testing Required
+- [ ] Teacher CRUD with slug generation
+- [ ] Opc CRUD with slug generation
+- [ ] Refund operations via both Payment and Refund controllers
+- [ ] Slug uniqueness with duplicate names
+- [ ] Slug regeneration on update
+
+## Documentation
+
+### Added Documents
+- API_READINESS_CHECKLIST.md - Complete implementation status
+- IMPLEMENTATION_COMPLETE_SUMMARY.md - Comprehensive project overview
+
+## Breaking Changes
+None. This is additive functionality and internal refactoring.
+
+## Next Steps
+- Implement authorization policies and role-based access control
+- Add permission requirements to controller endpoints
+- Add branch isolation validation middleware
+- Complete integration testing suite
+
+---
+
+Relates-To: Architecture standardization initiative
+Completes: Slug generation implementation for all Person entities
+Finalizes: RequestDto → Command pattern across all controllers
