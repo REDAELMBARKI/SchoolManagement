@@ -6,7 +6,7 @@ public interface IAuditLogService
         string action,
         string entityName,
         Guid entityId,
-        Guid branchId,
+        Guid branchId,  // REQUIRED - tracks the affected entity's branch (where changes happen)
         object? oldValues = null,
         object? newValues = null,
         string? message = null,

@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Core.Dtos.Commands;
 using SchoolManagement.Application.Core.Dtos.Requests;
 using SchoolManagement.Application.Core.Interfaces.Services;
+using SchoolManagement.CrossCutting.Identity.Authorizations.Requirements;
 using SchoolManagement.Domain.Common.Exceptions;
 
 
@@ -15,9 +17,11 @@ public class IntakeController : ControllerBase
 
 
     private readonly IIntakeService _intakeService;
-    public IntakeController(IIntakeService intakeService)
+    private readonly IAuthorizationService _authorizationService;
+    public IntakeController(IIntakeService intakeService , IAuthorizationService authorizationService)
     {
         _intakeService = intakeService;
+        _authorizationService = authorizationService;
     }
 
 
@@ -39,6 +43,11 @@ public class IntakeController : ControllerBase
         try
         {
             var intake = await _intakeService.GetIntakeByIdAsync(id);
+            var branchAccessResult = await  _authorizationService.AuthorizeAsync(User , intake?.Branch , new SameBranchRequirement());
+            if (!branchAccessResult.Succeeded)
+            {
+                return Forbid();
+            }
             return Ok(intake);
 
         }

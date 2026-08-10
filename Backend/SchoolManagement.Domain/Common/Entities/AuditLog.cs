@@ -9,6 +9,7 @@ public class AuditLog : BaseEntity
     public string? OldValues { get; private set; } // JSON
     public string? NewValues { get; private set; } // JSON
     public string? ChangedBy { get; private set; }
+    public string? HasRole { get; private set; }
     public DateTime ChangedAt { get; private set; }
     public Guid BranchId { get; private set; }
     public string? AdditionalData { get; private set; } // JSON for any additional data
@@ -23,10 +24,14 @@ public class AuditLog : BaseEntity
         string? oldValues,
         string? newValues,
         string? changedBy,
+        string? hasRole,
         Guid branchId,
         string? additionalData,
         string? message = null)
     {
+
+
+
         return new AuditLog
         {
             EntityName = entityName,
@@ -37,6 +42,7 @@ public class AuditLog : BaseEntity
             OldValues = oldValues,
             NewValues = newValues,
             ChangedBy = changedBy,
+            HasRole = hasRole,
             ChangedAt = DateTime.UtcNow,
             BranchId = branchId
         };

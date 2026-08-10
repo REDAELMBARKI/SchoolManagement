@@ -27,19 +27,22 @@ public class AuditLogService : IAuditLogService
         string action,
         string entityName,
         Guid entityId,
-        Guid branchId,
+        Guid branchId,  // REQUIRED - tracks where the change happened (affected entity's branch)
         object? oldValues = null,
         object? newValues = null,
         string? message = null,
         object? additionalData = null,
         CancellationToken cancellationToken = default)
     {
+        // Skip audit log if branchId is empty
         if (branchId == Guid.Empty)
         {
             return;
         }
 
-        var changedBy = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var httpContext = _httpContextAccessor.HttpContext;
+        var changedBy = httpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var hasRole = httpContext?.User.FindFirstValue(ClaimTypes.Role);
 
         var auditLog = AuditLog.Create(
             entityName: entityName,
@@ -48,9 +51,10 @@ public class AuditLogService : IAuditLogService
             oldValues: Serialize(oldValues),
             newValues: Serialize(newValues),
             changedBy: changedBy,
+            hasRole: hasRole,
             branchId: branchId,
-            message: message,
-            additionalData: Serialize(additionalData)
+            additionalData: Serialize(additionalData),
+            message: message
             );
 
         await _context.AuditLogs.AddAsync(auditLog, cancellationToken);

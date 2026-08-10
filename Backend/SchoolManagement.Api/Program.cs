@@ -15,6 +15,7 @@ using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Application.Core.Services;
 using SchoolManagement.Application.Core.Validators;
 using SchoolManagement.Application.Options;
+using SchoolManagement.CrossCutting.Identity.Authorizations.Extensions;
 using SchoolManagement.Domain.Academic.Interfaces;
 using SchoolManagement.Domain.Common.Interfaces;
 using SchoolManagement.Domain.Core.Interfaces;
@@ -59,7 +60,10 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 
 
+// add policies 
 
+builder.Services.AddAppAuthorizations();
+builder.Services.AddBranchingAuthorizations();
 
 // add hangfire 
 builder.Services.AddHangfire(config =>
@@ -175,6 +179,14 @@ builder.Services.AddScoped<IBranchQueryService, BranchQueryService>();
 builder.Services.AddScoped<IBranchService, BranchService>();
 builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
 builder.Services.AddScoped<IPlatformService, PlatformService>();
+
+// User Management - Domain/Business layer
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserQueryService, UserQueryService>();
+builder.Services.AddScoped<IDomainUserService, DomainUserService>();
+
+// User Management - Identity/Auth layer
+builder.Services.AddScoped<SchoolManagement.CrossCutting.Identity.Interfaces.IAuthService, SchoolManagement.CrossCutting.Identity.Services.AuthService>();
 
 // end Di registration
 

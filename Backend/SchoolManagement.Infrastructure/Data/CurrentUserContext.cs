@@ -8,6 +8,8 @@ namespace SchoolManagement.Infrastructure.Data
     {
         public IHttpContextAccessor _httpContext;
         public Guid BranchId { get; }
+
+        public string Role {  get; }
         public Guid NameIdentifier { get; }
 
         public CurrentUserContext(IHttpContextAccessor httpContext)
@@ -15,8 +17,20 @@ namespace SchoolManagement.Infrastructure.Data
             _httpContext = httpContext;
             var userIdString = GetNameIdentifier();
             var branchIdString = GetBranchId();
+            var userRole = GetUserRole();
             NameIdentifier = userIdString;
             BranchId = branchIdString;
+        }
+
+        private string  GetUserRole()
+        {
+            var userRole = _httpContext.HttpContext?.User.FindFirstValue(ClaimTypes.Role);
+            if(string.IsNullOrEmpty(userRole))
+            {
+                throw new InvalidOperationException("User Role is Missing from the User context");
+            }
+
+            return userRole;
         }
 
         private Guid GetNameIdentifier()

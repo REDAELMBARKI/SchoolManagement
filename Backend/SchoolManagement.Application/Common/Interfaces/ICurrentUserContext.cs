@@ -8,6 +8,8 @@ namespace SchoolManagement.Application.Common.Interfaces
     {
 
         Guid BranchId { get; }
+
+        string Role {  get; }
         Guid NameIdentifier { get; }
 
     }

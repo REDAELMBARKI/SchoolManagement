@@ -13,14 +13,23 @@ public class UserFactory : Factory<DomainUser>
     protected override Task<DomainUser> Make()
     {
         var genders = Context.Genders.Select(g => g.Id).ToList();
+        var branches = Context.Branches.Select(b => b.Id).ToList();
         var firstName = faker.Name.FirstName();
         var lastName = faker.Name.LastName();
-
+        var email = faker.Internet.Email(firstName, lastName);
+        var roles = new[] { "Administrator", "Receptionist" };
+        
         return Task.FromResult(DomainUser.Register(
             firstName: firstName,
             lastName: lastName,
+            email: email,
             slug: new SlugHelper().GenerateSlug($"{firstName} {lastName}"),
-            genderId: faker.PickRandom(genders)
+            genderId: faker.PickRandom(genders),
+            phone: faker.Phone.PhoneNumber(),
+            dateOfBirth: DateOnly.FromDateTime(faker.Date.Past(30, DateTime.Now.AddYears(-18))),
+            role: faker.PickRandom(roles),
+            branchId: faker.PickRandom(branches),
+            applicationUserId: Guid.NewGuid().ToString() // Mock ApplicationUser ID for factory
         ));
     }
 
