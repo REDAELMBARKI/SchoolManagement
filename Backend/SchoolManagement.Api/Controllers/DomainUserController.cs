@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Common.Dtos.Commands;
 using SchoolManagement.Application.Common.Dtos.Requests;
@@ -8,30 +9,45 @@ namespace SchoolManagement.Api.Controllers;
 
 [ApiController]
 [Route("api/domain-users")]
+[Authorize] 
 public class DomainUserController : ControllerBase
 {
     private readonly IDomainUserService _service;
+    private readonly IAuthorizationService _authorizationService;
 
-    public DomainUserController(IDomainUserService service)
+    public DomainUserController(IDomainUserService service, IAuthorizationService authorizationService)
     {
         _service = service;
+        _authorizationService = authorizationService;
     }
 
-    // 1. GET /api/domain-users - Get all users
     [HttpGet]
+    [Authorize(Policy = "IsAdministratorOrAbove")]
     public async Task<IActionResult> GetAll()
     {
         var result = await _service.GetAllAsync();
         return Ok(result);
     }
 
-    // 2. GET /api/domain-users/{id} - Get user by ID
     [HttpGet("{id:guid}")]
+    [Authorize(Policy = "IsAdministratorOrAbove")]
     public async Task<IActionResult> GetById(Guid id)
     {
         try
         {
             var result = await _service.GetByIdAsync(id);
+
+            var branchCheck = await _authorizationService.AuthorizeAsync(
+                User, 
+                result.BranchId, 
+                "IsSameBranch"
+            );
+
+            if (!branchCheck.Succeeded)
+            {
+                return NotFound();
+            }
+
             return Ok(result);
         }
         catch (NotFoundException ex)
@@ -44,12 +60,36 @@ public class DomainUserController : ControllerBase
         }
     }
 
-    // 3. PUT /api/domain-users/{id} - Update user profile
     [HttpPut("{id:guid}")]
+    [Authorize(Policy = "IsAdministratorOrAbove")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateUserRequestDto request)
     {
         try
         {
+            var user = await _service.GetByIdAsync(id);
+
+            var branchCheck = await _authorizationService.AuthorizeAsync(
+                User, 
+                user.BranchId, 
+                "IsSameBranch"
+            );
+
+            if (!branchCheck.Succeeded)
+            {
+                return NotFound();
+            }
+
+            var roleCheck = await _authorizationService.AuthorizeAsync(
+                User, 
+                user.Role, 
+                "CanManageRole"
+            );
+
+            if (!roleCheck.Succeeded)
+            {
+                return NotFound();
+            }
+
             var command = new UpdateDomainUserCommand
             {
                 FirstName = request.FirstName,
@@ -76,12 +116,36 @@ public class DomainUserController : ControllerBase
         }
     }
 
-    // 4. DELETE /api/domain-users/{id} - Delete user (soft delete)
     [HttpDelete("{id:guid}")]
+    [Authorize(Policy = "IsDirectorOrAbove")]
     public async Task<IActionResult> Delete(Guid id)
     {
         try
         {
+            var user = await _service.GetByIdAsync(id);
+
+            var branchCheck = await _authorizationService.AuthorizeAsync(
+                User, 
+                user.BranchId, 
+                "IsSameBranch"
+            );
+
+            if (!branchCheck.Succeeded)
+            {
+                return NotFound();
+            }
+
+            var roleCheck = await _authorizationService.AuthorizeAsync(
+                User, 
+                user.Role, 
+                "CanManageRole"
+            );
+
+            if (!roleCheck.Succeeded)
+            {
+                return NotFound();
+            }
+
             await _service.DeleteAsync(id);
             return NoContent();
         }
@@ -95,8 +159,8 @@ public class DomainUserController : ControllerBase
         }
     }
 
-    // 5. POST /api/domain-users/{id}/assign-branch - Assign user to branch
     [HttpPost("{id:guid}/assign-branch")]
+    [Authorize(Policy = "IsSuperAdmin")]
     public async Task<IActionResult> AssignBranch(Guid id, [FromBody] AssignBranchRequestDto request)
     {
         try
@@ -127,8 +191,8 @@ public class DomainUserController : ControllerBase
         }
     }
 
-    // 6. POST /api/domain-users/{id}/remove-branch - Remove user from branch
     [HttpPost("{id:guid}/remove-branch")]
+    [Authorize(Policy = "IsSuperAdmin")]
     public async Task<IActionResult> RemoveBranch(Guid id)
     {
         try
@@ -154,12 +218,36 @@ public class DomainUserController : ControllerBase
         }
     }
 
-    // 7. POST /api/domain-users/{id}/activate - Activate user
     [HttpPost("{id:guid}/activate")]
+    [Authorize(Policy = "IsAdministratorOrAbove")]
     public async Task<IActionResult> Activate(Guid id)
     {
         try
         {
+            var user = await _service.GetByIdAsync(id);
+
+            var branchCheck = await _authorizationService.AuthorizeAsync(
+                User, 
+                user.BranchId, 
+                "IsSameBranch"
+            );
+
+            if (!branchCheck.Succeeded)
+            {
+                return NotFound();
+            }
+
+            var roleCheck = await _authorizationService.AuthorizeAsync(
+                User, 
+                user.Role, 
+                "CanManageRole"
+            );
+
+            if (!roleCheck.Succeeded)
+            {
+                return NotFound();
+            }
+
             var result = await _service.ActivateAsync(id);
             return Ok(new 
             { 
@@ -177,12 +265,36 @@ public class DomainUserController : ControllerBase
         }
     }
 
-    // 8. POST /api/domain-users/{id}/deactivate - Deactivate user
     [HttpPost("{id:guid}/deactivate")]
+    [Authorize(Policy = "IsAdministratorOrAbove")]
     public async Task<IActionResult> Deactivate(Guid id)
     {
         try
         {
+            var user = await _service.GetByIdAsync(id);
+
+            var branchCheck = await _authorizationService.AuthorizeAsync(
+                User, 
+                user.BranchId, 
+                "IsSameBranch"
+            );
+
+            if (!branchCheck.Succeeded)
+            {
+                return NotFound();
+            }
+
+            var roleCheck = await _authorizationService.AuthorizeAsync(
+                User, 
+                user.Role, 
+                "CanManageRole"
+            );
+
+            if (!roleCheck.Succeeded)
+            {
+                return NotFound();
+            }
+
             var result = await _service.DeactivateAsync(id);
             return Ok(new 
             { 
@@ -200,12 +312,23 @@ public class DomainUserController : ControllerBase
         }
     }
 
-    // 9. GET /api/domain-users/branch/{branchId} - Get all users in specific branch
     [HttpGet("branch/{branchId:guid}")]
+    [Authorize(Policy = "IsAdministratorOrAbove")]
     public async Task<IActionResult> GetByBranch(Guid branchId)
     {
         try
         {
+            var branchCheck = await _authorizationService.AuthorizeAsync(
+                User, 
+                branchId, 
+                "IsSameBranch"
+            );
+
+            if (!branchCheck.Succeeded)
+            {
+                return Forbid();
+            }
+
             var result = await _service.GetByBranchIdAsync(branchId);
             return Ok(result);
         }
@@ -215,8 +338,8 @@ public class DomainUserController : ControllerBase
         }
     }
 
-    // 10. GET /api/domain-users/role/{role} - Get all users with specific role
     [HttpGet("role/{role}")]
+    [Authorize(Policy = "IsAdministratorOrAbove")]
     public async Task<IActionResult> GetByRole(string role)
     {
         try

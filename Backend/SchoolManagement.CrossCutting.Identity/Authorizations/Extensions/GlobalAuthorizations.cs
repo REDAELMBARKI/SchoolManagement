@@ -26,26 +26,30 @@ public static class AuthorizationExtensions
 
     private static void AddGlobalRolesPolicies(AuthorizationOptions options)
     {
-        options.AddPolicy("SuperAdminOnly", policy =>
+        options.AddPolicy("IsSuperAdmin", policy =>
         {
             policy.RequireRole("SuperAdmin");
         });
 
-
-        options.AddPolicy("Admin", policy =>
+        options.AddPolicy("IsDirector", policy =>
         {
-            policy.RequireRole("Admin");
+            policy.RequireRole("Director");
         });
 
-        options.AddPolicy("Teacher", policy =>
+        options.AddPolicy("IsAdministrator", policy =>
+        {
+            policy.RequireRole("Administrator");
+        });
+
+        options.AddPolicy("IsTeacher", policy =>
         {
             policy.RequireRole("Teacher");
         });
 
 
-        options.AddPolicy("FrontDesk", policy =>
+        options.AddPolicy("IsReceptionist", policy =>
         {
-            policy.RequireRole("FrontDesk");
+            policy.RequireRole("Receptionist");
         });
     }
 

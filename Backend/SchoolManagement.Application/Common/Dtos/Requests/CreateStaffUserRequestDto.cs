@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SchoolManagement.Application.Common.Dtos.Requests;
 
-public class RegisterUserRequestDto
+public class CreateStaffUserRequestDto
 {
     // Authentication fields
     [Required, EmailAddress, MaxLength(255)]

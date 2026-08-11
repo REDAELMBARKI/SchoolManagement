@@ -1,17 +1,25 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SchoolManagement.Application.Common.Interfaces;
 using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Core.Entities;
 using SchoolManagement.Infrastructure.Common.Configurations;
 using SchoolManagement.Infrastructure.Data.Configurations.Entities;
+
 namespace SchoolManagement.Infrastructure.Data;
 
 public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+    private readonly ICurrentUserContext? _currentUserContext;
+
+    public AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUserContext? currentUserContext = null) 
+        : base(options)
+    {
+        _currentUserContext = currentUserContext;
+    }
 
 
     // ── Lookup ──
@@ -86,6 +94,102 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
         //this.IgnoreEntities(modelBuilder);
         this.ApplyEntityConfigurations(modelBuilder);
         this.ApplySoftDeleteFilter(modelBuilder);
+        this.ApplyBranchIsolationFilter(modelBuilder);
+    }
+
+    /// <summary>
+    /// Applies global query filter for branch-level isolation.
+    /// ALL users (including SuperAdmin) are filtered by their BranchId by default.
+    /// SuperAdmin can bypass this filter using .IgnoreQueryFilters() when needed.
+    /// 
+    /// Usage:
+    /// - Normal query: var students = await _context.Students.ToListAsync(); // Filtered by user's branch
+    /// - SuperAdmin bypass: var students = await _context.Students.IgnoreQueryFilters().ToListAsync(); // See all branches
+    /// </summary>
+    private void ApplyBranchIsolationFilter(ModelBuilder modelBuilder)
+    {
+        // Skip if no current user context (e.g., during migrations)
+        if (_currentUserContext == null)
+            return;
+
+        var userBranchId = _currentUserContext.BranchId;
+
+        // Apply filter to ALL users (including SuperAdmin)
+        // SuperAdmin can explicitly bypass using .IgnoreQueryFilters() when needed
+
+        // People
+        modelBuilder.Entity<DomainUser>().HasQueryFilter(e => 
+            e.BranchId == null || e.BranchId == userBranchId);
+        
+        modelBuilder.Entity<Teacher>().HasQueryFilter(e => 
+            e.BranchId == userBranchId);
+        
+        modelBuilder.Entity<CommercialAgent>().HasQueryFilter(e => 
+            e.BranchId == userBranchId);
+        
+        modelBuilder.Entity<Opc>().HasQueryFilter(e => 
+            e.BranchId == userBranchId);
+
+        // Intakes and Students
+        modelBuilder.Entity<Intake>().HasQueryFilter(e => 
+            e.BranchId == userBranchId);
+        
+        modelBuilder.Entity<Student>().HasQueryFilter(e => 
+            e.BranchId == userBranchId);
+        
+        modelBuilder.Entity<StudentResponsable>().HasQueryFilter(e => 
+            e.BranchId == userBranchId);
+
+        // Physical
+        modelBuilder.Entity<Room>().HasQueryFilter(e => 
+            e.BranchId == userBranchId);
+
+        // Academic
+        modelBuilder.Entity<Group>().HasQueryFilter(e => 
+            e.BranchId == userBranchId);
+        
+        modelBuilder.Entity<Schedule>().HasQueryFilter(e => 
+            e.Group.BranchId == userBranchId);
+
+        // Operations
+        modelBuilder.Entity<Enrollment>().HasQueryFilter(e => 
+            e.Student.BranchId == userBranchId);
+        
+        modelBuilder.Entity<Absence>().HasQueryFilter(e => 
+            e.Student.BranchId == userBranchId);
+        
+        modelBuilder.Entity<Grade>().HasQueryFilter(e => 
+            e.Student.BranchId == userBranchId);
+
+        // Financial
+        modelBuilder.Entity<Payment>().HasQueryFilter(e => 
+            e.Invoice.BranchId == userBranchId);
+        
+        modelBuilder.Entity<Invoice>().HasQueryFilter(e => 
+            e.BranchId == userBranchId);
+        
+        modelBuilder.Entity<Charge>().HasQueryFilter(e => 
+            e.Invoice.BranchId == userBranchId);
+        
+        modelBuilder.Entity<Expense>().HasQueryFilter(e => 
+            e.BranchId == userBranchId);
+        
+        modelBuilder.Entity<PayrollPayment>().HasQueryFilter(e => 
+            e.BranchId == userBranchId);
+        
+        modelBuilder.Entity<Commission>().HasQueryFilter(e => 
+            e.SourceEnrollment != null && e.SourceEnrollment.Student.BranchId == userBranchId);
+        
+        modelBuilder.Entity<Refund>().HasQueryFilter(e => 
+            e.Payment.Invoice.BranchId == userBranchId);
+
+        // WhatsApp Messages
+        modelBuilder.Entity<WhatsAppMessage>().HasQueryFilter(e => 
+            e.BranchId == userBranchId);
+
+        // Audit Logs
+        modelBuilder.Entity<AuditLog>().HasQueryFilter(e => 
+            e.BranchId == userBranchId);
     }
 
 

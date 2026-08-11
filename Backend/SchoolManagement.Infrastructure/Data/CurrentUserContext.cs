@@ -2,74 +2,79 @@ using Microsoft.AspNetCore.Http;
 using SchoolManagement.Application.Common.Interfaces;
 using System.Security.Claims;
 
-namespace SchoolManagement.Infrastructure.Data
+namespace SchoolManagement.Infrastructure.Data;
+
+public class CurrentUserContext : ICurrentUserContext
 {
-    public class CurrentUserContext : ICurrentUserContext
+    private readonly IHttpContextAccessor _httpContext;
+    
+    public Guid BranchId { get; }
+    public string Role { get; }
+    public Guid NameIdentifier { get; }
+
+    public CurrentUserContext(IHttpContextAccessor httpContext)
     {
-        public IHttpContextAccessor _httpContext;
-        public Guid BranchId { get; }
+        _httpContext = httpContext;
+        
+        NameIdentifier = GetNameIdentifier();
+        Role = GetUserRole();
+        BranchId = GetBranchId();
+    }
 
-        public string Role {  get; }
-        public Guid NameIdentifier { get; }
-
-        public CurrentUserContext(IHttpContextAccessor httpContext)
+    private string GetUserRole()
+    {
+        var userRole = _httpContext.HttpContext?.User.FindFirstValue(ClaimTypes.Role);
+        
+        if (string.IsNullOrEmpty(userRole))
         {
-            _httpContext = httpContext;
-            var userIdString = GetNameIdentifier();
-            var branchIdString = GetBranchId();
-            var userRole = GetUserRole();
-            NameIdentifier = userIdString;
-            BranchId = branchIdString;
+            throw new InvalidOperationException("User Role is missing from the user context");
         }
 
-        private string  GetUserRole()
-        {
-            var userRole = _httpContext.HttpContext?.User.FindFirstValue(ClaimTypes.Role);
-            if(string.IsNullOrEmpty(userRole))
-            {
-                throw new InvalidOperationException("User Role is Missing from the User context");
-            }
+        return userRole;
+    }
 
-            return userRole;
+    private Guid GetNameIdentifier()
+    {
+        var userIdString = _httpContext.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(userIdString))
+        {
+            throw new InvalidOperationException(
+                "NameIdentifier claim is missing from the current user's identity. Check the login/claims setup.");
         }
 
-        private Guid GetNameIdentifier()
+        if (!Guid.TryParse(userIdString, out var userId))
         {
-            var userIdString = _httpContext.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(userIdString))
-            {
-                throw new InvalidOperationException(
-                    "NameIdentifier claim is missing from the current user's identity . check the login/claims setup ");
-            }
-
-            if (!Guid.TryParse(userIdString, out var userId))
-            {
-                throw new InvalidOperationException(
-                    $"NameIdentifier claim value '{userIdString}' is not a valid GUID.");
-            }
-
-            return userId;
+            throw new InvalidOperationException(
+                $"NameIdentifier claim value '{userIdString}' is not a valid GUID.");
         }
 
-        private Guid GetBranchId()
+        return userId;
+    }
+
+    private Guid GetBranchId()
+    {
+        var branchIdString = _httpContext.HttpContext?.User.FindFirstValue("BranchId");
+
+        // SuperAdmin has no BranchId claim - return Guid.Empty
+        if (string.IsNullOrEmpty(branchIdString))
         {
-
-            var branchIdString = _httpContext.HttpContext?.User.FindFirstValue("BranchId");
-
-            if (string.IsNullOrEmpty(branchIdString))
+            // Check if user is SuperAdmin
+            if (Role == "SuperAdmin")
             {
-                throw new InvalidOperationException(
-                    "BranchId claim is missing from the current user's identity . check the login/claims setup ");
+                return Guid.Empty; // SuperAdmin has no branch
             }
 
-            if (!Guid.TryParse(branchIdString, out var branchId))
-            {
-                throw new InvalidOperationException(
-                    $"BranchId claim value '{branchIdString}' is not a valid GUID.");
-            }
-
-            return branchId;
+            throw new InvalidOperationException(
+                "BranchId claim is missing from the current user's identity. Check the login/claims setup.");
         }
+
+        if (!Guid.TryParse(branchIdString, out var branchId))
+        {
+            throw new InvalidOperationException(
+                $"BranchId claim value '{branchIdString}' is not a valid GUID.");
+        }
+
+        return branchId;
     }
 }

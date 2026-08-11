@@ -3,53 +3,52 @@ using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Core.Dtos.Commands;
 using SchoolManagement.Application.Core.Dtos.Requests;
 using SchoolManagement.Application.Core.Interfaces.Services;
-using SchoolManagement.CrossCutting.Identity.Authorizations.Requirements;
 using SchoolManagement.Domain.Common.Exceptions;
-
 
 namespace SchoolManagement.Api.Controllers;
 
 [ApiController]
 [Route("api/intakes")]
+[Authorize]
 public class IntakeController : ControllerBase
 {
-
-
-
     private readonly IIntakeService _intakeService;
     private readonly IAuthorizationService _authorizationService;
-    public IntakeController(IIntakeService intakeService , IAuthorizationService authorizationService)
+
+    public IntakeController(IIntakeService intakeService, IAuthorizationService authorizationService)
     {
         _intakeService = intakeService;
         _authorizationService = authorizationService;
     }
 
-
-
-
     [HttpGet]
+    [Authorize(Policy = "IsReceptionistOrAbove")]
     public async Task<IActionResult> GetAll()
     {
         var intakes = await _intakeService.GetAllIntakesAsync();
         return Ok(intakes);
     }
 
-
-
-
     [HttpGet("{id}")]
+    [Authorize(Policy = "IsReceptionistOrAbove")]
     public async Task<IActionResult> GetById(Guid id)
     {
         try
         {
             var intake = await _intakeService.GetIntakeByIdAsync(id);
-            var branchAccessResult = await  _authorizationService.AuthorizeAsync(User , intake?.Branch , new SameBranchRequirement());
-            if (!branchAccessResult.Succeeded)
-            {
-                return Forbid();
-            }
-            return Ok(intake);
 
+            var branchCheck = await _authorizationService.AuthorizeAsync(
+                User,
+                intake.BranchId,
+                "IsSameBranch"
+            );
+
+            if (!branchCheck.Succeeded)
+            {
+                return NotFound();
+            }
+
+            return Ok(intake);
         }
         catch (NotFoundException)
         {
@@ -65,11 +64,8 @@ public class IntakeController : ControllerBase
         }
     }
 
-
-
-
-
     [HttpPost]
+    [Authorize(Policy = "IsReceptionistOrAbove")]
     public async Task<IActionResult> Add(IntakeRequestDto dto)
     {
         try
@@ -93,6 +89,7 @@ public class IntakeController : ControllerBase
                 TotalFees = dto.TotalFees,
                 AmountPaid = dto.AmountPaid
             };
+
             var newIntake = await _intakeService.AddIntakeAsync(command);
             return CreatedAtAction(nameof(GetById), new { id = newIntake.Id }, newIntake);
         }
@@ -106,13 +103,25 @@ public class IntakeController : ControllerBase
         }
     }
 
-
-
     [HttpPut("{id}")]
+    [Authorize(Policy = "IsReceptionistOrAbove")]
     public async Task<IActionResult> Update(Guid id, IntakeRequestDto dto)
     {
         try
         {
+            var intake = await _intakeService.GetIntakeByIdAsync(id);
+
+            var branchCheck = await _authorizationService.AuthorizeAsync(
+                User,
+                intake.BranchId,
+                "IsSameBranch"
+            );
+
+            if (!branchCheck.Succeeded)
+            {
+                return NotFound();
+            }
+
             var command = new UpdateIntakeCommand
             {
                 FirstName = dto.FirstName,
@@ -132,6 +141,7 @@ public class IntakeController : ControllerBase
                 TotalFees = dto.TotalFees,
                 AmountPaid = dto.AmountPaid
             };
+
             await _intakeService.UpdateAsync(id, command);
             return NoContent();
         }
@@ -149,17 +159,25 @@ public class IntakeController : ControllerBase
         }
     }
 
-
-
-
-
-
-
     [HttpDelete("{id}")]
+    [Authorize(Policy = "IsDirectorOrAbove")]
     public async Task<IActionResult> Delete(Guid id)
     {
         try
         {
+            var intake = await _intakeService.GetIntakeByIdAsync(id);
+
+            var branchCheck = await _authorizationService.AuthorizeAsync(
+                User,
+                intake.BranchId,
+                "IsSameBranch"
+            );
+
+            if (!branchCheck.Succeeded)
+            {
+                return NotFound();
+            }
+
             await _intakeService.DeleteIntakeAsync(id);
             return NoContent();
         }
@@ -170,21 +188,10 @@ public class IntakeController : ControllerBase
         catch (Exception)
         {
             return Problem(
-             statusCode: 500,
-             title: "Delete Error",
-             detail: "Failed to delete intake"
+                statusCode: 500,
+                title: "Delete Error",
+                detail: "Failed to delete intake"
             );
         }
     }
-
-
-
-
-
-
-
-
-
-
-
 }

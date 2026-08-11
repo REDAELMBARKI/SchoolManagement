@@ -64,6 +64,7 @@ builder.Services.AddFluentValidationClientsideAdapters();
 
 builder.Services.AddAppAuthorizations();
 builder.Services.AddBranchingAuthorizations();
+builder.Services.AddAccountsAuthorizations();
 
 // add hangfire 
 builder.Services.AddHangfire(config =>
