@@ -5,10 +5,10 @@ namespace SchoolManagement.Application.Common.Interfaces.Queries;
 
 public interface IUserQueryService : IEntityQuery<DomainUser>
 {
-    Task<List<UserResponseDto>> GetAllResponsesAsync();
-    Task<UserResponseDto?> GetResponseByIdAsync(Guid id);
+    Task<List<DomainUserResponseDto>> GetAllResponsesAsync();
+    Task<DomainUserResponseDto?> GetResponseByIdAsync(Guid id);
     Task<DomainUser?> GetByEmailAsync(string email);
     Task<DomainUser?> GetBySlugAsync(string slug);
-    Task<List<UserResponseDto>> GetByBranchIdAsync(Guid branchId);
-    Task<List<UserResponseDto>> GetByRoleAsync(string role);
+    Task<List<DomainUserResponseDto>> GetByBranchIdAsync(Guid branchId);
+    Task<List<DomainUserResponseDto>> GetByRoleAsync(string role);
 }

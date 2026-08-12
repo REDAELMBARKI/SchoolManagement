@@ -3,7 +3,7 @@ namespace SchoolManagement.Application.Core.Interfaces.Services;
 public interface IInvoiceService
 {
     Task<List<InvoiceResponseDto>> GetAllAsync();
-    Task<InvoiceResponseDto?> GetByIdAsync(Guid id);
+    Task<InvoiceResponseDto> GetByIdAsync(Guid id);
     Task<InvoiceResponseDto> CreateAsync(InvoiceCommand command);
     Task<InvoiceResponseDto> UpdateAsync(Guid id, UpdateInvoiceCommand command);
     Task DeleteAsync(Guid id);

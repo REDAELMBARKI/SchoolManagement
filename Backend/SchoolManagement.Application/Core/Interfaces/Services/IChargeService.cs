@@ -9,7 +9,7 @@ namespace SchoolManagement.Application.Core.Interfaces.Services;
 public interface IChargeService
 {
     Task<List<ChargeResponseDto>> GetAllAsync();
-    Task<ChargeResponseDto?> GetByIdAsync(Guid id);
+    Task<ChargeResponseDto> GetByIdAsync(Guid id);
     Task<ChargeResponseDto> CreateAsync(ChargeCommand dto);
     Task<ChargeResponseDto> UpdateAsync(Guid id, UpdateChargeCommand command);
     Task DeleteAsync(Guid id);

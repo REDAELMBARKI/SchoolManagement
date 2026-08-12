@@ -58,9 +58,14 @@ public class EnrollmentService : IEnrollmentService
         return await _queryService.GetAllResponsesAsync();
     }
 
-    public async Task<EnrollmentResponseDto?> GetByIdAsync(Guid id)
+    public async Task<EnrollmentResponseDto> GetByIdAsync(Guid id)
     {
-        return await _queryService.GetResponseByIdAsync(id);
+        var enrollment = await _queryService.GetResponseByIdAsync(id);
+        if (enrollment == null)
+        {
+            throw new NotFoundException($"Enrollment with id '{id}' not found.");
+        }
+        return enrollment;
     }
 
     public async Task<EnrollmentResponseDto> CreateAsync(EnrollmentCommand command)

@@ -70,9 +70,14 @@ public class GroupService : IGroupService
         return GroupMapper.ToResponse(newEntity);
     }
 
-    public async Task<GroupResponseDto?> GetByIdAsync(Guid id)
+    public async Task<GroupResponseDto> GetByIdAsync(Guid id)
     {
-        return await _query.GetResponseByIdAsync(id);
+        var group = await _query.GetResponseByIdAsync(id);
+        if (group == null)
+        {
+            throw new NotFoundException($"Group with ID {id} not found.");
+        }
+        return group;
     }
 
     public async Task<List<GroupResponseDto>> GetAllAsync()
@@ -80,7 +85,7 @@ public class GroupService : IGroupService
         return await _query.GetAllResponsesAsync();
     }
     
-    public async Task<GroupResponseDto?> UpdateAsync(Guid id, UpdateGroupCommand command)
+    public async Task<GroupResponseDto> UpdateAsync(Guid id, UpdateGroupCommand command)
     {
         var branchId = _currentUserContext.BranchId;
         if (branchId == Guid.Empty)

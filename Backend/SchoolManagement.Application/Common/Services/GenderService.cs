@@ -36,10 +36,13 @@ public class GenderService : IGenderService
         return genders.Select(GenderMapper.ToResponse).ToList();
     }
 
-    public async Task<GenderResponseDto?> GetByIdAsync(Guid id)
+    public async Task<GenderResponseDto> GetByIdAsync(Guid id)
     {
         var gender = await _query.GetByIdAsync(id);
-        if (gender == null) return null;
+        if (gender == null)
+        {
+            throw new NotFoundException($"Gender with id '{id}' not found.");
+        }
         return GenderMapper.ToResponse(gender);
     }
 

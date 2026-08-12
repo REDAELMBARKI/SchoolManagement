@@ -39,7 +39,7 @@ public class IntakeController : ControllerBase
 
             var branchCheck = await _authorizationService.AuthorizeAsync(
                 User,
-                intake.BranchId,
+                intake.Branch.Id,
                 "IsSameBranch"
             );
 
@@ -113,7 +113,7 @@ public class IntakeController : ControllerBase
 
             var branchCheck = await _authorizationService.AuthorizeAsync(
                 User,
-                intake.BranchId,
+                intake.Branch.Id,
                 "IsSameBranch"
             );
 
@@ -169,7 +169,7 @@ public class IntakeController : ControllerBase
 
             var branchCheck = await _authorizationService.AuthorizeAsync(
                 User,
-                intake.BranchId,
+                intake.Branch.Id,
                 "IsSameBranch"
             );
 

@@ -49,10 +49,13 @@ public class PaymentService : IPaymentService
         return payments.Select(p => PaymentMapper.ToResponse(p)).ToList();
     }
 
-    public async Task<PaymentResponseDto?> GetByIdAsync(Guid id)
+    public async Task<PaymentResponseDto> GetByIdAsync(Guid id)
     {
         var payment = await _repository.GetByIdAsync(id);
-        if (payment == null) return null;
+        if (payment == null)
+        {
+            throw new NotFoundException($"Payment with id '{id}' not found.");
+        }
         return PaymentMapper.ToResponse(payment);
     }
 

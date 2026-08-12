@@ -8,10 +8,12 @@ namespace SchoolManagement.CrossCutting.Identity.Services;
 public class AuthService : IAuthService
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly SignInManager<ApplicationUser> _signInManager;
 
-    public AuthService(UserManager<ApplicationUser> userManager)
+    public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
     {
         _userManager = userManager;
+        _signInManager = signInManager;
     }
 
     public async Task<string> CreateUserAsync(string email, string password, string role)
@@ -46,7 +48,7 @@ public class AuthService : IAuthService
         return user.Id;
     }
 
-    public async Task<string> AuthenticateAsync(string email, string password)
+    public async Task<string> AuthenticateAsync(string email, string password, bool rememberMe = false)
     {
         var user = await _userManager.FindByEmailAsync(email);
         if (user == null)
@@ -54,13 +56,46 @@ public class AuthService : IAuthService
             throw new Exception("Invalid email or password.");
         }
 
-        var isValid = await _userManager.CheckPasswordAsync(user, password);
-        if (!isValid)
+        if (await _userManager.IsLockedOutAsync(user))
         {
-            throw new Exception("Invalid email or password.");
+            var lockoutEnd = await _userManager.GetLockoutEndDateAsync(user);
+            var remainingMinutes = (lockoutEnd - DateTimeOffset.UtcNow)?.TotalMinutes ?? 0;
+            throw new Exception($"Account is locked. Try again in {Math.Ceiling(remainingMinutes)} minutes.");
         }
 
-        return user.Id;
+        var result = await _signInManager.PasswordSignInAsync(
+            user, 
+            password, 
+            isPersistent: false, 
+            lockoutOnFailure: true
+        );
+
+        if (result.Succeeded)
+        {
+            await _userManager.ResetAccessFailedCountAsync(user);
+            return user.Id;
+        }
+
+        if (result.IsLockedOut)
+        {
+            throw new Exception("Account locked due to multiple failed login attempts. Please try again in 15 minutes.");
+        }
+
+        if (result.IsNotAllowed)
+        {
+            throw new Exception("Account is not allowed to sign in. Please confirm your email.");
+        }
+
+        var failedAttempts = await _userManager.GetAccessFailedCountAsync(user);
+        var maxAttempts = _userManager.Options.Lockout.MaxFailedAccessAttempts;
+        var attemptsRemaining = maxAttempts - failedAttempts;
+
+        if (attemptsRemaining > 0)
+        {
+            throw new Exception($"Invalid email or password. {attemptsRemaining} attempts remaining before account lockout.");
+        }
+
+        throw new Exception("Invalid email or password.");
     }
 
     public async Task AssignRoleAsync(string applicationUserId, string role)
@@ -275,5 +310,15 @@ public class AuthService : IAuthService
     {
         var user = await _userManager.FindByEmailAsync(email);
         return user?.Id;
+    }
+
+    public async Task<ApplicationUser> GetApplicationUserAsync(string applicationUserId)
+    {
+        var user = await _userManager.FindByIdAsync(applicationUserId);
+        if (user == null)
+        {
+            throw new Exception("User not found.");
+        }
+        return user;
     }
 }

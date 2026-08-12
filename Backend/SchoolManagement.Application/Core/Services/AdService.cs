@@ -38,10 +38,13 @@ public class AdService : IAdService
         return ads.Select(AdMapper.ToResponse).ToList();
     }
 
-    public async Task<AdResponseDto?> GetByIdAsync(Guid id)
+    public async Task<AdResponseDto> GetByIdAsync(Guid id)
     {
         var ad = await _query.GetByIdAsync(id);
-        if (ad == null) return null;
+        if (ad == null)
+        {
+            throw new NotFoundException($"Ad with id '{id}' not found.");
+        }
         return AdMapper.ToResponse(ad);
     }
 

@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Common.Dtos.Commands;
 using SchoolManagement.Application.Common.Dtos.Requests;
 using SchoolManagement.Application.Common.Interfaces.Services;
+using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
+using System.Security.Claims;
 
 namespace SchoolManagement.Api.Controllers;
 
@@ -14,11 +16,16 @@ public class DomainUserController : ControllerBase
 {
     private readonly IDomainUserService _service;
     private readonly IAuthorizationService _authorizationService;
+    private readonly IAuditLogService _auditLogService;
 
-    public DomainUserController(IDomainUserService service, IAuthorizationService authorizationService)
+    public DomainUserController(
+        IDomainUserService service, 
+        IAuthorizationService authorizationService,
+        IAuditLogService auditLogService)
     {
         _service = service;
         _authorizationService = authorizationService;
+        _auditLogService = auditLogService;
     }
 
     [HttpGet]
@@ -45,6 +52,18 @@ public class DomainUserController : ControllerBase
 
             if (!branchCheck.Succeeded)
             {
+                var currentUserBranchId = User.FindFirst("BranchId")?.Value;
+                await _auditLogService.StoreAsync(
+                    action: AuditLog.UnauthorizedBranchAccessAction(),
+                    entityName: "DomainUser",
+                    entityId: id,
+                    branchId: Guid.TryParse(currentUserBranchId, out var bid) ? bid : Guid.Empty,
+                    newValues: new { AttemptedBranchId = result.BranchId },
+                    message: $"Unauthorized cross-branch access attempt to user {id}",
+                    severity: AuditLog.SeverityHigh,
+                    category: AuditLog.CategorySecurity
+                );
+
                 return NotFound();
             }
 

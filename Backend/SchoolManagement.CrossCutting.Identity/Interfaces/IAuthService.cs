@@ -1,3 +1,4 @@
+using SchoolManagement.Domain.Common.Entities;
 using System.Security.Claims;
 
 namespace SchoolManagement.CrossCutting.Identity.Interfaces;
@@ -6,7 +7,7 @@ public interface IAuthService
 {
     // User Creation & Authentication
     Task<string> CreateUserAsync(string email, string password, string role);
-    Task<string> AuthenticateAsync(string email, string password);
+    Task<string> AuthenticateAsync(string email, string password, bool rememberMe = false);
     
     // Role Management
     Task AssignRoleAsync(string applicationUserId, string role);
@@ -31,6 +32,7 @@ public interface IAuthService
     // User Queries
     Task<bool> UserExistsAsync(string email);
     Task<string?> GetUserIdByEmailAsync(string email);
+    Task<ApplicationUser> GetApplicationUserAsync(string applicationUserId);
 }
 
 public class ClaimDto

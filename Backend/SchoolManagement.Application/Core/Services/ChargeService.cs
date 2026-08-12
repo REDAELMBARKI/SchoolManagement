@@ -38,10 +38,13 @@ public class ChargeService : IChargeService
         return charges.Select(ChargeMapper.ToResponse).ToList();
     }
 
-    public async Task<ChargeResponseDto?> GetByIdAsync(Guid id)
+    public async Task<ChargeResponseDto> GetByIdAsync(Guid id)
     {
         var charge = await _queryService.GetByIdAsync(id);
-        if (charge == null) return null;
+        if (charge == null)
+        {
+            throw new NotFoundException($"Charge with id '{id}' not found.");
+        }
         return ChargeMapper.ToResponse(charge);
     }
 

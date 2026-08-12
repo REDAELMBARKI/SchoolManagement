@@ -27,23 +27,22 @@ public class AuditLogService : IAuditLogService
         string action,
         string entityName,
         Guid entityId,
-        Guid branchId,  // REQUIRED - tracks where the change happened (affected entity's branch)
+        Guid branchId,
         object? oldValues = null,
         object? newValues = null,
         string? message = null,
         object? additionalData = null,
+        string? ipAddress = null,
+        string? userAgent = null,
+        string? severity = null,
+        string? category = null,
         CancellationToken cancellationToken = default)
     {
-        // Skip audit log if branchId is empty
-        if (branchId == Guid.Empty)
-        {
-            return;
-        }
-
         var httpContext = _httpContextAccessor.HttpContext;
         var changedBy = httpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
         var hasRole = httpContext?.User.FindFirstValue(ClaimTypes.Role);
 
+        // AuditLog.Create handles the Guid.Empty → SYSTEM_BRANCH_ID fallback
         var auditLog = AuditLog.Create(
             entityName: entityName,
             entityId: entityId,
@@ -52,10 +51,14 @@ public class AuditLogService : IAuditLogService
             newValues: Serialize(newValues),
             changedBy: changedBy,
             hasRole: hasRole,
-            branchId: branchId,
+            branchId: branchId, // Fallback handled in entity
             additionalData: Serialize(additionalData),
-            message: message
-            );
+            message: message,
+            ipAddress: ipAddress ?? httpContext?.Connection.RemoteIpAddress?.ToString(),
+            userAgent: userAgent ?? httpContext?.Request.Headers["User-Agent"].ToString(),
+            severity: severity,
+            category: category
+        );
 
         await _context.AuditLogs.AddAsync(auditLog, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);

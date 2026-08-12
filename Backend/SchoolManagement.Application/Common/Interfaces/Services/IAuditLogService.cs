@@ -6,10 +6,14 @@ public interface IAuditLogService
         string action,
         string entityName,
         Guid entityId,
-        Guid branchId,  // REQUIRED - tracks the affected entity's branch (where changes happen)
+        Guid branchId,
         object? oldValues = null,
         object? newValues = null,
         string? message = null,
         object? additionalInfo = null,
+        string? ipAddress = null,
+        string? userAgent = null,
+        string? severity = null,
+        string? category = null,
         CancellationToken cancellationToken = default);
 }

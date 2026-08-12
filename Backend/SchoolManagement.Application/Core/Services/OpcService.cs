@@ -38,10 +38,13 @@ public class OpcService : IOpcService
         return opcs.Select(OpcMapper.ToResponse).ToList();
     }
 
-    public async Task<OpcResponseDto?> GetByIdAsync(Guid id)
+    public async Task<OpcResponseDto> GetByIdAsync(Guid id)
     {
         var opc = await _query.GetByIdAsync(id);
-        if (opc == null) return null;
+        if (opc == null)
+        {
+            throw new NotFoundException($"OPC with id '{id}' not found.");
+        }
         return OpcMapper.ToResponse(opc);
     }
 

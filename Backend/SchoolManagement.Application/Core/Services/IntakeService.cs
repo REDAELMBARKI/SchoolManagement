@@ -34,9 +34,14 @@ public class IntakeService : IIntakeService
         return await _query.GetAllResponsesAsync();
     }
 
-    public async Task<IntakeResponseDto?> GetIntakeByIdAsync(Guid id)
+    public async Task<IntakeResponseDto> GetIntakeByIdAsync(Guid id)
     {
-        return await _query.GetResponseByIdAsync(id);
+        var intake = await _query.GetResponseByIdAsync(id);
+        if (intake == null)
+        {
+            throw new NotFoundException($"Intake with id '{id}' not found.");
+        }
+        return intake;
     }
 
     public async Task<IntakeResponseDto> AddIntakeAsync(IntakeCommand command)
@@ -62,7 +67,7 @@ public class IntakeService : IIntakeService
         return IntakeMapper.ToResponse(newEntity);
     }
 
-    public async Task<IntakeResponseDto?> UpdateAsync(Guid id, UpdateIntakeCommand command)
+    public async Task<IntakeResponseDto> UpdateAsync(Guid id, UpdateIntakeCommand command)
     {
         var branchId = _currentUserContext.BranchId;
         if (branchId == Guid.Empty)

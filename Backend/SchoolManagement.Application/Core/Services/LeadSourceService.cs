@@ -37,10 +37,13 @@ public class LeadSourceService : ILeadSourceService
         return leadSources.Select(LeadSourceMapper.ToResponse).ToList();
     }
 
-    public async Task<LeadSourceResponseDto?> GetByIdAsync(Guid id)
+    public async Task<LeadSourceResponseDto> GetByIdAsync(Guid id)
     {
         var leadSource = await _query.GetByIdAsync(id);
-        if (leadSource == null) return null;
+        if (leadSource == null)
+        {
+            throw new NotFoundException($"LeadSource with id '{id}' not found.");
+        }
         return LeadSourceMapper.ToResponse(leadSource);
     }
 

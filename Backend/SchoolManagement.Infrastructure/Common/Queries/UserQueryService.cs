@@ -69,7 +69,7 @@ public class UserQueryService : IUserQueryService
         return await query.AnyAsync();
     }
 
-    public async Task<List<UserResponseDto>> GetAllResponsesAsync()
+    public async Task<List<DomainUserResponseDto>> GetAllResponsesAsync()
     {
         var users = await GetAllAsync();
         return users.Select(u => UserMapper.ToResponse(
@@ -79,7 +79,7 @@ public class UserQueryService : IUserQueryService
         )).ToList();
     }
 
-    public async Task<UserResponseDto?> GetResponseByIdAsync(Guid id)
+    public async Task<DomainUserResponseDto?> GetResponseByIdAsync(Guid id)
     {
         var user = await GetByIdAsync(id);
         if (user == null) return null;
@@ -123,12 +123,12 @@ public class UserQueryService : IUserQueryService
         return await query.FirstOrDefaultAsync();
     }
 
-    public async Task<List<UserResponseDto>> GetByBranchIdAsync(Guid branchId)
+    public async Task<List<DomainUserResponseDto>> GetByBranchIdAsync(Guid branchId)
     {
         // Only SuperAdmin can query other branches
         if (_currentUserContext.BranchId != Guid.Empty && _currentUserContext.BranchId != branchId)
         {
-            return new List<UserResponseDto>();  // Forbidden
+            return new List<DomainUserResponseDto>();  // Forbidden
         }
 
         var users = await _context.Set<DomainUser>()
@@ -145,7 +145,7 @@ public class UserQueryService : IUserQueryService
         )).ToList();
     }
 
-    public async Task<List<UserResponseDto>> GetByRoleAsync(string role)
+    public async Task<List<DomainUserResponseDto>> GetByRoleAsync(string role)
     {
         var query = _context.Set<DomainUser>()
             .Include(u => u.Branch)

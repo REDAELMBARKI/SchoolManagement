@@ -22,9 +22,9 @@ public static class UserMapper
         );
     }
 
-    public static UserResponseDto ToResponse(DomainUser user, string? branchName = null, string? genderName = null)
+    public static DomainUserResponseDto ToResponse(DomainUser user, string? branchName = null, string? genderName = null)
     {
-        return new UserResponseDto
+        return new DomainUserResponseDto
         {
             Id = user.Id,
             FirstName = user.FirstName,

@@ -1,6 +1,6 @@
 namespace SchoolManagement.Application.Common.Dtos.Responses;
 
-public class UserResponseDto
+public class DomainUserResponseDto
 {
     public Guid Id { get; set; }
     public string FirstName { get; set; } = string.Empty;

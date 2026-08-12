@@ -30,6 +30,11 @@ public class Commission : AggregateRoot
     
     public DateOnly PeriodMonth { get; private set; }
     public CommissionStatus Status { get; private set; } = CommissionStatus.Approved;
+    
+    /// <summary>
+    /// Branch ID for multi-tenant filtering and reporting.
+    /// </summary>
+    public Guid BranchId { get; private set; }
 
     /// <summary>
     /// Optional FK to CommissionTier for traceability and reporting.
@@ -72,7 +77,7 @@ public class Commission : AggregateRoot
     /// enrollment is active so the commission is earned right away.
     /// CommissionTierId is null for OPC commissions (no tier system).
     /// </summary>
-    public static Commission CreateForOpc(Guid opcId, decimal amount, DateOnly periodMonth, Guid enrollmentId)
+    public static Commission CreateForOpc(Guid opcId, decimal amount, DateOnly periodMonth, Guid enrollmentId, Guid branchId)
     {
         if (opcId == Guid.Empty)
             throw new DomainException("OPC ID must not be empty.");
@@ -80,6 +85,8 @@ public class Commission : AggregateRoot
             throw new DomainException("Commission amount must be greater than zero.");
         if (enrollmentId == Guid.Empty)
             throw new DomainException("Enrollment ID must not be empty.");
+        if (branchId == Guid.Empty)
+            throw new DomainException("Branch ID must not be empty.");
 
         return new Commission
         {
@@ -89,7 +96,8 @@ public class Commission : AggregateRoot
             PeriodMonth = periodMonth,
             Status = CommissionStatus.Approved,
             SourceEnrollmentId = enrollmentId,
-            CommissionTierId = null // OPC commissions don't use tiers
+            CommissionTierId = null, // OPC commissions don't use tiers
+            BranchId = branchId
         };
     }
 
@@ -103,7 +111,8 @@ public class Commission : AggregateRoot
         decimal amount,
         DateOnly periodMonth,
         int salesCount,
-        Guid commissionTierId)
+        Guid commissionTierId,
+        Guid branchId)
     {
         if (agentId == Guid.Empty)
             throw new DomainException("Agent ID must not be empty.");
@@ -113,6 +122,8 @@ public class Commission : AggregateRoot
             throw new DomainException("Sales count must be greater than zero.");
         if (commissionTierId == Guid.Empty)
             throw new DomainException("CommissionTierId is required for Commercial Agent commissions.");
+        if (branchId == Guid.Empty)
+            throw new DomainException("Branch ID must not be empty.");
 
         return new Commission
         {
@@ -122,7 +133,8 @@ public class Commission : AggregateRoot
             PeriodMonth = periodMonth,
             Status = CommissionStatus.Approved,
             SalesCountAtCalculation = salesCount,
-            CommissionTierId = commissionTierId
+            CommissionTierId = commissionTierId,
+            BranchId = branchId
         };
     }
 

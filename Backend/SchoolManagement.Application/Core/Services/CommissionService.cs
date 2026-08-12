@@ -69,7 +69,8 @@ public class CommissionService : ICommissionService
             opcId: opcId,
             amount: _settings.OpcFlatAmount,
             periodMonth: periodMonth,
-            enrollmentId: enrollmentId);
+            enrollmentId: enrollmentId,
+            branchId: intake.BranchId);
 
         await _repository.AddAsync(commission);
 
@@ -77,7 +78,7 @@ public class CommissionService : ICommissionService
             action: AuditLog.CreateAction(),
             entityName: nameof(Commission),
             entityId: commission.Id,
-            branchId: Guid.Empty,
+            branchId: intake.BranchId,
             newValues: CreateAuditSnapshot(commission),
             message: $"OPC commission created (Approved) for enrollment {enrollmentId}");
     }
@@ -112,7 +113,8 @@ public class CommissionService : ICommissionService
                 amount: tier.Amount,
                 periodMonth: periodMonth,
                 salesCount: salesCount,
-                commissionTierId: tier.Id);
+                commissionTierId: tier.Id,
+                branchId: agent.BranchId);
 
             await _repository.AddAsync(commission);
 
@@ -120,7 +122,7 @@ public class CommissionService : ICommissionService
                 action: AuditLog.CreateAction(),
                 entityName: nameof(Commission),
                 entityId: commission.Id,
-                branchId: Guid.Empty,
+                branchId: agent.BranchId,
                 newValues: CreateAuditSnapshot(commission),
                 message: $"Agent commission created for agent {agent.Id}, period {periodMonth:yyyy-MM}, {salesCount} sales, tier {tier.MinSalesCount}-{tier.MaxSalesCount?.ToString() ?? "∞"}");
         }

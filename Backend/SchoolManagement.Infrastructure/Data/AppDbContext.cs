@@ -28,6 +28,9 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
     public DbSet<Level> Levels { get; set; }
     public DbSet<Subject> Subjects { get; set; }
 
+    // ── Authentication ──
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
+
     // ── Platforms and Ads ──
     public DbSet<Platform> Platforms { get; set; }
     public DbSet<Ad> Ads { get; set; }
@@ -163,7 +166,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
 
         // Financial
         modelBuilder.Entity<Payment>().HasQueryFilter(e => 
-            e.Invoice.BranchId == userBranchId);
+            e.BranchId == userBranchId);
         
         modelBuilder.Entity<Invoice>().HasQueryFilter(e => 
             e.BranchId == userBranchId);
@@ -178,18 +181,18 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
             e.BranchId == userBranchId);
         
         modelBuilder.Entity<Commission>().HasQueryFilter(e => 
-            e.SourceEnrollment != null && e.SourceEnrollment.Student.BranchId == userBranchId);
+            e.BranchId == userBranchId);
         
         modelBuilder.Entity<Refund>().HasQueryFilter(e => 
-            e.Payment.Invoice.BranchId == userBranchId);
+            e.BranchId == userBranchId);
 
         // WhatsApp Messages
         modelBuilder.Entity<WhatsAppMessage>().HasQueryFilter(e => 
             e.BranchId == userBranchId);
 
-        // Audit Logs
+        // Audit Logs - Include user's branch logs AND global system logs
         modelBuilder.Entity<AuditLog>().HasQueryFilter(e => 
-            e.BranchId == userBranchId);
+            e.BranchId == userBranchId || e.BranchId == AuditLog.SYSTEM_BRANCH_ID);
     }
 
 
@@ -210,6 +213,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
     private void ApplyEntityConfigurations(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new PersonConfiguration());
+        modelBuilder.ApplyConfiguration(new AuditLogConfiguration());
         modelBuilder.ApplyConfiguration(new EmployeeConfigurations());
         modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new IntakeConfiguration());

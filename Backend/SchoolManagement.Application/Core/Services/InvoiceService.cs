@@ -58,10 +58,13 @@ public class InvoiceService : IInvoiceService
         return invoices.Select(InvoiceMapper.ToResponse).ToList();
     }
 
-    public async Task<InvoiceResponseDto?> GetByIdAsync(Guid id)
+    public async Task<InvoiceResponseDto> GetByIdAsync(Guid id)
     {
         var invoice = await _query.GetByIdAsync(id);
-        if (invoice == null) return null;
+        if (invoice == null)
+        {
+            throw new NotFoundException($"Invoice with id '{id}' not found.");
+        }
         return InvoiceMapper.ToResponse(invoice);
     }
 

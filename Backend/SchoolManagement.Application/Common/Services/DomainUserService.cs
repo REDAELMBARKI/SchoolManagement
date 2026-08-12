@@ -30,7 +30,7 @@ public class DomainUserService : IDomainUserService
         _currentUserContext = currentUserContext;
     }
 
-    public async Task<UserResponseDto> CreateAsync(DomainUserCommand command)
+    public async Task<DomainUserResponseDto> CreateAsync(DomainUserCommand command)
     {
         // Validation: BranchId is required (no SuperAdmin creation via API)
         if (command.BranchId == Guid.Empty)
@@ -91,7 +91,7 @@ public class DomainUserService : IDomainUserService
             ?? throw new NotFoundException("User created but not found in query.");
     }
 
-    public async Task<UserResponseDto> UpdateAsync(Guid id, UpdateDomainUserCommand command)
+    public async Task<DomainUserResponseDto> UpdateAsync(Guid id, UpdateDomainUserCommand command)
     {
         var user = await _repository.GetByIdAsync(id);
         if (user == null)
@@ -189,7 +189,7 @@ public class DomainUserService : IDomainUserService
         }
     }
 
-    public async Task<UserResponseDto> GetByIdAsync(Guid id)
+    public async Task<DomainUserResponseDto> GetByIdAsync(Guid id)
     {
         var user = await _queryService.GetResponseByIdAsync(id);
         if (user == null)
@@ -200,12 +200,12 @@ public class DomainUserService : IDomainUserService
         return user;
     }
 
-    public async Task<List<UserResponseDto>> GetAllAsync()
+    public async Task<List<DomainUserResponseDto>> GetAllAsync()
     {
         return await _queryService.GetAllResponsesAsync();
     }
 
-    public async Task<UserResponseDto> AssignBranchAsync(Guid userId, AssignBranchCommand command)
+    public async Task<DomainUserResponseDto> AssignBranchAsync(Guid userId, AssignBranchCommand command)
     {
         // Only SuperAdmin can assign branches
         if (_currentUserContext.Role != "SuperAdmin")
@@ -237,7 +237,7 @@ public class DomainUserService : IDomainUserService
             ?? throw new NotFoundException("User not found after branch assignment.");
     }
 
-    public async Task<UserResponseDto> RemoveBranchAsync(Guid userId)
+    public async Task<DomainUserResponseDto> RemoveBranchAsync(Guid userId)
     {
         // Only SuperAdmin can remove branches (effectively making user SuperAdmin)
         if (_currentUserContext.Role != "SuperAdmin")
@@ -274,7 +274,7 @@ public class DomainUserService : IDomainUserService
             ?? throw new NotFoundException("User not found after branch removal.");
     }
 
-    public async Task<UserResponseDto> ActivateAsync(Guid userId)
+    public async Task<DomainUserResponseDto> ActivateAsync(Guid userId)
     {
         // SuperAdmin or Director (for their branch) can activate users
         var user = await _repository.GetByIdAsync(userId);
@@ -316,7 +316,7 @@ public class DomainUserService : IDomainUserService
             ?? throw new NotFoundException("User not found after activation.");
     }
 
-    public async Task<UserResponseDto> DeactivateAsync(Guid userId)
+    public async Task<DomainUserResponseDto> DeactivateAsync(Guid userId)
     {
         // SuperAdmin or Director (for their branch) can deactivate users
         var user = await _repository.GetByIdAsync(userId);
@@ -358,12 +358,12 @@ public class DomainUserService : IDomainUserService
             ?? throw new NotFoundException("User not found after deactivation.");
     }
 
-    public async Task<List<UserResponseDto>> GetByBranchIdAsync(Guid branchId)
+    public async Task<List<DomainUserResponseDto>> GetByBranchIdAsync(Guid branchId)
     {
         return await _queryService.GetByBranchIdAsync(branchId);
     }
 
-    public async Task<List<UserResponseDto>> GetByRoleAsync(string role)
+    public async Task<List<DomainUserResponseDto>> GetByRoleAsync(string role)
     {
         return await _queryService.GetByRoleAsync(role);
     }
@@ -386,4 +386,20 @@ public class DomainUserService : IDomainUserService
             user.LastActiveAt
         };
     }
+
+
+    public async Task<DomainUserResponseDto> GetByApplicationUserIdAsync(string applicationUserId)
+    {
+        var user = await _repository.GetByApplicationUserIdAsync(applicationUserId);
+        
+        if (user == null)
+        {
+            throw new NotFoundException($"DomainUser with ApplicationUserId '{applicationUserId}' not found.");
+        }
+
+        return UserMapper.ToResponse(user);
+    }
+
 }
+
+  

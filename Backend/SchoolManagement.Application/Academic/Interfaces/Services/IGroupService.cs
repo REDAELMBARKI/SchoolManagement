@@ -9,8 +9,8 @@ namespace SchoolManagement.Application.Academic.Interfaces.Services;
 public interface IGroupService
 {
     Task<GroupResponseDto> CreateAsync(GroupCommand command);
-    Task<GroupResponseDto?> GetByIdAsync(Guid id);
+    Task<GroupResponseDto> GetByIdAsync(Guid id);
     Task<List<GroupResponseDto>> GetAllAsync();
-    Task<GroupResponseDto?> UpdateAsync(Guid id, UpdateGroupCommand command);
+    Task<GroupResponseDto> UpdateAsync(Guid id, UpdateGroupCommand command);
     Task<bool> DeleteAsync(Guid id);
 }

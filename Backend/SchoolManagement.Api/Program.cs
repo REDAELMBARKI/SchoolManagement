@@ -13,6 +13,7 @@ using SchoolManagement.Application.Common.Validators;
 using SchoolManagement.Application.Core.Interfaces.Queries;
 using SchoolManagement.Application.Core.Interfaces.Services;
 using SchoolManagement.Application.Core.Services;
+using SchoolManagement.CrossCutting.Identity.Services;
 using SchoolManagement.Application.Core.Validators;
 using SchoolManagement.Application.Options;
 using SchoolManagement.CrossCutting.Identity.Authorizations.Extensions;
@@ -122,6 +123,10 @@ builder.Services.AddScoped<ITransaction, EfTransaction>();
 builder.Services.AddScoped<ICurrentUserContext, CurrentUserContext>();
 builder.Services.AddScoped<IAuditLogService, AuditLogService>();
 builder.Services.AddScoped<ICommissionRepository, CommissionRepository>();
+
+// JWT & Refresh Token Services
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<ICommissionTierRepository, CommissionTierRepository>();
 builder.Services.AddScoped<ICommissionQueryService, CommissionQueryService>();
 builder.Services.AddScoped<ICommissionService, CommissionService>();

@@ -3,7 +3,7 @@ namespace SchoolManagement.Application.Core.Interfaces.Services;
 public interface IEnrollmentService
 {
     Task<List<EnrollmentResponseDto>> GetAllAsync();
-    Task<EnrollmentResponseDto?> GetByIdAsync(Guid id);
+    Task<EnrollmentResponseDto> GetByIdAsync(Guid id);
     Task<EnrollmentResponseDto> CreateAsync(EnrollmentCommand command);
     Task<EnrollmentResponseDto> UpdateAsync(Guid id, UpdateEnrollmentCommand command);
     Task<EnrollmentResponseDto> DropEnrollmentAsync(DropEnrollmentCommand command);

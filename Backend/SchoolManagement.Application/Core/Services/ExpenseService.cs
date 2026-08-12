@@ -35,10 +35,13 @@ public class ExpenseService : IExpenseService
         return expenses.Select(ExpenseMapper.ToResponse).ToList();
     }
 
-    public async Task<ExpenseResponseDto?> GetByIdAsync(Guid id)
+    public async Task<ExpenseResponseDto> GetByIdAsync(Guid id)
     {
         var expense = await _query.GetByIdAsync(id);
-        if (expense == null) return null;
+        if (expense == null)
+        {
+            throw new NotFoundException($"Expense with id '{id}' not found.");
+        }
         return ExpenseMapper.ToResponse(expense);
     }
 
