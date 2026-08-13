@@ -29,17 +29,17 @@ public class GradeConfiguration : IEntityTypeConfiguration<Grade>
         entityTypeBuilder.HasIndex(g => g.GroupTeacherId);
         entityTypeBuilder.HasIndex(g => g.BranchId);
 
-        // Grade → Student relationship (FIXED: Use Restrict to avoid cascade cycles)
+        // Grade → Student relationship (FIXED: Use NoAction to avoid cascade cycles)
         entityTypeBuilder.HasOne(g => g.Student)
             .WithMany()
             .HasForeignKey(g => g.StudentId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
 
 
-        // Grade → Branch relationship (FIXED: Use Restrict to avoid cascade cycles)
+        // Grade → Branch relationship (FIXED: Use NoAction to avoid cascade cycles)
         entityTypeBuilder.HasOne(g => g.Branch)
             .WithMany()
             .HasForeignKey(g => g.BranchId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

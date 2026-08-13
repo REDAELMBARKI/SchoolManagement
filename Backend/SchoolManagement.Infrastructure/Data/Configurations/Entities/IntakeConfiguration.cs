@@ -71,8 +71,8 @@ public class IntakeConfiguration : IEntityTypeConfiguration<Intake>
         entityTypeBuilder.Property(i => i.SubjectId)
             .IsRequired();
 
-        entityTypeBuilder.Property(i => i.BranchId)
-            .IsRequired();
+        // BranchId is inherited from Person (non-nullable Guid)
+        // No configuration needed here
 
         // Indexes for performance
         entityTypeBuilder.HasIndex(i => i.Phone);
@@ -82,20 +82,20 @@ public class IntakeConfiguration : IEntityTypeConfiguration<Intake>
 
 
         // relationships
-        // Intake → Subject relationship (FIXED: Use Restrict to avoid cascade cycles)
+        // Intake → Subject relationship (FIXED: Use NoAction to avoid cascade cycles)
 
 
         entityTypeBuilder
         .HasOne(i => i.Gender)
         .WithMany()
         .HasForeignKey(i => i.GenderId)
-        .OnDelete(DeleteBehavior.Restrict);
+        .OnDelete(DeleteBehavior.NoAction);
 
         entityTypeBuilder
         .HasOne(i => i.LeadSource)
         .WithMany(ls => ls.Intakes)
         .HasForeignKey(i => i.LeadSourceId)
-        .OnDelete(DeleteBehavior.Restrict);
+        .OnDelete(DeleteBehavior.NoAction);
 
         //  intake -> branch , branch -> intakes
 
@@ -103,20 +103,20 @@ public class IntakeConfiguration : IEntityTypeConfiguration<Intake>
         .HasOne(i => i.Branch)
         .WithMany()
         .HasForeignKey(i => i.BranchId)
-        .OnDelete(DeleteBehavior.Restrict);
+        .OnDelete(DeleteBehavior.NoAction);
 
 
         entityTypeBuilder
        .HasOne(i => i.Subject)
        .WithMany()
        .HasForeignKey(i => i.SubjectId)
-       .OnDelete(DeleteBehavior.Restrict);
+       .OnDelete(DeleteBehavior.NoAction);
 
 
         entityTypeBuilder
        .HasOne(i => i.CommercialAgent)
        .WithMany()
        .HasForeignKey(i => i.CommercialAgentId)
-       .OnDelete(DeleteBehavior.Restrict);
+       .OnDelete(DeleteBehavior.NoAction);
     }
 }

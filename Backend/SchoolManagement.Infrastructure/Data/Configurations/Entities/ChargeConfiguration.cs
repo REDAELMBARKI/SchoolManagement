@@ -30,9 +30,10 @@ public class ChargeConfiguration : IEntityTypeConfiguration<Charge>
         builder.HasIndex(c => c.InvoiceId)
             .IsUnique();
 
+        // Charge → Invoice: NoAction (Invoice owns the cascade, not Charge)
         builder.HasOne(c => c.Invoice)
             .WithOne(i => i.Charge)
             .HasForeignKey<Charge>(c => c.InvoiceId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

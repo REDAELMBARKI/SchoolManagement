@@ -28,10 +28,6 @@ public class PersonConfiguration : IEntityTypeConfiguration<Person>
         entityTypeBuilder.Property(p => p.GenderId)
             .IsRequired(false);
 
-        // BranchId - required (SuperAdmin uses SYSTEM_BRANCH_ID)
-        entityTypeBuilder.Property(p => p.BranchId)
-            .IsRequired();
-
         // Branch relationship (optional navigation)
         entityTypeBuilder
             .HasOne(p => p.Branch)

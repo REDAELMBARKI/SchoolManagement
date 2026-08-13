@@ -33,9 +33,8 @@ public class DomainUserConfiguration : IEntityTypeConfiguration<DomainUser>
         entityTypeBuilder.Property(u => u.Phone)
             .HasMaxLength(20);
 
-        // BranchId is nullable (NULL for SuperAdmin)
-        entityTypeBuilder.Property(u => u.BranchId)
-            .IsRequired(false);
+        // BranchId is non-nullable Guid (SuperAdmin uses SYSTEM_BRANCH_ID)
+        // No configuration needed - Guid is already non-nullable
 
         // Indexes
         entityTypeBuilder.HasIndex(u => u.ApplicationUserId);
@@ -47,6 +46,6 @@ public class DomainUserConfiguration : IEntityTypeConfiguration<DomainUser>
             .HasOne(u => u.Branch)
             .WithMany()
             .HasForeignKey(u => u.BranchId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

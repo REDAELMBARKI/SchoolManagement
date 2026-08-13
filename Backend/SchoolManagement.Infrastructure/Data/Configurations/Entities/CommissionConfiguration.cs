@@ -39,7 +39,7 @@ public class CommissionConfiguration : IEntityTypeConfiguration<Commission>
         builder.HasOne(c => c.CommissionTier)
             .WithMany()
             .HasForeignKey(c => c.CommissionTierId)
-            .OnDelete(DeleteBehavior.Restrict); // Prevent tier deletion if commissions reference it
+            .OnDelete(DeleteBehavior.NoAction); // Prevent tier deletion if commissions reference it
 
         // OPC fields
         builder.Property(c => c.SourceEnrollmentId)

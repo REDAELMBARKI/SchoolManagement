@@ -35,7 +35,7 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
         entityTypeBuilder.HasOne(e => e.Student)
             .WithMany(s => s.Enrollments)
             .HasForeignKey(e => e.StudentId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
 
         entityTypeBuilder
         .HasOne(e => e.Subject)
@@ -46,12 +46,12 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
         .HasOne(e => e.Branch)
         .WithMany(b => b.Enrollments)
         .HasForeignKey(e => e.BranchId)
-         .OnDelete(DeleteBehavior.Restrict);
+         .OnDelete(DeleteBehavior.NoAction);
 
         entityTypeBuilder
         .HasOne(e => e.Group)
         .WithMany(g => g.Enrollments)
         .HasForeignKey(e => e.GroupId)
-         .OnDelete(DeleteBehavior.Restrict);
+         .OnDelete(DeleteBehavior.NoAction);
     }
 }

@@ -124,15 +124,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
         modelBuilder.Entity<Person>().HasQueryFilter(e => 
             e.BranchId == userBranchId || e.BranchId == Branch.SYSTEM_BRANCH_ID);
 
-        // Intakes and Students
-        modelBuilder.Entity<Intake>().HasQueryFilter(e => 
-            e.BranchId == userBranchId);
-        
-        modelBuilder.Entity<Student>().HasQueryFilter(e => 
-            e.BranchId == userBranchId);
-        
-        modelBuilder.Entity<StudentResponsable>().HasQueryFilter(e => 
-            e.BranchId == userBranchId);
+        // NOTE: Intake, Student, StudentResponsable filters are NOT needed here
+        // They inherit from Person, so the Person filter above automatically applies
 
         // Physical
         modelBuilder.Entity<Room>().HasQueryFilter(e => 
@@ -225,6 +218,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
         modelBuilder.ApplyConfiguration(new LeadSourceConfiguration());
         modelBuilder.ApplyConfiguration(new OpcLeadSourceConfiguration());
         modelBuilder.ApplyConfiguration(new AdLeadSourceConfiguration());
+        modelBuilder.ApplyConfiguration(new AdConfiguration());  // Add Ad configuration
         modelBuilder.ApplyConfiguration(new CommissionConfiguration());
         modelBuilder.ApplyConfiguration(new RefundConfiguration());
         modelBuilder.ApplyConfiguration(new PayrollPaymentConfiguration());

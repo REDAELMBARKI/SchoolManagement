@@ -56,8 +56,8 @@ public class EmployeeConfigurations : IEntityTypeConfiguration<Employee>
             .IsRequired()
             .HasPrecision(18, 2);
 
-        entityTypeBuilder.Property(e => e.BranchId)
-            .IsRequired();
+        // BranchId is inherited from Person (non-nullable Guid)
+        // No configuration needed here
 
         // Indexes
 

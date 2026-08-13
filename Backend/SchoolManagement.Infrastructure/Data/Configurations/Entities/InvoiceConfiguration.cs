@@ -24,17 +24,18 @@ public class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
         builder.HasOne(i => i.Enrollment)
             .WithMany()
             .HasForeignKey(i => i.EnrollmentId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(i => i.Branch)
             .WithMany()
             .HasForeignKey(i => i.BranchId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // Invoice → Charge:.Restrict (when invoice deleted, delete charge)
         builder.HasOne(i => i.Charge)
             .WithOne(c => c.Invoice)
             .HasForeignKey<Charge>(c => c.InvoiceId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(i => i.Payments)
             .WithOne(p => p.Invoice)

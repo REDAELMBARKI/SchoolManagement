@@ -22,12 +22,12 @@ public class EnrollmentPlanConfiguration : IEntityTypeConfiguration<EnrollmentPl
         builder.HasOne(ep => ep.Enrollment)
             .WithMany(e => e.EnrollmentPlans)
             .HasForeignKey(ep => ep.EnrollmentId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasOne(ep => ep.Plan)
             .WithMany()
             .HasForeignKey(ep => ep.PlanId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasIndex(ep => ep.EnrollmentId);
         builder.HasIndex(ep => ep.PlanId);

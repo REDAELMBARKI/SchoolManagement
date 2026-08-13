@@ -15,7 +15,7 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
         builder.HasOne(a => a.Branch)
             .WithMany()
             .HasForeignKey(a => a.BranchId)
-            .OnDelete(DeleteBehavior.Restrict)
+            .OnDelete(DeleteBehavior.NoAction)
             .IsRequired(false);
 
         // Indexes for performance

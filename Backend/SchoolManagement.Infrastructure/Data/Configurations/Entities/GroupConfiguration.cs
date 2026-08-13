@@ -41,18 +41,18 @@ public class GroupConfiguration : IEntityTypeConfiguration<Group>
         entityTypeBuilder.HasOne(g => g.Branch)
             .WithMany()
             .HasForeignKey(g => g.BranchId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
 
-        // Group → Level relationship (FIXED: Use Restrict to avoid cascade cycles)
+        // Group → Level relationship (FIXED: Use NoAction to avoid cascade cycles)
         entityTypeBuilder.HasOne(g => g.Level)
             .WithMany()
             .HasForeignKey(g => g.LevelId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
 
         // Group → Subject relationship (inferred from LanguageId)
         entityTypeBuilder.HasOne(g => g.Subject)
             .WithMany()
             .HasForeignKey(g => g.SubjectId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }
