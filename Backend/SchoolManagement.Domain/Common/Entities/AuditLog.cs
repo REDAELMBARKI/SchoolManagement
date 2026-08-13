@@ -2,9 +2,6 @@ namespace SchoolManagement.Domain.Common.Entities;
 
 public class AuditLog : BaseEntity
 {
-    // Well-known system branch ID for global/non-branch-specific actions
-    public static readonly Guid SYSTEM_BRANCH_ID = Guid.Parse("00000000-0000-0000-0000-000000000001");
-    
     public const string SeverityInfo = "Info";
     public const string SeverityWarning = "Warning";
     public const string SeverityHigh = "High";
@@ -49,7 +46,7 @@ public class AuditLog : BaseEntity
         string? severity = null,
         string? category = null)
     {
-        var effectiveBranchId = branchId == Guid.Empty ? SYSTEM_BRANCH_ID : branchId;
+        var effectiveBranchId = branchId == Guid.Empty ? Branch.SYSTEM_BRANCH_ID : branchId;
 
         return new AuditLog
         {

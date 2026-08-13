@@ -13,8 +13,7 @@ public class DomainUser : Person
     public DateOnly? DateOfBirth { get; private set; }
     
     public bool IsActive { get; private set; } = true;
-    public Guid? BranchId { get; private set; }  // NULLABLE - NULL for SuperAdmin only
-    public Branch? Branch { get; set; }
+    // BranchId and Branch are inherited from Person base class
 
     public DateTime? LastActiveAt { get; private set; }
 
@@ -29,16 +28,19 @@ public class DomainUser : Person
         string? phone,
         DateOnly? dateOfBirth,
         string role,
-        Guid? branchId,
+        Guid branchId,  // Now required (not nullable)
         string applicationUserId)
     {
-        // Validation: SuperAdmin must have NULL BranchId
-        if (role == "SuperAdmin" && branchId.HasValue)
-            throw new DomainException("SuperAdmin cannot be assigned to a branch.");
+        // Validation: SuperAdmin must use SYSTEM_BRANCH_ID (not a real branch)
+        if (role == "SuperAdmin" && branchId != Branch.SYSTEM_BRANCH_ID)
+            throw new DomainException("SuperAdmin must use SYSTEM_BRANCH_ID.");
 
-        // Validation: Non-SuperAdmin must have BranchId
-        if (role != "SuperAdmin" && !branchId.HasValue)
-            throw new DomainException("User must be assigned to a branch.");
+        // Validation: Non-SuperAdmin must have a real BranchId (not SYSTEM_BRANCH_ID)
+        if (role != "SuperAdmin" && branchId == Branch.SYSTEM_BRANCH_ID)
+            throw new DomainException("User must be assigned to a real branch.");
+
+        if (branchId == Guid.Empty)
+            throw new DomainException("Branch ID must not be empty.");
 
         if (string.IsNullOrWhiteSpace(applicationUserId))
             throw new DomainException("Application user ID cannot be empty.");
@@ -54,25 +56,24 @@ public class DomainUser : Person
             Email = !string.IsNullOrWhiteSpace(email) ? new Email(email) : null,
             Phone = phone,
             DateOfBirth = dateOfBirth,
-            IsActive = true,
-            BranchId = branchId
+            IsActive = true
         };
         
-        user.RegisterPerson(firstName, lastName, slug, genderId);
+        user.RegisterPerson(firstName, lastName, slug, genderId, branchId);
         return user;
     }
 
-    public void UpdateBranch(Guid? branchId)
+    public void UpdateBranch(Guid branchId)
     {
-        // SuperAdmin cannot have branch
-        if (Role == "SuperAdmin" && branchId.HasValue)
-            throw new DomainException("SuperAdmin cannot be assigned to a branch.");
+        // SuperAdmin cannot change branch
+        if (Role == "SuperAdmin")
+            throw new DomainException("SuperAdmin cannot change branch (always SYSTEM_BRANCH_ID).");
 
-        // Non-SuperAdmin must have branch
-        if (Role != "SuperAdmin" && !branchId.HasValue)
-            throw new DomainException("User must be assigned to a branch.");
+        // Non-SuperAdmin must have a real branch (not SYSTEM_BRANCH_ID)
+        if (branchId == Guid.Empty || branchId == Branch.SYSTEM_BRANCH_ID)
+            throw new DomainException("User must be assigned to a real branch.");
 
-        BranchId = branchId;
+        UpdateBranchId(branchId);
     }
 
     public void UpdateEmail(string? email)
@@ -98,10 +99,10 @@ public class DomainUser : Person
 
         // If changing to SuperAdmin, remove branch
         if (newRole == "SuperAdmin")
-            BranchId = null;
+            BranchId = Branch.SYSTEM_BRANCH_ID;
 
         // If changing from SuperAdmin to other role, must assign branch later
-        if (Role == "SuperAdmin" && newRole != "SuperAdmin" && !BranchId.HasValue)
+        if (Role == "SuperAdmin" && newRole != "SuperAdmin" && BranchId == Guid.Empty)
             throw new DomainException("Must assign a branch when changing from SuperAdmin to another role.");
 
         Role = newRole;

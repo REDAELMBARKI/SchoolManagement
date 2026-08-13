@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Domain.Core.Entities;
+using SchoolManagement.Domain.Core.Enums;
 using Slugify;
 
 namespace SchoolManagement.Infrastructure.Data.Factories;

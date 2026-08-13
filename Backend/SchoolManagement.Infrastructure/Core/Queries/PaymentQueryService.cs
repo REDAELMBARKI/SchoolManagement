@@ -1,9 +1,10 @@
 using SchoolManagement.Application.Common.Interfaces.Queries;
+using SchoolManagement.Application.Core.Interfaces.Queries;
 using SchoolManagement.Domain.Core.Entities;
 
 namespace SchoolManagement.Infrastructure.Core.Queries
 {
-    internal class PaymentQueryService : IEntityQuery<Payment>
+    public class PaymentQueryService : IPaymentQueryService
     {
         public Task<List<Payment>> GetAllAsync()
         {

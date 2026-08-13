@@ -8,7 +8,7 @@ namespace SchoolManagement.Application.Core.Services;
 /// Pure orchestration service for student registration.
 /// Delegates to existing services: StudentService, EnrollmentService, InvoiceService, PaymentService.
 /// </summary>
-public class StudentRegistrationService
+public class StudentRegistrationService : IStudentRegistrationService
 {
     private readonly IStudentService _studentService;
     private readonly IEnrollmentService _enrollmentService;

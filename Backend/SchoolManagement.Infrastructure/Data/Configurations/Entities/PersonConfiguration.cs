@@ -28,10 +28,22 @@ public class PersonConfiguration : IEntityTypeConfiguration<Person>
         entityTypeBuilder.Property(p => p.GenderId)
             .IsRequired(false);
 
+        // BranchId - required (SuperAdmin uses SYSTEM_BRANCH_ID)
+        entityTypeBuilder.Property(p => p.BranchId)
+            .IsRequired();
+
+        // Branch relationship (optional navigation)
+        entityTypeBuilder
+            .HasOne(p => p.Branch)
+            .WithMany()
+            .HasForeignKey(p => p.BranchId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         // Shared Person indexes
         entityTypeBuilder.HasIndex(p => p.FirstName);
         entityTypeBuilder.HasIndex(p => p.LastName);
         entityTypeBuilder.HasIndex(p => p.Slug);
         entityTypeBuilder.HasIndex(p => p.GenderId);
+        entityTypeBuilder.HasIndex(p => p.BranchId);
     }
 }

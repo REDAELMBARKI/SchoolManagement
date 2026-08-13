@@ -14,13 +14,13 @@ public class Student : Person
 
     // fks
     public Guid? IntakeId { get; private set; }
-    public Guid BranchId { get; private set; }
+    // BranchId is inherited from Person base class
 
     // navigation
     public virtual ICollection<StudentResponsable> StudentResponsables { get; private set; } = new List<StudentResponsable>();
     public virtual ICollection<Enrollment> Enrollments { get; private set; } = new List<Enrollment>();
     public virtual Intake? Intake { get; private set; }
-    public virtual Branch Branch { get; private set; } = null!;
+    // Branch is inherited from Person base class
 
     private Student() { }
 
@@ -54,11 +54,10 @@ public class Student : Person
             Phone = phone,
             DateOfBirth = dateOfBirth,
             IntakeId = intakeId,
-            IsDirectRegistration = isDirectRegistration,
-            BranchId = branchId
+            IsDirectRegistration = isDirectRegistration
         };
 
-        student.RegisterPerson(firstName, lastName, slug, genderId);
+        student.RegisterPerson(firstName, lastName, slug, genderId, branchId);
         return student;
     }
 
@@ -131,12 +130,7 @@ public class Student : Person
         IsDirectRegistration = isDirectRegistration;
     }
 
-    public void UpdateBranchId(Guid branchId)
-    {
-        if (branchId == Guid.Empty)
-            throw new DomainException("Branch ID must not be empty.");
-        BranchId = branchId;
-    }
+    // UpdateBranchId is inherited from Person base class
 
     public void AddCredit(decimal amount)
     {

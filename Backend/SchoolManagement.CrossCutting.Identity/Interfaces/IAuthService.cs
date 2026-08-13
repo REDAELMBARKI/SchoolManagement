@@ -1,3 +1,4 @@
+using SchoolManagement.CrossCutting.Identity.Entities;
 using SchoolManagement.Domain.Common.Entities;
 using System.Security.Claims;
 

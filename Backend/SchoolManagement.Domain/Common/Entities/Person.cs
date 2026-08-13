@@ -9,8 +9,12 @@ public abstract class Person : AggregateRoot
     public string Slug { get; protected set; } = string.Empty;
     public Guid? GenderId { get; protected set; }
     public virtual Gender? Gender { get; protected set; }
+    
+    // Branch isolation - required (use Branch.SYSTEM_BRANCH_ID for SuperAdmin)
+    public Guid BranchId { get; protected set; }
+    public virtual Branch? Branch { get; protected set; }
 
-    protected void RegisterPerson(string firstName, string lastName, string slug, Guid? genderId)
+    protected void RegisterPerson(string firstName, string lastName, string slug, Guid? genderId, Guid branchId)
     {
         if (string.IsNullOrWhiteSpace(firstName))
         {
@@ -24,11 +28,16 @@ public abstract class Person : AggregateRoot
         {
             throw new DomainException("Slug cannot be empty.");
         }
+        if (branchId == Guid.Empty)
+        {
+            throw new DomainException("Branch ID must not be empty.");
+        }
 
         FirstName = firstName;
         LastName = lastName;
         Slug = slug;
         GenderId = genderId;
+        BranchId = branchId;
     }
 
     public void UpdateFirstName(string firstName)
@@ -61,5 +70,14 @@ public abstract class Person : AggregateRoot
     public void UpdateGenderId(Guid? genderId)
     {
         GenderId = genderId;
+    }
+    
+    public void UpdateBranchId(Guid branchId)
+    {
+        if (branchId == Guid.Empty)
+        {
+            throw new DomainException("Branch ID must not be empty.");
+        }
+        BranchId = branchId;
     }
 }

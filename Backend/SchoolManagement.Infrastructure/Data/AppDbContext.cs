@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Application.Common.Interfaces;
+using SchoolManagement.CrossCutting.Identity.Entities;
 using SchoolManagement.Domain.Academic.Entities;
 using SchoolManagement.Domain.Common;
 using SchoolManagement.Domain.Common.Entities;
@@ -117,21 +118,11 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
 
         var userBranchId = _currentUserContext.BranchId;
 
-        // Apply filter to ALL users (including SuperAdmin)
-        // SuperAdmin can explicitly bypass using .IgnoreQueryFilters() when needed
-
-        // People
-        modelBuilder.Entity<DomainUser>().HasQueryFilter(e => 
-            e.BranchId == null || e.BranchId == userBranchId);
-        
-        modelBuilder.Entity<Teacher>().HasQueryFilter(e => 
-            e.BranchId == userBranchId);
-        
-        modelBuilder.Entity<CommercialAgent>().HasQueryFilter(e => 
-            e.BranchId == userBranchId);
-        
-        modelBuilder.Entity<Opc>().HasQueryFilter(e => 
-            e.BranchId == userBranchId);
+        // Apply filter to Person base type - automatically covers ALL derived types
+        // (DomainUser, Employee, Teacher, Opc, CommercialAgent, Intake, Student, StudentResponsable)
+        // SuperAdmin has SYSTEM_BRANCH_ID, so they see everything with .IgnoreQueryFilters()
+        modelBuilder.Entity<Person>().HasQueryFilter(e => 
+            e.BranchId == userBranchId || e.BranchId == Branch.SYSTEM_BRANCH_ID);
 
         // Intakes and Students
         modelBuilder.Entity<Intake>().HasQueryFilter(e => 
@@ -192,7 +183,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
 
         // Audit Logs - Include user's branch logs AND global system logs
         modelBuilder.Entity<AuditLog>().HasQueryFilter(e => 
-            e.BranchId == userBranchId || e.BranchId == AuditLog.SYSTEM_BRANCH_ID);
+            e.BranchId == userBranchId || e.BranchId == Branch.SYSTEM_BRANCH_ID);
     }
 
 
@@ -216,6 +207,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
         modelBuilder.ApplyConfiguration(new AuditLogConfiguration());
         modelBuilder.ApplyConfiguration(new EmployeeConfigurations());
         modelBuilder.ApplyConfiguration(new UserConfiguration());
+        modelBuilder.ApplyConfiguration(new DomainUserConfiguration());
         modelBuilder.ApplyConfiguration(new IntakeConfiguration());
         modelBuilder.ApplyConfiguration(new StudentConfiguration());
         modelBuilder.ApplyConfiguration(new StudentResponsableConfiguration());

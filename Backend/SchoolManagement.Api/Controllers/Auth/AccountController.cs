@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Application.Common.Dtos.Commands;
@@ -9,6 +10,7 @@ using SchoolManagement.CrossCutting.Identity.Services;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
 using SchoolManagement.Domain.Common.Interfaces;
+using SchoolManagement.Api.Services;
 using System.Security.Claims;
 
 namespace SchoolManagement.Api.Controllers.Auth;
@@ -24,6 +26,8 @@ public class AccountController : ControllerBase
     private readonly IAuditLogService _auditLogService;
     private readonly IJwtService _jwtService;
     private readonly IRefreshTokenService _refreshTokenService;
+    private readonly IEmailService _emailService;
+    private readonly IMediator _mediator;
 
     public AccountController(
         IAuthService authService,
@@ -31,7 +35,9 @@ public class AccountController : ControllerBase
         IAuthorizationService authorizationService,
         IAuditLogService auditLogService,
         IJwtService jwtService,
-        IRefreshTokenService refreshTokenService)
+        IRefreshTokenService refreshTokenService,
+        IEmailService emailService,
+        IMediator mediator)
     {
         _authService = authService;
         _authorizationService = authorizationService;
@@ -39,6 +45,8 @@ public class AccountController : ControllerBase
         _auditLogService = auditLogService;
         _jwtService = jwtService;
         _refreshTokenService = refreshTokenService;
+        _emailService = emailService;
+        _mediator = mediator;
     }
 
 
@@ -53,7 +61,20 @@ public class AccountController : ControllerBase
             var applicationUserId = await _authService.CreateUserAsync(
                 email: request.Email,
                 password: request.Password,
-                role: "User" // Default role for public registration
+                role: "User" 
+            );
+
+            // Generate email confirmation token
+            var token = await _authService.GenerateEmailConfirmationTokenAsync(applicationUserId);
+            
+            // Build confirmation URL
+            var confirmUrl = $"{Request.Scheme}://{Request.Host}/confirm-email?token={Uri.EscapeDataString(token)}&userId={applicationUserId}";
+            
+            // CRITICAL EMAIL: Send email confirmation immediately (direct call)
+            await _emailService.SendEmailConfirmationAsync(
+                toEmail: request.Email,
+                userName: request.Email.Split('@')[0],
+                confirmUrl: confirmUrl
             );
 
             return Ok(new
@@ -64,7 +85,8 @@ public class AccountController : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(new { error = ex.Message });
+            // TODO: Log exception details
+            return StatusCode(500, new { error = "An error occurred during registration." });
         }
     }
 
@@ -75,8 +97,8 @@ public class AccountController : ControllerBase
     {
         try
         {
-            // Validation 1: BranchId is required
-            if (!request.BranchId.HasValue || request.BranchId.Value == Guid.Empty)
+            // Validation 1: BranchId is required (SuperAdmin uses SYSTEM_BRANCH_ID, others use real branch)
+            if (request.BranchId == Guid.Empty)
             {
                 return BadRequest(new { error = "BranchId is required for staff user creation." });
             }
@@ -148,7 +170,8 @@ public class AccountController : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(new { error = ex.Message });
+            // TODO: Log exception details
+            return StatusCode(500, new { error = "An error occurred while creating staff user." });
         }
     }
 
@@ -213,6 +236,18 @@ public class AccountController : ControllerBase
             // Set refresh token as httpOnly cookie (most secure)
             SetRefreshTokenCookie(refreshToken, refreshTokenExpiration);
 
+            // Audit log successful login
+            await _auditLogService.StoreAsync(
+                action: "SuccessfulLogin",
+                entityName: "Authentication",
+                entityId: Guid.Empty,
+                branchId: domainUser?.BranchId ?? Guid.Empty, // Falls back to SYSTEM_BRANCH_ID
+                newValues: new { Email = request.Email, RememberMe = request.RememberMe },
+                message: $"Successful login for {request.Email}",
+                severity: AuditLog.SeverityInfo,
+                category: AuditLog.CategorySecurity
+            );
+
             return Ok(new AuthResponseDto
             {
                 AccessToken = accessToken,
@@ -227,7 +262,7 @@ public class AccountController : ControllerBase
                 action: AuditLog.FailedLoginAction(),
                 entityName: "Authentication",
                 entityId: Guid.Empty,
-                branchId: AuditLog.SYSTEM_BRANCH_ID, // Global action - no specific branch
+                branchId: Guid.Empty, // Global action - no specific branch
                 newValues: new { Email = request.Email },
                 message: $"Failed login attempt for {request.Email}",
                 severity: AuditLog.SeverityWarning,
@@ -294,45 +329,75 @@ public class AccountController : ControllerBase
                 request.NewPassword
             );
 
+            // Audit log password change
+            await _auditLogService.StoreAsync(
+                action: "PasswordChanged",
+                entityName: "Authentication",
+                entityId: Guid.Empty,
+                branchId: Guid.Empty, // Falls back to SYSTEM_BRANCH_ID
+                message: $"Password changed for user {request.ApplicationUserId}",
+                severity: AuditLog.SeverityHigh,
+                category: AuditLog.CategorySecurity
+            );
+
             return Ok(new { message = "Password changed successfully" });
         }
         catch (Exception ex)
         {
-            return BadRequest(new { error = ex.Message });
+            // TODO: Log exception details
+            return StatusCode(500, new { error = "An error occurred during password change." });
         }
     }
 
     // POST /api/account/forgot-password - Generate password reset token
     [HttpPost("forgot-password")]
-    [AllowAnonymous] // Public endpoint - user forgot their password
+    [AllowAnonymous]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto request)
     {
         try
         {
             var applicationUserId = await _authService.GetUserIdByEmailAsync(request.Email);
-            if (applicationUserId == null)
+            
+            // Always return success to prevent email enumeration attacks
+            if (applicationUserId != null)
             {
-                return BadRequest(new { error = "User not found" });
+                var token = await _authService.GeneratePasswordResetTokenAsync(applicationUserId);
+                var user = await _authService.GetApplicationUserAsync(applicationUserId);
+                
+                // Build reset URL
+                var resetUrl = $"{Request.Scheme}://{Request.Host}/reset-password?token={Uri.EscapeDataString(token)}&userId={applicationUserId}";
+                
+                // Get request details for security logging
+                var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+                var userAgent = Request.Headers["User-Agent"].ToString();
+                
+                // CRITICAL EMAIL: Send immediately (direct call, user is waiting)
+                await _emailService.SendPasswordResetEmailAsync(
+                    toEmail: request.Email,
+                    userName: user.UserName ?? request.Email.Split('@')[0],
+                    resetUrl: resetUrl,
+                    ipAddress: ipAddress,
+                    userAgent: userAgent
+                );
             }
 
-            var token = await _authService.GeneratePasswordResetTokenAsync(applicationUserId);
-
-            // TODO: Send email with reset token
+            // Return same response regardless of whether user exists
             return Ok(new
             {
-                message = "Password reset token generated. Check your email.",
-                token = token // In production, don't return token - send via email
+                message = "If an account exists with this email, a password reset link has been sent."
             });
         }
         catch (Exception ex)
         {
-            return BadRequest(new { error = ex.Message });
+            // Log the error but don't expose details
+            // TODO: Add logging _logger.LogError(ex, "Error in forgot password");
+            return StatusCode(500, new { error = "An error occurred. Please try again later." });
         }
     }
 
     // POST /api/account/reset-password - Reset password with token
     [HttpPost("reset-password")]
-    [AllowAnonymous] // Public endpoint - user has reset token from email
+    [AllowAnonymous]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordWithTokenRequestDto request)
     {
         try
@@ -347,7 +412,7 @@ public class AccountController : ControllerBase
                 action: AuditLog.PasswordResetAction(),
                 entityName: "Authentication",
                 entityId: Guid.Empty,
-                branchId: AuditLog.SYSTEM_BRANCH_ID, // Global action - no specific branch
+                branchId: Guid.Empty, // Global action - no specific branch
                 message: $"Password reset for user {request.ApplicationUserId}",
                 severity: AuditLog.SeverityHigh,
                 category: AuditLog.CategorySecurity
@@ -369,16 +434,25 @@ public class AccountController : ControllerBase
         try
         {
             await _authService.ConfirmEmailAsync(request.ApplicationUserId, request.Token);
+            
+            // Get user details for welcome email
+            var user = await _authService.GetApplicationUserAsync(request.ApplicationUserId);
+            
+            // CRITICAL EMAIL: Send confirmation immediately (direct call)
+            // This could also be considered non-critical and use an event
+            // For now, direct call to ensure user gets immediate feedback
+            
             return Ok(new { message = "Email confirmed successfully" });
         }
         catch (Exception ex)
         {
-            return BadRequest(new { error = ex.Message });
+            // TODO: Log exception details
+            return StatusCode(500, new { error = "An error occurred during email confirmation." });
         }
     }
 
 
-    [HttpPut("{username}/role")]
+    [HttpPut("{applicationUserId}/role")]
     [Authorize]
     public async Task<IActionResult> ChangeRole(string applicationUserId, [FromBody] ChangeRoleRequestDto request)
     {
@@ -418,27 +492,43 @@ public class AccountController : ControllerBase
             }
 
             // Authorization Check 3: Branch isolation (non-SuperAdmin can only manage same branch)
-            // Get target user's DomainUser to check branch
-            var targetDomainUser = await _domainUserService.GetByApplicationUserIdAsync(applicationUserId);
-
-            var branchCheck = await _authorizationService.AuthorizeAsync(
-                User,
-                targetDomainUser.BranchId,
-                "IsSameBranch"
-            );
-
-            if (!branchCheck.Succeeded)
+            // Get target user's DomainUser to check branch (skip if public user)
+            DomainUserResponseDto? targetDomainUser = null;
+            try
             {
-                return Forbid(); 
+                targetDomainUser = await _domainUserService.GetByApplicationUserIdAsync(applicationUserId);
+            }
+            catch (NotFoundException)
+            {
+                // Public user (no DomainUser) - only SuperAdmin can change their roles
+                var superAdminCheck = await _authorizationService.AuthorizeAsync(User, null, "IsSuperAdmin");
+                if (!superAdminCheck.Succeeded)
+                {
+                    return Forbid();
+                }
+            }
+
+            if (targetDomainUser != null)
+            {
+                var branchCheck = await _authorizationService.AuthorizeAsync(
+                    User,
+                    targetDomainUser.BranchId,
+                    "IsSameBranch"
+                );
+
+                if (!branchCheck.Succeeded)
+                {
+                    return Forbid();
+                }
             }
 
             await _authService.ChangeRoleAsync(applicationUserId, oldRole, request.NewRole);
 
             await _auditLogService.StoreAsync(
                 action: AuditLog.RoleChangedAction(),
-                entityName: "DomainUser",
-                entityId: targetDomainUser.Id,
-                branchId: targetDomainUser.BranchId ?? AuditLog.SYSTEM_BRANCH_ID ,
+                entityName: targetDomainUser != null ? "DomainUser" : "ApplicationUser",
+                entityId: targetDomainUser?.Id ?? Guid.Empty,
+                branchId: targetDomainUser?.BranchId ?? Guid.Empty, // Falls back to SYSTEM_BRANCH_ID
                 oldValues: new { Role = oldRole },
                 newValues: new { Role = request.NewRole },
                 message: $"User role changed from {oldRole} to {request.NewRole}",
@@ -455,7 +545,8 @@ public class AccountController : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(new { error = ex.Message });
+            // TODO: Log exception details
+            return StatusCode(500, new { error = "An error occurred while changing role." });
         }
     }
 
@@ -476,7 +567,8 @@ public class AccountController : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(new { error = ex.Message });
+            // TODO: Log exception details
+            return StatusCode(500, new { error = "An error occurred while adding claim." });
         }
     }
 
@@ -492,7 +584,8 @@ public class AccountController : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(new { error = ex.Message });
+            // TODO: Log exception details
+            return StatusCode(500, new { error = "An error occurred while removing claim." });
         }
     }
 
@@ -520,7 +613,8 @@ public class AccountController : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(new { error = ex.Message });
+            // TODO: Log exception details
+            return StatusCode(500, new { error = "An error occurred while retrieving claims." });
         }
     }
 
@@ -548,7 +642,8 @@ public class AccountController : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(new { error = ex.Message });
+            // TODO: Log exception details
+            return StatusCode(500, new { error = "An error occurred while retrieving roles." });
         }
     }
 
@@ -600,6 +695,28 @@ public class AccountController : ControllerBase
             if (storedToken == null)
             {
                 return Unauthorized(new { error = "Invalid or expired refresh token" });
+            }
+
+            // Security: Check if IP address changed significantly (different IP = potential token theft)
+            if (storedToken.CreatedByIp != ipAddress && storedToken.CreatedByIp != "Unknown" && ipAddress != "Unknown")
+            {
+                // Log suspicious activity
+                await _auditLogService.StoreAsync(
+                    action: "SuspiciousTokenRefresh",
+                    entityName: "RefreshToken",
+                    entityId: storedToken.Id,
+                    branchId: Guid.Empty, // Falls back to SYSTEM_BRANCH_ID
+                    oldValues: new { OriginalIp = storedToken.CreatedByIp },
+                    newValues: new { CurrentIp = ipAddress },
+                    message: $"Refresh token used from different IP. Original: {storedToken.CreatedByIp}, Current: {ipAddress}",
+                    severity: AuditLog.SeverityWarning,
+                    category: AuditLog.CategorySecurity
+                );
+
+                // For now, allow but log. In production, you might want to:
+                // - Revoke token and require re-login
+                // - Send email notification to user
+                // - Require additional verification (2FA)
             }
 
             // Check if user has DomainUser profile (staff) or just ApplicationUser (public)
@@ -656,7 +773,8 @@ public class AccountController : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(new { error = ex.Message });
+            // TODO: Log exception details
+            return StatusCode(500, new { error = "An error occurred while refreshing token." });
         }
     }
 
@@ -697,7 +815,10 @@ public class AccountController : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(new { error = ex.Message });
+            // TODO: Log exception details
+            return StatusCode(500, new { error = "An error occurred while revoking token." });
         }
     }
+
+  
 }

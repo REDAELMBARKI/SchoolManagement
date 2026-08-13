@@ -20,7 +20,7 @@ public class Intake : Person
     public Guid? CommercialAgentId { get; private set; }
     public Guid? LeadSourceId { get; private set; }
     public Guid SubjectId { get; private set; }
-    public Guid BranchId { get; private set; }
+    // BranchId is inherited from Person base class
     public bool IsIndependent { get; private set; } = false;
     public decimal TotalFees { get; private set; }
     public decimal AmountPaid { get; private set; }
@@ -28,7 +28,7 @@ public class Intake : Person
     public virtual LeadSource? LeadSource { get; private set; }
     public virtual CommercialAgent? CommercialAgent { get; private set; }
     public virtual Subject Subject { get; private set; } = null!;
-    public virtual Branch Branch { get; private set; } = null!;
+    // Branch is inherited from Person base class
 
     public virtual ICollection<Student> Students { get; private set; } = new List<Student>();
 
@@ -65,13 +65,12 @@ public class Intake : Person
             CommercialAgentId = commercialAgentId,
             LeadSourceId = leadSourceId,
             SubjectId = subjectId,
-            BranchId = branchId,
             IsIndependent = isIndependent,
             TotalFees = totalFees,
             AmountPaid = amountPaid
         };
 
-        intake.RegisterPerson(firstName, lastName, slug, genderId);
+        intake.RegisterPerson(firstName, lastName, slug, genderId, branchId);
         return intake;
     }
 
@@ -154,14 +153,7 @@ public class Intake : Person
         SubjectId = subjectId;
     }
 
-    public void UpdateBranchId(Guid branchId)
-    {
-        if (branchId == Guid.Empty)
-        {
-            throw new DomainException("Branch ID must not be empty.");
-        }
-        BranchId = branchId;
-    }
+    // UpdateBranchId is inherited from Person base class
 
     public void UpdateIsIndependent(bool isIndependent)
     {

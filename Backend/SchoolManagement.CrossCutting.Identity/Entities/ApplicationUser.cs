@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace SchoolManagement.Domain.Common.Entities
+namespace SchoolManagement.CrossCutting.Identity.Entities
 {
     public  class ApplicationUser : IdentityUser
     {

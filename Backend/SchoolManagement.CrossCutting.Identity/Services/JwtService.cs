@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using SchoolManagement.CrossCutting.Identity.Entities;
 using SchoolManagement.Domain.Common.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;

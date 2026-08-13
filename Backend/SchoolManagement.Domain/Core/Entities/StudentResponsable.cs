@@ -1,5 +1,6 @@
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
+using SchoolManagement.Domain.Core.Enums;
 
 namespace SchoolManagement.Domain.Core.Entities;
 
@@ -8,10 +9,10 @@ public class StudentResponsable : Person
     public string? Email { get; private set; } = string.Empty;
     public string Phone { get; private set; } = string.Empty;
     public RelationshipType Relationship { get; private set; }
-    public Guid BranchId { get; private set; }
+    // BranchId is inherited from Person base class
 
     public virtual ICollection<Student> Students { get; private set; } = new List<Student>();
-    public virtual Branch Branch { get; private set; } = null!;
+    // Branch is inherited from Person base class
 
     private StudentResponsable() { }
 
@@ -30,11 +31,10 @@ public class StudentResponsable : Person
         {
             Email = email,
             Phone = phone,
-            Relationship = relationship,
-            BranchId = branchId
+            Relationship = relationship
         };
 
-        responsable.RegisterPerson(firstName, lastName, slug, genderId);
+        responsable.RegisterPerson(firstName, lastName, slug, genderId, branchId);
         return responsable;
     }
 
@@ -57,22 +57,6 @@ public class StudentResponsable : Person
         Relationship = relationship;
     }
 
-    public void UpdateBranchId(Guid branchId)
-    {
-        if (branchId == Guid.Empty)
-            throw new DomainException("Branch ID must not be empty.");
-        BranchId = branchId;
-    }
+  
 }
 
-public enum RelationshipType
-{
-    Father,
-    Mother,
-    Guardian,
-    Grandfather,
-    Grandmother,
-    Uncle,
-    Aunt,
-    Other
-}

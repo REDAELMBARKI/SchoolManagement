@@ -76,16 +76,12 @@ public class DomainUserService : IDomainUserService
         var domainUser = UserMapper.ToDomain(command);
         await _repository.AddAsync(domainUser);
 
-        // Audit log: Only track if user has a branch (non-SuperAdmin)
-        if (domainUser.BranchId.HasValue && domainUser.BranchId.Value != Guid.Empty)
-        {
-            await _auditLogService.StoreAsync(
+        await _auditLogService.StoreAsync(
                 action: AuditLog.CreateAction(),
                 entityName: "DomainUser",
                 entityId: domainUser.Id,
-                branchId: domainUser.BranchId.Value,
+                branchId: domainUser.BranchId,
                 newValues: CreateAuditSnapshot(domainUser));
-        }
 
         return await _queryService.GetResponseByIdAsync(domainUser.Id) 
             ?? throw new NotFoundException("User created but not found in query.");
@@ -139,17 +135,14 @@ public class DomainUserService : IDomainUserService
 
         await _repository.UpdateAsync(user);
 
-        // Audit log: Only track if user has a branch (non-SuperAdmin)
-        if (user.BranchId.HasValue && user.BranchId.Value != Guid.Empty)
-        {
-            await _auditLogService.StoreAsync(
-                action: AuditLog.UpdateAction(),
-                entityName: "DomainUser",
-                entityId: id,
-                branchId: user.BranchId.Value,
-                oldValues: oldValues,
-                newValues: CreateAuditSnapshot(user));
-        }
+        // Audit log: Track for all users (SuperAdmin uses SYSTEM_BRANCH_ID)
+        await _auditLogService.StoreAsync(
+            action: AuditLog.UpdateAction(),
+            entityName: "DomainUser",
+            entityId: id,
+            branchId: user.BranchId,
+            oldValues: oldValues,
+            newValues: CreateAuditSnapshot(user));
 
         return await _queryService.GetResponseByIdAsync(id) 
             ?? throw new NotFoundException("User not found after update.");
@@ -177,16 +170,13 @@ public class DomainUserService : IDomainUserService
         // Note: ApplicationUser deletion should be handled by AccountController/AuthService
         // This service only handles DomainUser (business layer)
 
-        // Audit log: Only track if user has a branch (non-SuperAdmin)
-        if (user.BranchId.HasValue && user.BranchId.Value != Guid.Empty)
-        {
-            await _auditLogService.StoreAsync(
-                action: AuditLog.DeleteAction(),
-                entityName: "DomainUser",
-                entityId: id,
-                branchId: user.BranchId.Value,
-                oldValues: oldValues);
-        }
+        // Audit log: Track for all users (SuperAdmin uses SYSTEM_BRANCH_ID)
+        await _auditLogService.StoreAsync(
+            action: AuditLog.DeleteAction(),
+            entityName: "DomainUser",
+            entityId: id,
+            branchId: user.BranchId,
+            oldValues: oldValues);
     }
 
     public async Task<DomainUserResponseDto> GetByIdAsync(Guid id)
@@ -239,7 +229,7 @@ public class DomainUserService : IDomainUserService
 
     public async Task<DomainUserResponseDto> RemoveBranchAsync(Guid userId)
     {
-        // Only SuperAdmin can remove branches (effectively making user SuperAdmin)
+        // Only SuperAdmin can remove branches (effectively making user SuperAdmin by setting SYSTEM_BRANCH_ID)
         if (_currentUserContext.Role != "SuperAdmin")
         {
             throw new ForbiddenException("Only SuperAdmin can remove branch assignments.");
@@ -254,21 +244,18 @@ public class DomainUserService : IDomainUserService
         var oldValues = CreateAuditSnapshot(user);
         var oldBranchId = user.BranchId; // Capture before removal
 
-        // Remove branch (set to null) - user becomes SuperAdmin-like
-        user.UpdateBranch(null);
+        // Set branch to SYSTEM_BRANCH_ID - user becomes SuperAdmin-like
+        user.UpdateBranch(Branch.SYSTEM_BRANCH_ID);
         await _repository.UpdateAsync(user);
 
-        // Audit log: Track the branch that was removed (old branch)
-        if (oldBranchId.HasValue && oldBranchId.Value != Guid.Empty)
-        {
-            await _auditLogService.StoreAsync(
-                action: AuditLog.UpdateAction(),
-                entityName: "DomainUser",
-                entityId: userId,
-                branchId: oldBranchId.Value,
-                oldValues: oldValues,
-                newValues: CreateAuditSnapshot(user));
-        }
+        // Audit log: Track the branch change
+        await _auditLogService.StoreAsync(
+            action: AuditLog.UpdateAction(),
+            entityName: "DomainUser",
+            entityId: userId,
+            branchId: oldBranchId,
+            oldValues: oldValues,
+            newValues: CreateAuditSnapshot(user));
 
         return await _queryService.GetResponseByIdAsync(userId) 
             ?? throw new NotFoundException("User not found after branch removal.");
@@ -300,17 +287,14 @@ public class DomainUserService : IDomainUserService
         user.Activate();
         await _repository.UpdateAsync(user);
 
-        // Audit log: Only track if user has a branch (non-SuperAdmin)
-        if (user.BranchId.HasValue && user.BranchId.Value != Guid.Empty)
-        {
-            await _auditLogService.StoreAsync(
-                action: "Activate",
-                entityName: "DomainUser",
-                entityId: userId,
-                branchId: user.BranchId.Value,
-                oldValues: oldValues,
-                newValues: CreateAuditSnapshot(user));
-        }
+        // Audit log: Track for all users (SuperAdmin uses SYSTEM_BRANCH_ID)
+        await _auditLogService.StoreAsync(
+            action: "Activate",
+            entityName: "DomainUser",
+            entityId: userId,
+            branchId: user.BranchId,
+            oldValues: oldValues,
+            newValues: CreateAuditSnapshot(user));
 
         return await _queryService.GetResponseByIdAsync(userId) 
             ?? throw new NotFoundException("User not found after activation.");
@@ -342,17 +326,14 @@ public class DomainUserService : IDomainUserService
         user.Deactivate();
         await _repository.UpdateAsync(user);
 
-        // Audit log: Only track if user has a branch (non-SuperAdmin)
-        if (user.BranchId.HasValue && user.BranchId.Value != Guid.Empty)
-        {
-            await _auditLogService.StoreAsync(
-                action: "Deactivate",
-                entityName: "DomainUser",
-                entityId: userId,
-                branchId: user.BranchId.Value,
-                oldValues: oldValues,
-                newValues: CreateAuditSnapshot(user));
-        }
+        // Audit log: Track for all users (SuperAdmin uses SYSTEM_BRANCH_ID)
+        await _auditLogService.StoreAsync(
+            action: "Deactivate",
+            entityName: "DomainUser",
+            entityId: userId,
+            branchId: user.BranchId,
+            oldValues: oldValues,
+            newValues: CreateAuditSnapshot(user));
 
         return await _queryService.GetResponseByIdAsync(userId) 
             ?? throw new NotFoundException("User not found after deactivation.");

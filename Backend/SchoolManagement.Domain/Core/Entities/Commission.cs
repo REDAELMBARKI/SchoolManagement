@@ -49,7 +49,7 @@ public class Commission : AggregateRoot
     /// Navigation property to the CommissionTier (for EF Core).
     /// NULL for OPC commissions, populated for Agent commissions.
     /// </summary>
-    public CommissionTier? CommissionTier { get; private set; }
+    public virtual CommissionTier? CommissionTier { get; private set; }
 
     /// <summary>
     /// OPC only — the enrollment that triggered this commission.

@@ -208,11 +208,9 @@ public class Schedule : AggregateRoot
 
 
 public class Day : BaseEntity
-
 {
-
     public string Name { get; private set; } = string.Empty;
-    public object OrderIndex { get; set; }
+    public int OrderIndex { get; set; }
 
     private Day() { }
 

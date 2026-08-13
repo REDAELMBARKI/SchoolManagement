@@ -12,11 +12,7 @@ public abstract class Employee : Person
     public DateTime HireDate { get; private set; } = DateTime.UtcNow;
     public decimal Salary { get; private set; }
 
-    // Foreign keys
-    public Guid BranchId { get; private set; }
-
-    // Navigation properties
-    public virtual Branch Branch { get; private set; } = null!;
+    // BranchId and Branch are inherited from Person base class
 
     protected void RegisterEmployee(string firstName, string lastName, string slug, Guid? genderId, string? email, string phone, DateOnly? dateOfBirth, DateTime hireDate, decimal salary, Guid branchId)
     {
@@ -33,13 +29,12 @@ public abstract class Employee : Person
             throw new DomainException("Branch ID must not be empty.");
         }
 
-        RegisterPerson(firstName, lastName, slug, genderId);
+        RegisterPerson(firstName, lastName, slug, genderId, branchId);
         Email = email != null ? new Email(email) : null;
         Phone = phone;
         DateOfBirth = dateOfBirth;
         HireDate = hireDate;
         Salary = salary;
-        BranchId = branchId;
     }
 
     public void UpdateEmail(string? email)
@@ -73,14 +68,5 @@ public abstract class Employee : Person
             throw new DomainException("Salary cannot be negative.");
         }
         Salary = salary;
-    }
-
-    public void UpdateBranchId(Guid branchId)
-    {
-        if (branchId == Guid.Empty)
-        {
-            throw new DomainException("Branch ID must not be empty.");
-        }
-        BranchId = branchId;
     }
 }

@@ -16,9 +16,18 @@ public class CurrentUserContext : ICurrentUserContext
     {
         _httpContext = httpContext;
         
-        NameIdentifier = GetNameIdentifier();
-        Role = GetUserRole();
-        BranchId = GetBranchId();
+        if (_httpContext.HttpContext?.User?.Identity?.IsAuthenticated == true)
+        {
+            NameIdentifier = GetNameIdentifier();
+            Role = GetUserRole();
+            BranchId = GetBranchId();
+        }
+        else
+        {
+            NameIdentifier = Guid.Empty;
+            Role = string.Empty;
+            BranchId = Guid.Empty;
+        }
     }
 
     private string GetUserRole()

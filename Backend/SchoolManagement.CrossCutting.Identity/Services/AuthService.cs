@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using SchoolManagement.CrossCutting.Identity.Entities;
 using SchoolManagement.CrossCutting.Identity.Interfaces;
 using SchoolManagement.Domain.Common.Entities;
 using System.Security.Claims;
@@ -230,12 +231,6 @@ public class AuthService : IAuthService
     public async Task ResetPasswordAsync(string applicationUserId, string newPassword)
     {
         var user = await _userManager.FindByIdAsync(applicationUserId);
-        if (user == null)
-        {
-            throw new Exception("User not found.");
-        }
-
-        // Generate token and reset password
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
         var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
         
