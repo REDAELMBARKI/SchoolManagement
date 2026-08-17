@@ -9,7 +9,7 @@ public class Opc : Employee
     [NotMapped]
     public IEnumerable<Intake> Intakes => LeadSources.SelectMany(ls => ls.Intakes).ToList();
 
-    private Opc() { } // For EF Core
+    protected Opc() { } // For EF Core
 
     public static Opc Register(string firstName, string lastName, string slug, Guid? genderId, string? email, string phone, DateOnly? dateOfBirth, DateTime hireDate, decimal salary, Guid branchId)
     {

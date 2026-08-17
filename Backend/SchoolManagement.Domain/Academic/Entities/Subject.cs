@@ -17,7 +17,7 @@ public class Subject : AggregateRoot
     public virtual ICollection<Teacher> Teachers { get; private set; } = new List<Teacher>();
     public virtual Branch Branch { get; private set; } = null!;
 
-    private Subject() { }
+    protected Subject() { }
 
     public static Subject Create(string name, string slug, string? description, Guid branchId)
     {

@@ -11,7 +11,7 @@ public class Teacher : Employee
     public virtual ICollection<Group> Groups { get; private set; } = new List<Group>();
     public virtual ICollection<TeacherSubject> TeacherSubjects { get; private set; } = new List<TeacherSubject>();
 
-    private Teacher() { } // For EF Core
+    protected Teacher() { } // For EF Core
 
     public static Teacher Register(string firstName, string lastName, string slug, Guid? genderId, string? email, string phone, DateOnly? dateOfBirth, DateTime hireDate, decimal salary, Guid branchId, string specialization)
     {

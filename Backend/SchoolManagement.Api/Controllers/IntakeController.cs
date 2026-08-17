@@ -28,6 +28,21 @@ public class IntakeController : ControllerBase
         var intakes = await _intakeService.GetAllIntakesAsync();
         return Ok(intakes);
     }
+    
+    [HttpGet("debug/raw")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAllRaw()
+    {
+        // Bypass ALL filters for debugging
+        var intakes = await _intakeService.GetAllIntakesIgnoreFiltersAsync();
+        
+        return Ok(new 
+        {
+            Count = intakes.Count(),
+            Message = "This bypasses all filters (soft delete + branch). If Count=0, database is empty.",
+            Data = intakes
+        });
+    }
 
     [HttpGet("{id}")]
     [Authorize(Policy = "IsReceptionistOrAbove")]

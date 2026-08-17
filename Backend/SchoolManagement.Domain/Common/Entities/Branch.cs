@@ -17,7 +17,7 @@ public class Branch : AggregateRoot
 
     public virtual ICollection<Enrollment> Enrollments { get; private set; } = new List<Enrollment>();
 
-    private Branch() { }
+    protected Branch() { }
 
     public static Branch Create(string name, string slug, string city, string address, string? phone)
     {

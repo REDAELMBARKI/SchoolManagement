@@ -21,7 +21,7 @@ public class Media : AggregateRoot
     public Guid BranchId { get; private set; }
     public virtual Branch Branch { get; private set; } = null!;
 
-    private Media() { }
+    protected Media() { }
 
     public static Media Create(string url, string mimeType, long size, string? altText, int? width, int? height, OwnerType ownerType, Guid ownerId, MediaType mediaType, MediaCollection? collection, int order, bool isMain, string storageProvider, Guid branchId)
     {

@@ -16,7 +16,7 @@ public class Plan : AggregateRoot
 
     public virtual Branch Branch { get; private set; } = null!;
 
-    private Plan() { }
+    protected Plan() { }
 
     public decimal Amount => BaseAmount - (DiscountPercent.HasValue ? (BaseAmount * (DiscountPercent.Value / 100)) : 0m);
 

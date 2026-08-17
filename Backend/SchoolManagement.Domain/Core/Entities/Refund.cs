@@ -15,7 +15,7 @@ public class Refund : AggregateRoot
     // Navigation
     public virtual Payment Payment { get; private set; } = null!;
 
-    private Refund() { }
+    protected Refund() { }
 
     public static Refund Create(
         Guid paymentId,

@@ -70,7 +70,7 @@ public class Commission : AggregateRoot
     /// </summary>
     public string? BlockReason { get; private set; }
 
-    private Commission() { }
+    protected Commission() { }
 
     /// <summary>
     /// Creates an OPC commission. Starts as Approved immediately —

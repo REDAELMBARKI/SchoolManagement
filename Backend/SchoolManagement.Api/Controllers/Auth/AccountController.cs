@@ -12,6 +12,8 @@ using SchoolManagement.Domain.Common.Exceptions;
 using SchoolManagement.Domain.Common.Interfaces;
 using SchoolManagement.Api.Services;
 using System.Security.Claims;
+using Serilog;
+using ILogger = Serilog.ILogger;
 
 namespace SchoolManagement.Api.Controllers.Auth;
 
@@ -28,6 +30,8 @@ public class AccountController : ControllerBase
     private readonly IRefreshTokenService _refreshTokenService;
     private readonly IEmailService _emailService;
     private readonly IMediator _mediator;
+    private readonly ILogger _logger;
+    private readonly IConfiguration _configuration;
 
     public AccountController(
         IAuthService authService,
@@ -37,7 +41,8 @@ public class AccountController : ControllerBase
         IJwtService jwtService,
         IRefreshTokenService refreshTokenService,
         IEmailService emailService,
-        IMediator mediator)
+        IMediator mediator,
+        IConfiguration configuration)
     {
         _authService = authService;
         _authorizationService = authorizationService;
@@ -47,6 +52,8 @@ public class AccountController : ControllerBase
         _refreshTokenService = refreshTokenService;
         _emailService = emailService;
         _mediator = mediator;
+        _configuration = configuration;
+        _logger = Log.ForContext<AccountController>();
     }
 
 
@@ -55,8 +62,13 @@ public class AccountController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
     {
+        _logger.Information("=== REGISTRATION ATTEMPT START ===");
+        _logger.Information("Email: {Email}", request.Email);
+        
         try
         {
+            _logger.Information("Step 1: Creating ApplicationUser with role 'User'");
+            
             // Create ApplicationUser with basic "User" role (for students/parents)
             var applicationUserId = await _authService.CreateUserAsync(
                 email: request.Email,
@@ -64,11 +76,20 @@ public class AccountController : ControllerBase
                 role: "User" 
             );
 
+            _logger.Information("Step 1 SUCCESS: ApplicationUser created with ID: {ApplicationUserId}", applicationUserId);
+
+            _logger.Information("Step 2: Generating email confirmation token");
+            
             // Generate email confirmation token
             var token = await _authService.GenerateEmailConfirmationTokenAsync(applicationUserId);
             
-            // Build confirmation URL
-            var confirmUrl = $"{Request.Scheme}://{Request.Host}/confirm-email?token={Uri.EscapeDataString(token)}&userId={applicationUserId}";
+            _logger.Information("Step 2 SUCCESS: Token generated (length: {TokenLength})", token?.Length ?? 0);
+            
+            // Build confirmation URL - points to API endpoint that will handle confirmation
+            var confirmUrl = $"{Request.Scheme}://{Request.Host}/api/account/confirm-email?token={Uri.EscapeDataString(token)}&userId={applicationUserId}";
+            
+            _logger.Information("Step 3: Sending email confirmation to {Email}", request.Email);
+            _logger.Debug("Confirmation URL: {ConfirmUrl}", confirmUrl);
             
             // CRITICAL EMAIL: Send email confirmation immediately (direct call)
             await _emailService.SendEmailConfirmationAsync(
@@ -77,16 +98,47 @@ public class AccountController : ControllerBase
                 confirmUrl: confirmUrl
             );
 
+            _logger.Information("Step 3 SUCCESS: Email sent successfully");
+            _logger.Information("=== REGISTRATION COMPLETED SUCCESSFULLY ===");
+
             return Ok(new
             {
                 message = "Registration successful. Please check your email to confirm your account.",
                 applicationUserId = applicationUserId
             });
         }
+        catch (DomainException dex)
+        {
+            _logger.Warning(dex, "REGISTRATION FAILED - Domain Exception: {Message}", dex.Message);
+            return BadRequest(new { error = dex.Message });
+        }
+        catch (InvalidOperationException iex)
+        {
+            _logger.Error(iex, "REGISTRATION FAILED - Invalid Operation: {Message}", iex.Message);
+            return BadRequest(new { error = iex.Message });
+        }
         catch (Exception ex)
         {
-            // TODO: Log exception details
-            return StatusCode(500, new { error = "An error occurred during registration." });
+            _logger.Error(ex, "REGISTRATION FAILED - Unexpected Error: {Message} | StackTrace: {StackTrace}", 
+                ex.Message, ex.StackTrace);
+            
+            // Log inner exceptions if any
+            var innerEx = ex.InnerException;
+            var depth = 1;
+            while (innerEx != null)
+            {
+                _logger.Error("Inner Exception {Depth}: {Message} | StackTrace: {StackTrace}", 
+                    depth, innerEx.Message, innerEx.StackTrace);
+                innerEx = innerEx.InnerException;
+                depth++;
+            }
+
+
+
+            return StatusCode(500, new { 
+                error = $"Registration failed: {ex.Message}",
+                details = ex.InnerException?.Message 
+            });
         }
     }
 
@@ -262,7 +314,7 @@ public class AccountController : ControllerBase
                 action: AuditLog.FailedLoginAction(),
                 entityName: "Authentication",
                 entityId: Guid.Empty,
-                branchId: Guid.Empty, // Global action - no specific branch
+                branchId: Guid.Empty,
                 newValues: new { Email = request.Email },
                 message: $"Failed login attempt for {request.Email}",
                 severity: AuditLog.SeverityWarning,
@@ -427,27 +479,80 @@ public class AccountController : ControllerBase
     }
 
 
-    [HttpPost("confirm-email")]
+    [HttpGet("confirm-email")]
     [AllowAnonymous]
-    public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailRequestDto request)
+    public async Task<IActionResult> ConfirmEmailGet([FromQuery] string userId, [FromQuery] string token)
     {
+        _logger.Information("=== EMAIL CONFIRMATION ATTEMPT ===");
+        _logger.Information("UserId: {UserId}", userId);
+
         try
         {
-            await _authService.ConfirmEmailAsync(request.ApplicationUserId, request.Token);
+            await _authService.ConfirmEmailAsync(userId, token);
+            _logger.Information("Email confirmed successfully");
+
+            var frontendUrl = _configuration["FrontendUrl"] ?? "https://letsbeus.online";
             
-            // Get user details for welcome email
-            var user = await _authService.GetApplicationUserAsync(request.ApplicationUserId);
-            
-            // CRITICAL EMAIL: Send confirmation immediately (direct call)
-            // This could also be considered non-critical and use an event
-            // For now, direct call to ensure user gets immediate feedback
-            
-            return Ok(new { message = "Email confirmed successfully" });
+            return Redirect($"{frontendUrl}/login?emailConfirmed=true");
         }
         catch (Exception ex)
         {
-            // TODO: Log exception details
-            return StatusCode(500, new { error = "An error occurred during email confirmation." });
+            _logger.Error(ex, "Email confirmation FAILED: {Message}", ex.Message);
+
+            var frontendUrl = _configuration["FrontendUrl"] ?? "https://letsbeus.online";
+            return Redirect($"{frontendUrl}/login?emailConfirmed=false&error={Uri.EscapeDataString(ex.Message)}");
+        }
+    }
+
+    [HttpPost("resend-confirmation-email")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ResendConfirmationEmail([FromBody] ResendConfirmationEmailRequestDto request)
+    {
+        _logger.Information("=== RESEND CONFIRMATION EMAIL REQUEST ===");
+        _logger.Information("Email: {Email}", request.Email);
+
+        try
+        {
+            // Get user by email
+            var applicationUserId = await _authService.GetUserIdByEmailAsync(request.Email);
+
+            if (applicationUserId == null)
+            {
+                // Don't reveal if user exists (security best practice)
+                return Ok(new { message = "If an account exists with this email, a confirmation link has been sent." });
+            }
+
+            var user = await _authService.GetApplicationUserAsync(applicationUserId);
+
+            // Check if email is already confirmed
+            if (user.EmailConfirmed)
+            {
+                return BadRequest(new { error = "Email is already confirmed. You can login now." });
+            }
+
+            // Generate new confirmation token
+            var token = await _authService.GenerateEmailConfirmationTokenAsync(applicationUserId);
+
+            // Build confirmation URL
+            var confirmUrl = $"{Request.Scheme}://{Request.Host}/api/account/confirm-email?token={Uri.EscapeDataString(token)}&userId={applicationUserId}";
+
+            _logger.Information("Resending confirmation email to {Email}", request.Email);
+
+            // Send email
+            await _emailService.SendEmailConfirmationAsync(
+                toEmail: request.Email,
+                userName: user.UserName ?? request.Email.Split('@')[0],
+                confirmUrl: confirmUrl
+            );
+
+            _logger.Information("Confirmation email resent successfully to {Email}", request.Email);
+
+            return Ok(new { message = "If an account exists with this email, a confirmation link has been sent." });
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Failed to resend confirmation email: {Message}", ex.Message);
+            return StatusCode(500, new { error = "An error occurred. Please try again later." });
         }
     }
 

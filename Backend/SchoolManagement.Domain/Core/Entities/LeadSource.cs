@@ -25,7 +25,7 @@ public class OpcLeadSource : LeadSource
     public Guid OpcId { get; private set; }
     public virtual Opc Opc { get; private set; } = null!;
 
-    private OpcLeadSource() { }
+    protected OpcLeadSource() { }
 
     public static OpcLeadSource Create(Guid branchId, Guid opcId)
     {
@@ -54,7 +54,7 @@ public class AdLeadSource : LeadSource
     public Guid AdId { get; private set; }
     public virtual Ad Ad { get; private set; } = null!;
 
-    private AdLeadSource() { }
+    protected AdLeadSource() { }
 
     public static AdLeadSource Create(Guid branchId, Guid adId)
     {

@@ -31,7 +31,7 @@ public class Absence : AggregateRoot
     public virtual Schedule Schedule { get; private set; } = null!;
     public virtual Branch Branch { get; private set; } = null!;
 
-    private Absence() { }
+    protected Absence() { }
 
     public static Absence Create(Guid studentId, Guid scheduleId, Guid branchId, DateTime? date = null, string status = "Absent", bool isJustified = false, string? reason = null)
     {

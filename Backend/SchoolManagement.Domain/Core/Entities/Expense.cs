@@ -24,7 +24,7 @@ public class Expense : AggregateRoot
 
     public virtual Branch Branch { get; private set; } = null!;
 
-    private Expense() { }
+    protected Expense() { }
 
     public static Expense Create(
         ExpenseType category,

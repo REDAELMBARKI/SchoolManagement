@@ -51,7 +51,7 @@ public class AuditLogService : IAuditLogService
             newValues: Serialize(newValues),
             changedBy: changedBy,
             hasRole: hasRole,
-            branchId: branchId, // Fallback handled in entity
+            branchId: branchId,
             additionalData: Serialize(additionalData),
             message: message,
             ipAddress: ipAddress ?? httpContext?.Connection.RemoteIpAddress?.ToString(),

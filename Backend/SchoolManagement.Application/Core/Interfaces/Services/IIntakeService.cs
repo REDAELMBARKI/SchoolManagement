@@ -3,6 +3,7 @@ namespace SchoolManagement.Application.Core.Interfaces.Services;
 public interface IIntakeService
 {
     Task<IEnumerable<IntakeResponseDto>> GetAllIntakesAsync();
+    Task<IEnumerable<IntakeResponseDto>> GetAllIntakesIgnoreFiltersAsync();  // DEBUG
     Task<IntakeResponseDto> GetIntakeByIdAsync(Guid id);
     Task<IntakeResponseDto> AddIntakeAsync(IntakeCommand command);
     Task<IntakeResponseDto> UpdateAsync(Guid id, UpdateIntakeCommand command);

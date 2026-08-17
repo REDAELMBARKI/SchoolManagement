@@ -14,7 +14,7 @@ public class StudentResponsable : Person
     public virtual ICollection<Student> Students { get; private set; } = new List<Student>();
     // Branch is inherited from Person base class
 
-    private StudentResponsable() { }
+    protected StudentResponsable() { }
 
     public static StudentResponsable Register(string firstName, string lastName, string slug, Guid? genderId, string? email, string phone, RelationshipType relationship, Guid branchId)
     {

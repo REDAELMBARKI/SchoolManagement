@@ -13,7 +13,7 @@ public class Room : AggregateRoot
     public Guid BranchId { get; private set; }
     public virtual Branch Branch { get; private set; } = null!;
 
-    private Room() { }
+    protected Room() { }
 
     public static Room Create(string name, int capacity, string? floor, string? description, Guid branchId)
     {

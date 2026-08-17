@@ -29,6 +29,20 @@ public class IntakeQueryService : IIntakeQueryService
             .Include(i => i.Students)
             .ToListAsync();
     }
+    
+    // DEBUG: Get all without filters
+    public async Task<List<Intake>> GetAllIgnoreFiltersAsync()
+    {
+        return await _context.Intakes
+            .IgnoreQueryFilters()  // Bypass all filters
+            .Include(i => i.Gender)
+            .Include(i => i.LeadSource)
+            .Include(i => i.Subject)
+            .Include(i => i.CommercialAgent)
+            .Include(i => i.Branch)
+            .Include(i => i.Students)
+            .ToListAsync();
+    }
 
     public async Task<Intake?> GetByIdAsync(Guid id)
     {

@@ -28,7 +28,7 @@ public class Group : AggregateRoot
     public virtual Subject Subject { get; private set; } = null!;
     public virtual ICollection<Schedule> Schedules { get; private set; } = new List<Schedule>();
 
-    private Group() { } // For EF Core
+    protected Group() { } // For EF Core
 
     public static Group Create(string name, string slug, int capacity, string period, Guid branchId, Guid levelId, Guid subjectId)
     {

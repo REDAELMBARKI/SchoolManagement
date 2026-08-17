@@ -18,7 +18,7 @@ public class Grade : AggregateRoot
     public virtual Branch Branch { get; private set; } = null!;
     public virtual Student Student { get; private set; } = null!;
 
-    private Grade() { }
+    protected Grade() { }
 
     public static Grade Create(string evaluationType, float score, float maxScore, DateTime evaluationDate, string? comment, Guid studentId, Guid groupTeacherId, Guid branchId)
     {

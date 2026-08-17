@@ -45,7 +45,7 @@ public class Schedule : AggregateRoot
 
 
 
-    private Schedule() { }
+    protected Schedule() { }
 
 
 
@@ -212,7 +212,7 @@ public class Day : BaseEntity
     public string Name { get; private set; } = string.Empty;
     public int OrderIndex { get; set; }
 
-    private Day() { }
+    protected Day() { }
 
 
 
@@ -264,7 +264,7 @@ public class TimeSlot : BaseEntity
 
 
 
-    private TimeSlot() { }
+    protected TimeSlot() { }
 
 
 

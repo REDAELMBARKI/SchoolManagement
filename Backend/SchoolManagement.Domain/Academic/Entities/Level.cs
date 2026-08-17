@@ -11,7 +11,7 @@ public class Level : AggregateRoot
     public virtual Branch Branch { get; private set; } = null!;
     public int Order { get; private set; } = 1;
 
-    private Level() { }
+    protected Level() { }
 
     public static Level Create(string name, Guid branchId, int order)
     {

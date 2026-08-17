@@ -27,7 +27,7 @@ public class PayrollPayment : AggregateRoot
     // Navigation
     public virtual Branch Branch { get; private set; } = null!;
 
-    private PayrollPayment() { }
+    protected PayrollPayment() { }
 
     /// <summary>
     /// Creates a pending payroll payment for an employee.

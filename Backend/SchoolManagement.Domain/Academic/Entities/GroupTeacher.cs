@@ -11,7 +11,7 @@ public class GroupTeacher : BaseEntity
     public virtual Teacher Teacher { get; private set; } = null!;
     public virtual Group Group { get; private set; } = null!;
 
-    private GroupTeacher() { }
+    protected GroupTeacher() { }
 
     public static GroupTeacher Create(Guid teacherId, Guid groupId)
     {

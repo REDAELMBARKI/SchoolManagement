@@ -26,9 +26,9 @@ public class AuditLog : BaseEntity
     public string? UserAgent { get; private set; }
     public string? Severity { get; private set; } // Info, Warning, High, Critical
     public string? Category { get; private set; } // Business, Security, Financial
-    public virtual Branch? Branch { get; private set; } // Nullable navigation property (for SYSTEM_BRANCH_ID which won't have actual Branch)
+    public virtual Branch Branch { get; private set; } // Nullable navigation property (for SYSTEM_BRANCH_ID which won't have actual Branch)
 
-    private AuditLog() { }
+    protected AuditLog() { }
 
     public static AuditLog Create(
         string entityName,

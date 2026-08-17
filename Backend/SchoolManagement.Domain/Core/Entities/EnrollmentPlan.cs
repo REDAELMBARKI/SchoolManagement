@@ -11,7 +11,7 @@ public class EnrollmentPlan : BaseEntity
     public virtual Enrollment Enrollment { get; private set; } = null!;
     public virtual Plan Plan { get; private set; } = null!;
 
-    private EnrollmentPlan() { }
+    protected EnrollmentPlan() { }
 
     public static EnrollmentPlan Create(Guid enrollmentId, Guid planId)
     {

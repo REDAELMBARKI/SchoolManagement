@@ -13,7 +13,7 @@ public class Ad : AggregateRoot
     public virtual Branch Branch { get; private set; } = null!;
     public virtual Platform Platform { get; private set; } = null!;
 
-    private Ad() { }
+    protected Ad() { }
 
     public static Ad Create(string name, string slug, Guid platformId, Guid branchId)
     {

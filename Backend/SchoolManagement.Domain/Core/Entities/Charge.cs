@@ -17,7 +17,7 @@ public class Charge : AggregateRoot
     // Navigation property
     public virtual Invoice Invoice { get; private set; } = null!;
 
-    private Charge() { }
+    protected Charge() { }
 
     public static Charge Create(
         Guid invoiceId,

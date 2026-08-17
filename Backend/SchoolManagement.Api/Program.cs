@@ -35,18 +35,40 @@ using SchoolManagement.Infrastructure.Data;
 using SchoolManagement.Infrastructure.Data.Configurations.Extensions;
 using SchoolManagement.Infrastructure.Data.Seeders;
 using Serilog;
+using Serilog.Events;
 using System.Text.Json.Serialization;
 using SchoolManagement.Domain.Common.Entities;
 using Microsoft.AspNetCore.Identity;
 using SchoolManagement.CrossCutting.Identity.Entities;
+using SchoolManagement.Api.Settings;
 
+// Configure Serilog
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Error()
-    .WriteTo.Console(outputTemplate: "[{Level}] {Message}{NewLine}{Exception}{NewLine}")
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+    .MinimumLevel.Override("System", LogEventLevel.Warning)
+    .Enrich.FromLogContext()
+    .Enrich.WithMachineName()
+    .Enrich.WithThreadId()
+    .Enrich.WithEnvironmentName()
+    .WriteTo.Console(
+        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}")
+    .WriteTo.File(
+        path: "logs/log-.txt",
+        rollingInterval: RollingInterval.Day,
+        outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}")
+    .WriteTo.Seq("http://localhost:5341")  // Seq UI - Install: docker run -d --restart unless-stopped --name seq -e ACCEPT_EULA=Y -p 5341:80 datalust/seq:latest
     .CreateLogger();
 
+try
+{
+    Log.Information("=== Starting School Management API ===");
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Use Serilog for logging
+builder.Host.UseSerilog();
 
 
 // auto mapper 
@@ -127,8 +149,8 @@ builder.Services.Configure<SchoolManagement.Application.Common.Settings.MediaSto
     builder.Configuration.GetSection("MediaStorage"));
 
 // SMTP Settings
-builder.Services.Configure<SchoolManagement.Api.Settings.SmtpSettings>(
-    builder.Configuration.GetSection(SchoolManagement.Api.Settings.SmtpSettings.SectionName));
+builder.Services.Configure<SmtpSettings>(
+    builder.Configuration.GetSection(SmtpSettings.SectionName));
 
 // Di registration 
 builder.Services.Scan(scan => scan
@@ -274,7 +296,7 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        //context.Database.Migrate();
+        context.Database.Migrate();
         Console.WriteLine("server runs succesfully");
     }
     catch (Exception error)
@@ -304,5 +326,15 @@ app.RegisterHangfireJobs();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.Run();
 
+    Log.Information("=== School Management API started successfully ===");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

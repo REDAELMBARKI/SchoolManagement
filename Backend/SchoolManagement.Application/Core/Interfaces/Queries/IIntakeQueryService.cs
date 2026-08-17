@@ -5,6 +5,7 @@ namespace SchoolManagement.Application.Core.Interfaces.Queries;
 
 public interface IIntakeQueryService : IEntityQuery<Intake>, ISluged
 {
+    Task<List<Intake>> GetAllIgnoreFiltersAsync();  // DEBUG: Bypass all filters
     Task<List<IntakeResponseDto>> GetAllResponsesAsync();
     Task<IntakeResponseDto?> GetResponseByIdAsync(Guid id);
     Task<List<IntakeResponseDto>> GetIntakesByStatusAsync(IntakeStatus status);

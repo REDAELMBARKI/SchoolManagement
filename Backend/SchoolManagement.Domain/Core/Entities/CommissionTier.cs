@@ -24,7 +24,7 @@ public class CommissionTier : AggregateRoot
     /// <summary>Display order for UI sorting (lower numbers appear first).</summary>
     public int DisplayOrder { get; private set; }
 
-    private CommissionTier() { } // EF Core
+    protected CommissionTier() { } // EF Core
 
     public static CommissionTier Create(
         int minSalesCount,

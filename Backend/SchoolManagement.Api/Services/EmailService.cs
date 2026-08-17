@@ -39,13 +39,20 @@ public class EmailService : IEmailService
             message.Body = bodyBuilder.ToMessageBody();
 
             using var client = new SmtpClient();
-            
+
+            _logger.LogInformation($"connnectin smtp, source {_smtpSettings.Username}");
+
+
             // Connect to SMTP server
             await client.ConnectAsync(
                 _smtpSettings.Host,
                 _smtpSettings.Port,
                 _smtpSettings.EnableSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None
             );
+
+
+            _logger.LogInformation($"smtp connected, {toEmail}, {subject}");
+
 
             // Authenticate if credentials provided
             if (!string.IsNullOrEmpty(_smtpSettings.Username) && !string.IsNullOrEmpty(_smtpSettings.Password))

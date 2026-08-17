@@ -33,6 +33,13 @@ public class IntakeService : IIntakeService
     {
         return await _query.GetAllResponsesAsync();
     }
+    
+    // DEBUG: Get all intakes bypassing filters
+    public async Task<IEnumerable<IntakeResponseDto>> GetAllIntakesIgnoreFiltersAsync()
+    {
+        var intakes = await _query.GetAllIgnoreFiltersAsync();
+        return intakes.Select(IntakeMapper.ToResponse);
+    }
 
     public async Task<IntakeResponseDto> GetIntakeByIdAsync(Guid id)
     {

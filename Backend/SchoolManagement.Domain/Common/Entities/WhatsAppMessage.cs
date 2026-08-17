@@ -21,7 +21,7 @@ public class WhatsAppMessage : AggregateRoot
 
     private const int MaxRetries = 5;
 
-    private WhatsAppMessage() { }
+    protected WhatsAppMessage() { }
 
     public static WhatsAppMessage Create(
         Guid branchId,

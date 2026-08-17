@@ -16,7 +16,7 @@ public class RefreshToken : AggregateRoot
     public bool IsRevoked => RevokedAt != null;
     public bool IsActive => !IsRevoked && !IsExpired;
 
-    private RefreshToken() { }
+    protected RefreshToken() { }
 
     public static RefreshToken Create(
         string token, 

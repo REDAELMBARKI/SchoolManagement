@@ -58,7 +58,7 @@ public class Enrollment : AggregateRoot
 
 
 
-    private Enrollment() { }
+    protected Enrollment() { }
 
 
 

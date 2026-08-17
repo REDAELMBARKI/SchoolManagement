@@ -3,6 +3,7 @@ using SchoolManagement.CrossCutting.Identity.Entities;
 using SchoolManagement.CrossCutting.Identity.Interfaces;
 using SchoolManagement.Domain.Common.Entities;
 using System.Security.Claims;
+using Serilog;
 
 namespace SchoolManagement.CrossCutting.Identity.Services;
 
@@ -10,42 +11,56 @@ public class AuthService : IAuthService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly ILogger _logger;
 
     public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _logger = Log.ForContext<AuthService>();
     }
 
     public async Task<string> CreateUserAsync(string email, string password, string role)
     {
+        _logger.Information("[AuthService] Creating user: {Email} with role: {Role}", email, role);
+        
         // Create ApplicationUser
         var user = new ApplicationUser
         {
             UserName = email,
             Email = email,
-            EmailConfirmed = true,
+            EmailConfirmed = false,  
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
 
+        _logger.Debug("[AuthService] Calling UserManager.CreateAsync");
         var result = await _userManager.CreateAsync(user, password);
+        
         if (!result.Succeeded)
         {
-            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            var errors = string.Join(", ", result.Errors.Select(e => $"{e.Code}: {e.Description}"));
+            _logger.Error("[AuthService] User creation FAILED: {Errors}", errors);
             throw new Exception($"Failed to create user: {errors}");
         }
 
+        _logger.Information("[AuthService] User created successfully with ID: {UserId}", user.Id);
+
         // Assign role
+        _logger.Debug("[AuthService] Assigning role: {Role} to user", role);
         var roleResult = await _userManager.AddToRoleAsync(user, role);
+        
         if (!roleResult.Succeeded)
         {
             // Rollback: Delete user if role assignment fails
+            _logger.Warning("[AuthService] Role assignment failed, rolling back user creation");
             await _userManager.DeleteAsync(user);
-            var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+            var errors = string.Join(", ", roleResult.Errors.Select(e => $"{e.Code}: {e.Description}"));
+            _logger.Error("[AuthService] Role assignment FAILED: {Errors}", errors);
             throw new Exception($"Failed to assign role: {errors}");
         }
 
+        _logger.Information("[AuthService] Role assigned successfully");
         return user.Id;
     }
 

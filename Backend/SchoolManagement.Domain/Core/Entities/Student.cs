@@ -22,7 +22,7 @@ public class Student : Person
     public virtual Intake? Intake { get; private set; }
     // Branch is inherited from Person base class
 
-    private Student() { }
+    protected Student() { }
 
     public static Student Register(string firstName, string lastName, string slug, Guid? genderId, string? email, string phone, DateOnly dateOfBirth, Guid? intakeId, bool isDirectRegistration, Guid branchId)
     {

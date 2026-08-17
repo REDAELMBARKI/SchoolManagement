@@ -8,7 +8,7 @@ public class Gender : AggregateRoot
 
     public string Name { get; private set; } = string.Empty;
 
-    private Gender() { }
+    protected Gender() { }  // EF Core lazy loading proxies need protected constructor
 
     public static Gender Create(string name, string slug)
     {

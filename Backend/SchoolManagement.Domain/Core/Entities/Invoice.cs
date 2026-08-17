@@ -33,7 +33,7 @@ public class Invoice : AggregateRoot
             ? 0
             : Charge.Amount - Charge.WaivedAmount;
 
-    private Invoice() { }
+    protected Invoice() { }
 
     public static Invoice Create(
         Guid enrollmentId,

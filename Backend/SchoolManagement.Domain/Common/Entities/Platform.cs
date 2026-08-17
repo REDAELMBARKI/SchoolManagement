@@ -10,7 +10,7 @@ public class Platform : AggregateRoot
 
     public virtual Branch Branch { get; private set; } = null!;
 
-    private Platform() { }
+    protected Platform() { }
 
     public static Platform Create(string name, string slug, Guid branchId)
     {

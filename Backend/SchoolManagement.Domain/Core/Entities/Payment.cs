@@ -24,7 +24,7 @@ public class Payment : AggregateRoot
     public virtual Invoice? Invoice { get; private set; }
     public virtual ICollection<Refund> Refunds { get; private set; } = new List<Refund>();
 
-    private Payment() { }
+    protected Payment() { }
 
     public static Payment Create(
         Guid enrollmentId,

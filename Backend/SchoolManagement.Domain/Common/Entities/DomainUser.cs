@@ -17,7 +17,7 @@ public class DomainUser : Person
 
     public DateTime? LastActiveAt { get; private set; }
 
-    private DomainUser() { }
+    protected DomainUser() { }
 
     public static DomainUser Register(
         string firstName, 

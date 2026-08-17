@@ -1,4 +1,4 @@
-﻿namespace SchoolManagement.Domain.Common.Enums
+namespace SchoolManagement.Domain.Common.Enums
 {
     public enum OwnerType
     {

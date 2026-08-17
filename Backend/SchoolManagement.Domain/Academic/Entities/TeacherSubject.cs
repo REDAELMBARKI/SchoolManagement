@@ -11,7 +11,7 @@ public class TeacherSubject : BaseEntity
     public virtual Teacher Teacher { get; private set; } = null!;
     public virtual Subject Subject { get; private set; } = null!;
 
-    private TeacherSubject() { }
+    protected TeacherSubject() { }
 
     public static TeacherSubject Create(Guid teacherId, Guid subjectId)
     {
