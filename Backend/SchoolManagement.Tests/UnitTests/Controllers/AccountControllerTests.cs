@@ -71,7 +71,7 @@ public class AccountControllerTests
         // TODO: Setup mocks for successful registration
         // TODO: Create RegisterRequestDto with valid email and password
         
-        var request =  new Regis
+        // var request = new RegisterRequestDto();
         // Act
         // TODO: Call _controller.Register(request)
         

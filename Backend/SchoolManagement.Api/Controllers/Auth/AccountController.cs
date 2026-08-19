@@ -9,10 +9,8 @@ using SchoolManagement.CrossCutting.Identity.Interfaces;
 using SchoolManagement.CrossCutting.Identity.Services;
 using SchoolManagement.Domain.Common.Entities;
 using SchoolManagement.Domain.Common.Exceptions;
-using SchoolManagement.Domain.Common.Interfaces;
-using SchoolManagement.Api.Services;
-using System.Security.Claims;
 using Serilog;
+using System.Security.Claims;
 using ILogger = Serilog.ILogger;
 
 namespace SchoolManagement.Api.Controllers.Auth;
@@ -64,33 +62,33 @@ public class AccountController : ControllerBase
     {
         _logger.Information("=== REGISTRATION ATTEMPT START ===");
         _logger.Information("Email: {Email}", request.Email);
-        
+
         try
         {
             _logger.Information("Step 1: Creating ApplicationUser with role 'User'");
-            
+
             // Create ApplicationUser with basic "User" role (for students/parents)
             var applicationUserId = await _authService.CreateUserAsync(
                 email: request.Email,
                 password: request.Password,
-                role: "User" 
+                role: "User"
             );
 
             _logger.Information("Step 1 SUCCESS: ApplicationUser created with ID: {ApplicationUserId}", applicationUserId);
 
             _logger.Information("Step 2: Generating email confirmation token");
-            
+
             // Generate email confirmation token
             var token = await _authService.GenerateEmailConfirmationTokenAsync(applicationUserId);
-            
+
             _logger.Information("Step 2 SUCCESS: Token generated (length: {TokenLength})", token?.Length ?? 0);
-            
+
             // Build confirmation URL - points to API endpoint that will handle confirmation
             var confirmUrl = $"{Request.Scheme}://{Request.Host}/api/account/confirm-email?token={Uri.EscapeDataString(token)}&userId={applicationUserId}";
-            
+
             _logger.Information("Step 3: Sending email confirmation to {Email}", request.Email);
             _logger.Debug("Confirmation URL: {ConfirmUrl}", confirmUrl);
-            
+
             // CRITICAL EMAIL: Send email confirmation immediately (direct call)
             await _emailService.SendEmailConfirmationAsync(
                 toEmail: request.Email,
@@ -119,15 +117,15 @@ public class AccountController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, "REGISTRATION FAILED - Unexpected Error: {Message} | StackTrace: {StackTrace}", 
+            _logger.Error(ex, "REGISTRATION FAILED - Unexpected Error: {Message} | StackTrace: {StackTrace}",
                 ex.Message, ex.StackTrace);
-            
+
             // Log inner exceptions if any
             var innerEx = ex.InnerException;
             var depth = 1;
             while (innerEx != null)
             {
-                _logger.Error("Inner Exception {Depth}: {Message} | StackTrace: {StackTrace}", 
+                _logger.Error("Inner Exception {Depth}: {Message} | StackTrace: {StackTrace}",
                     depth, innerEx.Message, innerEx.StackTrace);
                 innerEx = innerEx.InnerException;
                 depth++;
@@ -135,9 +133,10 @@ public class AccountController : ControllerBase
 
 
 
-            return StatusCode(500, new { 
+            return StatusCode(500, new
+            {
                 error = $"Registration failed: {ex.Message}",
-                details = ex.InnerException?.Message 
+                details = ex.InnerException?.Message
             });
         }
     }
@@ -409,20 +408,20 @@ public class AccountController : ControllerBase
         try
         {
             var applicationUserId = await _authService.GetUserIdByEmailAsync(request.Email);
-            
+
             // Always return success to prevent email enumeration attacks
             if (applicationUserId != null)
             {
                 var token = await _authService.GeneratePasswordResetTokenAsync(applicationUserId);
                 var user = await _authService.GetApplicationUserAsync(applicationUserId);
-                
+
                 // Build reset URL
                 var resetUrl = $"{Request.Scheme}://{Request.Host}/reset-password?token={Uri.EscapeDataString(token)}&userId={applicationUserId}";
-                
+
                 // Get request details for security logging
                 var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
                 var userAgent = Request.Headers["User-Agent"].ToString();
-                
+
                 // CRITICAL EMAIL: Send immediately (direct call, user is waiting)
                 await _emailService.SendPasswordResetEmailAsync(
                     toEmail: request.Email,
@@ -492,7 +491,7 @@ public class AccountController : ControllerBase
             _logger.Information("Email confirmed successfully");
 
             var frontendUrl = _configuration["FrontendUrl"] ?? "https://letsbeus.online";
-            
+
             return Redirect($"{frontendUrl}/login?emailConfirmed=true");
         }
         catch (Exception ex)
@@ -925,5 +924,5 @@ public class AccountController : ControllerBase
         }
     }
 
-  
+
 }
