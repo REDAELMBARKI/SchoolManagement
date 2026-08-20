@@ -63,7 +63,7 @@ public class ExampleControllerTests : IntegrationTestBase
     public async Task GetEndpoint_WithSeededData_ReturnsData()
     {
         // Arrange
-        await EnsureDatabaseAsync();
+        //await EnsureDatabaseAsync();
         // TODO: Add seed data to DbContext
         // DbContext.Students.Add(new Student { ... });
         // await DbContext.SaveChangesAsync();

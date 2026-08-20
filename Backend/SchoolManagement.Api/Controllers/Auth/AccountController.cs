@@ -70,7 +70,7 @@ public class AccountController : ControllerBase
             // Create ApplicationUser with basic "User" role (for students/parents)
             var applicationUserId = await _authService.CreateUserAsync(
                 email: request.Email,
-                password: request.Password,
+                password: request.Password, 
                 role: "User"
             );
 
@@ -372,6 +372,7 @@ public class AccountController : ControllerBase
             if (!authResult.Succeeded)
             {
                 return Forbid(); // 403 Forbidden
+
             }
 
             await _authService.ChangePasswordAsync(

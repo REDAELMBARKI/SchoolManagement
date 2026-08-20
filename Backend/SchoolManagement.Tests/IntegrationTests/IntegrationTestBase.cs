@@ -1,13 +1,15 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SchoolManagement.Infrastructure.Data;
 using System.Net.Http.Headers;
+using Xunit;
 
 namespace SchoolManagement.Tests.IntegrationTests;
 
 public abstract class IntegrationTestBase : IClassFixture<WebApplicationFactoryBase<Program>>, IDisposable
 {
     protected readonly WebApplicationFactoryBase<Program> Factory;
-    protected readonly HttpClient Client;
+    protected HttpClient Client;
     protected readonly IServiceScope Scope;
     protected readonly AppDbContext DbContext;
 
@@ -22,6 +24,7 @@ public abstract class IntegrationTestBase : IClassFixture<WebApplicationFactoryB
         
         // Set default test authentication
         SetAuthenticationHeaders();
+       
     }
 
     /// <summary>
@@ -81,7 +84,96 @@ public abstract class IntegrationTestBase : IClassFixture<WebApplicationFactoryB
     }
 
     
+    /// <summary>
+    /// Clears specific tables from the test database
+    /// </summary>
+    protected async Task ClearTablesAsync(params string[] tableNames)
+    {
+        foreach (var tableName in tableNames)
+        {
+            await DbContext.Database.ExecuteSqlRawAsync($"DELETE FROM [{tableName}]");
+        }
+        await DbContext.SaveChangesAsync();
+    }
 
+    /// <summary>
+    /// Clears Identity/Auth related tables
+    /// </summary>
+    protected async Task ClearAuthTablesAsync()
+    {
+        await DbContext.Database.ExecuteSqlRawAsync("DELETE FROM [AspNetUserTokens]");
+        await DbContext.Database.ExecuteSqlRawAsync("DELETE FROM [AspNetUserRoles]");
+        await DbContext.Database.ExecuteSqlRawAsync("DELETE FROM [AspNetUserLogins]");
+        await DbContext.Database.ExecuteSqlRawAsync("DELETE FROM [AspNetUserClaims]");
+        await DbContext.Database.ExecuteSqlRawAsync("DELETE FROM [AspNetRoleClaims]");
+        await DbContext.Database.ExecuteSqlRawAsync("DELETE FROM [RefreshTokens]");
+        await DbContext.Database.ExecuteSqlRawAsync("DELETE FROM [AspNetUsers]");
+        await DbContext.Database.ExecuteSqlRawAsync("DELETE FROM [AspNetRoles]");
+        await DbContext.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Clears ONLY registered users (keeps roles intact)
+    /// Use this to avoid duplicate email errors when testing registration multiple times
+    /// </summary>
+    protected async Task ClearUsersOnlyAsync()
+    {
+        await DbContext.Database.ExecuteSqlRawAsync("DELETE FROM [AspNetUserTokens]");
+        await DbContext.Database.ExecuteSqlRawAsync("DELETE FROM [AspNetUserRoles]");
+        await DbContext.Database.ExecuteSqlRawAsync("DELETE FROM [AspNetUserLogins]");
+        await DbContext.Database.ExecuteSqlRawAsync("DELETE FROM [AspNetUserClaims]");
+        await DbContext.Database.ExecuteSqlRawAsync("DELETE FROM [RefreshTokens]");
+        await DbContext.Database.ExecuteSqlRawAsync("DELETE FROM [AspNetUsers]");
+        // NOTE: AspNetRoles NOT deleted - roles stay for subsequent tests
+        await DbContext.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Seeds Identity Roles required for user registration
+    /// </summary>
+    protected async Task SeedRolesAsync()
+    {
+        // Check if roles already exist
+        if (await DbContext.Roles.AnyAsync())
+        {
+            return; // Already seeded
+        }
+
+        var roles = new[]
+        {
+            "SuperAdmin",
+            "Director",
+            "Administrator",
+            "Receptionist",
+            "Teacher",
+            "User" // For students/parents
+        };
+
+        foreach (var roleName in roles)
+        {
+            var role = new Microsoft.AspNetCore.Identity.IdentityRole
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = roleName,
+                NormalizedName = roleName.ToUpper(),
+                ConcurrencyStamp = Guid.NewGuid().ToString()
+            };
+
+            DbContext.Roles.Add(role);
+        }
+
+        await DbContext.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Ensures test database exists and runs migrations
+    /// </summary>
+    protected async Task EnsureDatabaseAsync()
+    {
+        await DbContext.Database.MigrateAsync();
+    }
+
+  
 
     /// <summary>
     /// Seeds basic test data that most tests need

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using SchoolManagement.Infrastructure.Data;
 
 namespace SchoolManagement.Tests.IntegrationTests;
@@ -17,12 +18,21 @@ public class WebApplicationFactoryBase<TProgram> : WebApplicationFactory<TProgra
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.ConfigureAppConfiguration((context, config) =>
+        builder.ConfigureAppConfiguration((_, config) =>
         {
             var originalDbString = config.Build().GetConnectionString("DefaultConnection");
             var builder2 = new SqlConnectionStringBuilder(originalDbString);
             builder2.InitialCatalog = "SchoolManagementTestDb";
             _testConnectionString = builder2.ConnectionString;
+        });
+
+        // Enable detailed logging for API exceptions
+        builder.ConfigureLogging(logging =>
+        {
+            logging.ClearProviders();
+            logging.AddConsole();
+            logging.AddDebug();
+            logging.SetMinimumLevel(LogLevel.Information);
         });
 
         builder.ConfigureTestServices(services =>
@@ -31,10 +41,12 @@ public class WebApplicationFactoryBase<TProgram> : WebApplicationFactory<TProgra
             services.RemoveAll<AppDbContext>();
             services.RemoveAll<DbContextOptions<AppDbContext>>();
 
-            // Register test database with lazy loading
+            // Register test database with lazy loading + detailed errors
             services.AddDbContext<AppDbContext>(options => 
                 options.UseSqlServer(_testConnectionString)
-                       .UseLazyLoadingProxies());
+                       .UseLazyLoadingProxies()
+                       .EnableSensitiveDataLogging() // Shows SQL parameter values
+                       .EnableDetailedErrors());      // Shows detailed EF errors
 
             // Register test authentication
             services.AddAuthentication(TestAuthenticationHandler.SchemeName)
@@ -43,6 +55,4 @@ public class WebApplicationFactoryBase<TProgram> : WebApplicationFactory<TProgra
                     options => { });
         });
     }
-
-   
 }

@@ -27,6 +27,7 @@ public class DatabaseSeeder
 
     public async Task Seed()
     {
+        await new RoleSeeder(_context).RunAsync(); // MUST BE FIRST - Roles needed for user creation
         await new BranchSeeder(_context, _branchFactory).RunAsync();
         await new GenderSeeder(_context).RunAsync();
         await new PlatformSeeder(_context).RunAsync();
