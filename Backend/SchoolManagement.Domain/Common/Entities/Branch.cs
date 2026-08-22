@@ -8,6 +8,7 @@ public class Branch : AggregateRoot
 
 
     public static readonly Guid SYSTEM_BRANCH_ID = Guid.Parse("00000000-0000-0000-0000-000000000001");
+    public static readonly Guid GLOBAL_USER_BRANCH_ID = Guid.Parse("00000000-0000-0000-0000-000000000002");
 
     public string Name { get; private set; } = string.Empty;
     public string Slug { get; private set; } = string.Empty;

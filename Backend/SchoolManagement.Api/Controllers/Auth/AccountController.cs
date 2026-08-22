@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Utilities.Encoders;
 using SchoolManagement.Application.Common.Dtos.Commands;
 using SchoolManagement.Application.Common.Dtos.Requests;
 using SchoolManagement.Application.Common.Dtos.Responses;
@@ -70,7 +71,7 @@ public class AccountController : ControllerBase
             // Create ApplicationUser with basic "User" role (for students/parents)
             var applicationUserId = await _authService.CreateUserAsync(
                 email: request.Email,
-                password: request.Password, 
+                password: request.Password,
                 role: "User"
             );
 
@@ -105,39 +106,20 @@ public class AccountController : ControllerBase
                 applicationUserId = applicationUserId
             });
         }
+        catch (MyValidationException vex)
+        {
+            _logger.Warning(vex, "REGISTRATION FAILED - Validation error");
+            return BadRequest(new { error = vex.Message });
+        }
         catch (DomainException dex)
         {
-            _logger.Warning(dex, "REGISTRATION FAILED - Domain Exception: {Message}", dex.Message);
+            _logger.Warning(dex, "REGISTRATION FAILED - Domain Exception");
             return BadRequest(new { error = dex.Message });
-        }
-        catch (InvalidOperationException iex)
-        {
-            _logger.Error(iex, "REGISTRATION FAILED - Invalid Operation: {Message}", iex.Message);
-            return BadRequest(new { error = iex.Message });
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, "REGISTRATION FAILED - Unexpected Error: {Message} | StackTrace: {StackTrace}",
-                ex.Message, ex.StackTrace);
-
-            // Log inner exceptions if any
-            var innerEx = ex.InnerException;
-            var depth = 1;
-            while (innerEx != null)
-            {
-                _logger.Error("Inner Exception {Depth}: {Message} | StackTrace: {StackTrace}",
-                    depth, innerEx.Message, innerEx.StackTrace);
-                innerEx = innerEx.InnerException;
-                depth++;
-            }
-
-
-
-            return StatusCode(500, new
-            {
-                error = $"Registration failed: {ex.Message}",
-                details = ex.InnerException?.Message
-            });
+            _logger.Error(ex, "REGISTRATION FAILED - Unexpected Error");
+            return StatusCode(500, new { error = "Registration failed. Please try again later." });
         }
     }
 
@@ -158,8 +140,8 @@ public class AccountController : ControllerBase
             // This automatically prevents SuperAdmin creation because SuperAdmin is NOT in any managed roles list
             var authResult = await _authorizationService.AuthorizeAsync(
                 User,
-                request.Role, // Target role being created
-                "CanManageRole" // Clear policy name!
+                request.Role,
+                "CanManageRole"
             );
 
             if (!authResult.Succeeded)
@@ -170,7 +152,7 @@ public class AccountController : ControllerBase
             // Validation 3: Non-SuperAdmin users can only create staff in their own branch
             var branchAuthResult = await _authorizationService.AuthorizeAsync(
                 User,
-                request.BranchId.Value, // Target BranchId (Guid)
+                request.BranchId,
                 "IsSameBranch"
             );
 
@@ -197,7 +179,7 @@ public class AccountController : ControllerBase
                 DateOfBirth = request.DateOfBirth,
                 GenderId = request.GenderId,
                 Role = request.Role,
-                BranchId = request.BranchId.Value
+                BranchId = request.BranchId!.Value
             };
 
             var domainUser = await _domainUserService.CreateAsync(userCommand);
@@ -211,18 +193,31 @@ public class AccountController : ControllerBase
                     user = domainUser
                 });
         }
-        catch (DomainException ex)
+        catch (MyValidationException vex)
         {
-            return BadRequest(new { error = ex.Message });
+            return BadRequest(new { error = vex.Message });
         }
-        catch (ForbiddenException ex)
+        catch (NotFoundException nex)
         {
-            return StatusCode(403, new { error = ex.Message });
+            return BadRequest(new { error = $"Invalid data provided. Please check all fields. {nex.Message}", details = nex.InnerException?.Message });
+
+        }
+        catch (DomainException dex)
+        {
+            return BadRequest(new { error = dex.Message });
+        }
+        catch (ForbiddenException fex)
+        {
+            return StatusCode(403, new { error = fex.Message });
         }
         catch (Exception ex)
         {
-            // TODO: Log exception details
-            return StatusCode(500, new { error = "An error occurred while creating staff user." });
+            _logger.Error(ex, "Failed to create staff user");
+            return StatusCode(500, new
+            {
+                error = $"An error occurred while creating staff user. {ex.Message}",
+                details = ex.InnerException?.Message
+            });
         }
     }
 
@@ -292,7 +287,7 @@ public class AccountController : ControllerBase
                 action: "SuccessfulLogin",
                 entityName: "Authentication",
                 entityId: Guid.Empty,
-                branchId: domainUser?.BranchId ?? Guid.Empty, // Falls back to SYSTEM_BRANCH_ID
+                branchId: domainUser?.BranchId ?? Guid.Empty, 
                 newValues: new { Email = request.Email, RememberMe = request.RememberMe },
                 message: $"Successful login for {request.Email}",
                 severity: AuditLog.SeverityInfo,
@@ -302,12 +297,12 @@ public class AccountController : ControllerBase
             return Ok(new AuthResponseDto
             {
                 AccessToken = accessToken,
-                RefreshToken = refreshToken,  // Also include in response for mobile apps
+                RefreshToken = refreshToken, // included for mobile apps 
                 AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(15),
                 RefreshTokenExpiresAt = refreshTokenExpiration
             });
         }
-        catch (Exception ex)
+        catch (MyValidationException vex)
         {
             await _auditLogService.StoreAsync(
                 action: AuditLog.FailedLoginAction(),
@@ -320,7 +315,24 @@ public class AccountController : ControllerBase
                 category: AuditLog.CategorySecurity
             );
 
-            return Unauthorized(new { error = ex.Message });
+            // Generic message to prevent email enumeration
+            return Unauthorized(new { error = "Invalid email or password." });
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Login error");
+            await _auditLogService.StoreAsync(
+                action: AuditLog.FailedLoginAction(),
+                entityName: "Authentication",
+                entityId: Guid.Empty,
+                branchId: Guid.Empty,
+                newValues: new { Email = request.Email },
+                message: $"Login error for {request.Email}",
+                severity: AuditLog.SeverityWarning,
+                category: AuditLog.CategorySecurity
+            );
+
+            return Unauthorized(new { error = "Authentication failed. Please try again." });
         }
     }
 
@@ -375,6 +387,7 @@ public class AccountController : ControllerBase
 
             }
 
+
             await _authService.ChangePasswordAsync(
                 request.ApplicationUserId,
                 request.CurrentPassword,
@@ -394,10 +407,20 @@ public class AccountController : ControllerBase
 
             return Ok(new { message = "Password changed successfully" });
         }
+        catch (MyValidationException vex)
+        {
+            // Generic error - don't reveal if user exists or if password is wrong
+            return BadRequest(new { error = "Unable to change password. Please verify your information." });
+        }
+        catch (NotFoundException nex)
+        {
+            // Don't reveal user doesn't exist - same generic message
+            return BadRequest(new { error = "Unable to change password. Please verify your information." });
+        }
         catch (Exception ex)
         {
-            // TODO: Log exception details
-            return StatusCode(500, new { error = "An error occurred during password change." });
+            _logger.Error(ex, "Password change error");
+            return StatusCode(500, new { error = "An error occurred. Please try again later." });
         }
     }
 
@@ -472,9 +495,20 @@ public class AccountController : ControllerBase
 
             return Ok(new { message = "Password reset successfully" });
         }
+        catch (MyValidationException vex)
+        {
+            // Generic error - don't reveal if user exists or if token is invalid
+            return BadRequest(new { error = "Unable to reset password. The link may be invalid or expired." });
+        }
+        catch (NotFoundException nex)
+        {
+            // Don't reveal user doesn't exist - same generic message
+            return BadRequest(new { error = "Unable to reset password. The link may be invalid or expired." });
+        }
         catch (Exception ex)
         {
-            return BadRequest(new { error = ex.Message });
+            _logger.Error(ex, "Password reset error");
+            return BadRequest(new { error = "An error occurred. Please try again later." });
         }
     }
 
@@ -491,16 +525,33 @@ public class AccountController : ControllerBase
             await _authService.ConfirmEmailAsync(userId, token);
             _logger.Information("Email confirmed successfully");
 
-            var frontendUrl = _configuration["FrontendUrl"] ?? "https://letsbeus.online";
+            var frontendUrl = _configuration["FrontendUrl"] ?? "http://localhost:5298";
 
             return Redirect($"{frontendUrl}/login?emailConfirmed=true");
         }
+        catch (MyValidationException vex)
+        {
+            _logger.Warning(vex, "Email confirmation validation error");
+            var frontendUrl = _configuration["FrontendUrl"] ?? "http://localhost:5298";
+            return Redirect($"{frontendUrl}/login?emailConfirmed=false&error=confirmation_failed");
+        }
+        catch (NotFoundException nex)
+        {
+            _logger.Warning(nex, "Email confirmation user not found");
+            var frontendUrl = _configuration["FrontendUrl"] ?? "http://localhost:5298";
+            return Redirect($"{frontendUrl}/login?emailConfirmed=false&error=confirmation_failed");
+        }
+        catch(InvalidOperationException ine)
+        {
+            _logger.Warning(ine, "Email confirmation invalid operation error");
+            var frontendUrl = _configuration["FrontendUrl"] ?? "http://localhost:5298";
+            return Redirect($"{frontendUrl}/login?emailConfirmed=false&error=already_confirmed");
+        }
         catch (Exception ex)
         {
-            _logger.Error(ex, "Email confirmation FAILED: {Message}", ex.Message);
-
-            var frontendUrl = _configuration["FrontendUrl"] ?? "https://letsbeus.online";
-            return Redirect($"{frontendUrl}/login?emailConfirmed=false&error={Uri.EscapeDataString(ex.Message)}");
+            _logger.Error(ex, "Email confirmation error");
+            var frontendUrl = _configuration["FrontendUrl"] ?? "http://localhost:5298";
+            return Redirect($"{frontendUrl}/login?emailConfirmed=false&error=confirmation_failed");
         }
     }
 
@@ -648,9 +699,19 @@ public class AccountController : ControllerBase
                 newRole = request.NewRole
             });
         }
+        catch (MyValidationException vex)
+        {
+            _logger.Warning(vex, "Role change validation error");
+            return BadRequest(new { error = "Unable to change role. Please verify the information." });
+        }
+        catch (NotFoundException nex)
+        {
+            _logger.Warning(nex, "Role change user not found");
+            return BadRequest(new { error = "Unable to change role. User may not exist." });
+        }
         catch (Exception ex)
         {
-            // TODO: Log exception details
+            _logger.Error(ex, "Role change error");
             return StatusCode(500, new { error = "An error occurred while changing role." });
         }
     }
@@ -670,9 +731,19 @@ public class AccountController : ControllerBase
                 claim = new { type = request.ClaimType, value = request.ClaimValue }
             });
         }
+        catch (MyValidationException vex)
+        {
+            _logger.Warning(vex, "Add claim validation error");
+            return BadRequest(new { error = "Unable to add claim." });
+        }
+        catch (NotFoundException nex)
+        {
+            _logger.Warning(nex, "Add claim user not found");
+            return BadRequest(new { error = "Unable to add claim." });
+        }
         catch (Exception ex)
         {
-            // TODO: Log exception details
+            _logger.Error(ex, "Add claim error");
             return StatusCode(500, new { error = "An error occurred while adding claim." });
         }
     }
@@ -687,9 +758,19 @@ public class AccountController : ControllerBase
             await _authService.RemoveClaimAsync(applicationUserId, claimType);
             return Ok(new { message = "Claim removed successfully. User must re-login." });
         }
+        catch (MyValidationException vex)
+        {
+            _logger.Warning(vex, "Remove claim validation error");
+            return BadRequest(new { error = "Unable to remove claim." });
+        }
+        catch (NotFoundException nex)
+        {
+            _logger.Warning(nex, "Remove claim user/claim not found");
+            return BadRequest(new { error = "Unable to remove claim." });
+        }
         catch (Exception ex)
         {
-            // TODO: Log exception details
+            _logger.Error(ex, "Remove claim error");
             return StatusCode(500, new { error = "An error occurred while removing claim." });
         }
     }
@@ -716,9 +797,14 @@ public class AccountController : ControllerBase
             var claims = await _authService.GetUserClaimsAsync(applicationUserId);
             return Ok(new { applicationUserId = applicationUserId, claims = claims });
         }
+        catch (NotFoundException nex)
+        {
+            _logger.Warning(nex, "Get claims user not found");
+            return BadRequest(new { error = "Unable to retrieve claims." });
+        }
         catch (Exception ex)
         {
-            // TODO: Log exception details
+            _logger.Error(ex, "Get claims error");
             return StatusCode(500, new { error = "An error occurred while retrieving claims." });
         }
     }
@@ -745,9 +831,14 @@ public class AccountController : ControllerBase
             var roles = await _authService.GetUserRolesAsync(applicationUserId);
             return Ok(new { applicationUserId = applicationUserId, roles = roles });
         }
+        catch (NotFoundException nex)
+        {
+            _logger.Warning(nex, "Get roles user not found");
+            return BadRequest(new { error = "Unable to retrieve roles." });
+        }
         catch (Exception ex)
         {
-            // TODO: Log exception details
+            _logger.Error(ex, "Get roles error");
             return StatusCode(500, new { error = "An error occurred while retrieving roles." });
         }
     }
@@ -775,7 +866,13 @@ public class AccountController : ControllerBase
         }
         catch (NotFoundException ex)
         {
-            return NotFound(new { error = ex.Message });
+            _logger.Warning(ex, "GetUserById not found");
+            return NotFound();
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "GetUserById error");
+            return StatusCode(500, new { error = "An error occurred." });
         }
     }
 
@@ -876,9 +973,14 @@ public class AccountController : ControllerBase
                 RefreshTokenExpiresAt = refreshTokenExpiration
             });
         }
+        catch (NotFoundException nex)
+        {
+            _logger.Warning(nex, "Refresh token user not found");
+            return Unauthorized(new { error = "Invalid or expired refresh token" });
+        }
         catch (Exception ex)
         {
-            // TODO: Log exception details
+            _logger.Error(ex, "Refresh token error");
             return StatusCode(500, new { error = "An error occurred while refreshing token." });
         }
     }
@@ -918,12 +1020,61 @@ public class AccountController : ControllerBase
 
             return Ok(new { message = "Token revoked successfully" });
         }
+        catch (NotFoundException nex)
+        {
+            _logger.Warning(nex, "Revoke token not found");
+            return BadRequest(new { error = "Invalid token" });
+        }
         catch (Exception ex)
         {
-            // TODO: Log exception details
+            _logger.Error(ex, "Revoke token error");
             return StatusCode(500, new { error = "An error occurred while revoking token." });
         }
     }
 
+
+
+    /// <summary>
+    /// Convert an existing user (User role) to a staff member
+    /// </summary>
+    [HttpPut("convert-to-staff/{userId}")]
+    [Authorize(Roles = "SuperAdmin,Director")]
+    public async Task<IActionResult> ConvertToStaff(Guid userId, [FromBody] ConvertToStaffRequestDto request)
+    {
+        try
+        {
+            var command = new ConvertToStaffCommand
+            {
+                UserId = userId,
+                Role = request.Role,
+                BranchId = request.BranchId
+            };
+
+            var result = await _domainUserService.ConvertToStaffAsync(command);
+
+            return Ok(new
+            {
+                message = $"User successfully converted to {request.Role}",
+                user = result
+            });
+        }
+        catch (NotFoundException)
+        {
+            return NotFound(new { error = "User not found." });
+        }
+        catch (DomainException dex)
+        {
+            return BadRequest(new { error = dex.Message });
+        }
+        catch (ForbiddenException fex)
+        {
+            return StatusCode(403, new { error = fex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Error converting user to staff");
+            return StatusCode(500, new { error = "An error occurred while converting user to staff." });
+        }
+    }
 
 }

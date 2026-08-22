@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using SchoolManagement.CrossCutting.Identity.Entities;
 using SchoolManagement.CrossCutting.Identity.Interfaces;
 using SchoolManagement.Domain.Common.Entities;
+using SchoolManagement.Domain.Common.Exceptions;
 using System.Security.Claims;
 using Serilog;
 
@@ -41,7 +42,7 @@ public class AuthService : IAuthService
         {
             var errors = string.Join(", ", result.Errors.Select(e => $"{e.Code}: {e.Description}"));
             _logger.Error("[AuthService] User creation FAILED: {Errors}", errors);
-            throw new Exception($"Failed to create user: {errors}");
+            throw new MyValidationException($"Failed to create user: {errors}");
         }
 
         _logger.Information("[AuthService] User created successfully with ID: {UserId}", user.Id);
@@ -57,7 +58,7 @@ public class AuthService : IAuthService
             await _userManager.DeleteAsync(user);
             var errors = string.Join(", ", roleResult.Errors.Select(e => $"{e.Code}: {e.Description}"));
             _logger.Error("[AuthService] Role assignment FAILED: {Errors}", errors);
-            throw new Exception($"Failed to assign role: {errors}");
+            throw new MyValidationException($"Failed to assign role: {errors}");
         }
 
         _logger.Information("[AuthService] Role assigned successfully");
@@ -69,14 +70,14 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByEmailAsync(email);
         if (user == null)
         {
-            throw new Exception("Invalid email or password.");
+            throw new MyValidationException("Invalid email or password.");
         }
 
         if (await _userManager.IsLockedOutAsync(user))
         {
             var lockoutEnd = await _userManager.GetLockoutEndDateAsync(user);
             var remainingMinutes = (lockoutEnd - DateTimeOffset.UtcNow)?.TotalMinutes ?? 0;
-            throw new Exception($"Account is locked. Try again in {Math.Ceiling(remainingMinutes)} minutes.");
+            throw new MyValidationException($"Account is locked. Try again in {Math.Ceiling(remainingMinutes)} minutes.");
         }
 
         var result = await _signInManager.PasswordSignInAsync(
@@ -94,12 +95,12 @@ public class AuthService : IAuthService
 
         if (result.IsLockedOut)
         {
-            throw new Exception("Account locked due to multiple failed login attempts. Please try again in 15 minutes.");
+            throw new MyValidationException("Account locked due to multiple failed login attempts. Please try again in 15 minutes.");
         }
 
         if (result.IsNotAllowed)
         {
-            throw new Exception("Account is not allowed to sign in. Please confirm your email.");
+            throw new MyValidationException("Account is not allowed to sign in. Please confirm your email.");
         }
 
         var failedAttempts = await _userManager.GetAccessFailedCountAsync(user);
@@ -108,10 +109,10 @@ public class AuthService : IAuthService
 
         if (attemptsRemaining > 0)
         {
-            throw new Exception($"Invalid email or password. {attemptsRemaining} attempts remaining before account lockout.");
+            throw new MyValidationException($"Invalid email or password. {attemptsRemaining} attempts remaining before account lockout.");
         }
 
-        throw new Exception("Invalid email or password.");
+        throw new MyValidationException("Invalid email or password.");
     }
 
     public async Task AssignRoleAsync(string applicationUserId, string role)
@@ -119,14 +120,14 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByIdAsync(applicationUserId);
         if (user == null)
         {
-            throw new Exception("User not found.");
+            throw new NotFoundException("User not found.");
         }
 
         var result = await _userManager.AddToRoleAsync(user, role);
         if (!result.Succeeded)
         {
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-            throw new Exception($"Failed to assign role: {errors}");
+            throw new MyValidationException($"Failed to assign role: {errors}");
         }
     }
 
@@ -135,7 +136,7 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByIdAsync(applicationUserId);
         if (user == null)
         {
-            throw new Exception("User not found.");
+            throw new NotFoundException("User not found.");
         }
 
         // Remove old role
@@ -143,7 +144,7 @@ public class AuthService : IAuthService
         if (!removeResult.Succeeded)
         {
             var errors = string.Join(", ", removeResult.Errors.Select(e => e.Description));
-            throw new Exception($"Failed to remove old role: {errors}");
+            throw new MyValidationException($"Failed to remove old role: {errors}");
         }
 
         // Add new role
@@ -153,7 +154,7 @@ public class AuthService : IAuthService
             // Rollback: Re-add old role
             await _userManager.AddToRoleAsync(user, oldRole);
             var errors = string.Join(", ", addResult.Errors.Select(e => e.Description));
-            throw new Exception($"Failed to add new role: {errors}");
+            throw new MyValidationException($"Failed to add new role: {errors}");
         }
     }
 
@@ -162,7 +163,7 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByIdAsync(applicationUserId);
         if (user == null)
         {
-            throw new Exception("User not found.");
+            throw new NotFoundException("User not found.");
         }
 
         var roles = await _userManager.GetRolesAsync(user);
@@ -174,7 +175,7 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByIdAsync(applicationUserId);
         if (user == null)
         {
-            throw new Exception("User not found.");
+            throw new NotFoundException("User not found.");
         }
 
         var claim = new Claim(claimType, claimValue);
@@ -183,7 +184,7 @@ public class AuthService : IAuthService
         if (!result.Succeeded)
         {
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-            throw new Exception($"Failed to add claim: {errors}");
+            throw new MyValidationException($"Failed to add claim: {errors}");
         }
     }
 
@@ -192,7 +193,7 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByIdAsync(applicationUserId);
         if (user == null)
         {
-            throw new Exception("User not found.");
+            throw new NotFoundException("User not found.");
         }
 
         var claims = await _userManager.GetClaimsAsync(user);
@@ -200,14 +201,14 @@ public class AuthService : IAuthService
 
         if (claimToRemove == null)
         {
-            throw new Exception($"Claim {claimType} not found.");
+            throw new NotFoundException($"Claim {claimType} not found.");
         }
 
         var result = await _userManager.RemoveClaimAsync(user, claimToRemove);
         if (!result.Succeeded)
         {
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-            throw new Exception($"Failed to remove claim: {errors}");
+            throw new MyValidationException($"Failed to remove claim: {errors}");
         }
     }
 
@@ -216,7 +217,7 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByIdAsync(applicationUserId);
         if (user == null)
         {
-            throw new Exception("User not found.");
+            throw new NotFoundException("User not found.");
         }
 
         var claims = await _userManager.GetClaimsAsync(user);
@@ -232,27 +233,32 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByIdAsync(applicationUserId);
         if (user == null)
         {
-            throw new Exception("User not found.");
+            throw new NotFoundException("User not found.");
         }
 
         var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
         if (!result.Succeeded)
         {
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-            throw new Exception($"Failed to change password: {errors}");
+            throw new MyValidationException($"Failed to change password: {errors}");
         }
     }
 
     public async Task ResetPasswordAsync(string applicationUserId, string newPassword)
     {
         var user = await _userManager.FindByIdAsync(applicationUserId);
+        if (user == null)
+        {
+            throw new NotFoundException("User not found.");
+        }
+        
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
         var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
         
         if (!result.Succeeded)
         {
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-            throw new Exception($"Failed to reset password: {errors}");
+            throw new MyValidationException($"Failed to reset password: {errors}");
         }
     }
 
@@ -261,7 +267,7 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByIdAsync(applicationUserId);
         if (user == null)
         {
-            throw new Exception("User not found.");
+            throw new NotFoundException("User not found.");
         }
 
         return await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -272,14 +278,14 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByIdAsync(applicationUserId);
         if (user == null)
         {
-            throw new Exception("User not found.");
+            throw new NotFoundException("User not found.");
         }
 
         var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
         if (!result.Succeeded)
         {
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-            throw new Exception($"Failed to reset password: {errors}");
+            throw new MyValidationException($"Failed to reset password: {errors}");
         }
     }
 
@@ -288,7 +294,7 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByIdAsync(applicationUserId);
         if (user == null)
         {
-            throw new Exception("User not found.");
+            throw new NotFoundException("User not found.");
         }
 
         return await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -299,14 +305,19 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByIdAsync(applicationUserId);
         if (user == null)
         {
-            throw new Exception("User not found.");
+            throw new NotFoundException("User not found.");
+        }
+
+        if (user.EmailConfirmed)
+        {
+            throw new InvalidOperationException("This Email Has benn confirmed Successfully ");
         }
 
         var result = await _userManager.ConfirmEmailAsync(user, token);
         if (!result.Succeeded)
         {
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-            throw new Exception($"Failed to confirm email: {errors}");
+            throw new MyValidationException($"Failed to confirm email: {errors}");
         }
     }
 
@@ -327,7 +338,7 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByIdAsync(applicationUserId);
         if (user == null)
         {
-            throw new Exception("User not found.");
+            throw new NotFoundException("User not found.");
         }
         return user;
     }

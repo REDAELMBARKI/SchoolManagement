@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using SchoolManagement.Application.Common.Interfaces;
+using SchoolManagement.Domain.Common.Entities;
 using System.Security.Claims;
 
 namespace SchoolManagement.Infrastructure.Data;
@@ -65,13 +66,18 @@ public class CurrentUserContext : ICurrentUserContext
     {
         var branchIdString = _httpContext.HttpContext?.User.FindFirstValue("BranchId");
 
-        // SuperAdmin has no BranchId claim - return Guid.Empty
+        // SuperAdmin has no BranchId claim - return Guid.Empty (operates globally)
+        // User (students/parents) has no BranchId claim - return GLOBAL_USER_BRANCH_ID for audit tracking
         if (string.IsNullOrEmpty(branchIdString))
         {
-            // Check if user is SuperAdmin
             if (Role == "SuperAdmin")
             {
-                return Guid.Empty; // SuperAdmin has no branch
+                return Guid.Empty; // SuperAdmin operates globally
+            }
+            
+            if (Role == "User")
+            {
+                return Branch.GLOBAL_USER_BRANCH_ID; // User actions tracked under global user branch
             }
 
             throw new InvalidOperationException(

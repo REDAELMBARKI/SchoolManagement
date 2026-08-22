@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SchoolManagement.Application.Common.Dtos.Responses;
 using SchoolManagement.Application.Common.Interfaces;
 using SchoolManagement.Application.Common.Interfaces.Queries;
@@ -12,11 +13,13 @@ public class UserQueryService : IUserQueryService
 {
     private readonly AppDbContext _context;
     private readonly ICurrentUserContext _currentUserContext;
+    private readonly ILogger<UserQueryService> _logger;
 
-    public UserQueryService(AppDbContext context, ICurrentUserContext currentUserContext)
+    public UserQueryService(AppDbContext context, ICurrentUserContext currentUserContext, ILogger<UserQueryService> logger)
     {
         _context = context;
         _currentUserContext = currentUserContext;
+        _logger = logger;
     }
 
     public async Task<List<DomainUser>> GetAllAsync()
@@ -38,19 +41,35 @@ public class UserQueryService : IUserQueryService
 
     public async Task<DomainUser?> GetByIdAsync(Guid id)
     {
+        _logger.LogDebug("=== UserQueryService.GetByIdAsync START ===");
+        _logger.LogDebug("Querying UserId: {UserId}", id);
+        _logger.LogDebug("CurrentUser.BranchId: {CurrentBranchId}", _currentUserContext.BranchId);
+        
         var user = await _context.Set<DomainUser>()
             .Include(u => u.Branch)
             .Include(u => u.Gender)
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Id == id && u.DeletedAt == null);
 
+        if (user == null)
+        {
+            _logger.LogWarning("User NOT found in database! UserId: {UserId}", id);
+            return null;
+        }
+
+        _logger.LogDebug("User found in database - UserId: {UserId}, User.BranchId: {UserBranchId}", user.Id, user.BranchId);
+
         // Branch ownership validation
-        if (user != null && _currentUserContext.BranchId != Guid.Empty &&
+        if (_currentUserContext.BranchId != Guid.Empty &&
             user.BranchId != _currentUserContext.BranchId)
         {
+            _logger.LogWarning("BRANCH MISMATCH! User.BranchId: {UserBranchId}, CurrentUser.BranchId: {CurrentBranchId} - Returning NULL", 
+                user.BranchId, _currentUserContext.BranchId);
             return null;  // Forbidden - return null (will be handled by service)
         }
 
+        _logger.LogDebug("Branch check passed - returning user");
+        _logger.LogDebug("=== UserQueryService.GetByIdAsync END ===");
         return user;
     }
 
@@ -78,7 +97,6 @@ public class UserQueryService : IUserQueryService
             genderName: u.Gender?.Name
         )).ToList();
     }
-
     public async Task<DomainUserResponseDto?> GetResponseByIdAsync(Guid id)
     {
         var user = await GetByIdAsync(id);

@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="UnitTests\Controllers\" />
     <Folder Include="UnitTests\Registrations\" />
   </ItemGroup>
 

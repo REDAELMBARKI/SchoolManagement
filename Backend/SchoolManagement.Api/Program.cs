@@ -38,33 +38,43 @@ using Serilog;
 using Serilog.Events;
 using System.Text.Json.Serialization;
 
-// Configure Serilog
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
-    .MinimumLevel.Override("System", LogEventLevel.Warning)
-    .Enrich.FromLogContext()
-    .Enrich.WithMachineName()
-    .Enrich.WithThreadId()
-    .Enrich.WithEnvironmentName()
-    .WriteTo.Console(
-        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}")
-    .WriteTo.File(
-        path: "logs/log-.txt",
-        rollingInterval: RollingInterval.Day,
-        outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}")
-    .WriteTo.Seq("http://localhost:5341")  // Seq UI - Install: docker run -d --restart unless-stopped --name seq -e ACCEPT_EULA=Y -p 5341:80 datalust/seq:latest
-    .CreateLogger();
+// Configure Serilog (skip in test environment)
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+if (environment != "Testing")
+{
+    Log.Logger = new LoggerConfiguration()
+        .MinimumLevel.Information()
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+        .MinimumLevel.Override("System", LogEventLevel.Warning)
+        .Enrich.FromLogContext()
+        .Enrich.WithMachineName()
+        .Enrich.WithThreadId()
+        .Enrich.WithEnvironmentName()
+        .WriteTo.Console(
+            outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}")
+        .WriteTo.File(
+            path: "logs/log-.txt",
+            rollingInterval: RollingInterval.Day,
+            outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}")
+        .WriteTo.Seq("http://localhost:5341")  // Seq UI - Install: docker run -d --restart unless-stopped --name seq -e ACCEPT_EULA=Y -p 5341:80 datalust/seq:latest
+        .CreateLogger();
+}
 
 try
 {
-    Log.Information("=== Starting School Management API ===");
+    if (environment != "Testing")
+    {
+        Log.Information("=== Starting School Management API ===");
+    }
 
     var builder = WebApplication.CreateBuilder(args);
 
-    // Use Serilog for logging
-    builder.Host.UseSerilog();
+    // Use Serilog for logging (skip in tests)
+    if (environment != "Testing")
+    {
+        builder.Host.UseSerilog();
+    }
 
 
     // auto mapper 
@@ -334,3 +344,6 @@ finally
 {
     Log.CloseAndFlush();
 }
+
+// Make the implicit Program class public so test projects can access it
+public partial class Program { }

@@ -1,4 +1,5 @@
 using SchoolManagement.Domain.Common.Exceptions;
+using SchoolManagement.Domain.Common.Utils;
 using SchoolManagement.Domain.Common.ValueObjects;
 
 namespace SchoolManagement.Domain.Common.Entities;
@@ -104,6 +105,19 @@ public class DomainUser : Person
         // If changing from SuperAdmin to other role, must assign branch later
         if (Role == "SuperAdmin" && newRole != "SuperAdmin" && BranchId == Guid.Empty)
             throw new DomainException("Must assign a branch when changing from SuperAdmin to another role.");
+
+        Role = newRole;
+    }
+
+    public void UpdateRole(string newRole)
+    {
+        var validRoles = new[] { RoleHelper.SuperAdmin, RoleHelper.Director, RoleHelper.Administrator, RoleHelper.Reciptionest, RoleHelper.Teacher };
+        if (!validRoles.Contains(newRole))
+            throw new DomainException($"Invalid role: {newRole}. Valid roles: {string.Join(", ", validRoles)}");
+
+        // Cannot change to/from SuperAdmin
+        if (newRole == RoleHelper.SuperAdmin || Role == RoleHelper.SuperAdmin)
+            throw new DomainException("Cannot change SuperAdmin role using UpdateRole.");
 
         Role = newRole;
     }

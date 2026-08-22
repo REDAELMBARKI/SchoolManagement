@@ -21,25 +21,32 @@ public class TestAuthenticationHandler : AuthenticationHandler<AuthenticationSch
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        // Allow tests to control authentication via headers
         if (Context.Request.Headers.TryGetValue("X-Test-Unauthorized", out var _))
         {
             return Task.FromResult(AuthenticateResult.NoResult());
         }
 
-        // Read custom test values from headers or use defaults
-        var userId = Context.Request.Headers["X-Test-UserId"].FirstOrDefault() ?? "test-user-id";
-        var branchId = Context.Request.Headers["X-Test-BranchId"].FirstOrDefault() ?? "test-branch-id";
-        var role = Context.Request.Headers["X-Test-Role"].FirstOrDefault() ?? "Administrator";
-        var userName = Context.Request.Headers["X-Test-UserName"].FirstOrDefault() ?? "TestUser";
+        var userId = Context.Request.Headers["X-Test-UserId"].FirstOrDefault();
+        var branchId = Context.Request.Headers["X-Test-BranchId"].FirstOrDefault();
+        var role = Context.Request.Headers["X-Test-Role"].FirstOrDefault();
+        var userName = Context.Request.Headers["X-Test-UserName"].FirstOrDefault();
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Task.FromResult(AuthenticateResult.NoResult());
+        }
 
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, userName),
-            new Claim("BranchId", branchId),
+            new Claim(ClaimTypes.Name, userName ?? "TestUser"),
             new Claim(ClaimTypes.NameIdentifier, userId),
-            new Claim(ClaimTypes.Role, role)
+            new Claim(ClaimTypes.Role, role ?? "User")
         };
+
+        if (!string.IsNullOrEmpty(branchId))
+        {
+            claims.Add(new Claim("BranchId", branchId));
+        }
 
         var identity = new ClaimsIdentity(claims, SchemeName);
         var principal = new ClaimsPrincipal(identity);

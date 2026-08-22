@@ -31,6 +31,15 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
 
     // ── Authentication ──
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    
+    // ── ASP.NET Identity Tables ──
+    public DbSet<ApplicationUser> AspNetUsers { get; set; }
+    public DbSet<IdentityRole> AspNetRoles { get; set; }
+    public DbSet<IdentityUserRole<string>> AspNetUserRoles { get; set; }
+    public DbSet<IdentityUserClaim<string>> AspNetUserClaims { get; set; }
+    public DbSet<IdentityUserLogin<string>> AspNetUserLogins { get; set; }
+    public DbSet<IdentityUserToken<string>> AspNetUserTokens { get; set; }
+    public DbSet<IdentityRoleClaim<string>> AspNetRoleClaims { get; set; }
 
     // ── Platforms and Ads ──
     public DbSet<Platform> Platforms { get; set; }
@@ -116,67 +125,63 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
         if (_currentUserContext == null)
             return;
 
-        var userBranchId = _currentUserContext.BranchId;
-
-        // Apply filter to Person base type - automatically covers ALL derived types
-        // (DomainUser, Employee, Teacher, Opc, CommercialAgent, Intake, Student, StudentResponsable)
-        // SuperAdmin has SYSTEM_BRANCH_ID, so they see everything with .IgnoreQueryFilters()
+   
         modelBuilder.Entity<Person>().HasQueryFilter(e => 
-            e.BranchId == userBranchId || e.BranchId == Branch.SYSTEM_BRANCH_ID);
+            e.BranchId == _currentUserContext.BranchId || e.BranchId == Branch.SYSTEM_BRANCH_ID);
 
         // NOTE: Intake, Student, StudentResponsable filters are NOT needed here
         // They inherit from Person, so the Person filter above automatically applies
 
         // Physical
         modelBuilder.Entity<Room>().HasQueryFilter(e => 
-            e.BranchId == userBranchId);
+            e.BranchId == _currentUserContext.BranchId);
 
         // Academic
         modelBuilder.Entity<Group>().HasQueryFilter(e => 
-            e.BranchId == userBranchId);
+            e.BranchId == _currentUserContext.BranchId);
         
         modelBuilder.Entity<Schedule>().HasQueryFilter(e => 
-            e.Group.BranchId == userBranchId);
+            e.Group.BranchId == _currentUserContext.BranchId);
 
         // Operations
         modelBuilder.Entity<Enrollment>().HasQueryFilter(e => 
-            e.Student.BranchId == userBranchId);
+            e.Student.BranchId == _currentUserContext.BranchId);
         
         modelBuilder.Entity<Absence>().HasQueryFilter(e => 
-            e.Student.BranchId == userBranchId);
+            e.Student.BranchId == _currentUserContext.BranchId);
         
         modelBuilder.Entity<Grade>().HasQueryFilter(e => 
-            e.Student.BranchId == userBranchId);
+            e.Student.BranchId == _currentUserContext.BranchId);
 
         // Financial
         modelBuilder.Entity<Payment>().HasQueryFilter(e => 
-            e.BranchId == userBranchId);
+            e.BranchId == _currentUserContext.BranchId);
         
         modelBuilder.Entity<Invoice>().HasQueryFilter(e => 
-            e.BranchId == userBranchId);
+            e.BranchId == _currentUserContext.BranchId);
         
         modelBuilder.Entity<Charge>().HasQueryFilter(e => 
-            e.Invoice.BranchId == userBranchId);
+            e.Invoice.BranchId == _currentUserContext.BranchId);
         
         modelBuilder.Entity<Expense>().HasQueryFilter(e => 
-            e.BranchId == userBranchId);
+            e.BranchId == _currentUserContext.BranchId);
         
         modelBuilder.Entity<PayrollPayment>().HasQueryFilter(e => 
-            e.BranchId == userBranchId);
+            e.BranchId == _currentUserContext.BranchId);
         
         modelBuilder.Entity<Commission>().HasQueryFilter(e => 
-            e.BranchId == userBranchId);
+            e.BranchId == _currentUserContext.BranchId);
         
         modelBuilder.Entity<Refund>().HasQueryFilter(e => 
-            e.BranchId == userBranchId);
+            e.BranchId == _currentUserContext.BranchId);
 
         // WhatsApp Messages
         modelBuilder.Entity<WhatsAppMessage>().HasQueryFilter(e => 
-            e.BranchId == userBranchId);
+            e.BranchId == _currentUserContext.BranchId);
 
         // Audit Logs - Include user's branch logs AND global system logs
         modelBuilder.Entity<AuditLog>().HasQueryFilter(e => 
-            e.BranchId == userBranchId || e.BranchId == Branch.SYSTEM_BRANCH_ID);
+            e.BranchId == _currentUserContext.BranchId || e.BranchId == Branch.SYSTEM_BRANCH_ID);
     }
 
 

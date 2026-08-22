@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SchoolManagement.Infrastructure.Data;
 using System.Net.Http.Headers;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace SchoolManagement.Tests.IntegrationTests;
 
@@ -13,43 +14,51 @@ public abstract class IntegrationTestBase : IClassFixture<WebApplicationFactoryB
     protected readonly IServiceScope Scope;
     protected readonly AppDbContext DbContext;
 
-    protected IntegrationTestBase(WebApplicationFactoryBase<Program> factory)
+    protected IntegrationTestBase(WebApplicationFactoryBase<Program> factory, ITestOutputHelper _output)
     {
         Factory = factory;
-        Client = factory.CreateClient();
-        
+        try
+        {
+            Client = factory.CreateClient();
+        }
+        catch (Exception ex)
+        {
+            _output.WriteLine(ex.ToString()); // full stack trace, not just ex.Message
+            throw;
+        }
+
         // Create a scope to get the DbContext
         Scope = factory.Services.CreateScope();
         DbContext = Scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        
-        // Set default test authentication
-        SetAuthenticationHeaders();
-       
+
+        // DO NOT set default authentication - let tests control this explicitly
+        // Tests that need authentication should call CreateAuthenticatedClient()
+
     }
 
     /// <summary>
     /// Creates an authenticated HTTP client with custom claims
     /// </summary>
     protected HttpClient CreateAuthenticatedClient(
-        string? userId = null, 
-        string? branchId = null, 
-        string? role = null, 
+        string? userId = null,
+        string? branchId = null,
+        string? role = null,
         string? userName = null)
     {
         var client = Factory.CreateClient();
-        
+
         if (userId != null)
             client.DefaultRequestHeaders.Add("X-Test-UserId", userId);
-        
+
         if (branchId != null)
             client.DefaultRequestHeaders.Add("X-Test-BranchId", branchId);
-        
+
         if (role != null)
             client.DefaultRequestHeaders.Add("X-Test-Role", role);
-        
+
         if (userName != null)
             client.DefaultRequestHeaders.Add("X-Test-UserName", userName);
-        
+
         return client;
     }
 
@@ -67,23 +76,23 @@ public abstract class IntegrationTestBase : IClassFixture<WebApplicationFactoryB
     /// Sets authentication headers on the default client
     /// </summary>
     protected void SetAuthenticationHeaders(
-        string userId = "test-user-id", 
-        string branchId = "test-branch-id", 
-        string role = "Administrator", 
+        string userId = "test-user-id",
+        string branchId = "test-branch-id",
+        string role = "Administrator",
         string userName = "TestUser")
     {
         Client.DefaultRequestHeaders.Remove("X-Test-UserId");
         Client.DefaultRequestHeaders.Remove("X-Test-BranchId");
         Client.DefaultRequestHeaders.Remove("X-Test-Role");
         Client.DefaultRequestHeaders.Remove("X-Test-UserName");
-        
+
         Client.DefaultRequestHeaders.Add("X-Test-UserId", userId);
         Client.DefaultRequestHeaders.Add("X-Test-BranchId", branchId);
         Client.DefaultRequestHeaders.Add("X-Test-Role", role);
         Client.DefaultRequestHeaders.Add("X-Test-UserName", userName);
     }
 
-    
+
     /// <summary>
     /// Clears specific tables from the test database
     /// </summary>
@@ -173,7 +182,7 @@ public abstract class IntegrationTestBase : IClassFixture<WebApplicationFactoryB
         await DbContext.Database.MigrateAsync();
     }
 
-  
+
 
     /// <summary>
     /// Seeds basic test data that most tests need
@@ -190,4 +199,102 @@ public abstract class IntegrationTestBase : IClassFixture<WebApplicationFactoryB
         Client?.Dispose();
         GC.SuppressFinalize(this);
     }
+
+    /// <summary>
+    /// Gets a Gender from the database (must be seeded by DatabaseSeeder)
+    /// </summary>
+    protected async Task<Guid> GetGenderAsync(string name = "Male")
+    {
+        var gender = await DbContext.Genders
+            .Where(g => g.Name == name)
+            .Select(g => g.Id)
+            .FirstOrDefaultAsync();
+        
+        if (gender == Guid.Empty)
+        {
+            throw new InvalidOperationException($"Gender '{name}' not found. Ensure DatabaseSeeder has run.");
+        }
+        
+        return gender;
+    }
+
+    /// <summary>
+    /// Gets a Branch from the database (must be seeded by DatabaseSeeder)
+    /// </summary>
+    protected async Task<Guid> GetBranchAsync(string name = "Test Branch")
+    {
+        var branch = await DbContext.Branches
+            .Where(b => b.Name == name)
+            .Select(b => b.Id)
+            .FirstOrDefaultAsync();
+        
+        if (branch == Guid.Empty)
+        {
+            throw new InvalidOperationException($"Branch '{name}' not found. Ensure DatabaseSeeder has run.");
+        }
+        
+        return branch;
+    }
+
+    /// <summary>
+    /// Gets the first non-system branch from the database (must be seeded by DatabaseSeeder)
+    /// </summary>
+    protected async Task<Guid> GetFirstBranchAsync()
+    {
+        var branch = await DbContext.Branches
+            .Where(b => b.Id != SchoolManagement.Domain.Common.Entities.Branch.SYSTEM_BRANCH_ID 
+                     && b.Id != SchoolManagement.Domain.Common.Entities.Branch.GLOBAL_USER_BRANCH_ID)
+            .Select(b => b.Id)
+            .FirstOrDefaultAsync();
+        
+        if (branch == Guid.Empty)
+        {
+            throw new InvalidOperationException("No regular branches found. Ensure DatabaseSeeder has run.");
+        }
+        
+        return branch;
+    }
+
+    /// <summary>
+    /// Seeds Genders if they don't exist
+    /// </summary>
+    protected async Task SeedGendersAsync()
+    {
+        if (await DbContext.Genders.AnyAsync())
+        {
+            return; // Already seeded
+        }
+
+        var genders = new[]
+        {
+            SchoolManagement.Domain.Common.Entities.Gender.Create("Male", "male"),
+            SchoolManagement.Domain.Common.Entities.Gender.Create("Female", "female")
+        };
+
+        await DbContext.Genders.AddRangeAsync(genders);
+        await DbContext.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Seeds a test branch if it doesn't exist
+    /// </summary>
+    protected async Task SeedTestBranchAsync()
+    {
+        var exists = await DbContext.Branches.AnyAsync(b => b.Name == "Test Branch");
+        if (!exists)
+        {
+            var branch = SchoolManagement.Domain.Common.Entities.Branch.Create(
+                name: "Test Branch",
+                slug: "test-branch",
+                city: "Test City",
+                address: "123 Test St",
+                phone: "1234567890"
+            );
+            await DbContext.Branches.AddAsync(branch);
+            await DbContext.SaveChangesAsync();
+        }
+    }
+
+
+
 }

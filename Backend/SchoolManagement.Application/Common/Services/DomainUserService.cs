@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using SchoolManagement.Application.Common.Dtos.Commands;
 using SchoolManagement.Application.Common.Dtos.Responses;
 using SchoolManagement.Application.Common.Interfaces;
@@ -17,21 +18,31 @@ public class DomainUserService : IDomainUserService
     private readonly IUserQueryService _queryService;
     private readonly IAuditLogService _auditLogService;
     private readonly ICurrentUserContext _currentUserContext;
+    private readonly ILogger<DomainUserService> _logger;
 
     public DomainUserService(
         IUserRepository repository,
         IUserQueryService queryService,
         IAuditLogService auditLogService,
-        ICurrentUserContext currentUserContext)
+        ICurrentUserContext currentUserContext,
+        ILogger<DomainUserService> logger)
     {
         _repository = repository;
         _queryService = queryService;
         _auditLogService = auditLogService;
         _currentUserContext = currentUserContext;
+        _logger = logger;
     }
 
     public async Task<DomainUserResponseDto> CreateAsync(DomainUserCommand command)
     {
+        _logger.LogDebug("=== DomainUserService.CreateAsync START ===");
+        _logger.LogDebug("Command.BranchId: {BranchId}", command.BranchId);
+        _logger.LogDebug("Command.Email: {Email}", command.Email);
+        _logger.LogDebug("Command.Role: {Role}", command.Role);
+        _logger.LogDebug("CurrentUser.BranchId: {CurrentBranchId}", _currentUserContext.BranchId);
+        _logger.LogDebug("CurrentUser.Role: {CurrentRole}", _currentUserContext.Role);
+
         // Validation: BranchId is required (no SuperAdmin creation via API)
         if (command.BranchId == Guid.Empty)
         {
@@ -74,7 +85,12 @@ public class DomainUserService : IDomainUserService
 
         // Create DomainUser (ApplicationUserId must already be set by caller)
         var domainUser = UserMapper.ToDomain(command);
+        _logger.LogDebug("DomainUser created in memory - Id: {UserId}, ApplicationUserId: {AppUserId}, BranchId: {BranchId}", 
+            domainUser.Id, domainUser.ApplicationUserId, domainUser.BranchId);
+        
         await _repository.AddAsync(domainUser);
+        _logger.LogDebug("DomainUser saved to database - Id: {UserId}, ApplicationUserId: {AppUserId}", 
+            domainUser.Id, domainUser.ApplicationUserId);
 
         await _auditLogService.StoreAsync(
                 action: AuditLog.CreateAction(),
@@ -83,8 +99,20 @@ public class DomainUserService : IDomainUserService
                 branchId: domainUser.BranchId,
                 newValues: CreateAuditSnapshot(domainUser));
 
-        return await _queryService.GetResponseByIdAsync(domainUser.Id) 
-            ?? throw new NotFoundException("User created but not found in query.");
+        _logger.LogDebug("Querying user back from database...");
+        var result = await _queryService.GetResponseByIdAsync(domainUser.Id);
+        
+        if (result == null)
+        {
+            _logger.LogError("USER NOT FOUND IN QUERY! UserId: {UserId}, SavedBranchId: {SavedBranchId}, CurrentUserBranchId: {CurrentBranchId}", 
+                domainUser.Id, domainUser.BranchId, _currentUserContext.BranchId);
+            throw new NotFoundException($"User created but not found in query.");
+        }
+
+        _logger.LogDebug("User found in query - Id: {UserId}, BranchId: {BranchId}", result.Id, result.BranchId);
+        _logger.LogDebug("=== DomainUserService.CreateAsync END ===");
+        
+        return result;
     }
 
     public async Task<DomainUserResponseDto> UpdateAsync(Guid id, UpdateDomainUserCommand command)
@@ -381,6 +409,71 @@ public class DomainUserService : IDomainUserService
         return UserMapper.ToResponse(user);
     }
 
-}
+    public async Task<DomainUserResponseDto> ConvertToStaffAsync(ConvertToStaffCommand command)
+    {
+        _logger.LogDebug("Converting user {UserId} to staff role {Role}", command.UserId, command.Role);
 
-  
+        // Get the user
+        var user = await _repository.GetByIdAsync(command.UserId);
+        if (user == null)
+        {
+            throw new NotFoundException($"User with ID {command.UserId} not found.");
+        }
+
+        // Validation: Cannot convert SuperAdmin
+        if (user.Role == RoleHelper.SuperAdmin)
+        {
+            throw new DomainException("SuperAdmin cannot be converted to another role.");
+        }
+
+        // Validation: New role cannot be SuperAdmin
+        if (command.Role == RoleHelper.SuperAdmin)
+        {
+            throw new DomainException("Cannot convert user to SuperAdmin role.");
+        }
+
+        // Authorization: Only SuperAdmin and Director can convert users
+        if (_currentUserContext.Role != RoleHelper.SuperAdmin && _currentUserContext.Role != RoleHelper.Director)
+        {
+            throw new ForbiddenException("Only SuperAdmin and Director can convert users to staff.");
+        }
+
+        // Authorization: Director can only convert users in their branch
+        if (_currentUserContext.Role == RoleHelper.Director)
+        {
+            if (user.BranchId != _currentUserContext.BranchId)
+            {
+                throw new ForbiddenException("Director can only convert users from their own branch.");
+            }
+
+            // Director cannot create Director role
+            if (command.Role == RoleHelper.Director)
+            {
+                throw new ForbiddenException("Director cannot convert users to Director role.");
+            }
+        }
+
+        var oldValues = CreateAuditSnapshot(user);
+
+        // Update role and branch
+        user.UpdateRole(command.Role);
+        user.UpdateBranch(command.BranchId);
+
+        await _repository.UpdateAsync(user);
+
+        await _auditLogService.StoreAsync(
+            action: "ConvertToStaff",
+            entityName: "DomainUser",
+            entityId: user.Id,
+            branchId: command.BranchId,
+            oldValues: oldValues,
+            newValues: CreateAuditSnapshot(user));
+
+        _logger.LogInformation("User {UserId} converted to staff role {Role} in branch {BranchId}", 
+            command.UserId, command.Role, command.BranchId);
+
+        return await _queryService.GetResponseByIdAsync(user.Id) 
+            ?? throw new NotFoundException("User not found after conversion.");
+    }
+
+}

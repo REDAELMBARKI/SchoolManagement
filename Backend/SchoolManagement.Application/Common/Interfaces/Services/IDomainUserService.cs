@@ -20,6 +20,9 @@ public interface IDomainUserService
     Task<DomainUserResponseDto> ActivateAsync(Guid userId);
     Task<DomainUserResponseDto> DeactivateAsync(Guid userId);
 
+    // Role Conversion
+    Task<DomainUserResponseDto> ConvertToStaffAsync(ConvertToStaffCommand command);
+
     // Query Operations
     Task<List<DomainUserResponseDto>> GetByBranchIdAsync(Guid branchId);
     Task<List<DomainUserResponseDto>> GetByRoleAsync(string role);

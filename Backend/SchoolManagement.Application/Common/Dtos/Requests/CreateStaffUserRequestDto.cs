@@ -28,5 +28,5 @@ public class CreateStaffUserRequestDto
  
     public Guid? GenderId { get; set; }
 
-    public Guid? BranchId { get; set; }  // Required for non-SuperAdmin roles
+    public Guid? BranchId { get; set; } 
 }
